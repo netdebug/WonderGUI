@@ -50,14 +50,13 @@ public:
 		}
 	}
 
-protected:
 	WgRefCounted * m_pObj;
 };
 
 
 //____ WgSmartPtr _____________________________________________________________
 
-template<class T> class WgSmartPtr : private WgSmartPtrImpl
+template<class T> class WgSmartPtr : protected WgSmartPtrImpl
 {
 public:
 	WgSmartPtr(T* p=0) : WgSmartPtrImpl( p ) {};
@@ -87,7 +86,7 @@ template<class T,class P> class WgSmartChildPtr : public P
 {
 public:
 	WgSmartChildPtr(T* p=0) : P( p ) {};
-	WgSmartChildPtr(const WgSmartChildPtr<T,P>& r) : P( r.m_pObj ) {};
+	WgSmartChildPtr(const WgSmartChildPtr<T,P>& r) : P( (T*) r.m_pObj ) {};
 	~WgSmartChildPtr() {};
 
 /*
@@ -97,15 +96,15 @@ public:
 		return *this;
 	}
 */
-	inline T & operator*() const { return * (T*) m_pObj; }
-	inline T * operator->() const{ return (T*) m_pObj; }
+	inline T & operator*() const { return * (T*) this->m_pObj; }
+	inline T * operator->() const{ return (T*) this->m_pObj; }
 
-	inline bool operator==(const WgSmartChildPtr<T,P>& other) const { return m_pObj == other.m_pObj; }
-	inline bool operator!=(const WgSmartChildPtr<T,P>& other) const { return m_pObj != other.m_pObj; }
+	inline bool operator==(const WgSmartChildPtr<T,P>& other) const { return this->m_pObj == other.m_pObj; }
+	inline bool operator!=(const WgSmartChildPtr<T,P>& other) const { return this->m_pObj != other.m_pObj; }
 
-	inline operator bool() const { return (m_pObj != 0); }
+	inline operator bool() const { return (this->m_pObj != 0); }
 
-	inline T * GetRealPtr() const { return (T*) m_pObj; }
+	inline T * GetRealPtr() const { return (T*) this->m_pObj; }
 };
 
 

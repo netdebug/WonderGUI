@@ -294,7 +294,17 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pHook->SetAnchored( WG_NORTHWEST, WG_SOUTHEAST );
 
 
-	//
+	// Extra flex with background
+	
+	WgFlexPanel * pExtraFlex = new WgFlexPanel();
+	pExtraFlex->SetSkin( WgColorSkin::Create( WgColor(255,0,0,255)));
+	
+	pFlex->AddChild( pExtraFlex, WgRect(20,20,100,100) );
+	
+	WgImage * pPlate = (WgImage*) pDB->CloneWidget( "plate" );
+	pExtraFlex->AddChild( pPlate, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(30) );
+
+
 /*
 	{
 		WgShaderCapsule * pShader = new WgShaderCapsule();
@@ -313,7 +323,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 		WgStackHook * pHook = pStack->AddChild( pShader2 );
 		pHook->SetSizePolicy( WgStackHook::SCALE );
 		pHook->SetOrigo( WG_CENTER );
-		pHook->SetBorders( WgBorders(2) );
+		pHook->SetPadding( WgBorders(2) );
 
 
 		WgImage * pSplash= new WgImage();

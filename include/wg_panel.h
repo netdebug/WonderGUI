@@ -100,6 +100,9 @@ public:
 	WgPanel *			CastToPanel();
 	const WgPanel *		CastToPanel() const;
 
+	WgWidget * 	FindWidget( const WgCoord& ofs, WgSearchMode mode );
+
+
 protected:
 	WgPanel();
 	virtual ~WgPanel() {};

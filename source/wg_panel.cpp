@@ -74,6 +74,18 @@ void WgPanel::SetSkin( const WgSkinPtr& pSkin )
 	_requestRender();
 }
 
+//____ FindWidget() ____________________________________________________________
+
+WgWidget * WgPanel::FindWidget( const WgCoord& ofs, WgSearchMode mode )
+{
+	WgWidget * pWidget = WgContainer::FindWidget(ofs, mode);
+
+	if( !pWidget && _onAlphaTest(ofs) )
+		pWidget = this;
+		
+	return pWidget;
+}
+
 //____ _onAlphaTest() _________________________________________________________
 
 bool WgPanel::_onAlphaTest( const WgCoord& ofs )

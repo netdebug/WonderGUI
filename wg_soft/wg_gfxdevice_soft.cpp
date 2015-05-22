@@ -24,6 +24,7 @@
 #include <wg_surface_soft.h>
 
 #include <assert.h>
+#include <math.h>
 
 #define NB_CURVETAB_ENTRIES	1024
 
