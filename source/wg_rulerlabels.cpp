@@ -43,6 +43,7 @@ void WgRulerLabels::AddLabel( const WgCharSeq& text, const WgTextpropPtr& pProps
 	pLabel->text.setAlignment(origo);
     pLabel->text.setManager(m_pTextManager);
 	pLabel->offset = offset;
+    pLabel->text.SetAutoEllipsis(false);
 
     if( m_labels.IsEmpty() )
         pLabel->text.setHolder(this);
@@ -122,7 +123,7 @@ WgSize WgRulerLabels::PreferredSize() const
 
 //____ _onRender() _____________________________________________________________________
 
-void WgRulerLabels::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer )
+void WgRulerLabels::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
 	if( m_direction == WG_UP || m_direction == WG_DOWN )
 	{

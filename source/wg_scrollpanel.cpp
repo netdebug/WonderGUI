@@ -468,7 +468,8 @@ bool WgScrollPanel::SetHSlider( WgHSlider* pSlider )
 		pSlider->SetSliderTarget( &m_sliderTargets[1] );
 
 	_updateElementGeo( Size() );
-	pSlider->SetSlider( ViewOfsX(), ViewLenX() );
+    if( pSlider )
+        pSlider->SetSlider( ViewOfsX(), ViewLenX() );
 	_requestRender( m_elements[XDRAG].m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
 	return true;
 }
@@ -1066,7 +1067,7 @@ void WgScrollPanel::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * p
 
 //____ _renderPatches() ________________________________________________________
 
-void WgScrollPanel::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches, Uint8 _layer )
+void WgScrollPanel::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches )
 {
 
 	// We start by eliminating dirt outside our geometry
@@ -1101,19 +1102,19 @@ void WgScrollPanel::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas
 		WgRect window( canvas, m_elements[WINDOW].m_windowGeo + _canvas.Pos() );	// Use intersection in case canvas is smaller than window.
 
 		if( window.IntersectsWith(dirtBounds) )
-			m_elements[WINDOW].Widget()->_renderPatches( pDevice, canvas, window, &patches, _layer );
+			m_elements[WINDOW].Widget()->_renderPatches( pDevice, canvas, window, &patches );
 	}
 	if( m_elements[XDRAG].m_bVisible )
 	{
 		WgRect canvas = m_elements[XDRAG].m_windowGeo + _canvas.Pos();
 		if( canvas.IntersectsWith(dirtBounds) )
-			m_elements[XDRAG].Widget()->_renderPatches( pDevice, canvas, canvas, &patches, _layer );
+			m_elements[XDRAG].Widget()->_renderPatches( pDevice, canvas, canvas, &patches );
 	}
 	if( m_elements[YDRAG].m_bVisible )
 	{
 		WgRect canvas = m_elements[YDRAG].m_windowGeo + _canvas.Pos();
 		if( canvas.IntersectsWith(dirtBounds) )
-			m_elements[YDRAG].Widget()->_renderPatches( pDevice, canvas, canvas, &patches, _layer );
+			m_elements[YDRAG].Widget()->_renderPatches( pDevice, canvas, canvas, &patches );
 	}
 
 	WgMode mode = m_bEnabled?WG_MODE_NORMAL:WG_MODE_DISABLED;
@@ -1189,7 +1190,7 @@ bool WgScrollPanel::_onAlphaTest( const WgCoord& ofs )
 	{
 		WgMode mode = m_bEnabled?WG_MODE_NORMAL:WG_MODE_DISABLED;
 
-		if( WgUtil::MarkTestBlock( ofs, m_pFillerBlocks->GetBlock(mode, m_geoFiller), m_geoFiller ) )
+		if( WgUtil::MarkTestBlock( ofs, m_pFillerBlocks->GetBlock(mode, m_geoFiller), m_geoFiller, m_markOpacity ) )
 			return true;
 	}
 

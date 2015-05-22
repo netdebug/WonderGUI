@@ -1172,6 +1172,12 @@ void WgEventHandler::_processKeyPress( WgEvent::KeyPress * pEvent )
 		case WG_KEY_SUPER:
 			m_modKeys = (WgModifierKeys) (m_modKeys | WG_MODKEY_SUPER);
 			break;
+        case WG_KEY_MAC_CONTROL:
+			m_modKeys = (WgModifierKeys) (m_modKeys | WG_MODKEY_MAC_CONTROL);
+            break;
+        case WG_KEY_WIN_START:
+			m_modKeys = (WgModifierKeys) (m_modKeys | WG_MODKEY_WIN_START);
+            break;
 		default:
 			break;
 	}
@@ -1254,6 +1260,12 @@ void WgEventHandler::_processKeyRelease( WgEvent::KeyRelease * pEvent )
 		case WG_KEY_SUPER:
 			m_modKeys = (WgModifierKeys) (m_modKeys & ~WG_MODKEY_SUPER);
 			break;
+        case WG_KEY_MAC_CONTROL:
+			m_modKeys = (WgModifierKeys) (m_modKeys & ~WG_MODKEY_MAC_CONTROL);
+            break;
+        case WG_KEY_WIN_START:
+			m_modKeys = (WgModifierKeys) (m_modKeys & ~WG_MODKEY_WIN_START);
+            break;
 		default:
 			break;
 	}

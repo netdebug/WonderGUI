@@ -34,6 +34,7 @@ public:
 	
 	void			SetValue( float peak, float hold );
 	void			SetValue( float leftPeak, float leftHold, float rightPeak, float rightHold );
+    void            SetGaps(float fSides, float fGap) {m_fSidePadding = fSides; m_fGap = fGap; }
 	
 	
 	
@@ -41,7 +42,7 @@ public:
 	
 protected:
 	
-	void			_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer );
+	void			_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
 	void			_onCloneContent( const WgWidget * _pOrg );
 	bool			_onAlphaTest( const WgCoord& ofs );
 	void			_onNewSize( const WgSize& size );
@@ -58,7 +59,11 @@ protected:
 	bool			m_bStereo;
 	float			m_peak[2];
 	float			m_hold[2];
-	
+    
+    int m_iGap;
+    int m_iSidePadding;
+	float m_fGap;
+    float m_fSidePadding;
 };
 
 

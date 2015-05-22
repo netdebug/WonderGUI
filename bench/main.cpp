@@ -22,6 +22,9 @@
 #include <wg_gfxdevice_soft.h>
 #include <sdl_wglib.h>
 
+void DBG_ASSERT(bool x) {}
+
+
 extern std::ostream cout;
 
 SDL_Surface *	initSDL( int w, int h );

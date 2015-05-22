@@ -42,6 +42,7 @@ WgTextDisplay::WgTextDisplay()
 	m_text.SetAutoEllipsis(IsAutoEllipsisDefault());
 	m_text.SetEditMode( WG_TEXT_STATIC );
 	m_bResetCursorOnFocus = true;
+    m_str.assign("");
 }
 
 
@@ -143,7 +144,7 @@ WgString WgTextDisplay::GetTooltipString() const
 
 //____ _onRender() ________________________________________________________
 
-void WgTextDisplay::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer )
+void WgTextDisplay::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
 	WgText * pText = &m_text;
 

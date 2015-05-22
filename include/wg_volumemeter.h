@@ -13,6 +13,8 @@
 #	include <wg_geo.h>
 #endif
 
+#include <vector>
+
 //____ WgVolumeMeter ____________________________________________________________
 
 class WgVolumeMeter : public WgWidget
@@ -33,12 +35,14 @@ public:
 	void			SetLEDSpacing( float spacing );
 	void			SetValue( float peak, float hold );
 	void			SetDirection( WgDirection direction );
-		
+    void            SetPaddingX( float padding ) { m_fPaddingX = padding; }
+    void            SetZeroInMiddle(bool mb) { m_bZeroInMiddle = mb; }
+    void            EnableFades(bool b) { m_bUseFades = b; }
 	WgSize			PreferredSize() const;
 	
 protected:
 	
-	void			_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer );
+	void			_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
 	void			_onCloneContent( const WgWidget * _pOrg );
 	bool			_onAlphaTest( const WgCoord& ofs );
 	void			_onNewSize( const WgSize& size );
@@ -49,9 +53,22 @@ protected:
 	int				m_nLEDs;
 	float			m_LEDSpacing;
 	
-	float			m_peak;
-	float			m_hold;
+	int			    m_iPeak;
+    
+	int			    m_iHold;
+    float           m_fPeak;
 	
+    float           m_fPaddingX;
+    int             m_iPaddingX;
+    
+    bool            m_bZeroInMiddle;
+    float           d;
+    float           d2;
+    
+    
+    std::vector<float> m_LEDStates;
+    int             m_iUpdateCounter;
+    bool            m_bUseFades;
 };
 
 

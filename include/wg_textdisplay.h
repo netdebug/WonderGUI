@@ -80,10 +80,21 @@ public:
 	bool	IsEditable() const { return m_text.IsEditable(); }
 	bool	IsSelectable() const { return m_text.IsSelectable(); }
 
+    /* Added by Niklas */
+    void    ChangeText( std::string str )
+    {
+        if(str.compare(m_str) != 0) {
+            SetText(str);
+            m_str.assign(str);
+        }
+    }
+
+    std::string m_str;
+    
 protected:
 
 	void	_onCloneContent( const WgWidget * _pOrg );
-	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer );
+	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
 	void	_onNewSize( const WgSize& size );
 	void	_onRefresh();
 	void	_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler );

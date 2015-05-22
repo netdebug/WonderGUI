@@ -40,18 +40,25 @@ public:
 	static const char * GetClass();
 	virtual WgWidget * NewOfMyType() const { return new WgSwitch(); };
 
-    void    SetValue( int value );
+    void    SetValue( const float value );
+    void    SetColor( WgColor color );
+    void    SetOffColor(WgColor color );
     
 	WgSize	PreferredSize() const;
+    void    SetPreferredSize(WgSize size);
 
 protected:
 	void	_onCloneContent( const WgWidget * _pOrg );
-	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer );
+	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip  );
 	bool	_onAlphaTest( const WgCoord& ofs );
 	void	_onEnable();
 	void	_onDisable();
 
 private:
+    int m_iValue;
+    WgColor m_onColor;
+    WgColor m_offColor;
+    WgSize m_preferredSize;
 
 };
 

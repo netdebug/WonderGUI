@@ -59,6 +59,7 @@ public:
 	void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col );
 	void	ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col );
 	void	ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness );
+	void    ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, const WgColor * colors);
 
 	void	StretchBlit( const WgSurface * pSrc, bool bTriLinear = false, float mipmapBias = 0.f );
 	void	StretchBlit( const WgSurface * pSrc, const WgRect& dest, bool bTriLinear = false, float mipmapBias = 0.f );
@@ -125,6 +126,7 @@ protected:
 	WgSurfaceSoft * m_pCanvas;
 	Uint8			m_limitTable[512];
 	int *			m_pCurveTab;
+    Uint8 *          m_pDivTab;
 };
 
 #endif //WG_GFXDEVICE_SOFT_DOT_H

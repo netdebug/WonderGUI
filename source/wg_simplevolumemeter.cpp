@@ -23,7 +23,11 @@ WgSimpleVolumeMeter::WgSimpleVolumeMeter()
 	m_peak[1] = 0.f;
 	m_hold[0] = 0.f;
 	m_hold[1] = 0.f;
-	
+    m_iGap = 0;
+    m_fGap = 0.1f;
+    m_iSidePadding = 0;
+    m_fSidePadding = 0.1f;
+    
 //	_updateSectionPixelHeight();
 }
 
@@ -154,27 +158,31 @@ void WgSimpleVolumeMeter::_onNewSize( const WgSize& size )
 
 //____ _onRender() _____________________________________________________________________
 
-void WgSimpleVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer )
+void WgSimpleVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
 	if( !m_bEnabled )
 		return;
 	
-	if( m_bStereo )
+    if( m_bStereo )
 	{
 		WgRect r = _canvas;
-		r.w = (r.w - 1) / 2;
+		r.w = (r.w - m_iGap) / 2 - m_iSidePadding;
+        r.x += m_iSidePadding;
 		_renderHold( pDevice, 0, r, _clip );
 		_renderPeak( pDevice, 0, r, _clip );
 
-		r.x += r.w + 1;
+		r.x += r.w + m_iGap;
 		_renderHold( pDevice, 1, r, _clip );
 		_renderPeak( pDevice, 1, r, _clip );
 		
 	}
 	else 
 	{
-		_renderHold( pDevice, 0, _canvas, _clip );
-		_renderPeak( pDevice, 0, _canvas, _clip );			
+        WgRect r = _canvas;
+        r.w = r.w - 2 * m_iSidePadding;
+        r.x += m_iSidePadding;
+		_renderHold( pDevice, 0, r, _clip );
+		_renderPeak( pDevice, 0, r, _clip );
 	}
 }
 
@@ -244,10 +252,19 @@ void WgSimpleVolumeMeter::_renderHold( WgGfxDevice * pDevice, int nb, const WgRe
 void WgSimpleVolumeMeter::_updateSectionPixelHeight()
 {
 	int totalHeight = Geo().h;
+    int totalWidth = Geo().w;
 
 	m_sectionPixelHeight[0] = (int) (m_sectionHeight[0] * totalHeight + 0.5f);
 	m_sectionPixelHeight[1] =  ((int)((m_sectionHeight[0] + m_sectionHeight[1]) * totalHeight + 0.5f)) - m_sectionPixelHeight[0];
 	m_sectionPixelHeight[2] = totalHeight - m_sectionPixelHeight[1] - m_sectionPixelHeight[0];
+    
+    m_iGap = (int) ((float)totalWidth * m_fGap);
+    if(m_iGap <= 0)
+        m_iGap = 1;
+
+    m_iSidePadding = (int) ((float)totalWidth * m_fSidePadding);
+    if(m_iSidePadding <= 0)
+        m_iSidePadding = 1;
 }
 
 //____ _onCloneContent() _________________________________________________________________ 

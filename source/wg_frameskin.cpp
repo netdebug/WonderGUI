@@ -26,9 +26,9 @@
 
 
 
-WgFrameSkinPtr WgFrameSkin::Create( int thickness, WgColor col )
+WgSkinPtr WgFrameSkin::Create( int thickness, WgColor col )
 {
-	return WgFrameSkinPtr(new WgFrameSkin(thickness, col));
+	return WgSkinPtr(new WgFrameSkin(thickness, col));
 }
 
 

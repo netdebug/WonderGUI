@@ -30,13 +30,11 @@
 #	include <wg_color.h>
 #endif
 
-class WgFrameSkin;
-typedef	WgSmartChildPtr<WgFrameSkin,WgSkinPtr>	WgFrameSkinPtr;
 
 class WgFrameSkin : public WgSkin
 {
 public:
-	static WgFrameSkinPtr Create( int thickness, WgColor col );
+	static WgSkinPtr Create( int thickness, WgColor col );
 	
 	~WgFrameSkin() {};
 	
@@ -52,5 +50,3 @@ private:
 };
 
 #endif //WG_FRAMESKIN_DOT_H
-
-

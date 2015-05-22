@@ -74,18 +74,6 @@ void WgPanel::SetSkin( const WgSkinPtr& pSkin )
 	_requestRender();
 }
 
-//____ FindWidget() ____________________________________________________________
-
-WgWidget * WgPanel::FindWidget( const WgCoord& ofs, WgSearchMode mode )
-{
-	WgWidget * pWidget = WgContainer::FindWidget(ofs, mode);
-
-	if( !pWidget && _onAlphaTest(ofs) )
-		pWidget = this;
-		
-	return pWidget;
-}
-
 //____ _onAlphaTest() _________________________________________________________
 
 bool WgPanel::_onAlphaTest( const WgCoord& ofs )
@@ -155,10 +143,10 @@ void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRec
 
 //____ _onRender() ___________________________________________________________________
 
-void WgPanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer )
+void WgPanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
 	if( m_pSkin )
-		m_pSkin->Render( pDevice, _canvas, _clip );
+		m_pSkin->Render( pDevice, WG_STATE_NORMAL,_canvas, _clip );
 }
 
 //____ WgPanelHook::Parent() __________________________________________________

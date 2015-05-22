@@ -690,7 +690,7 @@ std::string WgCharSeq::GetStdString() const
 			char * p = new char[size+1];
 			WgTextTool::getTextUTF8( (WgChar*) m_pChar, p, size+1 );
 			std::string str( p, size );
-			delete p;
+			delete[] p;
 			return str;
 		}
 		case UTF8:
@@ -706,7 +706,7 @@ std::string WgCharSeq::GetStdString() const
 			char * p = new char[size+1];
 			WgTextTool::getTextUTF8( (Uint16*) m_pChar, p, size+1 );
 			std::string str( p, size );
-			delete p;
+			delete[] p;
 			return str;
 		}
 		case ESCAPED_UTF8:
@@ -715,7 +715,7 @@ std::string WgCharSeq::GetStdString() const
 			char * p = new char[size+1];
 			WgTextTool::stripTextCommands( (char*) m_pChar, p, size+1 );
 			std::string str( p, size );
-			delete p;
+			delete[] p;
 			return str;
 		}
 
@@ -725,7 +725,7 @@ std::string WgCharSeq::GetStdString() const
 			char * p = new char[size+1];
 			WgTextTool::stripTextCommandsConvert( (Uint16*) m_pChar, p, m_nbChars+1 );
 			std::string str( p, size );
-			delete p;
+			delete[] p;
 			return str;
 		}
 
@@ -735,7 +735,7 @@ std::string WgCharSeq::GetStdString() const
 			char * p = new char[size+1];
 			WgTextTool::getTextUTF8( (char*) m_pChar, ((WgCharSeq8*)this)->m_codepage, p, size+1 );
 			std::string str( p, size );
-			delete p;
+			delete[] p;
 			return str;
 		}
 

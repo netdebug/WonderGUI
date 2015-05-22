@@ -32,6 +32,10 @@ static const char	c_widgetType[] = {"Switch"};
 WgSwitch::WgSwitch()
 {
 	m_bOpaque = false;
+    m_iValue = 0;
+    m_onColor = WgColor::white;
+    m_offColor = WgColor(64, 64, 64, 255);
+    m_preferredSize = WgSize(46,46);
 }
 
 //____ Destructor _____________________________________________________________
@@ -56,16 +60,56 @@ const char * WgSwitch::GetClass()
 
 //____ SetValue() _____________________________________________________________
 
-void WgSwitch::SetValue( int value )
+void WgSwitch::SetValue( const float value )
 {
-    //TODO: Implement!
+    int iValue;
+    
+    if(value > 0.6667f)
+        iValue = 0;
+    else if(value > 0.3333f)
+        iValue = 1;
+    else
+        iValue = 2;
+
+    if(m_iValue == iValue)
+        return;
+
+    m_iValue = iValue;
+    _requestRender();
+}
+
+//____ SetColor() __________________________________________________________
+
+void WgSwitch::SetColor( WgColor color )
+{
+    m_onColor = color;
+    const float tint = 0.25f;
+    m_offColor = color;
+//    m_offColor.r = m_onColor.r * tint;
+//    m_offColor.g = m_onColor.g * tint;
+//    m_offColor.b = m_onColor.b * tint;
+    m_offColor.a = (Uint8)((float)m_onColor.a * tint);
+    
+    _requestRender();
+}
+
+//____ SetOffColor() __________________________________________________________
+
+void WgSwitch::SetOffColor(WgColor color )
+{
+    m_offColor = color;
 }
 
 //____ PreferredSize() __________________________________________________________
 
+void WgSwitch::SetPreferredSize(WgSize size)
+{
+    m_preferredSize = size;
+}
+
 WgSize WgSwitch::PreferredSize() const
 {
-	return WgSize(40,40);
+	return m_preferredSize;
 }
 
 
@@ -78,20 +122,26 @@ void WgSwitch::_onCloneContent( const WgWidget * _pOrg )
 
 //____ _onRender() _____________________________________________________________
 
-void WgSwitch::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer )
+void WgSwitch::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
 	int sz = WgMin( _canvas.w,_canvas.h );
 
+    WgColor color;
 	if( sz > 12 )
 	{
-		int itemSize = sz/4;
-		int stepping = itemSize/2;
+		int stepping = (int)floor((float)sz*(1.0f/8.0f));
+		int itemSize = stepping*2;
 
 		int y = _canvas.y;
 		int x = _canvas.x + (sz - itemSize) / 2;
 		for( int i = 0 ; i < 3 ; i++ )
 		{
-			pDevice->ClipDrawElipse( _clip, WgRect(x,y,itemSize,itemSize), WgColor::white );
+            if (i == m_iValue) {
+                color = m_onColor;
+            } else {
+                color = m_offColor;
+            }
+			pDevice->ClipDrawElipse( _clip, WgRect(x,y,itemSize,itemSize), color );
 			y += itemSize + stepping;
 		}
 	}	

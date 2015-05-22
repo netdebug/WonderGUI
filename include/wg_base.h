@@ -150,6 +150,7 @@ private:
 
 	};
 
+    static int      s_iSoftubeNumberOfInstances;
 	static Data *	s_pData;
 
 };

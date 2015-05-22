@@ -28,6 +28,10 @@
 #	include <wg_types.h>
 #endif
 
+#include <math.h>
+
+static inline const float wg_round(const float x) {return floorf(x+0.5f);}
+
 //=============================================================================
 
 //____ systemwide defines _____________________________________________________
@@ -48,7 +52,7 @@
 								// that better handles broken unicode strings.
 								// Ignored if WG_USE_UTF8 isn't defined.
 
-//#define WG_USE_FREETYPE			// Disable if you don't care for vector fonts and want to skip
+//TJ_NEW #define WG_USE_FREETYPE			// Disable if you don't care for vector fonts and want to skip
 								// dependency on freetype.
 
 
@@ -94,8 +98,12 @@ enum WgModifierKeys
 	WG_MODKEY_SUPER_CTRL_ALT = 14,
 	WG_MODKEY_SUPER_CTRL_ALT_SHIFT = 15,
 
-	// Needs to be last!
-	WG_MAX_MODKEYS = 16
+
+    WG_MODKEY_MAC_CONTROL = 16,
+    WG_MODKEY_WIN_START = 17,
+
+    // Needs to be last!
+	WG_MAX_MODKEYS = 18
 };
 
 //____ layer constants ____________________________________________________

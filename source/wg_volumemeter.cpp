@@ -1,9 +1,12 @@
 
 #include <wg_volumemeter.h>
 #include <wg_gfxdevice.h>
-
+#include <math.h>
 static const char	c_widgetType[] = {"VolumeMeter"};
 
+#ifdef WIN32
+#include <wg_userdefines.h>
+#endif
 
 //____ Constructor ____________________________________________________________
 
@@ -24,8 +27,24 @@ WgVolumeMeter::WgVolumeMeter()
 	m_LEDSpacing = 0.33;
 	m_direction = WG_UP;
 	
-	m_peak = 0.f;
-	m_hold = 0.f;	
+	m_iPeak = 0;
+	m_iHold = 0;
+    m_fPeak = 0.0f;
+    
+    m_fPaddingX = 0.05f;
+    m_iPaddingX = 1;
+    
+    m_bZeroInMiddle = false;
+    d = 1.0f/(float)(m_nLEDs-1);
+    d2 = 0.5f/(float)(m_nLEDs);
+   
+    m_iUpdateCounter = 8;
+    
+    m_LEDStates.resize(m_nLEDs);
+    for(int i=0;i<m_nLEDs;i++)
+        m_LEDStates[i] = 0.0f;
+    
+    m_bUseFades = false;
 }
 
 //____ Destructor _____________________________________________________________
@@ -98,6 +117,15 @@ void WgVolumeMeter::SetNbLEDs( int bottomSection, int middleSection, int topSect
 		_requestResize();
 		_requestRender();
 	}
+
+    
+    d = 1.0f/(float)(m_nLEDs-1);
+    d2 = 0.5f/(float)(m_nLEDs);
+    
+    m_LEDStates.resize(m_nLEDs);
+    for(int i=0;i<m_nLEDs;i++)
+        m_LEDStates[i] = 0.0f;
+
 }
 
 //____ SetLEDSpacing() ___________________________________________________________
@@ -118,17 +146,34 @@ void WgVolumeMeter::SetLEDSpacing( float spacing )
 
 //____ SetValue() ______________________________________________________________
 
-void WgVolumeMeter::SetValue( float peak, float hold )
+void WgVolumeMeter::SetValue( float fPeak, float fHold )
 {
-	WG_LIMIT( peak, 0.f, 1.f );
-	WG_LIMIT( hold, 0.f, 1.f );
-	
-	if( m_peak != peak || m_hold != hold )
+	WG_LIMIT( fPeak, 0.f, 1.f );
+	WG_LIMIT( fHold, 0.f, 1.f );
+
+    int iPeak = (int)wg_round(fPeak * m_nLEDs);
+    int iHold = (int)wg_round(fHold * m_nLEDs);
+
+    // TODO: There are probably problems that ZeroInMiddle doesn't update properly with few LEDs.
+    // Since ZeroInMiddle do a floating point comparison in render, you'd need to create something smart here
+    
+    if(iPeak != m_iPeak || iHold != m_iHold)
 	{
-		m_peak = peak;
-		m_hold = hold;
+		m_iPeak = iPeak;
+		m_iHold = iHold;
+
+        // Lambda = 0.7f, Limit = 0.1f => log(0.1)/log(0.7) = 6.45, m_iCounter must be set to 7.
+        m_iUpdateCounter = 8;
 		_requestRender();
 	}
+    else if(m_iUpdateCounter > 0)
+    {
+        if(m_bUseFades)
+            _requestRender();
+    }
+    
+    m_fPeak = fPeak;
+
 }
 
 
@@ -146,6 +191,22 @@ WgSize WgVolumeMeter::PreferredSize() const
 
 void WgVolumeMeter::_onNewSize( const WgSize& size )
 {
+    switch (m_direction)
+    {
+        case WG_LEFT:
+        case WG_RIGHT:
+            m_iPaddingX = (int) ((float)size.h * m_fPaddingX);
+            break;
+        case WG_UP:
+        case WG_DOWN:
+        default:
+            m_iPaddingX = (int) ((float)size.w * m_fPaddingX);
+            break;
+    }
+    
+    if(m_iPaddingX <= 0)
+        m_iPaddingX = 0;
+    
 	_requestRender();
 }
 
@@ -153,18 +214,9 @@ void WgVolumeMeter::_onNewSize( const WgSize& size )
 
 //____ _onRender() _____________________________________________________________________
 
-void WgVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer )
+void WgVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	int	peak = 0;
-	int hold = 0;
-	
-	if( m_bEnabled )
-	{
-		peak = (int) (m_nLEDs * m_peak);
-		hold = (int) (m_nLEDs * m_hold);
-	}
-
-	
+	int p = m_iPaddingX;
 	
 	float ledSize = ((m_direction == WG_UP || m_direction == WG_DOWN)?_canvas.h:_canvas.w) / (float)(m_nLEDs + (m_nLEDs-1)*m_LEDSpacing);
 	float stepSize = ledSize * (1.f+m_LEDSpacing);
@@ -176,31 +228,36 @@ void WgVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 	switch( m_direction )
 	{
 		case WG_UP:
-			ledRect = WgRectF( _canvas.x, _canvas.y + _canvas.h - ledSize, _canvas.w, ledSize );
+			ledRect = WgRectF( _canvas.x + p, _canvas.y + _canvas.h - ledSize, _canvas.w - 2*p, ledSize );
 			stepX = 0.f;
 			stepY = -stepSize;
 			break;
 		case WG_DOWN:
-			ledRect = WgRectF( _canvas.x, _canvas.y, _canvas.w, ledSize );
+			ledRect = WgRectF( _canvas.x+p, _canvas.y, _canvas.w - 2*p, ledSize );
 			stepX = 0.f;
 			stepY = stepSize;
 			break;
 		case WG_LEFT:
-			ledRect = WgRectF( _canvas.x + _canvas.w - ledSize, _canvas.y, ledSize, _canvas.h );
+			ledRect = WgRectF( _canvas.x + _canvas.w - ledSize, _canvas.y + p, ledSize, _canvas.h - 2*p);
 			stepX = -stepSize;
 			stepY = 0.f;
 			break;
 		case WG_RIGHT:
-			ledRect = WgRectF( _canvas.x, _canvas.y, ledSize, _canvas.h );
+			ledRect = WgRectF( _canvas.x, _canvas.y + p, ledSize, _canvas.h - 2*p);
 			stepX = stepSize;
 			stepY = 0.f;
 			break;
 	}
 	
 	WgRectF	clip( _clip );
-		
+    WgColor color;
+    
+
+    
+    
 	for( int i = 0 ; i < m_nLEDs ; i++ )
 	{
+
 		int section = 0;
 		int onoff = 0;
 
@@ -211,17 +268,73 @@ void WgVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 		else
 			section = 2;
 		
-		if( i < peak || i+1 == hold )
-			onoff = 1;
-		
-		pDevice->FillSubPixel( WgRectF(ledRect, clip), m_LEDColors[section][onoff] );
-		
+        // NB: Hold is not implemented for Zero In Middle
+        if(m_bZeroInMiddle)
+        {
+            float id = d*(float)i;
+
+            // This one is tricky...
+            
+            if(id < 0.5f)
+            {
+                if(m_fPeak < id + d2)
+                    onoff = 1;
+            }
+            else if(id > 0.5f)
+            {
+                if(m_fPeak > id - d2)
+                    onoff = 1;
+            }
+            else
+            {
+                onoff = 1;
+            }
+        }
+        else // Normal mode
+        {
+            if( i < m_iPeak || i+1 == m_iHold )
+                onoff = 1;
+        }
+        
+        if(m_bUseFades)
+        {
+            if(onoff == 1)
+            {
+                m_LEDStates[i] = 1.0f;
+                color = m_LEDColors[section][1];
+            }
+            else
+            {
+                // Lambda = 0.7, Limit = 0.1 => log(0.1)/log(0.7) = 6.45, m_iCounter must be set to 7.
+                m_LEDStates[i] = m_LEDStates[i]*0.7f; // Fade out
+                if(m_LEDStates[i] < 0.1f)
+                {
+                    // Set to 0
+                    m_LEDStates[i] = 0.0f;
+                    color = m_LEDColors[section][0];
+                }
+                else if(m_LEDStates[i] >= 0.1f)
+                {
+                    // Fade to zero
+                    color = m_LEDColors[section][0]*(1.0f-m_LEDStates[i]) + m_LEDColors[section][1]*m_LEDStates[i];
+                }
+            }
+            pDevice->FillSubPixel( WgRectF(ledRect, clip), color);
+        }
+        else
+        {
+            pDevice->FillSubPixel( WgRectF(ledRect, clip), m_LEDColors[section][onoff] );
+        }
+        
 		ledRect.x += stepX;
 		ledRect.y += stepY;
 	}
+    
+    m_iUpdateCounter--;
+
 }
 
-//____ _onCloneContent() _________________________________________________________________ 
+//____ _onCloneContent() _________________________________________________________________
 
 void WgVolumeMeter::_onCloneContent( const WgWidget * _pOrg )
 {
@@ -237,8 +350,8 @@ void WgVolumeMeter::_onCloneContent( const WgWidget * _pOrg )
 	m_direction = pOrg->m_direction;
 	m_nLEDs = pOrg->m_nLEDs;
 	m_LEDSpacing = pOrg->m_LEDSpacing;
-	m_peak = pOrg->m_peak;
-	m_hold = pOrg->m_hold;	
+	m_iPeak = pOrg->m_iPeak;
+	m_iHold = pOrg->m_iHold;
 }
 
 //____ _onAlphaTest() ____________________________________________________________________

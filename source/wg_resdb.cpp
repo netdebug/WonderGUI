@@ -399,7 +399,7 @@ bool WgResDB::AddCursor( const std::string& id, WgCursor * pCursor, MetaData * p
 
 bool WgResDB::AddTextprop( const std::string& id, const WgTextpropPtr& pProp, MetaData * pMetaData )
 {
-	//assert(m_mapTextprops.find(id) == m_mapTextprops.end());
+	//NO assert(m_mapTextprops.find(id) == m_mapTextprops.end());
 	if(m_mapTextprops.find(id) == m_mapTextprops.end())
 	{
 		TextpropRes* p = new TextpropRes(id, pProp, pMetaData);
@@ -469,7 +469,7 @@ std::string WgResDB::LoadString( const std::string& token )
 
 bool WgResDB::AddBlockset( const std::string& id, const WgBlocksetPtr& pBlockset, MetaData * pMetaData )
 {
-	assert(m_mapBlocksets.find(id) == m_mapBlocksets.end());
+//	assert(m_mapBlocksets.find(id) == m_mapBlocksets.end());
 	if(m_mapBlocksets.find(id) == m_mapBlocksets.end())
 	{
 		BlocksetRes* p = new BlocksetRes(id, pBlockset, pMetaData);

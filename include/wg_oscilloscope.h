@@ -22,6 +22,7 @@
 #ifndef WG_OSCILLOSCOPE_DOT_H
 #define WG_OSCILLOSCOPE_DOT_H
 
+#include <math.h>
 
 #ifndef WG_WIDGET_DOT_H
 #	include <wg_widget.h>
@@ -35,7 +36,10 @@
 #	include <wg_blockset.h>
 #endif
 
+class WgRect;
+
 //____ WgOscilloscope ____________________________________________________________
+#define WG_OSC_PIXEL_BUFFER_SIZE 16000
 
 class WgOscilloscope : public WgWidget
 {
@@ -63,13 +67,20 @@ public:
 
 	WgSize	PreferredSize() const;
 
+	// Anti-alias
+	void antiAlias(const int nPoints, const int x_offset, const float *pYval);
+
 protected:
 
 	void	_onCloneContent( const WgWidget * _pOrg );
-	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer );
+	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
 
 
 private:
+	static inline int ipart(double x) { return (int)floor(x); }
+	static inline float fpart(float x) { return fabsf(x) - ipart(x); }
+	static inline float rfpart(float x) { return 1.0f - fpart(x); }
+	void plot(const int x, const int y, const float alpha);
 
 	struct Marker
 	{
@@ -94,6 +105,11 @@ private:
 	Marker *		m_pMarkers;
 	
 	WgBlocksetPtr	m_pMarkerGfx;
+
+	// Anti-alias
+	int m_iNextPixel;
+	WgCoord m_pAAPix[WG_OSC_PIXEL_BUFFER_SIZE];
+	WgColor m_pAACol[WG_OSC_PIXEL_BUFFER_SIZE];
 };
 
 

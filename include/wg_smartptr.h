@@ -51,33 +51,34 @@ public:
 	}
 
 	WgRefCounted * m_pObj;
+protected:
 };
 
 
 //____ WgSmartPtr _____________________________________________________________
 
-template<class T> class WgSmartPtr : protected WgSmartPtrImpl
+template<class T> class WgSmartPtr : public WgSmartPtrImpl
 {
 public:
 	WgSmartPtr(T* p=0) : WgSmartPtrImpl( p ) {};
 	WgSmartPtr(const WgSmartPtr<T>& r) : WgSmartPtrImpl( r.m_pObj ) {};
 	~WgSmartPtr() {};
-
-
+    
+    
     inline WgSmartPtr<T> & operator=( WgSmartPtr<T> const & r)
 	{
 		copy( r );
 		return *this;
 	}
-
+    
 	inline T & operator*() const { return * (T*) m_pObj; }
 	inline T * operator->() const{ return (T*) m_pObj; }
-
+    
 	inline bool operator==(const WgSmartPtr<T>& other) const { return m_pObj == other.m_pObj; }
 	inline bool operator!=(const WgSmartPtr<T>& other) const { return m_pObj != other.m_pObj; }
-
+    
 	inline operator bool() const { return (m_pObj != 0); }
-
+    
 	inline T * GetRealPtr() const { return (T*) m_pObj; }
 };
 
@@ -88,24 +89,25 @@ public:
 	WgSmartChildPtr(T* p=0) : P( p ) {};
 	WgSmartChildPtr(const WgSmartChildPtr<T,P>& r) : P( (T*) r.m_pObj ) {};
 	~WgSmartChildPtr() {};
-
-/*
-    inline WgSmartChildPtr<T,P> & operator=( WgSmartChildPtr<T,P> const & r)
-	{
-		copy( r );
-		return *this;
-	}
-*/
-	inline T & operator*() const { return * (T*) this->m_pObj; }
-	inline T * operator->() const{ return (T*) this->m_pObj; }
-
-	inline bool operator==(const WgSmartChildPtr<T,P>& other) const { return this->m_pObj == other.m_pObj; }
-	inline bool operator!=(const WgSmartChildPtr<T,P>& other) const { return this->m_pObj != other.m_pObj; }
-
-	inline operator bool() const { return (this->m_pObj != 0); }
-
-	inline T * GetRealPtr() const { return (T*) this->m_pObj; }
+    
+    /*
+     inline WgSmartChildPtr<T,P> & operator=( WgSmartChildPtr<T,P> const & r)
+     {
+     copy( r );
+     return *this;
+     }
+     */
+	inline T & operator*() const { return * (T*) P::m_pObj; }
+	inline T * operator->() const{ return (T*) P::m_pObj; }
+    
+	inline bool operator==(const WgSmartChildPtr<T,P>& other) const { return P::m_pObj == other.m_pObj; }
+	inline bool operator!=(const WgSmartChildPtr<T,P>& other) const { return P::m_pObj != other.m_pObj; }
+    
+	inline operator bool() const { return (P::m_pObj != 0); }
+    
+	inline T * GetRealPtr() const { return (T*) P::m_pObj; }
 };
+
 
 
 

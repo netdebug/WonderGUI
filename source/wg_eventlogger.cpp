@@ -489,7 +489,7 @@ void WgEventLogger::OnEvent( const WgEvent::Event * _pEvent )
 	modkeys = _formatModkeys( _pEvent );
 	pointerPos = _formatPointerPos( _pEvent );
 
-	m_out << timestamp << " - " << id << " - " << widget << pointerPos << modkeys << params;
+	m_out << timestamp.c_str() << " - " << id.c_str() << " - " << widget.c_str() << pointerPos.c_str() << modkeys.c_str() << params;
 	m_out << std::endl;
 }
 

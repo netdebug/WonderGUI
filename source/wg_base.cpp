@@ -35,12 +35,17 @@
 #endif
 
 WgBase::Data *			WgBase::s_pData = 0;
-
+int WgBase::s_iSoftubeNumberOfInstances = 0;
 
 //____ Init() __________________________________________________________________
 
 void WgBase::Init()
 {
+    s_iSoftubeNumberOfInstances++;
+    if(s_iSoftubeNumberOfInstances != 1)
+        return;
+    
+    
 	assert( s_pData == 0 );
 	s_pData = new Data;
 
@@ -69,6 +74,10 @@ void WgBase::Init()
 
 void WgBase::Exit()
 {
+    s_iSoftubeNumberOfInstances--;
+    if(s_iSoftubeNumberOfInstances != 0)
+        return;
+    
 	assert( s_pData != 0 );
 
 #ifdef WG_USE_FREETYPE

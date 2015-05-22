@@ -71,7 +71,7 @@ public:
 	virtual int		HeightForWidth( int width ) const;
 //	virtual int		WidthForHeight( int height ) const;
 
-	WgSize			PreferredSize() const;
+	virtual WgSize	PreferredSize() const;
 
 	bool			IsAutoEllipsisDefault() const { return false; };
 
@@ -79,7 +79,7 @@ public:
 protected:
 
 	virtual void	_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler );
-	virtual void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip, Uint8 _layer );
+	virtual void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
 	void			_onRefresh();
 	virtual void	_onCloneContent( const WgWidget * _pOrg );
 	bool			_onAlphaTest( const WgCoord& ofs );
@@ -108,6 +108,7 @@ protected:
 	bool			m_bPressed;				// Set when left mousebutton was pressed inside.
 	bool			m_bReturnPressed;
 	bool			m_bPointerInside;
+    
 };
 
 #endif //WG_BUTTON_DOT_H
