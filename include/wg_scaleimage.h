@@ -22,6 +22,7 @@
 #ifndef WG_SCALEIMAGE_DOT_H
 #define WG_SCALEIMAGE_DOT_H
 
+#include <assert.h>
 
 #ifndef WG_WIDGET_DOT_H
 #	include <wg_widget.h>
@@ -181,15 +182,14 @@ public:
         
         // NOTE: THIS WILL OVERFLOW for really major downsizing (2800x2800 to 1x1 or more)
         // (2800 ~ sqrt(2^23)) - for a lazy fix, just call this in two passes.
-//TJ_NEW
-/*        
+        
         assert(src);
         assert(dest);
         assert(w1 >= 1);
         assert(h1 >= 1);
         assert(w2 >= 1);
         assert(h2 >= 1);
- */       
+       
         // check for MMX (one time only)
         if (!g_bMMX_known)
         {
