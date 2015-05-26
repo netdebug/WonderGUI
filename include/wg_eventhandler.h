@@ -152,6 +152,7 @@ private:
 	void	_processCharacter( WgEvent::Character * pEvent );
 
 	bool	_isWidgetInList( const WgWidget * pWidget, const std::vector<WgWidgetWeakPtr>& list );
+	int		_widgetPosInList( const WgWidget * pWidget, const std::vector<WgWidgetWeakPtr>& list );
 
 	void	_addCallback( const WgEventFilter& filter, Callback * pCallback );
 	int		_deleteCallbacksTo( const void * pReceiver );
@@ -159,6 +160,8 @@ private:
 	int		_deleteCallback( const WgEventFilter& filter, const void * pReceiver );
 
 	void 	_updateMarkedWidget(bool bPostMouseMoveEvents);
+	WgWidget * _updateEnteredWidgets( WgWidget * pMarkedWidget );
+	
 	void	_addTickReceiver( WgWidget * pWidget );
 		
 	//
@@ -179,6 +182,8 @@ private:
 	// Current mouse state
 
 	WgWidgetWeakPtr				m_pMarkedWidget;		// Widget the pointer currently is "inside". Empty if outside a modal widget.
+
+	std::vector<WgWidgetWeakPtr>	m_vEnteredWidgets;	// All widgets that pointer is considered to be inside (= markedWidget + its ancestors).
 
 	// Current button states
 

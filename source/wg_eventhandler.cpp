@@ -1100,8 +1100,14 @@ void WgEventHandler::_updateMarkedWidget(bool bPostMouseMoveEvents)
 
 	// Post POINTER_EXIT events for widgets no longer marked,
 	// Post POINTER_ENTER events for new marked widgets
-	// and POINTER_MOVE events for those already marked
+	// and POINTER_MOVE event for first already marked (which can and should bubble down).
 
+	WgWidget * pFirstAlreadyMarked = _updateEnteredWidgets( pNowMarked );
+	
+	if( bPostMouseMoveEvents && pFirstAlreadyMarked )
+		QueueEvent( new WgEvent::MouseMove( pFirstAlreadyMarked ) );
+		
+/*
 	if( pNowMarked != m_pMarkedWidget.GetRealPtr() )
 	{
 		if( m_pMarkedWidget )
@@ -1112,7 +1118,7 @@ void WgEventHandler::_updateMarkedWidget(bool bPostMouseMoveEvents)
 	}
 	else if( bPostMouseMoveEvents && pNowMarked )
 		QueueEvent( new WgEvent::MouseMove( pNowMarked ) );
-
+*/
 	// Copy content of pNowMarked to m_pMarkedWidget
 
 	m_pMarkedWidget = pNowMarked;
@@ -1135,6 +1141,48 @@ void WgEventHandler::_updateMarkedWidget(bool bPostMouseMoveEvents)
 	}	
 	
 }
+
+//____ _updateEnteredWidgets() _________________________________________________
+
+WgWidget * WgEventHandler::_updateEnteredWidgets( WgWidget * pMarkedWidget )
+{
+	
+	// Loop through our new widgets and check if they already
+	// were entered. Send MouseEnter to all new widgets and notice the first
+	// common ancestor .
+
+	WgWidget * pFirstAlreadyMarked = 0;
+	for( WgWidget * pWidget = pMarkedWidget ; pWidget != 0 ; pWidget = pWidget->Parent() )
+	{
+		int ofs = _widgetPosInList( pWidget, m_vEnteredWidgets );
+		if( ofs >= 0 )
+		{	
+			if( !pFirstAlreadyMarked )
+				pFirstAlreadyMarked = pWidget;
+			m_vEnteredWidgets[ofs] = 0;			
+		}
+		else
+			QueueEvent( new WgEvent::MouseEnter( pWidget ) );		
+	}
+
+	// Send MouseLeave to those that were left.
+
+	for( size_t i = 0 ; i < m_vEnteredWidgets.size() ; i++ )
+		if(m_vEnteredWidgets[i] )
+			QueueEvent( new WgEvent::MouseLeave( m_vEnteredWidgets[i].GetRealPtr()) );
+	
+	// Replace the old list with a new one.
+	
+	m_vEnteredWidgets.clear();
+	for( WgWidget * pWidget = pMarkedWidget ; pWidget != 0 ; pWidget = pWidget->Parent() )
+		m_vEnteredWidgets.push_back( pWidget );
+
+	// Return first already marked, calling function might need it.
+
+	return pFirstAlreadyMarked;
+}
+
+
 
 
 //____ _processKeyPress() ______________________________________________________
@@ -1461,6 +1509,16 @@ bool WgEventHandler::_isWidgetInList( const WgWidget * pWidget, const std::vecto
 	return false;
 }
 
+//____ _widgetPosInList() ________________________________________________________
+
+int WgEventHandler::_widgetPosInList( const WgWidget * pWidget, const std::vector<WgWidgetWeakPtr>& list )
+{
+	for( size_t i = 0 ; i < list.size() ; i++ )
+		if( list[i].GetRealPtr() == pWidget )
+			return i;
+
+	return -1;
+}
 
 
 
