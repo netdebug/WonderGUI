@@ -78,7 +78,7 @@ WgRect  WgColorSkin::ContentRect( const WgRect& canvas, WgState state ) const
 	return canvas;
 }
 
-bool WgColorSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state ) const
+bool WgColorSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const
 {
-	return m_color.a > 0 ? true : false;
+	return m_color.a >= opacityTreshold ? true : false;
 }

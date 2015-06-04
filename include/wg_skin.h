@@ -53,7 +53,7 @@ public:
 	virtual WgSize	SizeForContent( const WgSize contentSize ) const = 0;
 	virtual WgRect	ContentRect( const WgRect& canvas, WgState state ) const = 0;
 
-	virtual bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state ) const = 0;
+	virtual bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const = 0;
 
 	virtual bool	IsOpaque() const = 0;
 	virtual bool	IsOpaque( WgState state ) const = 0;

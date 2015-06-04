@@ -79,7 +79,7 @@ void WgPanel::SetSkin( const WgSkinPtr& pSkin )
 bool WgPanel::_onAlphaTest( const WgCoord& ofs )
 {
 	if( m_pSkin )
-		return m_pSkin->IsOpaque();
+		return m_pSkin->MarkTest( ofs, Size(), WG_STATE_NORMAL, m_markOpacity);
 	else
 		return false;		// By default cointainers have nothing to display themselves.
 }

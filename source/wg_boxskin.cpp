@@ -201,7 +201,7 @@ WgSize WgBoxSkin::SizeForContent( const WgSize contentSize ) const
 
 //____ MarkTest() _____________________________________________________________
 
-bool WgBoxSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state ) const
+bool WgBoxSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const
 {
 	if( m_bOpaque )
 		return true;
@@ -210,10 +210,11 @@ bool WgBoxSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState 
 
 	WgRect center = WgRect(canvasSize) - m_frame;
 	if( center.Contains(ofs) )
-		return m_color[i].a > 0;
+		return m_color[i].a >= opacityTreshold;
 	else
-		return m_frameColor[i].a > 0;
+		return m_frameColor[i].a >= opacityTreshold;
 }
+
 
 //____ IsOpaque() _____________________________________________________________
 

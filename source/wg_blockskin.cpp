@@ -489,7 +489,7 @@ WgSize WgBlockSkin::SizeForContent( const WgSize contentSize ) const
 
 //____ MarkTest() _____________________________________________________________
 
-bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvasSize, WgState state ) const
+bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const
 {
 	if( !m_pSurface )
 		return false;
@@ -575,7 +575,7 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvasSize, WgSta
 
 	Uint8 alpha = m_pSurface->GetOpacity(srcOfs.x+ofs.x, srcOfs.y+ofs.y);
 
-	if( alpha )
+	if( alpha >= opacityTreshold )
 		return true;
 	else
 		return false;

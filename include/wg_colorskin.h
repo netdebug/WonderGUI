@@ -53,7 +53,7 @@ public:
 	WgSize	SizeForContent( const WgSize contentSize ) const;
 	WgRect	ContentRect( const WgRect& canvas, WgState state ) const;
 
-	bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state ) const;
+	bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const;
 
 
 
