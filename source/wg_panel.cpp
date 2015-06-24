@@ -100,7 +100,7 @@ void WgPanel::_onCloneContent( const WgPanel * _pOrg )
 
 void WgPanel::_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip )
 {
-	if( m_pSkin && m_pSkin->IsOpaque() )
+	if( m_pSkin )
 		container.Add( WgRect( geo, clip ) );
 	else
 		WgContainer::_onCollectPatches( container, geo, clip );

@@ -21,6 +21,8 @@
 #include <wg_surface_soft.h>
 #include <wg_gfxdevice_soft.h>
 #include <sdl_wglib.h>
+#include <wg_boxskin.h>
+
 
 void DBG_ASSERT(bool x) {}
 
@@ -42,7 +44,15 @@ void addResizablePanel( WgFlexPanel * pParent, WgWidget * pChild, WgEventHandler
 void cbResize( const WgEvent::Event* _pEvent, void * _pFlexHook );
 
 
+WgFlexPanel * createPresetSelector();
+
+
 WgModalLayer * g_pModal = 0;
+
+WgWidget * pWidgetToMove = 0;
+
+WgValueDisplay * m_pCounter = 0;
+WgValueDisplay * m_pCounter2 = 0;
 
 //____ main() _________________________________________________________________
 
@@ -132,41 +142,17 @@ int main ( int argc, char** argv )
 
    // program main loop
 
+	int moveCounter = 0;
+
     while (eventLoop( pRoot->EventHandler() ))
     {
-
-		// GET DIRTY RECTS
-
-		int nDirtyRects;
-		SDL_Rect	dirtyRects[100];
-
-		if( pRoot->NbDirtyRects() <= 100 )
-		{
-			nDirtyRects = pRoot->NbDirtyRects();
-			for( int i = 0 ; i < nDirtyRects ; i++ )
-			{
-				const WgRect * pR = pRoot->FirstDirtyRect() + i;
-
-				dirtyRects[i].x = pR->x;
-				dirtyRects[i].y = pR->y;
-				dirtyRects[i].w = pR->w;
-				dirtyRects[i].h = pR->h;
-			}
-		}
-		else
-		{
-			nDirtyRects = 1;
-
-			const WgRect r = pRoot->Geo();
-
-			dirtyRects[0].x = r.x;
-			dirtyRects[0].y = r.y;
-			dirtyRects[0].w = r.w;
-			dirtyRects[0].h = r.h;
-		}
-
-
-        // DRAWING STARTS HERE
+		if( m_pCounter )
+			m_pCounter->IncValue();
+		
+		if( m_pCounter2 )
+			m_pCounter2->IncValue();
+		
+		// DRAWING STARTS HERE
 
 		SDL_LockSurface( pScreen );
 		pRoot->Render();
@@ -176,12 +162,53 @@ int main ( int argc, char** argv )
 
         // finally, update the screen :)
 
-		SDL_UpdateRects( pScreen, nDirtyRects, dirtyRects);
+		// GET DIRTY RECTS
 
+		int nUpdatedRects;
+		SDL_Rect	updatedRects[100];
+
+/*		if( pRoot->NbUpdatedRects() <= 100 )
+		{
+			nUpdatedRects = pRoot->NbUpdatedRects();
+			for( int i = 0 ; i < nUpdatedRects ; i++ )
+			{
+				const WgRect * pR = pRoot->FirstUpdatedRect() + i;
+
+				updatedRects[i].x = pR->x;
+				updatedRects[i].y = pR->y;
+				updatedRects[i].w = pR->w;
+				updatedRects[i].h = pR->h;
+			}
+		}
+		else*/
+		{
+			nUpdatedRects = 1;
+
+			const WgRect r = pRoot->Geo();
+
+			updatedRects[0].x = r.x;
+			updatedRects[0].y = r.y;
+			updatedRects[0].w = r.w;
+			updatedRects[0].h = r.h;
+		}
+
+		SDL_UpdateRects( pScreen, nUpdatedRects, updatedRects);
 
         // Pause for a while
 
         SDL_Delay(10);
+		
+		if( moveCounter < 1 && pWidgetToMove ) {
+			
+			printf( "%d:", nUpdatedRects );
+			for( int i = 0 ; i < nUpdatedRects ; i++ )
+				printf( "(%d,%d,%d,%d) ", updatedRects[i].x, updatedRects[i].y, updatedRects[i].w, updatedRects[i].h );
+			printf( "\n" );	
+			moveCounter++;
+			WgFlexHook * p = (WgFlexHook*) pWidgetToMove->Hook();
+			p->SetOfs( p->Pos() + WgCoord( 50,50));
+		}
+			 
 
     } // end main loop
 
@@ -298,14 +325,59 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 
 	// Extra flex with background
+/*	
+	{
 	
-	WgFlexPanel * pExtraFlex = new WgFlexPanel();
-	pExtraFlex->SetSkin( WgColorSkin::Create( WgColor(255,0,0,255)));
+		WgFlexPanel * pExtraFlex = new WgFlexPanel();
+		pExtraFlex->SetSkin( WgColorSkin::Create( WgColor(255,0,0,255)));
+		
+		pFlex->AddChild( pExtraFlex, WgRect(20,20,100,100) );
+		
+		WgImage * pPlate = (WgImage*) pDB->CloneWidget( "plate" );
+		pExtraFlex->AddChild( pPlate, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(30) );
+		
+	}
+*/
+	// Test transparency issue
 	
-	pFlex->AddChild( pExtraFlex, WgRect(20,20,100,100) );
-	
-	WgImage * pPlate = (WgImage*) pDB->CloneWidget( "plate" );
-	pExtraFlex->AddChild( pPlate, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(30) );
+	{
+
+/*		
+		m_pCounter = new WgValueDisplay();
+		m_pCounter->SetValue(123);
+		m_pCounter->SetRange(0, 100000);
+		pFlex->AddChild( m_pCounter );
+		m_pCounter = 0;
+		m_pCounter2 = 0;
+*/
+
+
+		WgFlexPanel * pExtraFlex = new WgFlexPanel();
+		pExtraFlex->SetSkin( WgColorSkin::Create( WgColor(0,0,0,128)));
+
+
+		WgFlexPanel * pSel = createPresetSelector();
+		pFlex->AddChild(pSel);
+
+
+
+//		pFlex->AddChild( pExtraFlex );
+
+		WgTextDisplay * pText = new WgTextDisplay();
+		pText->SetText( "THIS IS SOME TEST TEXT" );
+		
+				
+		pExtraFlex->AddChild( pText, WgRect( 10,10,100,100) );
+
+		addResizablePanel( pFlex, pExtraFlex, pEventHandler );
+
+		((WgFlexHook*)pExtraFlex->Hook())->SetSize( WgSize(200,150));
+		((WgFlexHook*)pExtraFlex->Hook())->SetOfs( WgCoord(50,50));
+
+
+		pWidgetToMove = pExtraFlex;
+
+	}
 
 
 /*
@@ -734,14 +806,108 @@ void cbResize( const WgEvent::Event* _pEvent, void * _pFlexHook )
 void addResizablePanel( WgFlexPanel * pParent, WgWidget * pChild, WgEventHandler * pEventHandler )
 {
 	WgHook * pHook = pParent->AddChild( pChild );
-	pEventHandler->AddCallback( WgEventFilter::MouseButtonDrag(pChild, 2), cbResize, pHook );
+	pEventHandler->AddCallback( WgEventFilter::MouseButtonDrag(pChild, 3), cbResize, pHook );
 
 
-	pEventHandler->AddCallback( WgEventFilter::MouseButtonPress(pChild, 3), cbInitDrag, pChild );
-	pEventHandler->AddCallback( WgEventFilter::MouseButtonDrag(pChild, 3), cbDragWidget, pChild );
+	pEventHandler->AddCallback( WgEventFilter::MouseButtonPress(pChild, 1), cbInitDrag, pChild );
+	pEventHandler->AddCallback( WgEventFilter::MouseButtonDrag(pChild, 1), cbDragWidget, pChild );
 }
 
 
 
 
+WgFlexPanel * createPresetSelector()
+{
+	WgFlexPanel * pBottom = new WgFlexPanel();
+	
+    WgBoxSkinPtr pSkin = WgBoxSkin::Create(WgColor(0, 0, 0, 255), WgBorders(0), WgColor(0, 0, 0, 255));
 
+	pBottom->SetSkin(pSkin);
+/*
+		WgButton * pButton = new WgButton();
+		pButton->SetText( "BUTTON" );
+		pBottom->AddChild( pButton, WgRect(4,75,100,15) );
+*/
+
+    for(int i = 0; i< 10; i++)
+    {	
+		WgButton * pButton = new WgButton();
+		pButton->SetText( "BUTTON" );
+		pBottom->AddChild( pButton, WgRect(4,i*15,100,15) );
+    }
+	
+	return pBottom;
+}
+
+
+/*
+
+SectionPresetSelector::SectionPresetSelector(float fCenterX, float fTopY, float fScale, CSoftubeGUIModule pkModule, WgEventHandler pHandler, WgTextpropPtr pWgProp, WgTextManager pTextManager, WgFlexPanel pkRootPanel, int iParam, std::vector<SectionPreset> pPresets) : WgFlexPanel(),
+m_iParam(iParam),
+m_pPresets(pPresets),
+m_bIsVisible(false)
+{
+    //Coordinates and sizes are in 1150 px Width to match the rest of the GUI placement
+    int iRows = pPresets.size();
+    
+    float fHalfWidth  = 0.045f;
+    if(iParam == eParamReverbPreset)
+        fHalfWidth = 0.06f;
+    
+    float fStepHeight = 0.0232f;
+    float fHalfHeightOffset = 0.0125f;
+    
+    int iTextHeight = (int)floor(14.0f*fScale + .5f);
+    int iTextWidth  = (int)floor(90.0f*fScale + .5f);
+    if(iParam == eParamReverbPreset)
+        iTextWidth  = (int)floor(120.0f*fScale + .5f);
+        
+    int iBorder     = (int)floor(10.0f*fScale + .5f);
+    int iSpacing    = (int)floor(2.0f*fScale + .5f);
+    
+    //WgBoxSkinPtr pSkin = WgBoxSkin::Create(WgColor(0, 0, 0, 255), WgBorders(0), WgColor(0, 0, 0, 255));
+    WgBoxSkinPtr pTextSkin = WgBoxSkin::Create(WgColor(0, 0, 0, 0), WgBorders(0), WgColor(0, 0, 0, 0));
+
+ //SetSkin(pSkin);
+
+    //Place Preset Selection window on root panel
+    int iTopLeft = pkRootPanel->AddAnchor(fCenterX-fHalfWidth, fTopY);
+    int iBottomRight = pkRootPanel->AddAnchor(fCenterX + fHalfWidth, fTopY + fStepHeight*iRows + 2.0f*fHalfHeightOffset);
+    m_pHook = pkRootPanel->AddChild(this, iTopLeft, iBottomRight);
+    //m_pHook = pkRootPanel->AddChild(this, WgRect(500, 500, 100, 200), WG_WEST);
+    DBG_ASSERT(m_pHook != NULL);
+
+    // Create background image
+ WgImage* pImage = new WgImage();
+ WgSurface* pSurface = pkModule->GetGui()->GetSurface(IDR_BACKGROUND_PRESET);
+
+ WgFlexHook * pkHook = this->AddChild( pImage, WgRect( 0, 0, pSurface->Width(), pSurface->Height()) );
+
+ if( pSurface )
+  pImage->SetSource( WgBlockset::CreateFromSurface( pSurface ) );
+
+ pImage->SetMarkOpacity(0);
+ pkHook->SetVisible(true);
+
+    //Add text button and callback for all presets
+    for(int i = 0; i<pPresets.size(); i++)
+    {
+        WgGizmoTextButton* pkTextButton;
+        pkTextButton = pkModule->AddTextButton(pPresets[i].GetPresetName(), pWgProp, WgCoord(iBorder, i*(iTextHeight+iSpacing)+iBorder), WgCoord(iTextWidth, iTextHeight), i, WG_NORTHWEST, this);
+        
+        pkTextButton->SetSkin(pTextSkin);
+        pkTextButton->SetHoverSkin(pTextSkin);
+        pkTextButton->SetSelectedSkin(pTextSkin);
+        pkTextButton->SetSelectedHoverSkin(pTextSkin);
+        pkTextButton->SetDisabledSkin(pTextSkin);
+        pkTextButton->SetTextManager(pTextManager);
+        pkTextButton->SetTextAlignment(WG_WEST);
+        pkTextButton->SetParam(pPresets[i].GetPresetParam());
+        m_pTextButtons.push_back(pkTextButton);
+        
+        pHandler->AddCallback( WgEventFilter::KnobTurn(pkTextButton), cbPresetSelectionCallback, pkTextButton);
+    }
+    m_pHook->SetVisible(m_bIsVisible);
+}
+
+*/
