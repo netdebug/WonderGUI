@@ -114,7 +114,7 @@ namespace sdl_wglib
 
 		WgSurfaceSDL	wrapper( bmp );
 
-		WgSurface * pSurf = factory.CreateSurface( wrapper.Size(), wrapper.IsOpaque()? WG_PIXEL_RGB_8 : WG_PIXEL_ARGB_8 );
+		WgSurface * pSurf = factory.CreateSurface( wrapper.Size(), /*wrapper.IsOpaque()? WG_PIXEL_RGB_8 :*/ WG_PIXEL_RGBA_8 );
 
 		if( !pSurf )
 		{

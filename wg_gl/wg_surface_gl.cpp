@@ -90,12 +90,14 @@ WgSurfaceGL::WgSurfaceGL( WgSize dimensions, GLint _format, void * _pPixels )
 	_initBuffer();
 
 
+	GLenum extFormat = m_pixelSize == 4 ? GL_RGBA : GL_RGB;
+
 	glGenTextures( 1, &m_texture );
 	glBindTexture( GL_TEXTURE_2D, m_texture );
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 	glTexImage2D( GL_TEXTURE_2D, 0, _format, m_size.w, m_size.h, 0,
-		GL_BGRA, GL_UNSIGNED_BYTE, NULL );
+		extFormat, GL_UNSIGNED_BYTE, NULL );
 
 	pglBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
 
@@ -157,7 +159,7 @@ void WgSurfaceGL::_setPixelFormat( GLint _format )
 
 	case GL_RGBA8:
 		m_pixelSize = 4;
-		pixeltype = WG_PIXEL_ARGB_8;
+		pixeltype = WG_PIXEL_RGBA_8;
 		break;
 
 	default:
@@ -367,7 +369,7 @@ Uint32 WgSurfaceGL::GetPixel( WgCoord coord ) const
 
 Uint8 WgSurfaceGL::GetOpacity( WgCoord coord ) const
 {
-	return 255;
+//	return 255;
 
 	if( m_buffer )
 	{
@@ -418,7 +420,8 @@ WgSurface * WgSurfaceFactoryGL::CreateSurface( const WgSize& size, WgPixelType t
 	GLint	format;
 	int		buffSize;
 
-
+//		format = GL_RGBA8;
+//		buffSize = 4*size.w*size.h;
 
 	switch( type )
 	{
@@ -427,7 +430,7 @@ WgSurface * WgSurfaceFactoryGL::CreateSurface( const WgSize& size, WgPixelType t
 		buffSize = 3*size.w*size.h;
 		break;
 
-	case WG_PIXEL_ARGB_8:
+	case WG_PIXEL_RGBA_8:
 		format = GL_RGBA8;
 		buffSize = 4*size.w*size.h;
 		break;

@@ -180,7 +180,7 @@ void WgScaleImage::_regenerateSurface()
 
 	if( m_pSurfaceFactory )
 	{
-		m_pGenSurface = m_pSurfaceFactory->CreateSurface( m_imgRect.Size(), WG_PIXEL_ARGB_8 );
+		m_pGenSurface = m_pSurfaceFactory->CreateSurface( m_imgRect.Size(), WG_PIXEL_RGBA_8 );
 
 		// Insert code here to stretch-copy content from m_pOrgSurface to m_pGenSurface
         resample(m_pOrgSurface, m_pGenSurface);

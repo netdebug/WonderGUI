@@ -218,10 +218,9 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 		pDst += dstRect.y * dstPitch + dstRect.x * pDstFormat->bits/8;
 
 
-		if( (pSrcFormat->type == pDstFormat->type && pSrcFormat->type != WG_PIXEL_CUSTOM) ||
-			(pSrcFormat->bits == pDstFormat->bits && pSrcFormat->R_mask == pDstFormat->R_mask &&
-			 pSrcFormat->G_mask == pDstFormat->G_mask && pSrcFormat->B_mask == pDstFormat->B_mask &&
-			 pSrcFormat->A_mask == pDstFormat->A_mask) )
+		if( pSrcFormat->bits == pDstFormat->bits && pSrcFormat->R_mask == pDstFormat->R_mask &&
+			pSrcFormat->G_mask == pDstFormat->G_mask && pSrcFormat->B_mask == pDstFormat->B_mask &&
+			pSrcFormat->A_mask == pDstFormat->A_mask)
 		{
 			// We have identical formats so we can do a fast straight copy
 
@@ -233,16 +232,12 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 				pDst += dstPitch;
 			}
 		}
-		else if( (pSrcFormat->type == WG_PIXEL_ARGB_8 || pSrcFormat->type == WG_PIXEL_RGB_8) &&
-				 (pDstFormat->type == WG_PIXEL_ARGB_8 || pDstFormat->type == WG_PIXEL_RGB_8) )
+		else if( pSrcFormat->type == WG_PIXEL_RGB_8 && pDstFormat->type == WG_PIXEL_RGBA_8)
 		{
-			// We are just switching between RGBA_8 and RGB_8, just copy RGB components and skip alpha
+			// We are just switching from RGB_8 and RGBA_8, just copy RGB components and fill alpha
 
-			int		srcInc = pSrcFormat->bits/8;
-			int		dstInc = pDstFormat->bits/8;
-
-			int		srcLineInc = srcPitch - srcInc * srcRect.w;
-			int		dstLineInc = dstPitch - dstInc * srcRect.w;
+			int		srcLineInc = srcPitch - 3 * srcRect.w;
+			int		dstLineInc = dstPitch - 4 * srcRect.w;
 
 			for( int y = 0 ; y < srcRect.h ; y++ )
 			{
@@ -251,13 +246,35 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 					pDst[0] = pSrc[0];
 					pDst[1] = pSrc[1];
 					pDst[2] = pSrc[2];
-					pSrc += srcInc;
-					pDst += dstInc;
+					pDst[3] = 255;
+					pSrc += 3;
+					pDst += 4;
 				}
 				pSrc += srcLineInc;
 				pDst += dstLineInc;
 			}
 
+		}
+		else if( pSrcFormat->type == WG_PIXEL_RGBA_8 && pDstFormat->type == WG_PIXEL_RGB_8 )
+		{
+			// We are just switching from RGBA_8 to RGB_8, copy RGB components and skip alpha.
+
+			int		srcLineInc = srcPitch - 4 * srcRect.w;
+			int		dstLineInc = dstPitch - 3 * srcRect.w;
+
+			for( int y = 0 ; y < srcRect.h ; y++ )
+			{
+				for( int x = 0 ; x < srcRect.w ; x++ )
+				{
+					pDst[0] = pSrc[0];
+					pDst[1] = pSrc[1];
+					pDst[2] = pSrc[2];
+					pSrc += 4;
+					pDst += 3;
+				}
+				pSrc += srcLineInc;
+				pDst += dstLineInc;
+			}
 		}
 		else
 		{
@@ -269,11 +286,14 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 			int		srcLineInc = srcPitch - srcInc * srcRect.w;
 			int		dstLineInc = dstPitch - dstInc * srcRect.w;
 
-			unsigned int	R_mask = (((0xFFFFFFFF & pSrcFormat->R_mask) >> pSrcFormat->R_shift) << pDstFormat->R_shift) & pDstFormat->R_mask;
-			unsigned int	G_mask = (((0xFFFFFFFF & pSrcFormat->G_mask) >> pSrcFormat->G_shift) << pDstFormat->G_shift) & pDstFormat->G_mask;
-			unsigned int	B_mask = (((0xFFFFFFFF & pSrcFormat->B_mask) >> pSrcFormat->B_shift) << pDstFormat->B_shift) & pDstFormat->B_mask;
-			unsigned int	A_mask = (((0xFFFFFFFF & pSrcFormat->A_mask) >> pSrcFormat->A_shift) << pDstFormat->A_shift) & pDstFormat->A_mask;
+			unsigned int	R_mask = ((pSrcFormat->R_mask >> pSrcFormat->R_shift) << pDstFormat->R_shift) & pDstFormat->R_mask;
+			unsigned int	G_mask = ((pSrcFormat->G_mask >> pSrcFormat->G_shift) << pDstFormat->G_shift) & pDstFormat->G_mask;
+			unsigned int	B_mask = ((pSrcFormat->B_mask >> pSrcFormat->B_shift) << pDstFormat->B_shift) & pDstFormat->B_mask;
+			unsigned int	A_mask = ((pSrcFormat->A_mask >> pSrcFormat->A_shift) << pDstFormat->A_shift) & pDstFormat->A_mask;
 
+			unsigned int	baseAlpha = 0;
+			if( pSrcFormat->A_mask == 0 && pDstFormat->A_mask != 0 )
+				baseAlpha = pDstFormat->A_mask;							// Fill alpha channel, all pixels are opaque.
 
 			switch( (pSrcFormat->bits << 8) + pDstFormat->bits )
 			{
@@ -286,7 +306,8 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 							unsigned int dstpixel = (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
 													(((srcpixel >> pSrcFormat->G_shift) << pDstFormat->G_shift) & G_mask) |
 													(((srcpixel >> pSrcFormat->B_shift) << pDstFormat->B_shift) & B_mask) |
-													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask);
+													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask) |
+													baseAlpha;
 							* ((unsigned short*)pDst) = (unsigned short) dstpixel; pDst+=2;
 						}
 						pSrc += srcLineInc;
@@ -299,10 +320,11 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 						for( int x = 0 ; x < srcRect.w ; x++ )
 						{
 							unsigned int srcpixel = pSrc[0] + (((unsigned int)pSrc[1])<<8) + (((unsigned int)pSrc[2])<<16); pSrc+=3;
-							unsigned int dstpixel = (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
+							unsigned int dstpixel = baseAlpha | (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
 													(((srcpixel >> pSrcFormat->G_shift) << pDstFormat->G_shift) & G_mask) |
 													(((srcpixel >> pSrcFormat->B_shift) << pDstFormat->B_shift) & B_mask) |
-													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask);
+													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask) |
+													baseAlpha;
 							* ((unsigned short*)pDst) = (unsigned short) dstpixel; pDst+=2;
 						}
 						pSrc += srcLineInc;
@@ -318,7 +340,8 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 							unsigned int dstpixel = (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
 													(((srcpixel >> pSrcFormat->G_shift) << pDstFormat->G_shift) & G_mask) |
 													(((srcpixel >> pSrcFormat->B_shift) << pDstFormat->B_shift) & B_mask) |
-													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask);
+													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask) |
+													baseAlpha;
 							* ((unsigned short*)pDst) = (unsigned short) dstpixel; pDst+=2;
 						}
 						pSrc += srcLineInc;
@@ -334,7 +357,8 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 							unsigned int dstpixel = (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
 													(((srcpixel >> pSrcFormat->G_shift) << pDstFormat->G_shift) & G_mask) |
 													(((srcpixel >> pSrcFormat->B_shift) << pDstFormat->B_shift) & B_mask) |
-													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask);
+													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask) |
+													baseAlpha;
 							pDst[0] = (unsigned char) dstpixel;
 							pDst[1] = (unsigned char) (dstpixel >> 8);
 							pDst[2] = (unsigned char) (dstpixel >> 16);
@@ -354,7 +378,8 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 							unsigned int dstpixel = (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
 													(((srcpixel >> pSrcFormat->G_shift) << pDstFormat->G_shift) & G_mask) |
 													(((srcpixel >> pSrcFormat->B_shift) << pDstFormat->B_shift) & B_mask) |
-													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask);
+													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask) |
+													baseAlpha;
 							pDst[0] = (unsigned char) dstpixel;
 							pDst[1] = (unsigned char) (dstpixel >> 8);
 							pDst[2] = (unsigned char) (dstpixel >> 16);
@@ -373,7 +398,8 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 							unsigned int dstpixel = (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
 													(((srcpixel >> pSrcFormat->G_shift) << pDstFormat->G_shift) & G_mask) |
 													(((srcpixel >> pSrcFormat->B_shift) << pDstFormat->B_shift) & B_mask) |
-													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask);
+													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask) |
+													baseAlpha;
 							pDst[0] = (unsigned char) dstpixel;
 							pDst[1] = (unsigned char) (dstpixel >> 8);
 							pDst[2] = (unsigned char) (dstpixel >> 16);
@@ -392,7 +418,8 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 							unsigned int dstpixel = (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
 													(((srcpixel >> pSrcFormat->G_shift) << pDstFormat->G_shift) & G_mask) |
 													(((srcpixel >> pSrcFormat->B_shift) << pDstFormat->B_shift) & B_mask) |
-													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask);
+													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask) |
+													baseAlpha;
 							* ((unsigned int*)pDst) = dstpixel; pDst+=4;
 						}
 						pSrc += srcLineInc;
@@ -408,7 +435,8 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 							unsigned int dstpixel = (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
 													(((srcpixel >> pSrcFormat->G_shift) << pDstFormat->G_shift) & G_mask) |
 													(((srcpixel >> pSrcFormat->B_shift) << pDstFormat->B_shift) & B_mask) |
-													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask);
+													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask) |
+													baseAlpha;
 							* ((unsigned int*)pDst) = dstpixel; pDst+=4;
 						}
 						pSrc += srcLineInc;
@@ -424,7 +452,8 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 							unsigned int dstpixel = (((srcpixel >> pSrcFormat->R_shift) << pDstFormat->R_shift) & R_mask) |
 													(((srcpixel >> pSrcFormat->G_shift) << pDstFormat->G_shift) & G_mask) |
 													(((srcpixel >> pSrcFormat->B_shift) << pDstFormat->B_shift) & B_mask) |
-													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask);
+													(((srcpixel >> pSrcFormat->A_shift) << pDstFormat->A_shift) & A_mask) |
+													baseAlpha;
 							* ((unsigned int*)pDst) = dstpixel; pDst+=4;
 						}
 						pSrc += srcLineInc;

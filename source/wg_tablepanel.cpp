@@ -505,7 +505,7 @@ int WgTableRow::AddWidget( WgWidget * pWidget )
 WgWidget * WgTableRow::ReleaseWidget( int cell )
 {
 	if( m_nCells <= cell || !m_pCells[cell].Widget() )
-		return false;
+		return 0;
 
 	WgWidget * pReleased = m_pCells[cell].Widget();
 	m_pCells[cell]._attachWidget(0);

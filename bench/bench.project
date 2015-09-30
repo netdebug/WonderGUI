@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CodeLite_Project Name="bench" InternalType="Console">
   <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00010001N0005Debug000000000000]]>
+    </Plugin>
     <Plugin Name="CMakePlugin">
       <![CDATA[[{
   "name": "Debug",
@@ -13,9 +16,6 @@
   "parentProject": ""
  }]]]>
     </Plugin>
-    <Plugin Name="qmake">
-      <![CDATA[00010001N0005Debug000000000000]]>
-    </Plugin>
   </Plugins>
   <Description/>
   <Dependencies/>
@@ -26,12 +26,11 @@
   </VirtualDirectory>
   <Dependencies Name="Release">
     <Project Name="wondergui"/>
-    <Project Name="wg_sdl"/>
   </Dependencies>
   <Dependencies Name="Debug">
     <Project Name="wondergui"/>
     <Project Name="wg_soft"/>
-    <Project Name="wg_sdl"/>
+    <Project Name="wg_gl"/>
   </Dependencies>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -48,6 +47,7 @@
         <IncludePath Value="../include"/>
         <IncludePath Value="../wg_sdl"/>
         <IncludePath Value="../wg_soft"/>
+        <IncludePath Value="../wg_gl"/>
         <IncludePath Value="../extras"/>
         <IncludePath Value="../"/>
         <Preprocessor Value="WG_TNG"/>
@@ -56,12 +56,16 @@
         <LibraryPath Value="../Debug"/>
         <LibraryPath Value="../wg_sdl/Debug"/>
         <LibraryPath Value="../wg_soft/Debug"/>
+        <LibraryPath Value="../wg_gl/Debug"/>
         <Library Value="SDL"/>
         <Library Value="freetype"/>
         <Library Value="SDL_image"/>
         <Library Value="wg_soft"/>
         <Library Value="wg_sdl"/>
+        <Library Value="wg_gl"/>
         <Library Value="wondergui"/>
+        <Library Value="GL"/>
+        <Library Value="GLU"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(IntermediateDirectory)/$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
