@@ -107,6 +107,9 @@ public:
 	virtual void	ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness ) = 0;
         virtual void    ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, const WgColor * colors) = 0;
 
+	virtual void	DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f ) = 0;
+	virtual void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f ) = 0;
+
 
 	virtual void	DrawArcNE( const WgRect& rect, WgColor color ) = 0;
 	virtual void	DrawElipse( const WgRect& rect, WgColor color ) = 0;

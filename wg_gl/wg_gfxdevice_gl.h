@@ -63,22 +63,23 @@ public:
 						   		 float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias );
 								 
 								 
-	virtual void	FillSubPixel( const WgRectF& rect, const WgColor& col ) {};
+	void	FillSubPixel( const WgRectF& rect, const WgColor& col );
 							 
 								 
-	virtual void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) {};
-	virtual void	ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) {};
-	virtual void	ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness ) {};
-    virtual void    ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, const WgColor * colors) {};
+	void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col );
+	void	ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col );
+	void	ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness );
+    void    ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, const WgColor * colors);
 
+	void	DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
+	void	DrawArcNE( const WgRect& rect, WgColor color );
+	void	DrawElipse( const WgRect& rect, WgColor color );
+	void	DrawFilledElipse( const WgRect& rect, WgColor color );
 
-	virtual void	DrawArcNE( const WgRect& rect, WgColor color ) {};
-	virtual void	DrawElipse( const WgRect& rect, WgColor color ) {};
-	virtual void	DrawFilledElipse( const WgRect& rect, WgColor color ) {};
-
-	virtual void	ClipDrawArcNE( const WgRect& clip, const WgRect& rect, WgColor color ) {};
-	virtual void	ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color ) {};
-	virtual void	ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color ) {};
+	void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
+	void	ClipDrawArcNE( const WgRect& clip, const WgRect& rect, WgColor color );
+	void	ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color );
+	void	ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color );
 								 
 
 protected:

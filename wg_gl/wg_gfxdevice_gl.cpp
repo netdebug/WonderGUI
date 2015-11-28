@@ -171,10 +171,12 @@ void WgGfxDeviceGL::Fill( const WgRect& _rect, const WgColor& _col )
 		return;
 
 	glDisable(GL_TEXTURE_2D);
-	if( !_col.a )
-		glDisable(GL_BLEND);
-	else
+
+	if( m_blendMode == WG_BLENDMODE_OPAQUE && _col.a != 255 )
 		glEnable(GL_BLEND);
+		
+	if( _col.a == 255 && m_blendMode != WG_BLENDMODE_OPAQUE )
+		glDisable(GL_BLEND);		
 
 	int	dx1 = _rect.x;
 	int	dy1 = m_canvasSize.h - _rect.y;
@@ -191,6 +193,15 @@ void WgGfxDeviceGL::Fill( const WgRect& _rect, const WgColor& _col )
 	glColor4ub( m_tintColor.r, m_tintColor.g, m_tintColor.b, m_tintColor.a );
 	glEnable(GL_TEXTURE_2D);
 
+
+	// Clean up
+
+	if( m_blendMode == WG_BLENDMODE_OPAQUE && _col.a != 255 )
+		glDisable(GL_BLEND);
+		
+	if( _col.a == 255 && m_blendMode != WG_BLENDMODE_OPAQUE )
+		glEnable(GL_BLEND);		
+		
 	return;
 }
 
@@ -269,6 +280,9 @@ void WgGfxDeviceGL::StretchBlitSubPixel( const WgSurface * pSrc, float sx, float
 	glEnd();
 }
 
+
+
+
 //____ _setBlendMode() _________________________________________________________
 
 void WgGfxDeviceGL::_setBlendMode( WgBlendMode blendMode )
@@ -302,4 +316,169 @@ void WgGfxDeviceGL::_setBlendMode( WgBlendMode blendMode )
 		default:
 			break;
 	}
+}
+
+//____ FillSubPixel() __________________________________________________________
+
+void WgGfxDeviceGL::FillSubPixel( const WgRectF& rect, const WgColor& col ) 
+{
+	if( col.a == 0 || rect.w < 1 || rect.h < 1 )
+		return;
+
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_POLYGON_SMOOTH);
+
+	float	dx1 = rect.x;
+	float	dy1 = m_canvasSize.h - rect.y;
+	float 	dx2 = rect.x + rect.w;
+	float	dy2 = m_canvasSize.h - (rect.y + rect.h);
+
+	glColor4ub( col.r, col.g, col.b, col.a );
+	glBegin(GL_QUADS);
+		glVertex2f( dx1, dy1 );
+		glVertex2f( dx2, dy1 );
+		glVertex2f( dx2, dy2 );
+		glVertex2f( dx1, dy2 );
+	glEnd();
+	glColor4ub( m_tintColor.r, m_tintColor.g, m_tintColor.b, m_tintColor.a );
+	glDisable(GL_POLYGON_SMOOTH);
+	glEnable(GL_TEXTURE_2D);
+
+	return;
+}
+							 
+//____ ClipDrawHorrLine() ______________________________________________________
+								 
+void WgGfxDeviceGL::ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) 
+{
+	if( col.a == 0 || clip.y > start.y || clip.y+clip.h <= start.y || 
+		clip.x >= start.x + length || clip.x+clip.w <= start.x )
+		return;
+
+	if( !col.a )
+		glDisable(GL_BLEND);
+	else
+		glEnable(GL_BLEND);
+
+	int	beg = start.x > clip.x ? start.x : clip.x;
+	int end = start.x+length < clip.x+clip.w ? start.x+length : clip.x+clip.w;
+
+	glColor4ub( col.r, col.g, col.b, col.a );
+	glBegin(GL_LINES);
+		glVertex2i( beg, start.y );
+		glVertex2i( end, start.y );
+	glEnd();
+	glColor4ub( m_tintColor.r, m_tintColor.g, m_tintColor.b, m_tintColor.a );
+
+	return;	
+}
+
+//____ ClipDrawVertLine() ______________________________________________________
+
+void WgGfxDeviceGL::ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) 
+{
+	if( col.a == 0 || clip.x > start.x || clip.x+clip.w <= start.x || 
+		clip.y >= start.y + length || clip.y+clip.h <= start.y )
+		return;
+
+	if( !col.a )
+		glDisable(GL_BLEND);
+	else
+		glEnable(GL_BLEND);
+
+	int	beg = start.y > clip.y ? start.y : clip.y;
+	int end = start.y+length < clip.y+clip.h ? start.y+length : clip.y+clip.h;
+
+	glColor4ub( col.r, col.g, col.b, col.a );
+	glBegin(GL_LINES);
+		glVertex2i( start.x, beg );
+		glVertex2i( start.x, end );
+	glEnd();
+	glColor4ub( m_tintColor.r, m_tintColor.g, m_tintColor.b, m_tintColor.a );
+
+	return;	
+}
+
+//____ ClipPlotSoftPixels() ____________________________________________________
+
+void WgGfxDeviceGL::ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness ) 
+{
+}
+
+//____ ClipPlotPixels() ________________________________________________________
+
+void WgGfxDeviceGL::ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, const WgColor * colors) 
+{
+	WgColor	prevCol = m_tintColor;
+	
+	glBegin(GL_POINTS);
+	for( int i = 0 ; i < nCoords ; i++ )
+	{
+		WgCoord coord = pCoords[i];
+		WgColor col = colors[i];
+		
+		if( coord.x >= clip.x && coord.x < clip.x+clip.w && coord.y >= clip.y && coord.y < clip.y+clip.h )
+		{
+			if( col != prevCol )
+			{
+				glColor4ub( col.r, col.g, col.b, col.a );
+				prevCol = col;
+			}
+			glVertex2i( coord.x, coord.y );
+		}
+	}
+
+	glEnd();
+	glColor4ub( m_tintColor.r, m_tintColor.g, m_tintColor.b, m_tintColor.a );
+
+	return;	
+}
+
+//____ DrawLine() _____________________________________________________________
+
+void WgGfxDeviceGL::DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness )
+{
+}
+
+
+//____ DrawArcNE() _____________________________________________________________
+
+void WgGfxDeviceGL::DrawArcNE( const WgRect& rect, WgColor color ) 
+{
+}
+
+//____ DrawElipse() ____________________________________________________________
+
+void WgGfxDeviceGL::DrawElipse( const WgRect& rect, WgColor color ) 
+{
+}
+
+//____ DrawFilledElipse() ______________________________________________________
+
+void WgGfxDeviceGL::DrawFilledElipse( const WgRect& rect, WgColor color ) 
+{
+}
+
+//____ ClipDrawLine() _____________________________________________________________
+
+void WgGfxDeviceGL::ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness )
+{
+}
+
+//____ ClipDrawArcNE() _________________________________________________________
+
+void WgGfxDeviceGL::ClipDrawArcNE( const WgRect& clip, const WgRect& rect, WgColor color ) 
+{
+}
+
+//____ ClipDrawElipse() ________________________________________________________
+
+void WgGfxDeviceGL::ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color ) 
+{
+}
+
+//____ ClipDrawFilledElipse() __________________________________________________
+
+void WgGfxDeviceGL::ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color ) 
+{
 }

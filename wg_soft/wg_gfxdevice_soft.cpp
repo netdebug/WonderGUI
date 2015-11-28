@@ -25,6 +25,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <cstdlib>
 
 #include <wg_userdefines.h>
 
@@ -266,6 +267,135 @@ void WgGfxDeviceSoft::FillSubPixel( const WgRectF& rect, const WgColor& col )
 	if( aaBottomRight != 0 )
 		_plotAA( x2, y2, fillColor, blendMode, aaBottomRight );
 }
+
+
+//____ DrawLine() ______________________________________________________________
+
+void WgGfxDeviceSoft::DrawLine( WgCoord beg, WgCoord end, WgColor color, float thickness )
+{
+	Uint8 *	pRow;
+	int		rowInc, pixelInc;
+	int 	length, width;
+	int		pos, slope;
+
+	if( abs(beg.x-end.x) > abs(beg.y-end.y) )
+	{
+		// Prepare mainly horizontal line
+		
+		if( beg.x > end.x )
+			WgSwap( beg, end );
+		
+		length = end.x - beg.x;
+		width = (int) (thickness*65536.f);					// TODO: Needs better calculation!!!
+		pos = (beg.y << 16) - width/2;		
+		slope = ((end.y - beg.y) << 16) / length;
+				
+		rowInc = m_pCanvas->m_pixelFormat.bits/8;
+		pixelInc = m_pCanvas->m_pitch;
+
+		pRow = m_pCanvas->m_pData + beg.x * rowInc;
+	}
+	else
+	{
+		// Prepare mainly vertical line
+		
+		if( beg.y > end.y )
+			WgSwap( beg, end );
+		
+		length = end.y - beg.y;
+		if( length == 0 )
+			return;											// TODO: Should stil draw the caps!
+		width = (int) (thickness*65536.f);					// TODO: Needs better calculation!!!
+		pos = (beg.x << 16) - width/2;		
+		slope = ((end.x - beg.x) << 16) / length;
+				
+		rowInc = m_pCanvas->m_pitch;
+		pixelInc = m_pCanvas->m_pixelFormat.bits/8;
+
+		pRow = m_pCanvas->m_pData + beg.y * rowInc;		
+	}
+
+	for( int i = 0 ; i < length ; i++ )
+	{
+		
+		int beg = pos >> 16;
+		int end = (pos + width) >> 16;
+		int ofs = beg;
+		
+		if( beg == end )
+		{
+			// Special case, one pixel wide row
+			
+			int alpha = (color.a * width) >> 16;
+
+			int invAlpha = 255 - alpha;
+			Uint8 * pDst = pRow + ofs*pixelInc;
+			
+			pDst[0] = m_pDivTab[pDst[0]*invAlpha + color.b*alpha];
+			pDst[1] = m_pDivTab[pDst[1]*invAlpha + color.g*alpha];
+			pDst[2] = m_pDivTab[pDst[2]*invAlpha + color.r*alpha];			
+		}
+		else
+		{
+			// First anti-aliased pixel of column
+			
+			int alpha = (color.a * (65536 - (pos & 0xFFFF))) >> 16;
+			
+			int invAlpha = 255 - alpha;
+			Uint8 * pDst = pRow + ofs*pixelInc;
+			
+			pDst[0] = m_pDivTab[pDst[0]*invAlpha + color.b*alpha];
+			pDst[1] = m_pDivTab[pDst[1]*invAlpha + color.g*alpha];
+			pDst[2] = m_pDivTab[pDst[2]*invAlpha + color.r*alpha];			
+			ofs++;
+			
+			// All non-antialiased middle pixels of column
+			
+			
+			if( ofs < end )
+			{					
+				alpha = color.a;	
+				invAlpha = 255 - alpha;
+
+				int storedRed = color.r * alpha;
+				int storedGreen = color.g * alpha;
+				int storedBlue = color.b * alpha;
+
+				do 
+				{
+					pDst = pRow + ofs*pixelInc;						
+					pDst[0] = m_pDivTab[pDst[0]*invAlpha + storedBlue];
+					pDst[1] = m_pDivTab[pDst[1]*invAlpha + storedGreen];
+					pDst[2] = m_pDivTab[pDst[2]*invAlpha + storedRed];			
+					ofs++;
+					
+				} while( ofs < end );
+			}
+
+			// Last anti-aliased pixel of column
+
+			alpha = (color.a * ((pos+width) & 0xFFFF)) >> 16;
+			
+			invAlpha = 255 - alpha;
+			pDst = pRow + ofs*pixelInc;
+			
+			pDst[0] = m_pDivTab[pDst[0]*invAlpha + color.b*alpha];
+			pDst[1] = m_pDivTab[pDst[1]*invAlpha + color.g*alpha];
+			pDst[2] = m_pDivTab[pDst[2]*invAlpha + color.r*alpha];			
+
+		}
+		
+		pRow += rowInc;
+		pos += slope;
+	}
+}
+
+//____ ClipDrawLine() __________________________________________________________
+
+void WgGfxDeviceSoft::ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness )
+{
+}
+
 
 //____ ClipDrawHorrLine() _____________________________________________________
 
@@ -1313,8 +1443,8 @@ void WgGfxDeviceSoft::_blit( const WgSurface* _pSrcSurf, const WgRect& srcrect, 
 				for( int x = 0 ; x < srcrect.w ; x++ )
 				{
 					pDst[0] = m_pDivTab[pSrc[0]*(255-pDst[0]) + pDst[0]*(255-pSrc[0])];
-					pDst[1] = m_pDivTab[pSrc[1]*(255-pDst[1]) + pDst[1]*(255-pSrc[0])];
-					pDst[2] = m_pDivTab[pSrc[2]*(255-pDst[2]) + pDst[2]*(255-pSrc[0])];
+					pDst[1] = m_pDivTab[pSrc[1]*(255-pDst[1]) + pDst[1]*(255-pSrc[1])];
+					pDst[2] = m_pDivTab[pSrc[2]*(255-pDst[2]) + pDst[2]*(255-pSrc[2])];
 					pSrc += srcPixelBytes;
 					pDst += dstPixelBytes;
 				}

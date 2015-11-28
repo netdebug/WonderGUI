@@ -56,6 +56,9 @@ public:
 	void	ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color );
 	void	ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color );
 
+	void	DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
+	void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
+
 	void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col );
 	void	ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col );
 	void	ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness );

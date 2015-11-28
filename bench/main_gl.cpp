@@ -25,7 +25,6 @@
 #include <sdl_wglib.h>
 #include <wg_boxskin.h>
 
-#include "testwidget.h"
 
 void DBG_ASSERT(bool x) {}
 
@@ -80,20 +79,20 @@ int main ( int argc, char** argv )
 	WgBase::Init();
 	sdl_wglib::MapKeys();
 
-	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", WgSurfaceFactorySoft() );
+	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", WgSurfaceFactoryGL() );
 
 
 //	WgBase::InitFreeType();
 
 	// Setup gfxdevice and gui
-
-	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(640,480), WG_PIXEL_RGBA_8, (unsigned char *) pScreen->pixels, pScreen->pitch );
+/*
+	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(640,480), WG_PIXEL_ARGB_8, (unsigned char *) pScreen->pixels, pScreen->pitch );
 	WgGfxDeviceSoft * pGfxDevice = new WgGfxDeviceSoft( pCanvas );
 	pGfxDevice->SetBilinearFiltering( true );
+*/
 
 
-
-//	WgGfxDeviceGL * pGfxDevice = new WgGfxDeviceGL( WgSize(640,480) );
+	WgGfxDeviceGL * pGfxDevice = new WgGfxDeviceGL( WgSize(640,480) );
 
 
 	// Load TTF-font
@@ -111,11 +110,11 @@ int main ( int argc, char** argv )
 */
 	// Load bitmap font
 
-	WgFont * pFont = sdl_wglib::LoadBitmapFont( "../resources/anuvverbubbla_8x8.png", "../resources/anuvverbubbla_8x8.fnt", WgSurfaceFactorySoft() );
+	WgFont * pFont = sdl_wglib::LoadBitmapFont( "../resources/anuvverbubbla_8x8.png", "../resources/anuvverbubbla_8x8.fnt", WgSurfaceFactoryGL() );
 
 	// Load and setup cursor
 
-	WgSurface * pCursorImg = sdl_wglib::LoadSurface("../resources/cursors.png", WgSurfaceFactorySoft() );
+	WgSurface * pCursorImg = sdl_wglib::LoadSurface("../resources/cursors.png", WgSurfaceFactoryGL() );
 
 	WgGfxAnim * pCursorEOL = new WgGfxAnim();
 	pCursorEOL->SetSize( WgSize(8,8) );
@@ -181,7 +180,7 @@ int main ( int argc, char** argv )
 		int nUpdatedRects;
 		SDL_Rect	updatedRects[100];
 
-		if( pRoot->NbUpdatedRects() <= 100 )
+/*		if( pRoot->NbUpdatedRects() <= 100 )
 		{
 			nUpdatedRects = pRoot->NbUpdatedRects();
 			for( int i = 0 ; i < nUpdatedRects ; i++ )
@@ -194,8 +193,8 @@ int main ( int argc, char** argv )
 				updatedRects[i].h = pR->h;
 			}
 		}
-		else
-		{
+		else*/
+/*		{
 			nUpdatedRects = 1;
 
 			const WgRect r = pRoot->Geo();
@@ -208,9 +207,9 @@ int main ( int argc, char** argv )
 
 		SDL_UpdateRects( pScreen, nUpdatedRects, updatedRects);
 
-
+ */
  
-//		SDL_GL_SwapBuffers();
+		SDL_GL_SwapBuffers();
         // Pause for a while
 
         SDL_Delay(10);
@@ -285,7 +284,7 @@ void printWidgetSizes()
 
 WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 {
-	WgResDB * pDB = sdl_wglib::LoadStdWidgets( "../resources/blocks.png", WgSurfaceFactorySoft() );
+	WgResDB * pDB = sdl_wglib::LoadStdWidgets( "../resources/blocks.png", WgSurfaceFactoryGL() );
 	if( !pDB )
 		return 0;
 
@@ -304,16 +303,16 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 	// Load images and specify blocks
 
-	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", WgSurfaceFactorySoft() );
+	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", WgSurfaceFactoryGL() );
 	WgBlocksetPtr pBackBlock = WgBlockset::CreateFromSurface(pBackImg, WG_TILE_ALL );
 
-	WgSurface * pFlagImg = sdl_wglib::LoadSurface("cb2.bmp", WgSurfaceFactorySoft() );
+	WgSurface * pFlagImg = sdl_wglib::LoadSurface("cb2.bmp", WgSurfaceFactoryGL() );
 	WgBlocksetPtr pFlagBlock = WgBlockset::CreateFromSurface( pFlagImg );
 
-	WgSurface * pSplashImg = sdl_wglib::LoadSurface("../resources/splash.png", WgSurfaceFactorySoft() );
+	WgSurface * pSplashImg = sdl_wglib::LoadSurface("../resources/splash.png", WgSurfaceFactoryGL() );
 	WgBlocksetPtr pSplashBlock = WgBlockset::CreateFromSurface( pSplashImg );
 
-	WgSurface * pBigImg = sdl_wglib::LoadSurface("../resources/frog.jpg", WgSurfaceFactorySoft() );
+	WgSurface * pBigImg = sdl_wglib::LoadSurface("../resources/frog.jpg", WgSurfaceFactoryGL() );
 	WgBlocksetPtr pBigBlock = WgBlockset::CreateFromSurface( pBigImg );
 
 	// MenuPanel
@@ -341,14 +340,6 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pHook->SetAnchored( WG_NORTHWEST, WG_SOUTHEAST );
 
 
-	// Test widget
-	
-	TestWidget * pTest = new TestWidget();
-	pHook = pFlex->AddChild( pTest );
-	pTest->Start();
-	
-
-
 	// Extra flex with background
 /*	
 	{
@@ -364,7 +355,6 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	}
 */
 	// Test transparency issue
-
 	
 	{
 
@@ -377,7 +367,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 		m_pCounter2 = 0;
 */
 
-/*
+
 		WgFlexPanel * pExtraFlex = new WgFlexPanel();
 		pExtraFlex->SetSkin( WgColorSkin::Create( WgColor(0,0,0,128)));
 
@@ -402,12 +392,8 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 
 		pWidgetToMove = pExtraFlex;
-*/
+
 	}
-
-
-
-
 
 
 /*
@@ -727,9 +713,16 @@ SDL_Surface * initSDL( int w, int h )
    const SDL_VideoInfo* info = SDL_GetVideoInfo( );
     int bpp = info->vfmt->BitsPerPixel;
  
+//    SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );
+//    SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );
+//    SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
+//    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
+    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 0 );
+
+
 
     // create a new window
-    SDL_Surface* pScreen = SDL_SetVideoMode(w, h, bpp, 0);
+    SDL_Surface* pScreen = SDL_SetVideoMode(w, h, bpp, SDL_OPENGL);
     if ( !pScreen )
     {
         printf("Unable to set %dx%d video: %s\n", w, h, SDL_GetError());

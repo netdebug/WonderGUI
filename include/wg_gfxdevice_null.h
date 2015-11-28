@@ -52,13 +52,16 @@ public:
 						   		 float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias );
 
 
+	void	DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
 	void	DrawArcNE( const WgRect& rect, WgColor color );
 	void	DrawElipse( const WgRect& rect, WgColor color );
 	void	DrawFilledElipse( const WgRect& rect, WgColor color );
 
+	void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
 	void	ClipDrawArcNE( const WgRect& clip, const WgRect& rect, WgColor color );
 	void	ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color );
 	void	ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color );
+
 
 protected:
 

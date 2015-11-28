@@ -23,6 +23,8 @@
     <File Name="main.cpp"/>
     <File Name="../extras/sdl_wglib.cpp"/>
     <File Name="../extras/sdl_wglib.h"/>
+    <File Name="testwidget.cpp"/>
+    <File Name="testwidget.h"/>
   </VirtualDirectory>
   <Dependencies Name="Release">
     <Project Name="wondergui"/>
