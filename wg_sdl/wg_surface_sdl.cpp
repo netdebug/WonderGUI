@@ -64,12 +64,12 @@ WgSurfaceSDL::WgSurfaceSDL( WgSize size, WgPixelType type )
 
 	switch( type )
 	{
-	case WG_PIXEL_RGB_8:
-		pSurf = SDL_CreateRGBSurface( flags, size.w, size.h, 24, 0xFF, 0xFF00, 0xFF0000, 0x00 );
+	case WG_PIXEL_BGR_8:
+		pSurf = SDL_CreateRGBSurface( flags, size.w, size.h, 24, 0xFF0000, 0xFF00, 0xFF, 0x00 );
 		m_pixelFormat.type = type;
 		break;
-	case WG_PIXEL_ARGB_8:
-		pSurf = SDL_CreateRGBSurface( flags, size.w, size.h, 32, 0xFF, 0xFF00, 0xFF0000, 0xFF000000 );
+	case WG_PIXEL_BGRA_8:
+		pSurf = SDL_CreateRGBSurface( flags, size.w, size.h, 32, 0xFF0000, 0xFF00, 0xFF, 0xFF000000 );
 		m_pixelFormat.type = type;
 		break;
 	default:

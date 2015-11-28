@@ -232,7 +232,7 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 				pDst += dstPitch;
 			}
 		}
-		else if( pSrcFormat->type == WG_PIXEL_RGB_8 && pDstFormat->type == WG_PIXEL_RGBA_8)
+		else if( pSrcFormat->type == WG_PIXEL_BGR_8 && pDstFormat->type == WG_PIXEL_BGRA_8)
 		{
 			// We are just switching from RGB_8 and RGBA_8, just copy RGB components and fill alpha
 
@@ -255,7 +255,7 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 			}
 
 		}
-		else if( pSrcFormat->type == WG_PIXEL_RGBA_8 && pDstFormat->type == WG_PIXEL_RGB_8 )
+		else if( pSrcFormat->type == WG_PIXEL_BGRA_8 && pDstFormat->type == WG_PIXEL_BGRA_8 )
 		{
 			// We are just switching from RGBA_8 to RGB_8, copy RGB components and skip alpha.
 

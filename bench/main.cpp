@@ -87,7 +87,7 @@ int main ( int argc, char** argv )
 
 	// Setup gfxdevice and gui
 
-	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(640,480), WG_PIXEL_RGBA_8, (unsigned char *) pScreen->pixels, pScreen->pitch );
+	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(640,480), WG_PIXEL_BGRA_8, (unsigned char *) pScreen->pixels, pScreen->pitch );
 	WgGfxDeviceSoft * pGfxDevice = new WgGfxDeviceSoft( pCanvas );
 	pGfxDevice->SetBilinearFiltering( true );
 

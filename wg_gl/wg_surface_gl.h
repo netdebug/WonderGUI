@@ -40,8 +40,7 @@
 class WgSurfaceGL : public WgSurface
 {
 public:
-	WgSurfaceGL( WgSize dimensions, GLint format, void * pPixels );
-	WgSurfaceGL( GLuint texture, Uint8 * pAlpha = 0 );
+	WgSurfaceGL( WgSize dimensions, WgPixelType format, void * pPixels );
 	~WgSurfaceGL();
 
 	inline	GLuint	GetTexture() const { return m_texture; };
@@ -62,17 +61,11 @@ public:
 	void		Unlock();
 
 private:
-	static bool	_initGlExtensions();
-
-	void		_setPixelFormat( GLint _format );
-	void		_initBuffer();
-
 
 	GLuint		m_buffer;			// Pointer at GL pixel buffer, if any.
 	GLuint 		m_texture;			// GL texture handle.
-	GLint		m_format;			// GL-enum for the texture format or 0 if unknown.
+	GLint		m_format;			// GL-enum for the texture format.
 	WgSize		m_size;				// Width and height in pixels.
-	Uint8 *		m_pAlpha;			// Pointer at supplementary alpha map, if any.
 	Uint32		m_pixelSize;		// Size in bytes of a pixel.
 
 };
@@ -82,7 +75,7 @@ private:
 class WgSurfaceFactoryGL : public WgSurfaceFactory
 {
 public:
-	WgSurface * CreateSurface( const WgSize& size, WgPixelType type = WG_PIXEL_RGBA_8 ) const;
+	WgSurface * CreateSurface( const WgSize& size, WgPixelType type = WG_PIXEL_BGRA_8 ) const;
 };
 
 

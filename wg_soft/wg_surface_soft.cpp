@@ -34,7 +34,7 @@ static const char	c_surfaceType[] = {"Software"};
 
 WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type )
 {
-	assert( type == WG_PIXEL_RGB_8 || type == WG_PIXEL_RGBA_8 );
+	assert( type == WG_PIXEL_BGR_8 || type == WG_PIXEL_BGRA_8 );
 	WgUtil::PixelTypeToFormat(type, m_pixelFormat);
 
 	m_pitch = ((size.w+3)&0xFFFFFFFC)*m_pixelFormat.bits/8;
@@ -46,7 +46,7 @@ WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type )
 
 WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, int pitch )
 {
-	assert( type == WG_PIXEL_RGB_8 || type == WG_PIXEL_RGBA_8 );
+	assert( type == WG_PIXEL_BGR_8 || type == WG_PIXEL_BGRA_8 );
 	WgUtil::PixelTypeToFormat(type, m_pixelFormat);
 
 	m_pitch = pitch;
@@ -109,7 +109,7 @@ Uint32 WgSurfaceSoft::GetPixel( WgCoord coord ) const
 		coord.y >= m_size.h || coord.y < 0  )
 		return 0;
 
-	if( m_pixelFormat.type == WG_PIXEL_RGBA_8 )
+	if( m_pixelFormat.type == WG_PIXEL_BGRA_8 )
     {
 		Uint32 k = * ((Uint32*) &m_pData[ m_pitch*coord.y+coord.x*4 ]);
 		return k;
@@ -136,7 +136,7 @@ Uint8 WgSurfaceSoft::GetOpacity( WgCoord coord ) const
 		coord.y >= m_size.h || coord.y < 0  )
 		return 0;
 
-	if( m_pixelFormat.type == WG_PIXEL_RGBA_8 )
+	if( m_pixelFormat.type == WG_PIXEL_BGRA_8 )
 	  {
 		Uint8 * pPixel = m_pData + m_pitch*coord.y + coord.x*4;
 	    return (Uint8)(m_fScaleAlpha * (float)pPixel[3]);
@@ -207,9 +207,9 @@ void WgSurfaceSoft::PutPixels(const vector<int> &x, const vector<int> &y, const 
 
 	switch(m_pixelFormat.type)
 	{
-		case WG_PIXEL_RGB_8:
+		case WG_PIXEL_BGR_8:
 			break;
-		case WG_PIXEL_RGBA_8:
+		case WG_PIXEL_BGRA_8:
 			for(int n=0; n<length; n++)
 			{
 			  ind = y[n]*m_pitch + x[n]*4;

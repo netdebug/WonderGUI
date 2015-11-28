@@ -176,7 +176,7 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 {
 	switch( type )
 	{
-		case WG_PIXEL_RGB_8:
+		case WG_PIXEL_BGR_8:
 			wFormat.type = type;
 			wFormat.bits = 24;
 
@@ -185,7 +185,7 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 			wFormat.B_bits = 8;
 			wFormat.A_bits = 0;
 
-#if WG_IS_BIG_ENDIAN
+#if WG_IS_LITTLE_ENDIAN
 			wFormat.R_mask = 0xFF0000;
 			wFormat.G_mask = 0xFF00;
 			wFormat.B_mask = 0xFF;
@@ -209,7 +209,7 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 
 			return true;
 
-		case WG_PIXEL_RGBA_8:
+		case WG_PIXEL_BGRA_8:
 			wFormat.type = type;
 			wFormat.bits = 32;
 
@@ -218,26 +218,26 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 			wFormat.B_bits = 8;
 			wFormat.A_bits = 8;
 
-#if WG_IS_BIG_ENDIAN
-			wFormat.R_mask = 0xFF000000;
-			wFormat.G_mask = 0xFF0000;
-			wFormat.B_mask = 0xFF00;
-			wFormat.A_mask = 0xFF;
-
-			wFormat.B_shift = 0;
-			wFormat.G_shift = 8;
-			wFormat.R_shift = 16;
-			wFormat.A_shift = 24;
-#else
-			wFormat.R_mask = 0xFF;
-			wFormat.G_mask = 0xFF00;
-			wFormat.B_mask = 0xFF0000;
+#if WG_IS_LITTLE_ENDIAN
 			wFormat.A_mask = 0xFF000000;
+			wFormat.R_mask = 0xFF0000;
+			wFormat.G_mask = 0xFF00;
+			wFormat.B_mask = 0xFF;
 
-			wFormat.R_shift = 0;
-			wFormat.G_shift = 8;
-			wFormat.B_shift = 16;
 			wFormat.A_shift = 24;
+			wFormat.R_shift = 16;
+			wFormat.G_shift = 8;
+			wFormat.B_shift = 0;
+#else
+			wFormat.A_mask = 0xFF;
+			wFormat.R_mask = 0xFF00;
+			wFormat.G_mask = 0xFF0000;
+			wFormat.B_mask = 0xFF000000;
+
+			wFormat.A_shift = 0;
+			wFormat.R_shift = 8;
+			wFormat.G_shift = 16;
+			wFormat.B_shift = 24;
 #endif
 
 			return true;

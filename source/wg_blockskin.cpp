@@ -207,8 +207,8 @@ void WgBlockSkin::_scanStateBlockSectionArea( StateData * pState, WgOrigo sectio
 	const WgPixelFormat * pFormat = m_pSurface->PixelFormat();
 	int pitch = m_pSurface->Pitch();
 
-	if( pFormat->type != WG_PIXEL_RGBA_8 )
-		return;												// Only supports RGBA_8 for the moment.
+	if( pFormat->type != WG_PIXEL_BGRA_8 )
+		return;												// Only supports BGRA_8 for the moment.
 
 	unsigned char * p = ((unsigned char*)m_pSurface->Pixels()) + sectionArea.x * pFormat->bits/8 + sectionArea.y * pitch;
 	

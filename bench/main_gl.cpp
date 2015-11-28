@@ -79,7 +79,7 @@ int main ( int argc, char** argv )
 	WgBase::Init();
 	sdl_wglib::MapKeys();
 
-	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", WgSurfaceFactoryGL() );
+//	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", WgSurfaceFactoryGL() );
 
 
 //	WgBase::InitFreeType();

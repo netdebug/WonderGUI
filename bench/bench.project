@@ -20,19 +20,15 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="code">
-    <File Name="main.cpp"/>
+    <File Name="main.cpp" ExcludeProjConfig="Debug"/>
     <File Name="../extras/sdl_wglib.cpp"/>
     <File Name="../extras/sdl_wglib.h"/>
     <File Name="testwidget.cpp"/>
     <File Name="testwidget.h"/>
+    <File Name="main_gl.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Release">
     <Project Name="wondergui"/>
-  </Dependencies>
-  <Dependencies Name="Debug">
-    <Project Name="wondergui"/>
-    <Project Name="wg_soft"/>
-    <Project Name="wg_gl"/>
   </Dependencies>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -158,4 +154,10 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug">
+    <Project Name="wondergui"/>
+    <Project Name="wg_soft"/>
+    <Project Name="wg_gl"/>
+    <Project Name="wg_sdl"/>
+  </Dependencies>
 </CodeLite_Project>
