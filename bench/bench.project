@@ -20,12 +20,12 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="code">
-    <File Name="main.cpp" ExcludeProjConfig="Debug"/>
+    <File Name="main.cpp" ExcludeProjConfig=""/>
     <File Name="../extras/sdl_wglib.cpp"/>
     <File Name="../extras/sdl_wglib.h"/>
     <File Name="testwidget.cpp"/>
     <File Name="testwidget.h"/>
-    <File Name="main_gl.cpp"/>
+    <File Name="main_gl.cpp" ExcludeProjConfig="Debug"/>
   </VirtualDirectory>
   <Dependencies Name="Release">
     <Project Name="wondergui"/>

@@ -280,15 +280,16 @@ void WgGfxDeviceSoft::DrawLine( WgCoord beg, WgCoord end, WgColor color, float t
 
 	if( abs(beg.x-end.x) > abs(beg.y-end.y) )
 	{
-		// Prepare mainly horizontal line
+		// Prepare mainly horizontal line segment
 		
 		if( beg.x > end.x )
 			WgSwap( beg, end );
 		
 		length = end.x - beg.x;
-		width = (int) (thickness*65536.f);					// TODO: Needs better calculation!!!
-		pos = (beg.y << 16) - width/2;		
 		slope = ((end.y - beg.y) << 16) / length;
+
+		width = (int) (thickness*m_lineThicknessTable[abs(slope>>12)]);
+		pos = (beg.y << 16) - width/2;		
 				
 		rowInc = m_pCanvas->m_pixelFormat.bits/8;
 		pixelInc = m_pCanvas->m_pitch;
@@ -297,7 +298,7 @@ void WgGfxDeviceSoft::DrawLine( WgCoord beg, WgCoord end, WgColor color, float t
 	}
 	else
 	{
-		// Prepare mainly vertical line
+		// Prepare mainly vertical line segment
 		
 		if( beg.y > end.y )
 			WgSwap( beg, end );
@@ -305,15 +306,114 @@ void WgGfxDeviceSoft::DrawLine( WgCoord beg, WgCoord end, WgColor color, float t
 		length = end.y - beg.y;
 		if( length == 0 )
 			return;											// TODO: Should stil draw the caps!
-		width = (int) (thickness*65536.f);					// TODO: Needs better calculation!!!
-		pos = (beg.x << 16) - width/2;		
+
 		slope = ((end.x - beg.x) << 16) / length;
+		width = (int) (thickness*m_lineThicknessTable[abs(slope>>12)]);
+		pos = (beg.x << 16) - width/2;		
 				
 		rowInc = m_pCanvas->m_pitch;
 		pixelInc = m_pCanvas->m_pixelFormat.bits/8;
 
 		pRow = m_pCanvas->m_pData + beg.y * rowInc;		
 	}
+
+	_drawLineSegment( pRow, rowInc, pixelInc, length, width, pos, slope, color );
+}
+
+//____ ClipDrawLine() __________________________________________________________
+
+void WgGfxDeviceSoft::ClipDrawLine( const WgRect& clip, WgCoord beg, WgCoord end, WgColor color, float thickness )
+{
+	Uint8 *	pRow;
+	int		rowInc, pixelInc;
+	int 	length, width;
+	int		pos, slope;
+	int		clipStart, clipEnd;
+
+	if( abs(beg.x-end.x) > abs(beg.y-end.y) )
+	{
+		// Prepare mainly horizontal line segment
+		
+		if( beg.x > end.x )
+			WgSwap( beg, end );
+		
+		length = end.x - beg.x;
+		slope = ((end.y - beg.y) << 16) / length;
+
+		width = (int) (thickness*m_lineThicknessTable[abs(slope>>12)]);
+		pos = (beg.y << 16) - width/2;		
+				
+		rowInc = m_pCanvas->m_pixelFormat.bits/8;
+		pixelInc = m_pCanvas->m_pitch;
+
+		pRow = m_pCanvas->m_pData + beg.x * rowInc;
+
+		// Do clipping for line segment
+		
+		if( beg.x > clip.x + clip.w || end.x < clip.x )
+			return;										// Segement not visible.
+			
+		if( beg.x < clip.x )
+		{
+			int cut = clip.x - beg.x;
+			length -= cut;
+			pRow += rowInc*cut;
+			pos += slope*cut;		}
+
+		if( end.x > clip.x + clip.w )
+			length -= end.x - (clip.x+clip.w);
+
+		clipStart = clip.y << 16;
+		clipEnd = (clip.y + clip.h) <<16;
+	}
+	else
+	{
+		// Prepare mainly vertical line segment
+		
+		if( beg.y > end.y )
+			WgSwap( beg, end );
+		
+		length = end.y - beg.y;
+		if( length == 0 )
+			return;											// TODO: Should stil draw the caps!
+
+		slope = ((end.x - beg.x) << 16) / length;
+		width = (int) (thickness*m_lineThicknessTable[abs(slope>>12)]);
+		pos = (beg.x << 16) - width/2;		
+				
+		rowInc = m_pCanvas->m_pitch;
+		pixelInc = m_pCanvas->m_pixelFormat.bits/8;
+
+		pRow = m_pCanvas->m_pData + beg.y * rowInc;		
+
+		// Do clipping for line segment
+		
+		if( beg.y > clip.y + clip.h || end.y < clip.y )
+			return;										// Segement not visible.
+			
+		if( beg.y < clip.y )
+		{
+			int cut = clip.y - beg.y;
+			length -= cut;
+			pRow += rowInc*cut;
+			pos += slope*cut;
+		}
+
+		if( end.y > clip.y + clip.h )
+			length -= end.y - (clip.y+clip.h);
+			
+		clipStart = clip.x << 16;
+		clipEnd = (clip.x + clip.w) <<16;
+	}
+
+	_clipDrawLineSegment( clipStart, clipEnd, pRow, rowInc, pixelInc, length, width, pos, slope, color );
+}
+
+//____ _drawLineSegment() ______________________________________________________
+
+void WgGfxDeviceSoft::_drawLineSegment( Uint8 * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, WgColor color )
+{
+	//TODO: Translate to use m_pDivTab
 
 	for( int i = 0 ; i < length ; i++ )
 	{
@@ -374,15 +474,18 @@ void WgGfxDeviceSoft::DrawLine( WgCoord beg, WgCoord end, WgColor color, float t
 
 			// Last anti-aliased pixel of column
 
-			alpha = (color.a * ((pos+width) & 0xFFFF)) >> 16;
-			
-			invAlpha = 255 - alpha;
-			pDst = pRow + ofs*pixelInc;
-			
-			pDst[0] = m_pDivTab[pDst[0]*invAlpha + color.b*alpha];
-			pDst[1] = m_pDivTab[pDst[1]*invAlpha + color.g*alpha];
-			pDst[2] = m_pDivTab[pDst[2]*invAlpha + color.r*alpha];			
-
+			int overflow = (pos+width) & 0xFFFF;
+			if( overflow > 0 )
+			{
+				alpha = (color.a * overflow) >> 16;
+				
+				invAlpha = 255 - alpha;
+				pDst = pRow + ofs*pixelInc;
+				
+				pDst[0] = m_pDivTab[pDst[0]*invAlpha + color.b*alpha];
+				pDst[1] = m_pDivTab[pDst[1]*invAlpha + color.g*alpha];
+				pDst[2] = m_pDivTab[pDst[2]*invAlpha + color.r*alpha];			
+			}
 		}
 		
 		pRow += rowInc;
@@ -390,11 +493,109 @@ void WgGfxDeviceSoft::DrawLine( WgCoord beg, WgCoord end, WgColor color, float t
 	}
 }
 
-//____ ClipDrawLine() __________________________________________________________
+//____ _clipDrawLineSegment() ______________________________________________________
 
-void WgGfxDeviceSoft::ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness )
+void WgGfxDeviceSoft::_clipDrawLineSegment( int clipStart, int clipEnd, Uint8 * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, WgColor color )
 {
+	//TODO: Translate to use m_pDivTab
+
+	for( int i = 0 ; i < length ; i++ )
+	{
+		
+		if( pos >= clipEnd || pos + width <= clipStart )
+		{			pRow += rowInc;
+			pos += slope;
+			continue;
+		}
+		
+		int clippedPos = pos;
+		int clippedWidth = width;
+		
+		if( clippedPos < clipStart )
+		{
+			clippedWidth -= clipStart - clippedPos;
+			clippedPos = clipStart;
+		}
+		
+		if( clippedPos + clippedWidth > clipEnd )
+			clippedWidth = clipEnd - clippedPos;
+		
+		
+		int beg = clippedPos >> 16;
+		int end = (clippedPos + clippedWidth) >> 16;
+		int ofs = beg;
+		
+		if( beg == end )
+		{
+			// Special case, one pixel wide row
+			
+			int alpha = (color.a * clippedWidth) >> 16;
+
+			int invAlpha = 255 - alpha;
+			Uint8 * pDst = pRow + ofs*pixelInc;
+			
+			pDst[0] = m_pDivTab[pDst[0]*invAlpha + color.b*alpha];
+			pDst[1] = m_pDivTab[pDst[1]*invAlpha + color.g*alpha];
+			pDst[2] = m_pDivTab[pDst[2]*invAlpha + color.r*alpha];			
+		}
+		else
+		{
+			// First anti-aliased pixel of column
+			
+			int alpha = (color.a * (65536 - (clippedPos & 0xFFFF))) >> 16;
+			
+			int invAlpha = 255 - alpha;
+			Uint8 * pDst = pRow + ofs*pixelInc;
+			
+			pDst[0] = m_pDivTab[pDst[0]*invAlpha + color.b*alpha];
+			pDst[1] = m_pDivTab[pDst[1]*invAlpha + color.g*alpha];
+			pDst[2] = m_pDivTab[pDst[2]*invAlpha + color.r*alpha];			
+			ofs++;
+			
+			// All non-antialiased middle pixels of column
+			
+			
+			if( ofs < end )
+			{					
+				alpha = color.a;	
+				invAlpha = 255 - alpha;
+
+				int storedRed = color.r * alpha;
+				int storedGreen = color.g * alpha;
+				int storedBlue = color.b * alpha;
+
+				do 
+				{
+					pDst = pRow + ofs*pixelInc;						
+					pDst[0] = m_pDivTab[pDst[0]*invAlpha + storedBlue];
+					pDst[1] = m_pDivTab[pDst[1]*invAlpha + storedGreen];
+					pDst[2] = m_pDivTab[pDst[2]*invAlpha + storedRed];			
+					ofs++;
+					
+				} while( ofs < end );
+			}
+
+			// Last anti-aliased pixel of column
+
+			int overflow = (clippedPos+clippedWidth) & 0xFFFF;
+			if( overflow > 0 )
+			{
+				alpha = (color.a * overflow) >> 16;
+				invAlpha = 255 - alpha;
+				pDst = pRow + ofs*pixelInc;
+			
+				pDst[0] = m_pDivTab[pDst[0]*invAlpha + color.b*alpha];
+				pDst[1] = m_pDivTab[pDst[1]*invAlpha + color.g*alpha];
+				pDst[2] = m_pDivTab[pDst[2]*invAlpha + color.r*alpha];			
+			}
+		}
+		
+		pRow += rowInc;
+		pos += slope;
+	}
 }
+
+
 
 
 //____ ClipDrawHorrLine() _____________________________________________________
@@ -2227,5 +2428,13 @@ void WgGfxDeviceSoft::_initTables()
 
 	for( int i = 0 ; i < 65536 ; i++ )
 		m_pDivTab[i] = i / 255;
+
+	// Init lineThicknessTable
+	
+	for( int i = 0 ; i < 17 ; i++ )
+	{
+		double b = i/16.0;
+		m_lineThicknessTable[i] = (int) (sqrt( 1.0 + b*b ) * 65536);
+	}
 
 }

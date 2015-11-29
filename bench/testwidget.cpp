@@ -98,12 +98,13 @@ void TestWidget::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const 
 	if( m_bPointsInitialized )
 	{
 	
+		pDevice->ClipDrawLine( _clip, WgCoord(_canvas.x, _canvas.y), WgCoord(_canvas.x + _canvas.w, _canvas.y + _canvas.h ), WgColor(0,255,0), 15.f );
+
 		for( int i = 0 ; i < 2 ; i+=2 )
 		{
-			pDevice->DrawLine( _canvas.Pos() + m_coord[i], _canvas.Pos() + m_coord[i+1], WgColor(255,0,0), 15.f );
+			pDevice->ClipDrawLine( _clip, _canvas.Pos() + m_coord[i], _canvas.Pos() + m_coord[i+1], WgColor(255,0,0), 2.f );
 		}
 	
-		pDevice->DrawLine( WgCoord(_canvas.x + 20, _canvas.y +10), WgCoord(_canvas.x + 30, _canvas.y + _canvas.h -10 ), WgColor(0,255,0), 10.f );
 	}
 }
 
@@ -117,7 +118,7 @@ void TestWidget::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHand
 		{
 			const WgEvent::Tick * pTick = static_cast<const WgEvent::Tick*>(pEvent);
 			
-			WgRect area( 10,10, Size() - WgSize(10,10) );
+			WgRect area( 0,0, Size() );
 			
 			
 			if( !m_bPointsInitialized )

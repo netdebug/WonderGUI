@@ -85,6 +85,10 @@ protected:
 	void	_initTables();
 	void	_genCurveTab();
 
+	void 	_drawLineSegment( Uint8 * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, WgColor color );
+	void 	_clipDrawLineSegment( int clipStart, int clipEnd, Uint8 * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, WgColor color );
+
+
 	void	_drawHorrFadeLine( Uint8 * pLineStart, int begOfs, int peakOfs, int endOfs, WgColor color );
 	void	_clipDrawHorrFadeLine( int clipX1, int clipX2, Uint8 * pLineStart, int begOfs, int peakOfs, int endOfs, WgColor color );
 
@@ -128,8 +132,9 @@ protected:
 	bool			m_bBilinearFiltering;
 	WgSurfaceSoft * m_pCanvas;
 	Uint8			m_limitTable[512];
+	int				m_lineThicknessTable[17];
 	int *			m_pCurveTab;
-    Uint8 *          m_pDivTab;
+    Uint8 *         m_pDivTab;
 };
 
 #endif //WG_GFXDEVICE_SOFT_DOT_H
