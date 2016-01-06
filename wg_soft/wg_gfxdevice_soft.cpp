@@ -20,6 +20,8 @@
 
 =========================================================================*/
 
+#include <algorithm>
+
 #include <wg_gfxdevice_soft.h>
 #include <wg_surface_soft.h>
 

@@ -1,14 +1,11 @@
-#ifdef __cplusplus
-    #include <cstdlib>
-#else
-    #include <stdlib.h>
-#endif
+#include <cstdlib>
+
 #ifdef WIN32
 #include <SDL.h>
 #include <SDL_image.h>
 #else
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #endif
 
 
@@ -32,7 +29,6 @@ void DBG_ASSERT(bool x) {}
 
 extern std::ostream cout;
 
-SDL_Surface *	initSDL( int w, int h );
 bool			eventLoop( WgEventHandler * pHandler );
 WgRootPanel * 		setupGUI( WgGfxDevice * pDevice );
 void			printWidgetSizes();
@@ -66,12 +62,17 @@ int main ( int argc, char** argv )
 	
 	printWidgetSizes();
 	
-	
-	// Init SDL
 
-	SDL_Surface * pScreen = initSDL(640,480);
-	if(!pScreen )
-		return 1;
+	//------------------------------------------------------
+	// Init SDL
+	//------------------------------------------------------
+
+	SDL_Init(SDL_INIT_VIDEO);
+
+	int posX = 100, posY = 100, width = 320, height = 240;
+	SDL_Window * pWin = SDL_CreateWindow("Hello WonderGUI", posX, posY, width, height, 0);
+
+	SDL_Surface * pScreen = SDL_GetWindowSurface(pWin);
 
 	IMG_Init( IMG_INIT_PNG | IMG_INIT_JPG );
 
@@ -87,7 +88,15 @@ int main ( int argc, char** argv )
 
 	// Setup gfxdevice and gui
 
-	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(640,480), WG_PIXEL_BGRA_8, (unsigned char *) pScreen->pixels, pScreen->pitch );
+	WgPixelType type = WG_PIXEL_UNKNOWN;
+
+	if (pScreen->format->BitsPerPixel == 32)
+		type = WG_PIXEL_BGRA_8;
+	else if (pScreen->format->BitsPerPixel == 24)
+		type = WG_PIXEL_BGR_8;
+
+
+	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(width,height), type, (unsigned char *) pScreen->pixels, pScreen->pitch );
 	WgGfxDeviceSoft * pGfxDevice = new WgGfxDeviceSoft( pCanvas );
 	pGfxDevice->SetBilinearFiltering( true );
 
@@ -206,8 +215,7 @@ int main ( int argc, char** argv )
 			updatedRects[0].h = r.h;
 		}
 
-		SDL_UpdateRects( pScreen, nUpdatedRects, updatedRects);
-
+		SDL_UpdateWindowSurfaceRects(pWin, updatedRects, nUpdatedRects);
 
  
 //		SDL_GL_SwapBuffers();
@@ -705,40 +713,6 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pVBox->SetRadioGroup(true);
 */
 	return pRoot;
-}
-
-//____ initSDL() ______________________________________________________________
-
-SDL_Surface * initSDL( int w, int h )
-{
-    // initialize SDL video
-    if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-    {
-        printf( "Unable to init SDL: %s\n", SDL_GetError() );
-        return 0;
-    }
-
-    // make sure SDL cleans up before exit
-    atexit(SDL_Quit);
-
- 
-	// OpenGL preparations
-
-   const SDL_VideoInfo* info = SDL_GetVideoInfo( );
-    int bpp = info->vfmt->BitsPerPixel;
- 
-
-    // create a new window
-    SDL_Surface* pScreen = SDL_SetVideoMode(w, h, bpp, 0);
-    if ( !pScreen )
-    {
-        printf("Unable to set %dx%d video: %s\n", w, h, SDL_GetError());
-        return 0;
-    }
-
-	SDL_EnableUNICODE(true);
-
-	return pScreen;
 }
 
 

@@ -39,7 +39,7 @@ WgFrameSkin::WgFrameSkin( int thickness, WgColor col )
 }
 
 	
-void WgFrameSkin::Render( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _clip )
+void WgFrameSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip ) const
 {
     WgRect top( WgRect(_canvas.x, _canvas.y, _canvas.w, m_thickness), _clip );
     WgRect left( WgRect(_canvas.x, _canvas.y+m_thickness, m_thickness, _canvas.h - m_thickness*2), _clip );

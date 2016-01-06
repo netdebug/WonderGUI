@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{57861DF7-4FBE-4E46-9494-F953F233D7DC}</ProjectGuid>
+    <RootNamespace>wondergui</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.23107.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <IncludePath>C:\Users\Tord\Workspace\freetype\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <IncludePath>C:\Users\Tord\Workspace\freetype\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Debug.h" />
+    <ClInclude Include="include\wg_anim.h" />
+    <ClInclude Include="include\wg_animplayer.h" />
+    <ClInclude Include="include\wg_base.h" />
+    <ClInclude Include="include\wg_bitmapglyphs.h" />
+    <ClInclude Include="include\wg_blockset.h" />
+    <ClInclude Include="include\wg_blockskin.h" />
+    <ClInclude Include="include\wg_boxskin.h" />
+    <ClInclude Include="include\wg_button.h" />
+    <ClInclude Include="include\wg_capsule.h" />
+    <ClInclude Include="include\wg_chain.h" />
+    <ClInclude Include="include\wg_char.h" />
+    <ClInclude Include="include\wg_charbuffer.h" />
+    <ClInclude Include="include\wg_charseq.h" />
+    <ClInclude Include="include\wg_checkbox.h" />
+    <ClInclude Include="include\wg_codepages.h" />
+    <ClInclude Include="include\wg_color.h" />
+    <ClInclude Include="include\wg_colorset.h" />
+    <ClInclude Include="include\wg_colorskin.h" />
+    <ClInclude Include="include\wg_combobox.h" />
+    <ClInclude Include="include\wg_container.h" />
+    <ClInclude Include="include\wg_cursor.h" />
+    <ClInclude Include="include\wg_cursorinstance.h" />
+    <ClInclude Include="include\wg_dynarray.h" />
+    <ClInclude Include="include\wg_event.h" />
+    <ClInclude Include="include\wg_eventfilter.h" />
+    <ClInclude Include="include\wg_eventhandler.h" />
+    <ClInclude Include="include\wg_eventlogger.h" />
+    <ClInclude Include="include\wg_extendedskin.h" />
+    <ClInclude Include="include\wg_filler.h" />
+    <ClInclude Include="include\wg_flexpanel.h" />
+    <ClInclude Include="include\wg_font.h" />
+    <ClInclude Include="include\wg_fpsdisplay.h" />
+    <ClInclude Include="include\wg_geo.h" />
+    <ClInclude Include="include\wg_gfxanim.h" />
+    <ClInclude Include="include\wg_gfxdevice.h" />
+    <ClInclude Include="include\wg_gfxdevice_null.h" />
+    <ClInclude Include="include\wg_glyphset.h" />
+    <ClInclude Include="include\wg_hook.h" />
+    <ClInclude Include="include\wg_iconholder.h" />
+    <ClInclude Include="include\wg_image.h" />
+    <ClInclude Include="include\wg_interface_edittext.h" />
+    <ClInclude Include="include\wg_interface_textholder.h" />
+    <ClInclude Include="include\wg_interface_valueholder.h" />
+    <ClInclude Include="include\wg_key.h" />
+    <ClInclude Include="include\wg_knob.h" />
+    <ClInclude Include="include\wg_layer.h" />
+    <ClInclude Include="include\wg_lineeditor.h" />
+    <ClInclude Include="include\wg_listpanel.h" />
+    <ClInclude Include="include\wg_mempool.h" />
+    <ClInclude Include="include\wg_memstack.h" />
+    <ClInclude Include="include\wg_menu.h" />
+    <ClInclude Include="include\wg_menubar.h" />
+    <ClInclude Include="include\wg_menuitem.h" />
+    <ClInclude Include="include\wg_menulayer.h" />
+    <ClInclude Include="include\wg_modallayer.h" />
+    <ClInclude Include="include\wg_orderedselectable.h" />
+    <ClInclude Include="include\wg_oscilloscope.h" />
+    <ClInclude Include="include\wg_packpanel.h" />
+    <ClInclude Include="include\wg_panel.h" />
+    <ClInclude Include="include\wg_patches.h" />
+    <ClInclude Include="include\wg_pen.h" />
+    <ClInclude Include="include\wg_radiobutton.h" />
+    <ClInclude Include="include\wg_refcounted.h" />
+    <ClInclude Include="include\wg_refreshbutton.h" />
+    <ClInclude Include="include\wg_resdb.h" />
+    <ClInclude Include="include\wg_resloader.h" />
+    <ClInclude Include="include\wg_rootpanel.h" />
+    <ClInclude Include="include\wg_rulerlabels.h" />
+    <ClInclude Include="include\wg_scaleimage.h" />
+    <ClInclude Include="include\wg_scrollpanel.h" />
+    <ClInclude Include="include\wg_shadercapsule.h" />
+    <ClInclude Include="include\wg_simplevolumemeter.h" />
+    <ClInclude Include="include\wg_sizebroker.h" />
+    <ClInclude Include="include\wg_sizecapsule.h" />
+    <ClInclude Include="include\wg_sizescaler.h" />
+    <ClInclude Include="include\wg_skin.h" />
+    <ClInclude Include="include\wg_slider.h" />
+    <ClInclude Include="include\wg_slidertarget.h" />
+    <ClInclude Include="include\wg_smartptr.h" />
+    <ClInclude Include="include\wg_stackpanel.h" />
+    <ClInclude Include="include\wg_string.h" />
+    <ClInclude Include="include\wg_surface.h" />
+    <ClInclude Include="include\wg_switch.h" />
+    <ClInclude Include="include\wg_tablepanel.h" />
+    <ClInclude Include="include\wg_tablist.h" />
+    <ClInclude Include="include\wg_tabordercapsule.h" />
+    <ClInclude Include="include\wg_text.h" />
+    <ClInclude Include="include\wg_textdisplay.h" />
+    <ClInclude Include="include\wg_textlink.h" />
+    <ClInclude Include="include\wg_textmanager.h" />
+    <ClInclude Include="include\wg_textprop.h" />
+    <ClInclude Include="include\wg_textpropmanager.h" />
+    <ClInclude Include="include\wg_texttool.h" />
+    <ClInclude Include="include\wg_tileholder.h" />
+    <ClInclude Include="include\wg_types.h" />
+    <ClInclude Include="include\wg_userdefines.h" />
+    <ClInclude Include="include\wg_util.h" />
+    <ClInclude Include="include\wg_valuedisplay.h" />
+    <ClInclude Include="include\wg_valueeditor.h" />
+    <ClInclude Include="include\wg_valueformat.h" />
+    <ClInclude Include="include\wg_vectorglyphs.h" />
+    <ClInclude Include="include\wg_vectorpanel.h" />
+    <ClInclude Include="include\wg_volumemeter.h" />
+    <ClInclude Include="include\wg_widget.h" />
+    <ClInclude Include="include\wg_widgetcollection.h" />
+    <ClInclude Include="include\wg_widgetholder.h" />
+    <ClInclude Include="include\wondergui.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\wg_anim.cpp" />
+    <ClCompile Include="source\wg_animplayer.cpp" />
+    <ClCompile Include="source\wg_base.cpp" />
+    <ClCompile Include="source\wg_bitmapglyphs.cpp" />
+    <ClCompile Include="source\wg_blockset.cpp" />
+    <ClCompile Include="source\wg_blockskin.cpp" />
+    <ClCompile Include="source\wg_boxskin.cpp" />
+    <ClCompile Include="source\wg_button.cpp" />
+    <ClCompile Include="source\wg_capsule.cpp" />
+    <ClCompile Include="source\wg_chain.cpp" />
+    <ClCompile Include="source\wg_char.cpp" />
+    <ClCompile Include="source\wg_charbuffer.cpp" />
+    <ClCompile Include="source\wg_charseq.cpp" />
+    <ClCompile Include="source\wg_checkbox.cpp" />
+    <ClCompile Include="source\wg_codepages.cpp" />
+    <ClCompile Include="source\wg_color.cpp" />
+    <ClCompile Include="source\wg_colorset.cpp" />
+    <ClCompile Include="source\wg_colorskin.cpp" />
+    <ClCompile Include="source\wg_combobox.cpp" />
+    <ClCompile Include="source\wg_container.cpp" />
+    <ClCompile Include="source\wg_cursor.cpp" />
+    <ClCompile Include="source\wg_cursorinstance.cpp" />
+    <ClCompile Include="source\wg_event.cpp" />
+    <ClCompile Include="source\wg_eventfilter.cpp" />
+    <ClCompile Include="source\wg_eventhandler.cpp" />
+    <ClCompile Include="source\wg_eventlogger.cpp" />
+    <ClCompile Include="source\wg_extendedskin.cpp" />
+    <ClCompile Include="source\wg_filler.cpp" />
+    <ClCompile Include="source\wg_flexpanel.cpp" />
+    <ClCompile Include="source\wg_font.cpp" />
+    <ClCompile Include="source\wg_fpsdisplay.cpp" />
+    <ClCompile Include="source\wg_geo.cpp" />
+    <ClCompile Include="source\wg_gfxanim.cpp" />
+    <ClCompile Include="source\wg_gfxdevice.cpp" />
+    <ClCompile Include="source\wg_gfxdevice_null.cpp" />
+    <ClCompile Include="source\wg_glyphset.cpp" />
+    <ClCompile Include="source\wg_hook.cpp" />
+    <ClCompile Include="source\wg_iconholder.cpp" />
+    <ClCompile Include="source\wg_image.cpp" />
+    <ClCompile Include="source\wg_interface_edittext.cpp" />
+    <ClCompile Include="source\wg_interface_textholder.cpp" />
+    <ClCompile Include="source\wg_interface_valueholder.cpp" />
+    <ClCompile Include="source\wg_knob.cpp" />
+    <ClCompile Include="source\wg_layer.cpp" />
+    <ClCompile Include="source\wg_lineeditor.cpp" />
+    <ClCompile Include="source\wg_listpanel.cpp" />
+    <ClCompile Include="source\wg_mempool.cpp" />
+    <ClCompile Include="source\wg_memstack.cpp" />
+    <ClCompile Include="source\wg_menu.cpp" />
+    <ClCompile Include="source\wg_menubar.cpp" />
+    <ClCompile Include="source\wg_menuitem.cpp" />
+    <ClCompile Include="source\wg_menulayer.cpp" />
+    <ClCompile Include="source\wg_modallayer.cpp" />
+    <ClCompile Include="source\wg_orderedselectable.cpp" />
+    <ClCompile Include="source\wg_oscilloscope.cpp" />
+    <ClCompile Include="source\wg_packpanel.cpp" />
+    <ClCompile Include="source\wg_panel.cpp" />
+    <ClCompile Include="source\wg_patches.cpp" />
+    <ClCompile Include="source\wg_pen.cpp" />
+    <ClCompile Include="source\wg_radiobutton.cpp" />
+    <ClCompile Include="source\wg_refreshbutton.cpp" />
+    <ClCompile Include="source\wg_resdb.cpp" />
+    <ClCompile Include="source\wg_rootpanel.cpp" />
+    <ClCompile Include="source\wg_rulerlabels.cpp" />
+    <ClCompile Include="source\wg_scaleimage.cpp" />
+    <ClCompile Include="source\wg_scrollpanel.cpp" />
+    <ClCompile Include="source\wg_shadercapsule.cpp" />
+    <ClCompile Include="source\wg_simplevolumemeter.cpp" />
+    <ClCompile Include="source\wg_sizebroker.cpp" />
+    <ClCompile Include="source\wg_sizecapsule.cpp" />
+    <ClCompile Include="source\wg_sizescaler.cpp" />
+    <ClCompile Include="source\wg_skin.cpp" />
+    <ClCompile Include="source\wg_slider.cpp" />
+    <ClCompile Include="source\wg_slidertarget.cpp" />
+    <ClCompile Include="source\wg_smartptr.cpp" />
+    <ClCompile Include="source\wg_stackpanel.cpp" />
+    <ClCompile Include="source\wg_string.cpp" />
+    <ClCompile Include="source\wg_surface.cpp" />
+    <ClCompile Include="source\wg_switch.cpp" />
+    <ClCompile Include="source\wg_tablepanel.cpp" />
+    <ClCompile Include="source\wg_tablist.cpp" />
+    <ClCompile Include="source\wg_tabordercapsule.cpp" />
+    <ClCompile Include="source\wg_text.cpp" />
+    <ClCompile Include="source\wg_textdisplay.cpp" />
+    <ClCompile Include="source\wg_textmanager.cpp" />
+    <ClCompile Include="source\wg_textprop.cpp" />
+    <ClCompile Include="source\wg_textpropmanager.cpp" />
+    <ClCompile Include="source\wg_texttool.cpp" />
+    <ClCompile Include="source\wg_tileholder.cpp" />
+    <ClCompile Include="source\wg_util.cpp" />
+    <ClCompile Include="source\wg_valuedisplay.cpp" />
+    <ClCompile Include="source\wg_valueeditor.cpp" />
+    <ClCompile Include="source\wg_valueformat.cpp" />
+    <ClCompile Include="source\wg_vectorglyphs.cpp" />
+    <ClCompile Include="source\wg_vectorpanel.cpp" />
+    <ClCompile Include="source\wg_volumemeter.cpp" />
+    <ClCompile Include="source\wg_widget.cpp" />
+    <ClCompile Include="source\wg_widgetholder.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

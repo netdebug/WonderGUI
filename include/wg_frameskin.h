@@ -38,7 +38,7 @@ public:
 	
 	~WgFrameSkin() {};
 	
-	void Render( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _clip );
+	void Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip ) const;
 	bool IsOpaque() const;
 	
 private:
