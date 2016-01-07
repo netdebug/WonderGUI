@@ -29,11 +29,11 @@
 #endif
 #endif
 
-#ifdef _MSC_VER // MS do not support C99
-#include "WG/C99Compatibility/pstdint.h"
-#else
+//#ifdef _MSC_VER // MS do not support C99
+//#include "WG/C99Compatibility/pstdint.h"
+//#else
 #	include <stdint.h>			// Use the C99 official header
-#endif
+//#endif
 
 
 #ifndef Uint8
@@ -81,6 +81,8 @@
 #	endif
 #endif
 
+#define WG_IS_LITTLE_ENDIAN 1
+#define WG_IS_BIG_ENDIAN 0
 
 #ifndef WG_IS_BIG_ENDIAN
 #error Could not detect endianness. You need to define WG_IS_BIG_ENDIAN and WG_IS_LITTLE_ENDIAN in wg_types.h

@@ -59,8 +59,8 @@ namespace sdl_wglib
 			case SDL_KEYDOWN:
 			{
 				g_pHandler->QueueEvent( new WgEvent::KeyPress( event.key.keysym.sym ) );
-				if( event.key.keysym.unicode != 0 )
-					g_pHandler->QueueEvent( new WgEvent::Character( event.key.keysym.unicode ) );
+//				if( event.key.keysym.unicode != 0 )
+//					g_pHandler->QueueEvent( new WgEvent::Character( event.key.keysym.unicode ) );
 				break;
 			}
 
