@@ -26,12 +26,6 @@
 #include <wg_surface_gl.h>
 #include <wg_util.h>
 
-#ifdef WIN32
-#	include <glext.h>
-#else
-#	include <GL/glext.h>
-#	include <GL/glx.h>
-#endif
 //#include <GL/glu.h>
 
 

@@ -115,6 +115,8 @@ bool WgGfxDeviceGL::BeginRender()
 	glPushMatrix();							// Store The Modelview Matrix
 	glLoadIdentity();						// Reset The Modelview Matrix
 
+
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	//
 
 	m_bRendering = true;
@@ -326,7 +328,11 @@ void WgGfxDeviceGL::FillSubPixel( const WgRectF& rect, const WgColor& col )
 		return;
 
 	glDisable(GL_TEXTURE_2D);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable( GL_BLEND );
 	glEnable(GL_POLYGON_SMOOTH);
+	glDisable( GL_MULTISAMPLE );
 
 	float	dx1 = rect.x;
 	float	dy1 = m_canvasSize.h - rect.y;

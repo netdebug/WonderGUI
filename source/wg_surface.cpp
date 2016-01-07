@@ -234,7 +234,7 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
 		}
 		else if( pSrcFormat->type == WG_PIXEL_BGR_8 && pDstFormat->type == WG_PIXEL_BGRA_8)
 		{
-			// We are just switching from RGB_8 and RGBA_8, just copy RGB components and fill alpha
+			// We are just switching from RGB_8 to RGBA_8, just copy RGB components and fill alpha
 
 			int		srcLineInc = srcPitch - 3 * srcRect.w;
 			int		dstLineInc = dstPitch - 4 * srcRect.w;
