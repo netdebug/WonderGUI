@@ -174,6 +174,15 @@ bool WgRootPanel::SetVisible( bool bVisible )
 	return true;
 }
 
+//____ SetUpdatedRectOverlay() _________________________________________________
+
+void WgRootPanel::SetUpdatedRectOverlay( const WgSkinPtr& pUpdatedRectOverlay, int afterglowFrames )
+{
+	m_pUpdatedRectOverlay = pUpdatedRectOverlay;
+	m_afterglowFrames = afterglowFrames;
+}
+
+
 
 //____ Render() _______________________________________________________________
 
@@ -206,6 +215,38 @@ bool WgRootPanel::BeginRender()
 	if( !m_pGfxDevice || !m_hook.Widget() )
 		return false;						// No GFX-device or no widgets to render.
 
+
+	if( m_pUpdatedRectOverlay )
+	{
+		// Remove from afterglow queue patches that are overlapped by our new dirty patches.
+
+		for( std::deque<WgPatches>::iterator it = m_afterglowRects.begin() ; it != m_afterglowRects.end() ; ++it )
+			it->Sub(&m_dirtyPatches);
+
+		// Add our new dirty patches to the top of the afterglow queue.
+		
+		
+		m_afterglowRects.push_front(WgPatches());
+		m_afterglowRects.front().Add(&m_dirtyPatches);
+		
+		// Possibly remove overlays from the back, put them into dirty rects for re-render
+		
+		while( m_afterglowRects.size() > m_afterglowFrames+1 )
+		{
+			m_dirtyPatches.Add( &m_afterglowRects.back() );
+			m_afterglowRects.pop_back();
+		}
+		
+		// Re-render graphics behind overlays that go from state FOCUSED to NORMAL 
+		
+		if( m_afterglowRects.size() > 1 )
+		{
+			m_dirtyPatches.Add( &m_afterglowRects[1] );
+		}
+	}
+	
+	// Initialize GfxDevice
+
 	return m_pGfxDevice->BeginRender();
 }
 
@@ -230,6 +271,7 @@ bool WgRootPanel::RenderSection( const WgRect& _clip )
 		return true;						// Not an error, just hidden.
 
 	// Copy and clip our dirty patches
+	// TODO: Optimize when clip rectangle equals canvas
 
 	WgPatches dirtyPatches( m_dirtyPatches.Size() );
 
@@ -244,6 +286,30 @@ bool WgRootPanel::RenderSection( const WgRect& _clip )
 
 	m_hook.Widget()->_renderPatches( m_pGfxDevice, canvas, canvas, &dirtyPatches );
 
+	// Handle updated rect overlays
+	
+	if( m_pUpdatedRectOverlay )
+	{
+		// Render our new overlays
+		
+		for( const WgRect * pRect = m_afterglowRects[0].Begin() ; pRect != m_afterglowRects[0].End() ; pRect++ )
+		{
+			m_pUpdatedRectOverlay->Render( m_pGfxDevice, WG_STATE_FOCUSED, *pRect, clip );
+		}		
+
+		// Render overlays that have turned into afterglow
+
+		if( m_afterglowRects.size() > 1 )
+		{
+			for( const WgRect * pRect = m_afterglowRects[1].Begin() ; pRect != m_afterglowRects[1].End() ; pRect++ )
+			{
+				m_pUpdatedRectOverlay->Render( m_pGfxDevice, WG_STATE_NORMAL, *pRect, clip );
+			}		
+		}
+	}
+	
+
+
 	return true;
 }
 
@@ -254,7 +320,8 @@ bool WgRootPanel::EndRender( void )
 	if( !m_pGfxDevice || !m_hook.Widget() )
 		return false;						// No GFX-device or no widgets to render.
 
-	// Turn dirty patches into update patches
+
+	// Turn dirty patches into updated patches
 	//TODO: Optimize by just making a swap.
 
 	m_updatedPatches.Clear();

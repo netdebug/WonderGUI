@@ -22,6 +22,8 @@
 #ifndef WG_ROOTPANEL_DOT_H
 #define WG_ROOTPANEL_DOT_H
 
+#include <deque>
+
 #ifndef WG_CONTAINER_DOT_H
 #	include <wg_container.h>
 #endif
@@ -32,6 +34,10 @@
 
 #ifndef WG_PATCHES_DOT_H
 #	include <wg_patches.h>
+#endif
+
+#ifndef WG_SKIN_DOT_H
+#	include <wg_skin.h>
 #endif
 
 class WgGfxDevice;
@@ -88,6 +94,8 @@ public:
 	bool	RenderSection( const WgRect& clip );
 	bool	EndRender();
 
+	void	SetUpdatedRectOverlay( const WgSkinPtr& pUpdatedRectOverlay, int afterglowFrames = 3 );
+
 	inline void	AddDirtyPatch( const WgRect& rect ) { m_dirtyPatches.Add( rect ); }
 
 	WgWidget *	FindWidget( const WgCoord& ofs, WgSearchMode mode );
@@ -126,6 +134,7 @@ protected:
 	};
 
 
+
 	WgHook*				_firstHook() const { return m_hook.Widget()? const_cast<Hook*>(&m_hook):0; }
 	WgHook*				_lastHook() const { return m_hook.Widget()? const_cast<Hook*>(&m_hook):0; }
 
@@ -134,6 +143,12 @@ protected:
 
 	WgPatches			m_dirtyPatches;		// Dirty patches that needs to be rendered.
 	WgPatches			m_updatedPatches;	// Patches that were updated in last rendering session.
+
+	WgSkinPtr			m_pUpdatedRectOverlay;
+	int					m_afterglowFrames;
+
+	std::deque<WgPatches>	m_afterglowRects;	// Afterglow rects are placed in this queue.
+	
 
 	WgGfxDevice *		m_pGfxDevice;
 	WgEventHandler *	m_pEventHandler;

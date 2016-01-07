@@ -152,6 +152,14 @@ int main ( int argc, char** argv )
 
 	pRoot->FindWidget( WgCoord(10,10), WG_SEARCH_ACTION_TARGET );
 
+	// Setup debug overlays
+	
+	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
+	pOverlaySkin->SetStateColor( WG_STATE_NORMAL, WgColor::transparent, WgColor::red );	
+	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 500 );
+	
+
+
    // program main loop
 
 	int moveCounter = 0;
@@ -166,7 +174,7 @@ int main ( int argc, char** argv )
 		
 		// DRAWING STARTS HERE
 
-		pRoot->AddDirtyPatch( pRoot->Geo().Size() );
+//		pRoot->AddDirtyPatch( pRoot->Geo().Size() );
 
 //		SDL_LockSurface( pScreen );
 		pRoot->Render();
@@ -213,7 +221,7 @@ int main ( int argc, char** argv )
 //		SDL_GL_SwapBuffers();
         // Pause for a while
 
-        SDL_Delay(10);
+        SDL_Delay(20);
 		
 		if( moveCounter < 1 && pWidgetToMove ) {
 			
@@ -341,11 +349,25 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pHook->SetAnchored( WG_NORTHWEST, WG_SOUTHEAST );
 
 
-	// Test widget
+	// Simple movable rectangle
 	
+	WgFiller * pRect = new WgFiller();
+	pRect->SetColors( WgColorset::Create( WgColor::coral ));
+	
+	pHook = pFlex->AddChild( pRect, WgRect(10,10,50,50) );
+	
+	pEventHandler->AddCallback( WgEventFilter::MouseButtonPress(pRect, 1), cbInitDrag, pRect );
+	pEventHandler->AddCallback( WgEventFilter::MouseButtonDrag(pRect, 1), cbDragWidget, pRect );
+
+
+	// Test widget
+/*
 	TestWidget * pTest = new TestWidget();
 	pHook = pFlex->AddChild( pTest );
 	pTest->Start();
+*/
+
+
 	
 
 
