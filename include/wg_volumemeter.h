@@ -35,17 +35,19 @@ public:
 	void			SetLEDSpacing( float spacing );
 	void			SetValue( float peak, float hold );
 	void			SetDirection( WgDirection direction );
-    void            SetPaddingX( float padding ) { m_fPaddingX = padding; }
+    void            SetSidePadding( float padding ) { m_fSidePadding = padding; }
     void            SetZeroInMiddle(bool mb) { m_bZeroInMiddle = mb; }
     void            EnableFades(bool b) { m_bUseFades = b; }
 	WgSize			PreferredSize() const;
 	
 protected:
 	
+	void			_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler );
 	void			_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
 	void			_onCloneContent( const WgWidget * _pOrg );
 	bool			_onAlphaTest( const WgCoord& ofs );
 	void			_onNewSize( const WgSize& size );
+
 	
 	WgDirection		m_direction;
 	WgColor			m_LEDColors[3][2];
@@ -58,8 +60,8 @@ protected:
 	int			    m_iHold;
     float           m_fPeak;
 	
-    float           m_fPaddingX;
-    int             m_iPaddingX;
+    float           m_fSidePadding;
+    int             m_iSidePadding;
     
     bool            m_bZeroInMiddle;
     float           d;
@@ -67,7 +69,7 @@ protected:
     
     
     std::vector<float> m_LEDStates;
-    int             m_iUpdateCounter;
+
     bool            m_bUseFades;
 };
 

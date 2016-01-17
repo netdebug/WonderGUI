@@ -51,6 +51,10 @@ protected:
 	void			_renderPeak( WgGfxDevice * pDevice, int nb, const WgRect& _rect, const WgRect& _clip );
 	void			_renderHold( WgGfxDevice * pDevice, int nb, const WgRect& _rect, const WgRect& _clip );
 	
+	void 			_requestRenderPartial( float newLeftPeak, float newLeftHold, float newRightPeak, float newRightHold );
+	void 			_calcHoldRect( WgRect * pDest, const WgRect& canvas, float holdValue );
+	
+	
 	
 	WgColor			m_sectionColors[3];
 	float			m_sectionHeight[3];

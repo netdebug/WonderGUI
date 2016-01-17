@@ -45,12 +45,12 @@ void WgHook::_attachWidget( WgWidget * pWidget )
 	assert( pWidget->Parent() == 0 );
 
 	if( m_pWidget )
-		m_pWidget->m_pHook = 0;
+		m_pWidget->_onNewHook(this);
 
 	m_pWidget = pWidget;
 
 	if( pWidget )
-		pWidget->m_pHook = this;
+		pWidget->_onNewHook(this);
 }
 
 //____ _relinkWidget() __________________________________________________________

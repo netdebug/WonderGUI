@@ -169,6 +169,16 @@ WgWidget * WgContainer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 	return pResult;
 }
 
+//____ _onNewRoot() ___________________________________________________________
+
+void WgContainer::_onNewRoot( WgRootPanel * pRoot )
+{
+	for( WgHook * p = FirstHook() ; p != 0 ; p = p->Next() )
+		p->Widget()->_onNewRoot( pRoot );	
+
+	WgWidget::_onNewRoot(pRoot);
+}
+
 //____ _focusRequested() _______________________________________________________
 
 bool WgContainer::_focusRequested( WgHook * pBranch, WgWidget * pWidgetRequesting )

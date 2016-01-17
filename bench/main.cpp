@@ -21,6 +21,9 @@
 #include <wg_gfxdevice_gl.h>
 #include <sdl_wglib.h>
 #include <wg_boxskin.h>
+#include <wg_volumemeter.h>
+#include <wg_simplevolumemeter.h>
+
 
 #include "testwidget.h"
 
@@ -52,6 +55,13 @@ WgWidget * pWidgetToMove = 0;
 
 WgValueDisplay * m_pCounter = 0;
 WgValueDisplay * m_pCounter2 = 0;
+
+WgVolumeMeter * m_pVolMeter = 0;
+WgSimpleVolumeMeter * m_pSimpleVolMeter1 = 0;
+
+float	leftPeak = 1.f, rightPeak = 0.5f, leftHold = 0.5f, rightHold = 0.5f;
+
+bool	leftUp = true, rightUp = false;
 
 
 //____ main() _________________________________________________________________
@@ -165,13 +175,13 @@ int main ( int argc, char** argv )
 	
 	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
 	pOverlaySkin->SetStateColor( WG_STATE_NORMAL, WgColor::transparent, WgColor::red );	
-	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 500 );
+	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 0 );
 	
 
 
    // program main loop
 
-	int moveCounter = 0;
+	int counter = 0;
 
     while (eventLoop( pRoot->EventHandler() ))
     {
@@ -181,6 +191,51 @@ int main ( int argc, char** argv )
 		if( m_pCounter2 )
 			m_pCounter2->IncValue();
 		
+		
+		if( m_pVolMeter )
+			m_pVolMeter->SetValue( (counter%100)/100.f, (counter%1000)/1000.f ); 
+			
+		if( m_pSimpleVolMeter1 )
+		{
+			if( leftUp )
+				leftPeak += 0.01;
+			else
+				leftPeak -= 0.01;
+				
+			if( leftPeak >= 1.f )
+				leftUp = false;
+				
+			if( leftPeak <= 0.f )
+				leftUp = true;
+				
+			if( leftPeak > leftHold )
+				leftHold = leftPeak;
+			else
+				leftHold -= 0.003;
+				
+
+			if( rightUp )
+				rightPeak += 0.01;
+			else
+				rightPeak -= 0.01;
+				
+			if( rightPeak >= 1.f )
+				rightUp = false;
+				
+			if( rightPeak <= 0.f )
+				rightUp = true;
+				
+			if( rightPeak > rightHold )
+				rightHold = rightPeak;
+			else
+				rightHold -= 0.003;
+
+				
+			m_pSimpleVolMeter1->SetValue( leftPeak, leftHold, rightPeak, rightHold );
+		}
+			
+			
+			
 		// DRAWING STARTS HERE
 
 //		pRoot->AddDirtyPatch( pRoot->Geo().Size() );
@@ -229,19 +284,9 @@ int main ( int argc, char** argv )
 //		SDL_GL_SwapBuffers();
         // Pause for a while
 
-        SDL_Delay(20);
-		
-		if( moveCounter < 1 && pWidgetToMove ) {
-			
-			printf( "%d:", nUpdatedRects );
-			for( int i = 0 ; i < nUpdatedRects ; i++ )
-				printf( "(%d,%d,%d,%d) ", updatedRects[i].x, updatedRects[i].y, updatedRects[i].w, updatedRects[i].h );
-			printf( "\n" );	
-			moveCounter++;
-			WgFlexHook * p = (WgFlexHook*) pWidgetToMove->Hook();
-			p->SetOfs( p->Pos() + WgCoord( 50,50));
-		}
+        SDL_Delay(50);
 			 
+		counter++;
 
     } // end main loop
 
@@ -357,8 +402,25 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pHook->SetAnchored( WG_NORTHWEST, WG_SOUTHEAST );
 
 
-	// Simple movable rectangle
+	// LED Volume meter
+/*	
+	WgVolumeMeter * pMeter1 = new WgVolumeMeter();
+	pHook = pFlex->AddChild( pMeter1,WgRect(10,10,40,100) );
+
+	pMeter1->SetValue( 0.7f, 1.0f );
+	pMeter1->SetDirection( WG_RIGHT );
+	m_pVolMeter = pMeter1;
+*/
+
+	// Simple Volume meter
 	
+	WgSimpleVolumeMeter * pMeter2 = new WgSimpleVolumeMeter();
+	pHook = pFlex->AddChild( pMeter2,WgRect(10,10,40,100) );
+	pMeter2->SetValue( 0.5f, 1.0f, 0.3f, 0.9f );
+	m_pSimpleVolMeter1 = pMeter2;
+
+	// Simple movable rectangle
+/*	
 	WgFiller * pRect = new WgFiller();
 	pRect->SetColors( WgColorset::Create( WgColor::coral ));
 	
@@ -366,7 +428,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	
 	pEventHandler->AddCallback( WgEventFilter::MouseButtonPress(pRect, 1), cbInitDrag, pRect );
 	pEventHandler->AddCallback( WgEventFilter::MouseButtonDrag(pRect, 1), cbDragWidget, pRect );
-
+*/
 
 	// Test widget
 /*

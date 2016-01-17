@@ -112,12 +112,18 @@ void WgSimpleVolumeMeter::SetValue( float peak, float hold )
 	WG_LIMIT( peak, 0.f, 1.f );
 	WG_LIMIT( hold, 0.f, 1.f );
 
-	if( m_bStereo || m_peak[0] != peak || m_hold[0] != hold )
+	if( m_bStereo )
 	{
 		m_bStereo = false;
 		m_peak[0] = peak;
 		m_hold[0] = hold;
 		_requestRender();
+	}
+	else if( m_peak[0] != peak || m_hold[0] != hold )
+	{
+		_requestRenderPartial( peak, hold, 0.f, 0.f );
+		m_peak[0] = peak;
+		m_hold[0] = hold;
 	}
 }
 
@@ -127,17 +133,140 @@ void WgSimpleVolumeMeter::SetValue( float leftPeak, float leftHold, float rightP
 	WG_LIMIT( leftHold, 0.f, 1.f );
 	WG_LIMIT( rightPeak, 0.f, 1.f );
 	WG_LIMIT( rightHold, 0.f, 1.f );
-	
-	if( !m_bStereo || m_peak[0] != leftPeak || m_hold[0] != leftHold || m_peak[1] != rightPeak || m_hold[1] != rightHold )
+
+	if( !m_bStereo )
 	{
 		m_bStereo = true;
 		m_peak[0] = leftPeak;
 		m_peak[1] = rightPeak;
 		m_hold[0] = leftHold;
 		m_hold[1] = rightHold;
-		_requestRender();
+		_requestRender();		
+	}
+	else if( m_peak[0] != leftPeak || m_hold[0] != leftHold || m_peak[1] != rightPeak || m_hold[1] != rightHold )
+	{
+		_requestRenderPartial( leftPeak, leftHold, rightPeak, rightHold );
+
+		m_peak[0] = leftPeak;
+		m_peak[1] = rightPeak;
+		m_hold[0] = leftHold;
+		m_hold[1] = rightHold;
 	}
 }
+
+//____ _requestRenderPartial() _________________________________________________
+
+void WgSimpleVolumeMeter::_requestRenderPartial( float newLeftPeak, float newLeftHold, float newRightPeak, float newRightHold )
+{	
+	
+	WgRect canvas( 0,0,Size() );
+	
+	WgRect dirt;
+	
+	
+	if( newLeftHold != m_hold[0] )
+	{
+		WgRect out;
+		
+		_calcHoldRect( &out, canvas, newLeftHold );
+
+		if( dirt.h == 0 )
+			dirt = out;
+		else
+			dirt.GrowToContain(out);
+		
+		_calcHoldRect( &out, canvas, m_hold[0] );
+		
+		if( dirt.h == 0 )
+			dirt = out;
+		else
+			dirt.GrowToContain(out);
+	}
+	
+	if( m_bStereo && (newRightHold != m_hold[1]) )
+	{
+		WgRect out;
+		
+		_calcHoldRect( &out, canvas, newRightHold );
+
+		if( dirt.h == 0 )
+			dirt = out;
+		else
+			dirt.GrowToContain(out);
+		
+		_calcHoldRect( &out, canvas, m_hold[1] );
+		
+		if( dirt.h == 0 )
+			dirt = out;
+		else
+			dirt.GrowToContain(out);
+	}
+	
+	if( newLeftPeak != m_peak[0] )
+	{
+		int top = (int) (WgMax( newLeftPeak, m_peak[0] ) * canvas.h);
+		int bottom = (int) (WgMin( newLeftPeak, m_peak[0] ) * canvas.h);
+
+		WgRect out( canvas.x, canvas.y + canvas.h - top, canvas.w, top - bottom );
+
+		if( dirt.h == 0 )
+			dirt = out;
+		else
+			dirt.GrowToContain(out);
+	}
+
+	if( m_bStereo && (newRightPeak != m_peak[1]) )
+	{
+		int top = (int) (WgMax( newRightPeak, m_peak[1] ) * canvas.h);
+		int bottom = (int) (WgMin( newRightPeak, m_peak[1] ) * canvas.h);
+
+		WgRect out( canvas.x, canvas.y + canvas.h - top, canvas.w, top - bottom );
+
+		if( dirt.h == 0 )
+			dirt = out;
+		else
+			dirt.GrowToContain(out);
+	}
+
+	_requestRender( dirt );
+}
+
+
+//____ _calcHoldRect() _________________________________________________________________
+
+void WgSimpleVolumeMeter::_calcHoldRect( WgRect * pDest, const WgRect& canvas, float holdValue )
+{
+	if( m_holdHeight == 0.f )
+	{
+		pDest->h = 0;					// Hold shall not be displayed.
+		return;
+	}
+	
+	int height = (int) (m_holdHeight * canvas.h);
+	if( height < 1 )
+		height = 1;
+
+	
+	int ofs = (int) ((1.f - holdValue) * canvas.h);
+
+	if( ofs < m_sectionPixelHeight[2] )
+	{
+		if( ofs + height > m_sectionPixelHeight[2] )
+			ofs = m_sectionPixelHeight[2] - height;
+		
+	}
+	else if( ofs < m_sectionPixelHeight[2] + m_sectionPixelHeight[1] )
+	{
+		if( ofs + height > m_sectionPixelHeight[2] + m_sectionPixelHeight[1] )
+			ofs = m_sectionPixelHeight[2] + m_sectionPixelHeight[1] - height;
+	}
+
+	pDest->x = canvas.x;
+	pDest->y = canvas.y + ofs;
+	pDest->w = canvas.w;
+	pDest->h = height;
+}
+
 
 //____ PreferredSize() ________________________________________________________________
 
@@ -153,7 +282,6 @@ void WgSimpleVolumeMeter::_onNewSize( const WgSize& size )
 	_updateSectionPixelHeight();
 	_requestRender();
 }
-
 
 
 //____ _onRender() _____________________________________________________________________
@@ -209,6 +337,7 @@ void WgSimpleVolumeMeter::_renderPeak( WgGfxDevice * pDevice, int nb, const WgRe
 		height -= sectionHeight;
 	}
 }
+
 
 //____ _renderHold() ___________________________________________________________________
 

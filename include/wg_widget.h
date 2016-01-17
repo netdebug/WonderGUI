@@ -164,8 +164,8 @@ public:
 protected:
 
 	void			_onNewHook( WgHook * pHook );
+	virtual void	_onNewRoot( WgRootPanel * pRoot );
 
-	void			_onNewRoot( WgRootPanel * pRoot );
 	void			_startReceiveTicks();
 	void			_stopReceiveTicks();
 	virtual WgBlendMode	_getBlendMode() const;
