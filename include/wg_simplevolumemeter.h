@@ -47,27 +47,30 @@ protected:
 	bool			_onAlphaTest( const WgCoord& ofs );
 	void			_onNewSize( const WgSize& size );
 	
-	void			_updateSectionPixelHeight();
-	void			_renderPeak( WgGfxDevice * pDevice, int nb, const WgRect& _rect, const WgRect& _clip );
-	void			_renderHold( WgGfxDevice * pDevice, int nb, const WgRect& _rect, const WgRect& _clip );
-	
-	void 			_requestRenderPartial( float newLeftPeak, float newLeftHold, float newRightPeak, float newRightHold );
-	void 			_calcHoldRect( WgRect * pDest, const WgRect& canvas, float holdValue );
-	
+	void			_renderBar( WgGfxDevice * pDevice, int nb, const WgRect& _rect, const WgRect& _clip );
+	void 			_requestRenderPartial( WgSize sz, int newLeftPeak, int newLeftHold, int newRightPeak, int newRightHold );
+	void			_updateIValues( WgSize sz );
+	int 			_calcIHold( float holdValue, int canvasHeight );
+
 	
 	
 	WgColor			m_sectionColors[3];
-	float			m_sectionHeight[3];
-	int				m_sectionPixelHeight[3];
-	float			m_holdHeight;
+	float			m_fSectionHeight[3];
+	float			m_fHoldHeight;
 	bool			m_bStereo;
-	float			m_peak[2];
-	float			m_hold[2];
-    
-    int m_iGap;
-    int m_iSidePadding;
-	float m_fGap;
-    float m_fSidePadding;
+	float 			m_fGap;
+    float 			m_fSidePadding;
+	float			m_fPeak[2];
+	float			m_fHold[2];
+		
+	// Pixel values calculated from relative values above	
+		
+    int 			m_iGap;
+    int 			m_iSidePadding;
+	int				m_iHoldHeight;
+	int				m_iPeak[2];
+	int 			m_iHold[2];
+	int				m_iSectionHeight[3];
 };
 
 
