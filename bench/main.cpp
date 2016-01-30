@@ -34,7 +34,6 @@ extern std::ostream cout;
 
 bool			eventLoop( WgEventHandler * pHandler );
 WgRootPanel * 		setupGUI( WgGfxDevice * pDevice );
-void			printWidgetSizes();
 
 void cbInitDrag( const WgEvent::Event* _pEvent, WgWidget * pWidget );
 void cbDragWidget( const WgEvent::Event* _pEvent, WgWidget * pWidget );
@@ -47,6 +46,7 @@ void cbResize( const WgEvent::Event* _pEvent, void * _pFlexHook );
 
 
 WgFlexPanel * createPresetSelector();
+void updateOscilloscope( WgOscilloscope * pOsc, int ofs, float width, float amplitude );
 
 
 WgModalLayer * g_pModal = 0;
@@ -58,6 +58,7 @@ WgValueDisplay * m_pCounter2 = 0;
 
 WgVolumeMeter * m_pVolMeter = 0;
 WgSimpleVolumeMeter * m_pSimpleVolMeter1 = 0;
+WgOscilloscope * g_pOsc = 0;
 
 float	leftPeak = 1.f, rightPeak = 0.5f, leftHold = 0.5f, rightHold = 0.5f;
 
@@ -68,10 +69,6 @@ bool	leftUp = true, rightUp = false;
 
 int main ( int argc, char** argv )
 {
-	// Dump some info
-	
-	printWidgetSizes();
-	
 
 	//------------------------------------------------------
 	// Init SDL
@@ -168,9 +165,8 @@ int main ( int argc, char** argv )
 
 
 	WgRootPanel * pRoot = setupGUI( pGfxDevice );
-
-	pRoot->FindWidget( WgCoord(10,10), WG_SEARCH_ACTION_TARGET );
-
+	
+	
 	// Setup debug overlays
 	
 	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
@@ -235,14 +231,41 @@ int main ( int argc, char** argv )
 		}
 			
 			
+		if( g_pOsc )
+		{
+			const int freq_max = 500;
+			
+			float freq;
+			
+			int x = counter % freq_max;
+			if( x <= freq_max/2 )
+				freq = 0.0005f * x;
+			else
+				freq = 0.0005f * (freq_max - x); 
+			
+			
+			const int amp_mod_speed = 600;
+			
+			float amp;
+			
+			int y = counter % amp_mod_speed;
+			if( y <= amp_mod_speed/2 )
+				amp = 1.f * y / (amp_mod_speed/2);
+			else
+				amp = 1.f * (amp_mod_speed - y) / (amp_mod_speed/2);
+			
+			
+			updateOscilloscope( g_pOsc, counter, freq, amp );
+
+		}	
 			
 		// DRAWING STARTS HERE
 
 //		pRoot->AddDirtyPatch( pRoot->Geo().Size() );
 
-//		SDL_LockSurface( pScreen );
+		SDL_LockSurface( pScreen );
 		pRoot->Render();
-//		SDL_UnlockSurface( pScreen );
+		SDL_UnlockSurface( pScreen );
 
         // DRAWING ENDS HERE
 
@@ -305,41 +328,18 @@ int main ( int argc, char** argv )
     return 0;
 }
 
-//____ printWidgetSizes() _______________________________________________________
+//____ updateOscilloscope()_____________________________________________________
 
-void printWidgetSizes()
+void updateOscilloscope( WgOscilloscope * pOsc, int ofs, float freq, float amplitude )
 {
-	printf( "WgAnimPlayer: %d bytes\n", (int) sizeof(WgAnimPlayer) );
-	printf( "WgButton: %d bytes\n", (int) sizeof(WgButton) );
-	printf( "WgCheckBox: %d bytes\n", (int) sizeof(WgCheckBox) );
-	printf( "WgLineEditor: %d bytes\n", (int) sizeof(WgLineEditor) );
-	printf( "WgValueEditor: %d bytes\n", (int) sizeof(WgValueEditor) );
-	printf( "WgFiller: %d bytes\n", (int) sizeof(WgFiller) );
-	printf( "WgFlexPanel: %d bytes\n", (int) sizeof(WgFlexPanel) );
-	printf( "WgFpsDisplay: %d bytes\n", (int) sizeof(WgFpsDisplay) );
-	printf( "WgMenu: %d bytes\n", (int) sizeof(WgMenu) );
-	printf( "WgMenuLayer: %d bytes\n", (int) sizeof(WgMenuLayer) );
-	printf( "WgModalLayer: %d bytes\n", (int) sizeof(WgModalLayer) );
-	printf( "WgImage: %d bytes\n", (int) sizeof(WgImage) );
-	printf( "WgRadioButton: %d bytes\n", (int) sizeof(WgRadioButton) );
-	printf( "WgRefreshButton: %d bytes\n", (int) sizeof(WgRefreshButton) );
-	printf( "WgShaderCapsule: %d bytes\n", (int) sizeof(WgShaderCapsule) );
-	printf( "WgWidgetSlider: %d bytes\n", (int) sizeof(WgWidgetSlider) );
-	printf( "WgStackPanel: %d bytes\n", (int) sizeof(WgStackPanel) );
-	printf( "WgTablePanel: %d bytes\n", (int) sizeof(WgTablePanel) );
-	printf( "WgSizeCapsule: %d bytes\n", (int) sizeof(WgSizeCapsule) );
-	printf( "WgTextDisplay: %d bytes\n", (int) sizeof(WgTextDisplay) );
-	printf( "WgValueDisplay: %d bytes\n", (int) sizeof(WgValueDisplay) );
-	printf( "WgListPanel: %d bytes\n", (int) sizeof(WgListPanel) );
-	printf( "WgScrollPanel: %d bytes\n", (int) sizeof(WgScrollPanel) );
-	printf( "\n" );
-	printf( "WgFlexHook: %d bytes\n", (int) sizeof(WgFlexHook) );
-	printf( "WgMenuHook: %d bytes\n", (int) sizeof(WgMenuHook) );
-	printf( "WgModalHook: %d bytes\n", (int) sizeof(WgModalHook) );
-	printf( "WgStackHook: %d bytes\n", (int) sizeof(WgStackHook) );
-	printf( "WgTableHook: %d bytes\n", (int) sizeof(WgTableHook) );
-	printf( "WgListHook: %d bytes\n", (int) sizeof(WgListHook) );
-	printf( "WgScrollHook: %d bytes\n", (int) sizeof(WgScrollHook) );
+		float points[256];
+
+		for( int i = 0 ; i < 256 ; i++ )
+		{
+			points[i] = (float) sin((i + ofs)*freq)*amplitude;
+		}
+
+		pOsc->SetLinePoints(256,points);
 }
 
 //____ setupGUI() ______________________________________________________________
@@ -418,6 +418,9 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pHook = pFlex->AddChild( pMeter2,WgRect(10,10,40,100) );
 	pMeter2->SetValue( 0.5f, 1.0f, 0.3f, 0.9f );
 	m_pSimpleVolMeter1 = pMeter2;
+
+	pMeter2->SetColors( WgColor(0,255,0,128), WgColor(255,255,0,128), WgColor(255,0,0,128));
+	pMeter2->SetSections( 0.4f, 0.3f );
 
 	// Simple movable rectangle
 /*	
@@ -628,7 +631,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 */
 
 	// Test oscilloscope
-/*
+
 	{
 		WgSurface * pImg = sdl_wglib::LoadSurface("../resources/blocks.png", WgSurfaceFactorySoft() );
 
@@ -642,24 +645,16 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 		pOsc->SetHGridLines( 5, grid );
 		pOsc->SetVGridLines( 5, grid );
 		pOsc->SetGridColor( WgColor(64,64,64) );
+		pOsc->SetRenderSegments( 20 );
 
-		pOsc->SetMarkerGfx( pMarkerBlock );
-		pOsc->AddMarker( 30, 0.f );
-
-
-		float points[256];
-
-		for( int i = 0 ; i < 256 ; i++ )
-		{
-			points[i] = (float) sin(i/25.f)*0.90f;
-		}
-
-		pOsc->SetLinePoints(256,points);
-
+//		pOsc->SetMarkerGfx( pMarkerBlock );
+//		pOsc->AddMarker( 30, 0.f );
 
 		addResizablePanel( pFlex, pOsc, pEventHandler );
+		
+		g_pOsc = pOsc;
 	}
-*/
+
 	// Test combobox
 /*
 	{
