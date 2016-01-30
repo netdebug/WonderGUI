@@ -66,17 +66,23 @@ public:
 	void	SetMarkerGfx( const WgBlocksetPtr& pBlockset );
 
 	WgSize	PreferredSize() const;
+	
+	void	SetRenderSegments( int nSegments );
 
-	// Anti-alias
-	void antiAlias(const int nPoints, const int x_offset, const float *pYval);
 
 protected:
 
 	void	_onCloneContent( const WgWidget * _pOrg );
 	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
+	void	_onNewSize( const WgSize& size );
 
 
 private:
+	void	_updateRenderSegments( int nSegments, WgRect * pSegments );
+	void	_resampleLinePoints( WgSize sz );
+	void 	_antiAlias(const int nPoints, const float *pYval, WgCoord canvasOfs );
+
+
 	static inline int ipart(double x) { return (int)floor(x); }
 	static inline float fpart(float x) { return fabsf(x) - ipart(x); }
 	static inline float rfpart(float x) { return 1.0f - fpart(x); }
@@ -92,6 +98,8 @@ private:
 	WgColor			m_gridColor;
 	WgColor			m_lineColor;
 	float			m_lineThickness;
+	int				m_nRenderSegments;
+	
 
 	int				m_nVGridLines;
 	float *			m_pVGridLines;
@@ -100,6 +108,10 @@ private:
 
 	int				m_nLinePoints;
 	float *			m_pLinePoints;
+
+	int				m_nDisplayPoints;
+	float *			m_pDisplayPoints;
+
 
 	int				m_nMarkers;
 	Marker *		m_pMarkers;

@@ -48,9 +48,14 @@ WgOscilloscope::WgOscilloscope()
 
 	m_nLinePoints = 0;
 	m_pLinePoints = 0;
+	
+	m_nDisplayPoints = 0;
+	m_pDisplayPoints = 0;
 
 	m_nMarkers = 0;
 	m_pMarkers = 0;
+	
+	m_nRenderSegments = 1;
 }
 
 //____ Destructor _____________________________________________________________
@@ -60,6 +65,7 @@ WgOscilloscope::~WgOscilloscope()
 	delete [] m_pVGridLines;
 	delete [] m_pHGridLines;
 	delete [] m_pLinePoints;
+	delete [] m_pDisplayPoints;
 	delete [] m_pMarkers;
 }
 
@@ -176,94 +182,195 @@ void WgOscilloscope::SetLineThickness( float thickness )
 	}
 }
 
+//____ SetRenderSegments()______________________________________________________
+
+void WgOscilloscope::SetRenderSegments( int nSegments )
+{
+	if( nSegments > 0 )
+		m_nRenderSegments = nSegments;
+}
+
+
 //____ SetLinePoints() ________________________________________________________
 
 void WgOscilloscope::SetLinePoints( int nPoints, float pPointValues[] )
 {
-//    DBGM(DBG_GUI, ("DBG_GUI WgOscilloscope::SetLinePoints( nPoints=%d, pPointValues[0]=%f ) width=%d", nPoints, pPointValues[0], Size().w));
-    
-    
-    // TODO: Den här koden var helt åt skogen förut. Nu verkar det funka, men det behövs kollas igenom.
-    // TODO: Eftersom SetLinePoints kallas vid varje uppdatering verkar det ju fånigt att skapa en ny array varje gång?
-    
-    int sz = 0;
+	// Handle special case of no points (no line will be displayed)
+	
     if( nPoints == 0 )
     {
-        delete [] m_pLinePoints;
-        m_pLinePoints = 0;
-        m_nLinePoints = 0;
-        _requestRender();
-
+		if( m_nLinePoints != 0 )
+		{
+			delete [] m_pLinePoints;
+			m_pLinePoints = 0;
+			m_nLinePoints = 0;
+			_resampleLinePoints( Size() );
+			_requestRender();
+		}
         return;
     }
 
-    
+	WgSize sz = Size();
+
+	// Resize array if needed
+
 	if( nPoints != m_nLinePoints )
 	{
-		
-        // What is bigger, the data or window?
-        if(nPoints > Size().w)
-            sz = nPoints;
-        else
-            sz = Size().w;
-        
-        // Set up array
-        if(m_nLinePoints != sz)
-        {
-            delete [] m_pLinePoints;
-            m_pLinePoints = new float[sz+2]; // Need two extra points for anti-aliasing
-            m_nLinePoints = sz;
-        }
+		delete [] m_pLinePoints;
+		m_pLinePoints = new float[nPoints];
+		m_nLinePoints = nPoints;
 	}
+
+	// Fill in array
+
+	for( int i = 0 ; i < nPoints ; i++ )
+		m_pLinePoints[i] = pPointValues[i];
+
+	// Generate and prepare a list of render segments
+
+	int nSegments = m_nRenderSegments;
+	int segWidth = (sz.w+m_nRenderSegments-1)/m_nRenderSegments;
+	if( segWidth < 16 )
+	{
+		segWidth = 16;
+		nSegments = (sz.w+15)/segWidth;
+	}
+
+	int allocSize = sizeof(WgRect)*nSegments;
+	WgRect * pSegments = reinterpret_cast<WgRect*>(WgBase::MemStackAlloc(allocSize));
+
+
+	int ofs = 0;
+	for( int i = 0 ; i < nSegments ; i++ )
+	{
+		pSegments[i].x = ofs;
+		pSegments[i].y = 0;
+		pSegments[i].w = segWidth;
+		pSegments[i].h = 0;
+		ofs += segWidth;
+	}
+	pSegments[nSegments-1].w = sz.w - pSegments[nSegments-1].x;
+
+	// Resample the line points and update the render segments to only re-render as much as needed.
+
+	if( m_nDisplayPoints != 0 )
+		_updateRenderSegments( nSegments, pSegments );		// Get dirty rects for erasing previous line
+	_resampleLinePoints( sz );
+	_updateRenderSegments( nSegments, pSegments );			// Expand dirty rects to include current line
+
+	for( int i = 0 ; i < nSegments ; i++ )			
+		_requestRender( pSegments[i] );
+	
+	// Return memory allocated for render segments
+	
+	WgBase::MemStackRelease(allocSize);
+}
+
+//____ _updateRenderSegments()__________________________________________________
+
+void WgOscilloscope::_updateRenderSegments( int nSegments, WgRect * pSegments )
+{
+
+	WgRect * pSeg = pSegments;
+	
+	for( int seg = 0 ; seg < nSegments ; seg++ )
+	{
+		int point = pSeg->x;
+		
+		float min = m_pDisplayPoints[point];
+		float max = m_pDisplayPoints[point];
+		
+		for( int i = 1 ; i < pSeg->w+1 ; i++ )		// include one extra measure for the aa-algorithm
+		{
+			float v = m_pDisplayPoints[point+i];
+			if( v < min ) min = v;
+			if( v > max ) max = v;
+		}
+
+		int yBeg = ((int)min) - 2;		// Two pixels margin for the line drawing
+		int yEnd = ((int)max) + 3;		// Two pixels margin for the line drawing (+1 for cropping)
+		
+		if( pSeg->h == 0 )
+		{
+			pSeg->y = yBeg;
+			pSeg->h = yEnd - yBeg;
+		}
+		else
+		{
+			if( yBeg < pSeg->y )
+			{
+				pSeg->h += pSeg->y - yBeg;
+				pSeg->y = yBeg;
+			}
+			if( yEnd > pSeg->y + pSeg->h )
+				pSeg->h = yEnd - pSeg->y;			
+		}
+
+		pSeg++;
+	}
+}
+
+
+//____ _resampleLinePoints()____________________________________________________
+
+void WgOscilloscope::_resampleLinePoints( WgSize sz )
+{	
+	if( m_nLinePoints == 0 || sz.w == 0 )
+	{
+		if( m_nDisplayPoints != 0 )
+		{
+			delete [] m_pDisplayPoints;
+			m_pDisplayPoints = 0;
+			m_nDisplayPoints = 0;
+		}
+		return;
+	}
+	
+	if( m_nDisplayPoints != sz.w )
+	{
+		delete [] m_pDisplayPoints;
+        m_pDisplayPoints = new float[sz.w+2]; // Need two extra points for anti-aliasing
+        m_nDisplayPoints = sz.w;
+	}
+
+	// Recalculate values for our display, possibly resample if display width != m_nLinePoints
+	
+	float centerY = sz.h/2.f;
+	float scaleY = (sz.h-1)/2.f;
+
     
-    // "resample"
-    int ip = 0;
-    float lam = 0;
-    float point = 0;
-    
-    if (nPoints != Size().w)
+    if (m_nLinePoints != sz.w )
     {
-        float ratio = (float)nPoints/(float)Size().w;
+		int ip = 0;
+		float lam = 0;
+		float point = 0;
+        float ratio = m_nLinePoints/(float)sz.w;
         
-        for(int i=0; i < m_nLinePoints; i++)
-        {
-            point = (float)i * ratio;
-            ip = (int)floorf(point);
+        for( int i=0 ; i < sz.w ; i++ )
+        {			
+            point = i * ratio;
+            ip = (int)point;
             lam = point - (float)ip;
             
-            if(ip+1 < nPoints)
-                m_pLinePoints[i] = pPointValues[ip] * (1-lam) + pPointValues[ip+1] * lam;
+            if(ip+1 < m_nLinePoints)
+                m_pDisplayPoints[i] = centerY + (m_pLinePoints[ip] * (1-lam) + m_pLinePoints[ip+1] * lam) * scaleY;
             else
-                m_pLinePoints[i] = pPointValues[nPoints-1];
-            
-            // m_pLinePoints[i] = pPointValues[(int)((float)i*ratio)];
+                m_pDisplayPoints[i] = centerY + m_pLinePoints[m_nLinePoints-1] * scaleY;
         }
-//        m_nLinePoints = Size().w;
-        nPoints = m_nLinePoints;
     }
     else
     {
-        // Truncation
-        for( int i = 0 ; i < nPoints ; i++ )
-            m_pLinePoints[i] = pPointValues[i];
+        // Straight copy
+
+        for( int i = 0 ; i < m_nLinePoints ; i++ )
+            m_pDisplayPoints[i] = centerY + m_pLinePoints[i] * scaleY;
     }
 
+	// Just fill out our extras
 
-    
-	m_pLinePoints[m_nLinePoints] = m_pLinePoints[m_nLinePoints-1];
-    m_pLinePoints[m_nLinePoints+1] = m_pLinePoints[m_nLinePoints-1];
-    
-	_requestRender();
-}
+	m_pDisplayPoints[m_nDisplayPoints] = centerY + m_pLinePoints[m_nLinePoints-1] * scaleY;
+    m_pDisplayPoints[m_nDisplayPoints+1] = centerY + m_pLinePoints[m_nLinePoints-1] * scaleY;
 
-//____ ClearMarkers() _________________________________________________________
-
-void WgOscilloscope::ClearMarkers()
-{
-	delete [] m_pMarkers;
-	m_pMarkers = 0;
-	m_nMarkers = 0;
-	_requestRender();
 }
 
 //____ AddMarker() ____________________________________________________________
@@ -294,6 +401,12 @@ void WgOscilloscope::SetMarkerGfx( const WgBlocksetPtr& pBlockset )
 	}
 }
 
+//____ _onNewSize()_____________________________________________________________
+
+void WgOscilloscope::_onNewSize( const WgSize& size )
+{
+	_resampleLinePoints( size );
+}
 
 
 //____ _onCloneContent() ______________________________________________________
@@ -307,9 +420,6 @@ void WgOscilloscope::_onCloneContent( const WgWidget * _pOrg )
 
 void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-    
-
-    
 	// Render background
 	if( m_pBG )
 		m_pBG->Render( pDevice, WG_STATE_NORMAL, _canvas, _clip );
@@ -334,29 +444,21 @@ void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 	}
 
     // Nothing to draw (yet)
-    if(m_nLinePoints == 0)
+    if(m_nDisplayPoints == 0)
         return;
 
-    
 	// Draw the oscilloscope line
-	const int nPoints = m_nLinePoints > _canvas.w ? _canvas.w : m_nLinePoints;
-
-	// Need two extra point for anti-aliasing
-	const int allocSize = sizeof(float)*(nPoints+1);
-
-	float* pYval = reinterpret_cast<float*>(WgBase::MemStackAlloc(allocSize));
-	
-	for( int i = 0; i < nPoints+1; i++ )
-	{
-		pYval[i] = centerY + scaleY*m_pLinePoints[i];
-	}
 
 	m_iNextPixel = 0;
-	antiAlias(nPoints, _canvas.x, pYval);
+		
+//	antiAlias(_clip.w, _clip.x, m_pDisplayPoints + _clip.x - _canvas.x);
+
+	if( _clip.x > _canvas.x )
+		_antiAlias(_clip.w+1, m_pDisplayPoints + _clip.x - _canvas.x-1, WgCoord( _clip.x-1, _canvas.y ) );
+	else
+		_antiAlias(_clip.w, m_pDisplayPoints + _clip.x - _canvas.x, WgCoord( _clip.x, _canvas.y ) );
 
 	pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_lineColor, m_pAACol);
-
-	WgBase::MemStackRelease(allocSize);
 
 	// Blit markers
 
@@ -396,7 +498,7 @@ void WgOscilloscope::plot(const int x, const int y, const float alpha)
 
 
 // Xiaolin Wu's line algorithm
-void WgOscilloscope::antiAlias(const int nPoints, const int x_offset, const float *pYval)
+void WgOscilloscope::_antiAlias(const int nPoints, const float *pYval, WgCoord ofs )
 {
     int   x0i,x1i;
 	float x0,x1,y0,y1,yprev;
@@ -452,11 +554,11 @@ void WgOscilloscope::antiAlias(const int nPoints, const int x_offset, const floa
         ypxl1 = ipart(yend);
         
         if (steep) {
-            plot(ypxl1 +     x_offset, xpxl1, rfpart(yend) * xgap);
-            plot(ypxl1 + 1 + x_offset, xpxl1,  fpart(yend) * xgap);
+            plot(ypxl1 +     ofs.x, xpxl1+ ofs.y, rfpart(yend) * xgap);
+            plot(ypxl1 + 1 + ofs.x, xpxl1+ ofs.y,  fpart(yend) * xgap);
         } else {
-            plot(xpxl1 +     x_offset, ypxl1,     rfpart(yend) * xgap);
-            plot(xpxl1 +     x_offset, ypxl1 + 1,  fpart(yend) * xgap);
+            plot(xpxl1 +     ofs.x, ypxl1 + ofs.y,     rfpart(yend) * xgap);
+            plot(xpxl1 +     ofs.x, ypxl1 + 1 + ofs.y,  fpart(yend) * xgap);
         }
         intery = yend + gradient;
         
@@ -468,20 +570,20 @@ void WgOscilloscope::antiAlias(const int nPoints, const int x_offset, const floa
         ypxl2 = ipart(yend);
         
         if (steep) {
-            plot(ypxl2 +     x_offset, xpxl2, rfpart(yend) * xgap);
-            plot(ypxl2 + 1 + x_offset, xpxl2,  fpart(yend) * xgap);
+            plot(ypxl2 +     ofs.x, xpxl2 + ofs.y, rfpart(yend) * xgap);
+            plot(ypxl2 + 1 + ofs.x, xpxl2 + ofs.y,  fpart(yend) * xgap);
         } else {
-            plot(xpxl2 +     x_offset, ypxl2,     rfpart(yend) * xgap);
-            plot(xpxl2 +     x_offset, ypxl2 + 1,  fpart(yend) * xgap);
+            plot(xpxl2 +     ofs.x, ypxl2 + ofs.y,     rfpart(yend) * xgap);
+            plot(xpxl2 +     ofs.x, ypxl2 + 1 + ofs.y,  fpart(yend) * xgap);
         }
         
         for (int x=xpxl1+1; x<xpxl2; x++) {
             if (steep) {
-                plot(ipart(intery) +     x_offset, x, rfpart(intery));
-                plot(ipart(intery) + 1 + x_offset, x,  fpart(intery));
+                plot(ipart(intery) +     ofs.x, x + ofs.y, rfpart(intery));
+                plot(ipart(intery) + 1 + ofs.x, x + ofs.y,  fpart(intery));
             } else {
-                plot(x + x_offset, ipart (intery),  rfpart(intery));
-                plot(x + x_offset, ipart (intery)+1, fpart(intery));
+                plot(x + ofs.x, ipart (intery) + ofs.y,  rfpart(intery));
+                plot(x + ofs.x, ipart (intery)+1 + ofs.y, fpart(intery));
             }
             intery = intery + gradient;
         }
