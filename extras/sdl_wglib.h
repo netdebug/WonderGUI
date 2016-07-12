@@ -12,6 +12,7 @@ class WgSurface;
 class WgSurfaceFactory;
 class WgResDB;
 class WgFont;
+class WgPixelFormat;
 
 namespace sdl_wglib
 {
@@ -28,5 +29,7 @@ namespace sdl_wglib
 	
 	int 		FileSize( const char * pPath );
 	void * 		LoadFile( const char * pPath );
+
+	void		ConvertPixelFormat( WgPixelFormat * pWGFormat, const SDL_PixelFormat * pSDLFormat );
 	
 };

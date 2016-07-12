@@ -1,5 +1,6 @@
 #include <sdl_wglib.h>
-#include <wg_surface_sdl.h>
+//#include <wg_surface_sdl.h>
+#include <wg_surface_soft.h>
 #include <wondergui.h>
 
 
@@ -112,9 +113,18 @@ namespace sdl_wglib
 			return 0;
 		}
 
-		WgSurfaceSDL	wrapper( bmp );
+//		WgSurfaceSDL	wrapper( bmp );
 
-		WgSurface * pSurf = factory.CreateSurface( wrapper.Size(), /*wrapper.IsOpaque()? WG_PIXEL_RGB_8 :*/ WG_PIXEL_BGRA_8 );
+		WgPixelType type;
+		
+		if( bmp->format->Amask == 0 )
+			type = WG_PIXEL_BGR_8;
+		else
+			type = WG_PIXEL_BGRA_8;
+
+		WgSize dimensions( bmp->w, bmp->h );
+
+		WgSurface * pSurf = factory.CreateSurface( dimensions, type );
 
 		if( !pSurf )
 		{
@@ -122,7 +132,11 @@ namespace sdl_wglib
 			return 0;
 		}
 
-		if( !pSurf->CopyFrom( &wrapper, WgCoord(0,0) ) )
+		
+		WgPixelFormat	pixelFormat;
+		ConvertPixelFormat( &pixelFormat, bmp->format );
+
+		if( !pSurf->CopyFrom( &pixelFormat, (uint8_t*) bmp->pixels, bmp->pitch, dimensions, dimensions) )
 		{
 			printf("Unable to copy loaded bitmap '%s' to surface.\n", path);
 			delete pSurf;
@@ -370,8 +384,31 @@ namespace sdl_wglib
 		}
 
 		return pMem;
+	}
+	
+	//____ ConvertPixelFormat() ______________________________________________________
+
+	void ConvertPixelFormat( WgPixelFormat * pWGFormat, const SDL_PixelFormat * pSDLFormat )
+	{
+		pWGFormat->type = WG_PIXEL_CUSTOM;
+		pWGFormat->bits = pSDLFormat->BitsPerPixel;
+
+		pWGFormat->R_mask = pSDLFormat->Rmask;
+		pWGFormat->G_mask = pSDLFormat->Gmask;
+		pWGFormat->B_mask = pSDLFormat->Bmask;
+		pWGFormat->A_mask = pSDLFormat->Amask;
+
+		pWGFormat->R_shift = pSDLFormat->Rshift;
+		pWGFormat->G_shift = pSDLFormat->Gshift;
+		pWGFormat->B_shift = pSDLFormat->Bshift;
+		pWGFormat->A_shift = pSDLFormat->Ashift;
+
+		pWGFormat->R_bits = 8 - pSDLFormat->Rloss;
+		pWGFormat->G_bits = 8 - pSDLFormat->Gloss;
+		pWGFormat->B_bits = 8 - pSDLFormat->Bloss;
+		pWGFormat->A_bits = 8 - pSDLFormat->Aloss;
 
 	}
-
-
+	
+	
 };

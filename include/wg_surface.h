@@ -82,10 +82,13 @@ public:
 	virtual bool		Fill( WgColor col, const WgRect& rect );
 	virtual bool		CopyFrom( WgSurface * pSrcSurf, const WgRect& srcRect, WgCoord dst );
 	virtual bool		CopyFrom( WgSurface * pSrcSurf, WgCoord dst );
+	virtual bool		CopyFrom( const WgPixelFormat * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const WgRect& srcRect, const WgRect& dstRect );
 
 protected:
 	WgSurface();
 	WgRect				_lockAndAdjustRegion( WgAccessMode modeNeeded, const WgRect& region );
+	bool				_copyFrom( const WgPixelFormat * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const WgRect& srcRect, const WgRect& dstRect );
+
 
 	WgPixelFormat		m_pixelFormat;
 	int					m_pitch;

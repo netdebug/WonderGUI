@@ -413,7 +413,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 */
 
 	// Simple Volume meter
-	
+/*	
 	WgSimpleVolumeMeter * pMeter2 = new WgSimpleVolumeMeter();
 	pHook = pFlex->AddChild( pMeter2,WgRect(10,10,40,100) );
 	pMeter2->SetValue( 0.5f, 1.0f, 0.3f, 0.9f );
@@ -421,7 +421,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 	pMeter2->SetColors( WgColor(0,255,0,128), WgColor(255,255,0,128), WgColor(255,0,0,128));
 	pMeter2->SetSections( 0.4f, 0.3f );
-
+*/
 	// Simple movable rectangle
 /*	
 	WgFiller * pRect = new WgFiller();
@@ -671,7 +671,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 */
 
 	// Test view
-/*
+
 	{
 		WgScrollPanel * pView = (WgScrollPanel*) pDB->CloneWidget( "view" );
 
@@ -680,7 +680,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 		pView->SetContent( pImage );
 		addResizablePanel( pFlex, pView, pEventHandler );
 	}
-*/
+
 
 	// Test overlapping non-visible
 /*
