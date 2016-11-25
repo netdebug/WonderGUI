@@ -20,7 +20,7 @@
 
 =========================================================================*/
 #include <wg_interface_textholder.h>
-
+#include <Debug.h>
 
 //____ Constructor ____________________________________________________________
 
@@ -100,7 +100,7 @@ void Wg_Interface_TextHolder::ClearText()
 
 void Wg_Interface_TextHolder::SetText( const WgCharSeq& seq )
 {
-	m_pText->setText( seq );
+    m_pText->setText( seq );
 	_textModified();
 }
 

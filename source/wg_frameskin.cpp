@@ -56,3 +56,41 @@ bool WgFrameSkin::IsOpaque() const
 {
 	return false;
 }
+
+bool WgFrameSkin::IsOpaque(WgState state) const
+{
+	return false;
+}
+
+bool WgFrameSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state ) const
+{
+	return false;
+}
+
+WgSize WgFrameSkin::MinSize() const
+{
+	return WgSize(0,0);
+}
+
+WgSize WgFrameSkin::PreferredSize() const
+{
+	return WgSize(0,0);
+}
+
+WgSize  WgFrameSkin::SizeForContent( const WgSize contentSize ) const
+{
+	return contentSize;
+}
+
+WgRect  WgFrameSkin::ContentRect( const WgRect& canvas, WgState state ) const
+{
+	return canvas;
+}
+
+bool WgFrameSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const
+{
+	if( ofs.x < m_thickness || ofs.y < m_thickness || ofs.x > canvasSize.w - m_thickness || ofs.y > canvasSize.h - m_thickness )
+		return m_color.a >= opacityTreshold ? true : false;
+		
+	return false;
+}

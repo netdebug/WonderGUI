@@ -36,6 +36,7 @@
 #	include <wg_color.h>
 #endif
 
+#include <vector>
 
 //____ WgSurface ______________________________________________________________
 
@@ -52,6 +53,10 @@ public:
 	virtual	int			Width() const;
 	virtual	int			Height() const;
 	virtual bool		IsOpaque() const = 0;
+
+	virtual void		setScaleMode( WgScaleMode mode );
+	WgScaleMode			scaleMode() const { return m_scaleMode; }
+
 
 	// Slow, simple methods for reading and parsing individual pixels.
 
@@ -82,30 +87,39 @@ public:
 	virtual bool		Fill( WgColor col, const WgRect& rect );
 	virtual bool		CopyFrom( WgSurface * pSrcSurf, const WgRect& srcRect, WgCoord dst );
 	virtual bool		CopyFrom( WgSurface * pSrcSurf, WgCoord dst );
-	virtual bool		CopyFrom( const WgPixelFormat * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const WgRect& srcRect, const WgRect& dstRect );
 
+	// Merthods for handling meta data
+	
+	void *				MetaData() const { return m_pMetaData; }
+	int					MetaDataSize() const { return m_nMetaBytes; }
+	void				SetMetaData( void * pData, int byts );
+	void				ClearMetaData();
+
+
+	
+	// Softube specific...
+	
+	void    PutPixels(const std::vector<int> &x, const std::vector<int> &y, const std::vector<Uint32> &col, int length, bool replace);
+	
 protected:
 	WgSurface();
 	WgRect				_lockAndAdjustRegion( WgAccessMode modeNeeded, const WgRect& region );
-	bool				_copyFrom( const WgPixelFormat * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const WgRect& srcRect, const WgRect& dstRect );
-
-
+    bool                _copyFrom( const WgPixelFormat * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const WgRect& srcRect, const WgRect& dstRect );
+    
 	WgPixelFormat		m_pixelFormat;
 	int					m_pitch;
+
+	WgScaleMode			m_scaleMode;
 
 	WgAccessMode		m_accessMode;
 	Uint8 *				m_pPixels;			// Pointer at pixels when surface locked.
 	WgRect				m_lockRegion;		// Region of surface that is locked. Width/Height should be set to 0 when not locked.
+
+	void *				m_pMetaData;
+	int					m_nMetaBytes;
 };
 
-//____ WgSurfaceFactory _______________________________________________________
 
-class WgSurfaceFactory
-{
-public:
-	virtual WgSurface * CreateSurface( const WgSize& size, WgPixelType type = WG_PIXEL_BGRA_8 ) const = 0;
-	virtual ~WgSurfaceFactory() {}
-};
 
 
 //____ WgSurface::Pitch() _______________________________________________
@@ -123,9 +137,6 @@ int WgSurface::Pitch() const
 
 const WgPixelFormat *  WgSurface::PixelFormat() const
 {
-	if( m_accessMode == WG_NO_ACCESS )
-		return 0;
-
 	return &m_pixelFormat;
 }
 

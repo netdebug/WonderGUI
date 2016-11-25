@@ -40,7 +40,8 @@ WgColorSkin::WgColorSkin( WgColor col )
 	
 void WgColorSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip ) const
 {
-	pDevice->Fill( _clip, m_color );
+    
+	pDevice->Fill( WgRect(_clip, _canvas), m_color );
 }
 	
 bool WgColorSkin::IsOpaque() const

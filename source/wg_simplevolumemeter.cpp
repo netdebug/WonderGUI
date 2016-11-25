@@ -91,6 +91,7 @@ void WgSimpleVolumeMeter::SetHoldHeight( float fraction )
 	if( m_fHoldHeight != fraction )
 	{
 		m_fHoldHeight = fraction;
+        _updateIValues( Size() );
 		_requestRender();
 	}
 }
@@ -102,7 +103,7 @@ void WgSimpleVolumeMeter::SetValue( float peak, float hold )
 	WG_LIMIT( peak, 0.f, 1.f );
 	WG_LIMIT( hold, 0.f, 1.f );
 
-	m_fPeak[0] = peak;
+ 	m_fPeak[0] = peak;
 	m_fHold[0] = hold;
 
 	WgSize sz = Size();
@@ -131,7 +132,7 @@ void WgSimpleVolumeMeter::SetValue( float leftPeak, float leftHold, float rightP
 	WG_LIMIT( rightPeak, 0.f, 1.f );
 	WG_LIMIT( rightHold, 0.f, 1.f );
 
-	m_fPeak[0] = leftPeak;
+ 	m_fPeak[0] = leftPeak;
 	m_fPeak[1] = rightPeak;
 	m_fHold[0] = leftHold;
 	m_fHold[1] = rightHold;

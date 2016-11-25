@@ -364,7 +364,7 @@ void WgEventLogger::OnEvent( const WgEvent::Event * _pEvent )
 		{
 			id = "EditvalueModify";
 			const WgEvent::EditvalueEvent * pEvent = static_cast<const WgEvent::EditvalueEvent*>(_pEvent);
-			sprintf( params, "value=%ld fraction=%f", pEvent->Value(), pEvent->Fraction() );
+			sprintf( params, "value=%ld fraction=%f", (long)pEvent->Value(), pEvent->Fraction() );
 			break;
 		}
 
@@ -372,7 +372,7 @@ void WgEventLogger::OnEvent( const WgEvent::Event * _pEvent )
 		{
 			id = "EditvalueSet";
 			const WgEvent::EditvalueEvent * pEvent = static_cast<const WgEvent::EditvalueEvent*>(_pEvent);
-			sprintf( params, "value=%ld fraction=%f", pEvent->Value(), pEvent->Fraction() );
+			sprintf( params, "value=%ld fraction=%f", (long)pEvent->Value(), pEvent->Fraction() );
 			break;
 		}
 
@@ -466,7 +466,7 @@ void WgEventLogger::OnEvent( const WgEvent::Event * _pEvent )
 		{
 			id = "MenuClosed";
 			const WgEvent::MenuClosed * pEvent = static_cast<const WgEvent::MenuClosed*>(_pEvent);
-			sprintf( params, "menu=%d", pEvent->Menu() );
+			sprintf( params, "menu=%ld", (long int)pEvent->Menu() );
 			break;
 		}
 

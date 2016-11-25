@@ -601,18 +601,26 @@ void WgText::setProperties( const WgTextpropPtr& pProp )
 	_refreshAllLines();
 }
 
-void WgText::setColor( const WgColor color )
+bool WgText::setColor( const WgColor color )
 {
+    if( m_pBaseProp->IsColored() && m_pBaseProp->IsColorStatic() && m_pBaseProp->Color() == color )
+        return false;
+    
 	WgTextprop	prop = * m_pBaseProp;
 	prop.SetColor(color);
 	m_pBaseProp = prop.Register();
+    return true;
 }
 
-void WgText::setColor( const WgColor color, WgMode mode )
+bool WgText::setColor( const WgColor color, WgMode mode )
 {
-	WgTextprop	prop = * m_pBaseProp;
+    if( m_pBaseProp->IsColored(mode) && m_pBaseProp->Color(mode) == color )
+        return false;
+
+    WgTextprop	prop = * m_pBaseProp;
 	prop.SetColor(color,mode);
 	m_pBaseProp = prop.Register();
+    return true;
 }
 
 void WgText::setStyle( WgFontStyle style )

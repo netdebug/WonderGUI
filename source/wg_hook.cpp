@@ -45,7 +45,7 @@ void WgHook::_attachWidget( WgWidget * pWidget )
 	assert( pWidget->Parent() == 0 );
 
 	if( m_pWidget )
-		m_pWidget->_onNewHook(this);
+		m_pWidget->_onNewHook(0);
 
 	m_pWidget = pWidget;
 

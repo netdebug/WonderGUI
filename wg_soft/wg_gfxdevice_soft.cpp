@@ -34,11 +34,15 @@
 #define NB_CURVETAB_ENTRIES	1024
 
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+#include "PaceFusion.h"
+PACE_FUSION_EXCLUDE_USER_CALLBACKS
+#endif
+
 //____ Constructor _____________________________________________________________
 
 WgGfxDeviceSoft::WgGfxDeviceSoft() : WgGfxDevice(WgSize(0,0))
 {
-	m_bBilinearFiltering = true;
 	m_pCanvas = 0;
 	_initTables();
 	_genCurveTab();
@@ -46,7 +50,6 @@ WgGfxDeviceSoft::WgGfxDeviceSoft() : WgGfxDevice(WgSize(0,0))
 
 WgGfxDeviceSoft::WgGfxDeviceSoft( WgSurfaceSoft * pCanvas ) : WgGfxDevice( pCanvas?pCanvas->Size():WgSize() )
 {
-	m_bBilinearFiltering = true;
 	m_pCanvas = pCanvas;
 	_initTables();
 	_genCurveTab();
@@ -104,16 +107,34 @@ void WgGfxDeviceSoft::Fill( const WgRect& rect, const WgColor& col )
 	{
 		case WG_BLENDMODE_OPAQUE:
 		{
-			for( int y = 0 ; y < rect.h ; y++ )
-			{
-				for( int x = 0 ; x < rect.w*pixelBytes ; x+=pixelBytes )
-				{
-					pDst[x] = fillColor.b;
-					pDst[x+1] = fillColor.g;
-					pDst[x+2] = fillColor.r;
-				}
-				pDst += m_pCanvas->m_pitch;
-			}
+            int dstPixelBytes = m_pCanvas->m_pixelFormat.bits/8;
+            
+            if( dstPixelBytes == 4 )
+            {
+                for( int y = 0 ; y < rect.h ; y++ )
+                {
+                    Uint32 fillValue = ((int)fillColor.b) | (((int)fillColor.g) << 8) | (((int)fillColor.r) << 16);
+                    
+                    for( int x = 0 ; x < rect.w*pixelBytes ; x+=pixelBytes )
+                    {
+                        * ((Uint32*)(&pDst[x])) = fillValue;
+                    }
+                    pDst += m_pCanvas->m_pitch;
+                }
+            }
+            else
+            {
+                for( int y = 0 ; y < rect.h ; y++ )
+                {
+                    for( int x = 0 ; x < rect.w*pixelBytes ; x+=pixelBytes )
+                    {
+                        pDst[x] = fillColor.b;
+                        pDst[x+1] = fillColor.g;
+                        pDst[x+2] = fillColor.r;
+                    }
+                    pDst += m_pCanvas->m_pitch;
+                }
+            }
 		}
 		break;
 		case WG_BLENDMODE_BLEND:
@@ -360,7 +381,8 @@ void WgGfxDeviceSoft::ClipDrawLine( const WgRect& clip, WgCoord beg, WgCoord end
 			int cut = clip.x - beg.x;
 			length -= cut;
 			pRow += rowInc*cut;
-			pos += slope*cut;		}
+			pos += slope*cut;
+		}
 
 		if( end.x > clip.x + clip.w )
 			length -= end.x - (clip.x+clip.w);
@@ -505,7 +527,8 @@ void WgGfxDeviceSoft::_clipDrawLineSegment( int clipStart, int clipEnd, Uint8 * 
 	{
 		
 		if( pos >= clipEnd || pos + width <= clipStart )
-		{			pRow += rowInc;
+		{
+			pRow += rowInc;
 			pos += slope;
 			continue;
 		}
@@ -709,9 +732,9 @@ void WgGfxDeviceSoft::ClipPlotSoftPixels( const WgRect& clip, int nCoords, const
 		yp = pCoords[i].y;
 	}
 }
-//____ ClipPlotSoftPixels() _______________________________________________________
+//____ ClipPlotPixels() _______________________________________________________
 
-void WgGfxDeviceSoft::ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, const WgColor * colors)
+void WgGfxDeviceSoft::ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor * colors)
 {
 	const int pitch = m_pCanvas->m_pitch;
 	const int pixelBytes = m_pCanvas->m_pixelFormat.bits/8;
@@ -734,45 +757,7 @@ void WgGfxDeviceSoft::ClipPlotPixels( const WgRect& clip, int nCoords, const WgC
 		}
 	}
 }
-/*
-void WgGfxDeviceSoft::ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness )
-{
-	int pitch = m_pCanvas->m_pitch;
-	int pixelBytes = m_pCanvas->m_pixelFormat.bits/8;
 
-	int offset[4];
-
-	offset[0] = -pixelBytes;
-	offset[1] = -pitch;
-	offset[2] = pixelBytes;
-	offset[3] = pitch;
-
-	int alpha = (int) (256*(thickness - 1.f)/2);
-
-	int storedRed = ((int)col.r) * alpha;
-	int storedGreen = ((int)col.g) * alpha;
-	int storedBlue = ((int)col.b) * alpha;
-	int invAlpha = 255-alpha;
-
-
-	for( int i = 0 ; i < nCoords ; i++ )
-	{
-		Uint8 * pDst = m_pCanvas->m_pData + pCoords[i].y * m_pCanvas->m_pitch + pCoords[i].x * pixelBytes;
-
-		pDst[0] = col.b;
-		pDst[1] = col.g;
-		pDst[2] = col.r;
-
-		for( int x = 0 ; x < 4 ; x++ )
-		{
-			int ofs = offset[x];
-			pDst[ofs] = (Uint8) ((pDst[ofs]*invAlpha + storedBlue) >> 8);
-			pDst[ofs+1] = (Uint8) ((pDst[ofs+1]*invAlpha + storedGreen) >> 8);
-			pDst[ofs+2] = (Uint8) ((pDst[ofs+2]*invAlpha + storedRed) >> 8);
-		}
-	}
-}
-*/
 
 //____ _drawHorrVertLine() ________________________________________________
 
@@ -1713,6 +1698,9 @@ void WgGfxDeviceSoft::_tintBlit( const WgSurface* _pSrcSurf, const WgRect& srcre
 		}
 		case WG_BLENDMODE_BLEND:
 		{
+            if( m_tintColor.a == 0 )
+                break;
+            
 			if( srcPixelBytes == 4 )
 			{
 				int tintAlpha = (int) m_tintColor.a;
@@ -1768,7 +1756,10 @@ void WgGfxDeviceSoft::_tintBlit( const WgSurface* _pSrcSurf, const WgRect& srcre
 		}
 		case WG_BLENDMODE_ADD:
 		{
-			if( srcPixelBytes == 4 )
+            if( m_tintColor.a == 0 )
+                break;
+
+            if( srcPixelBytes == 4 )
 			{
 				int tintAlpha = (int) m_tintColor.a;
 				int tintRed = (int) m_tintColor.r;
@@ -1874,97 +1865,6 @@ void WgGfxDeviceSoft::_tintBlit( const WgSurface* _pSrcSurf, const WgRect& srcre
 	}
 }
 
-//____ StretchBlit() ___________________________________________________________
-
-void WgGfxDeviceSoft::StretchBlit( const WgSurface * pSrc, bool bTriLinear, float mipmapBias )
-{
-	StretchBlit( pSrc, WgRect(0, 0, pSrc->Width(),pSrc->Height()), WgRect(0,0,m_canvasSize.w,m_canvasSize.h), bTriLinear, mipmapBias );
-}
-
-void WgGfxDeviceSoft::StretchBlit( const WgSurface * pSrc, const WgRect& dest, bool bTriLinear, float mipmapBias )
-{
-	StretchBlit( pSrc, WgRect(0, 0, pSrc->Width(),pSrc->Height()), dest, bTriLinear, mipmapBias );
-}
-
-void WgGfxDeviceSoft::StretchBlit( const WgSurface * pSrc, const WgRect& src, const WgRect& dest, bool bTriLinear, float mipmapBias )
-{
-	float srcW = (float) src.w;
-	float srcH = (float) src.h;
-
-	float destW = (float) dest.w;
-	float destH = (float) dest.h;
-
-	if( m_bBilinearFiltering )
-	{
-		if( srcW < destW )
-			srcW--;
-
-		if( srcH < destH )
-			srcH--;
-	}
-
-	StretchBlitSubPixel( pSrc, (float) src.x, (float) src.y, srcW, srcH, (float) dest.x, (float) dest.y, destW, destH, bTriLinear, mipmapBias );
-}
-
-//____ ClipStretchBlit() _______________________________________________________
-
-void WgGfxDeviceSoft::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, bool bTriLinear, float mipBias )
-{
-	ClipStretchBlit( clip, pSrc, WgRect(0,0,pSrc->Width(), pSrc->Height()), WgRect( 0,0,m_canvasSize), bTriLinear, mipBias );
-}
-
-void WgGfxDeviceSoft::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, const WgRect& dest, bool bTriLinear, float mipBias )
-{
-	ClipStretchBlit( clip, pSrc, WgRect(0,0,pSrc->Width(), pSrc->Height()), dest, bTriLinear, mipBias );
-}
-
-void WgGfxDeviceSoft::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, const WgRect& src, const WgRect& dest, bool bTriLinear, float mipBias )
-{
-	ClipStretchBlit( clip, pSrc, (float)src.x, (float)src.y, (float)src.w, (float)src.h, (float)dest.x, (float)dest.y, (float)dest.w, (float)dest.h, false );
-}
-
-void WgGfxDeviceSoft::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias)
-{
-	if( m_bBilinearFiltering )
-	{
-		if( sw < dw )
-			sw--;
-
-		if( sh < dh )
-			sh--;
-	}
-
-	float cx = std::max(float(clip.x), dx);
-	float cy = std::max(float(clip.y), dy);
-	float cw = std::min(float(clip.x + clip.w), dx + dw) - cx;
-	float ch = std::min(float(clip.y + clip.h), dy + dh) - cy;
-
-	if(cw <= 0 || ch <= 0)
-		return;
-
-	if( dw > cw )
-	{
-		float	sdxr = sw / dw;			// Source/Destination X Ratio.
-
-		sw = sdxr * cw;
-
-		if( dx < cx )
-			sx += sdxr * (cx - dx);
-	}
-
-	if( dh > ch )
-	{
-		float	sdyr = sh / dh;			// Source/Destination Y Ratio.
-
-		sh = sdyr * ch;
-
-		if( dy < cy )
-			sy += sdyr * (cy - dy);
-	}
-
-	StretchBlitSubPixel( pSrc, sx, sy, sw, sh, cx, cy, cw, ch, bTriLinear, mipBias );
-}
-
 
 //____ StretchBlitSubPixel() ___________________________________________________
 
@@ -2055,7 +1955,7 @@ void WgGfxDeviceSoft::StretchBlitSubPixel( const WgSurface * _pSrcSurf, float sx
 																						\
 	_init_																				\
 																						\
-	if( m_bBilinearFiltering )															\
+	if( pSrcSurf->scaleMode() == WG_SCALEMODE_INTERPOLATE )															\
 	{																					\
 		int ofsY = (int) (sy*32768);		/* We use 15 binals for all calculations */	\
 		int incY = (int) (sh*32768/dh);													\

@@ -26,9 +26,17 @@
 #include <wg_util.h>
 
 
-using namespace std;
+
 
 static const char	c_surfaceType[] = {"Software"};
+
+//____ MaxSize() _______________________________________________________________
+
+WgSize WgSurfaceSoft::MaxSize()
+{
+	return WgSize(65536,65536);
+}
+
 
 //____ Constructor ________________________________________________________________
 
@@ -195,49 +203,4 @@ void WgSurfaceSoft::SetScaleAlpha(float fScaleAlpha)
         m_fScaleAlpha = fScaleAlpha;
 }
 
-//____ PutPixels() _____________________________________________________________
 
-#define PCLIP(x,y) (((x)>(y))?(y):(x))
-
-void WgSurfaceSoft::PutPixels(const vector<int> &x, const vector<int> &y, const vector<Uint32> &col, int length, bool replace)
-{
-	WgColor color1;
-	WgColor color2;
-	int ind;
-
-	switch(m_pixelFormat.type)
-	{
-		case WG_PIXEL_BGR_8:
-			break;
-		case WG_PIXEL_BGRA_8:
-			for(int n=0; n<length; n++)
-			{
-			  ind = y[n]*m_pitch + x[n]*4;
-			  if(!replace) {
-				// Get old (1) and new (2) pixel
-				color1.argb = *((Uint32*)&m_pData[ind]);
-				color2.argb = col[n];
-				// Blend
-				color1.r = (Uint8)(PCLIP((int)color1.r + (int)color2.r,0xFF));
-				color1.g = (Uint8)(PCLIP((int)color1.g + (int)color2.g,0xFF));
-				color1.b = (Uint8)(PCLIP((int)color1.b + (int)color2.b,0xFF));
-				color1.a = (Uint8)(PCLIP((int)color1.a + (int)color2.a,0xFF));
-				// Store
-				*((Uint32*)&m_pData[ind]) = color1.argb;
-			  } else {
-				// Overwrite old pixel with new pixel
-				*((Uint32*)&m_pData[ind]) = col[n];
-			  }
-			}
-			break;
-		default:
-			break;
-    }
-}
-
-//____ WgSurfaceFactorySoft::CreateSurface() ___________________________________
-
-WgSurface * WgSurfaceFactorySoft::CreateSurface( const WgSize& size, WgPixelType type ) const
-{
-	return new WgSurfaceSoft( size, type );
-}

@@ -24,6 +24,10 @@
 #include <wg_gfxdevice.h>
 #include <wg_geo.h>
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+#include "PaceFusion.h"
+#endif
+
 //____ Create() _______________________________________________________________
 
 WgBoxSkinPtr WgBoxSkin::Create()
@@ -144,6 +148,9 @@ void WgBoxSkin::SetStateColor( WgStateEnum state, WgColor color, WgColor frameCo
 
 //____ Render() _______________________________________________________________
 	
+#ifdef SOFTUBE_USE_PACE_FUSION
+PACE_FUSION_NO_USER_CALLBACK
+#endif
 void WgBoxSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip ) const
 {
 	int i = _stateToIndex(state);
@@ -218,6 +225,9 @@ bool WgBoxSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState 
 
 //____ IsOpaque() _____________________________________________________________
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+PACE_FUSION_NO_USER_CALLBACK
+#endif
 bool WgBoxSkin::IsOpaque() const
 {
 	return m_bOpaque;

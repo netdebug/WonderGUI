@@ -50,7 +50,8 @@ WgRootPanel::WgRootPanel( WgGfxDevice * pGfxDevice )
 {
 	m_bVisible = true;
 	m_bHasGeo = false;
-	m_geo = pGfxDevice->CanvasSize();
+	if( pGfxDevice )
+		m_geo = pGfxDevice->CanvasSize();
 	m_pGfxDevice = pGfxDevice;
 	m_pEventHandler = new WgEventHandler(this);
 	m_hook.m_pRoot = this;
@@ -133,7 +134,7 @@ WgWidget * WgRootPanel::ReleaseChild( WgWidget * pWidget )
 	if( pWidget == m_hook.Widget() )
 		return ReleaseChild();
 
-	return false;
+	return 0;
 }
 
 
@@ -237,8 +238,8 @@ bool WgRootPanel::BeginRender()
 			m_afterglowRects.pop_back();
 		}
 		
-		// Re-render graphics behind overlays that go from state FOCUSED to NORMAL 
-		
+		// Re-render graphics behind overlays that go from state FOCUSED to NORMAL
+
 		if( m_afterglowRects.size() > 1 )
 		{
 			m_dirtyPatches.Add( &m_afterglowRects[1] );
@@ -306,6 +307,7 @@ bool WgRootPanel::RenderSection( const WgRect& _clip )
 				m_pUpdatedRectOverlay->Render( m_pGfxDevice, WG_STATE_NORMAL, *pRect, clip );
 			}		
 		}
+
 	}
 	
 

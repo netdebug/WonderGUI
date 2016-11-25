@@ -27,6 +27,11 @@
 #	include <wg_surface.h>
 #endif
 
+#ifndef WG_SURFACEFACTORY_DOT_H
+#	include <wg_surfacefactory.h>
+#endif
+
+
 #ifdef WIN32
 #	include <SDL.h>
 #else

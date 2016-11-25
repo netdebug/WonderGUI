@@ -97,7 +97,6 @@
     <File Name="include/wg_sizecapsule.h"/>
     <File Name="include/wg_sizescaler.h"/>
     <File Name="include/wg_skin.h"/>
-    <File Name="include/wg_skinmanager.h"/>
     <File Name="include/wg_slider.h"/>
     <File Name="include/wg_slidertarget.h"/>
     <File Name="include/wg_smartptr.h"/>
@@ -227,7 +226,15 @@
     <File Name="source/wg_volumemeter.cpp"/>
     <File Name="source/wg_widget.cpp"/>
     <File Name="source/wg_widgetholder.cpp"/>
+    <File Name="include/wg_blob.h"/>
+    <File Name="include/wg_simpleline.h"/>
+    <File Name="include/wg_surfacefactory.h"/>
+    <File Name="source/wg_blob.cpp"/>
+    <File Name="source/wg_frameskin.cpp"/>
+    <File Name="source/wg_simpleline.cpp"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Static Library">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -241,12 +248,14 @@
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Static Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g" C_Options="-g" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="./include"/>
+        <IncludePath Value="./wg_soft"/>
         <IncludePath Value="/usr/include/freetype2/"/>
         <IncludePath Value="."/>
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/lib$(ProjectName).a" IntermediateDirectory="./Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -285,6 +294,7 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/lib$(ProjectName).a" IntermediateDirectory="./Release" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
       
@@ -349,6 +359,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>

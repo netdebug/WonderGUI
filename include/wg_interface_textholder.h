@@ -59,8 +59,8 @@ public:
 
 	inline void			SetTextProperties( const WgTextpropPtr& pProp )		{ m_pText->setProperties(pProp); _textModified(); }
 
-	inline void			SetTextColor( const WgColor color )					{ m_pText->setColor(color); _textModified(); }
-	inline void			SetTextColor( const WgColor color, WgMode mode )		{ m_pText->setColor(color,mode); _textModified(); }
+	inline void			SetTextColor( const WgColor color )					{ if( m_pText->setColor(color) ) _textModified(); }
+	inline void			SetTextColor( const WgColor color, WgMode mode )		{ if( m_pText->setColor(color,mode) )  _textModified(); }
 
 	inline void			SetTextStyle( WgFontStyle style )					{ m_pText->setStyle(style); _textModified(); }
 	inline void			SetTextStyle( WgFontStyle style, WgMode mode )		{ m_pText->setStyle(style,mode); _textModified(); }

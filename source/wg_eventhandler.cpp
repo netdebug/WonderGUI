@@ -738,7 +738,7 @@ void WgEventHandler::_postTickEvents( int ticks )
 
 void WgEventHandler::_addTickReceiver( WgWidget * pWidget )
 {
-	if( pWidget && !_isWidgetInList( pWidget, m_vTickWidgets ) )
+ 	if( pWidget && !_isWidgetInList( pWidget, m_vTickWidgets ) )
 		m_vTickWidgets.push_back( WgWidgetWeakPtr(pWidget) );
 }
 
@@ -914,6 +914,9 @@ void WgEventHandler::_processGeneralEvent( WgEvent::Event * pEvent )
 		case WG_EVENT_MAX:
 			assert(false);								// NOT ALLOWED!
 			break;
+
+                default:
+                        break;
 	}
 }
 

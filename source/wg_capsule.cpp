@@ -70,7 +70,7 @@ const WgCapsule * WgCapsule::CastToCapsule() const
 WgHook * WgCapsule::SetChild( WgWidget * pWidget )
 {
 	if( !pWidget )
-		return false;
+          return NULL;
 
 	m_hook._attachWidget(pWidget);
 	pWidget->_onNewSize(Size());

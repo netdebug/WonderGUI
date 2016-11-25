@@ -111,11 +111,12 @@ bool WgWidget::CloneContent( const WgWidget * _pOrg )
 
 void WgWidget::_onNewHook( WgHook * pHook )
 {
-	if( m_bReceiveTick && pHook )
+	if( pHook )
 	{
 		WgRootPanel * pNewRoot = pHook->Root(); 
 		WgRootPanel * pOldRoot = m_pHook ? m_pHook->Root() : 0;
-		
+
+
 		if( pNewRoot && pNewRoot != pOldRoot )
 			_onNewRoot( pNewRoot );
 	}

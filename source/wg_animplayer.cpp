@@ -31,6 +31,9 @@
 
 static const char	c_widgetType[] = {"AnimPlayer"};
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+#include "PaceFusion.h"
+#endif
 
 //____ Constructor _________________________________________________________________
 
@@ -63,6 +66,9 @@ const char * WgAnimPlayer::GetClass( void )
 
 //____ SetAnimation() ____________________________________________________________
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+PACE_FUSION_NO_USER_CALLBACK
+#endif
 bool WgAnimPlayer::SetAnimation( WgGfxAnim * pAnim )
 {
 	m_pAnim			= pAnim;
@@ -114,6 +120,9 @@ bool WgAnimPlayer::SetPlayPosFractional( float _fraction )
 
 //____ SetPlayPos() ___________________________________________________________
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+PACE_FUSION_NO_USER_CALLBACK
+#endif
 bool WgAnimPlayer::SetPlayPos( int _ticks )
 {
 	if( !m_pAnim )
@@ -247,6 +256,9 @@ void WgAnimPlayer::_playPosUpdated()
 
 //____ _onEvent() ______________________________________________________________
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+PACE_FUSION_NO_USER_CALLBACK
+#endif
 void WgAnimPlayer::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler )
 {
 	switch( pEvent->Type() )
@@ -272,6 +284,9 @@ void WgAnimPlayer::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 //____ _onRender() ________________________________________________________
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+PACE_FUSION_NO_USER_CALLBACK
+#endif
 void WgAnimPlayer::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
 	if( m_pAnim && m_bEnabled )
@@ -288,6 +303,9 @@ void WgAnimPlayer::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 
 //____ _onRefresh() _______________________________________________________
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+PACE_FUSION_NO_USER_CALLBACK
+#endif
 void WgAnimPlayer::_onRefresh( void )
 {
 	_requestRender();

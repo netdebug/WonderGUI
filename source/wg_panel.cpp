@@ -258,6 +258,8 @@ WgSize WgPanelHook::_paddedPreferredSize() const
         }
             
     }
+
+    return WgSize();
 }
 
 WgSize WgPanelHook::_paddedMinSize() const
@@ -275,6 +277,8 @@ WgSize WgPanelHook::_paddedMinSize() const
         }
             
     }
+
+    return WgSize();
 }
 
 WgSize WgPanelHook::_paddedMaxSize() const
@@ -292,6 +296,8 @@ WgSize WgPanelHook::_paddedMaxSize() const
         }
             
     }
+
+    return WgSize();
 }
 
 int WgPanelHook::_paddedWidthForHeight( int paddedHeight ) const
@@ -305,6 +311,8 @@ int WgPanelHook::_paddedWidthForHeight( int paddedHeight ) const
         }
             
     }
+
+    return 0;
 }
 
 int WgPanelHook::_paddedHeightForWidth( int paddedWidth ) const
@@ -325,4 +333,6 @@ int WgPanelHook::_paddedHeightForWidth( int paddedWidth ) const
         }
             
     }
+
+    return 0;
 }

@@ -458,7 +458,7 @@ void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 	else
 		_antiAlias(_clip.w, m_pDisplayPoints + _clip.x - _canvas.x, WgCoord( _clip.x, _canvas.y ) );
 
-	pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_lineColor, m_pAACol);
+	pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_pAACol);
 
 	// Blit markers
 

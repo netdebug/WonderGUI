@@ -16,9 +16,9 @@
 #include <iostream>
 
 #include <wg_surface_soft.h>
-#include <wg_surface_gl.h>
+#include <wg_glsurface.h>
 #include <wg_gfxdevice_soft.h>
-#include <wg_gfxdevice_gl.h>
+#include <wg_glgfxdevice.h>
 #include <sdl_wglib.h>
 #include <wg_boxskin.h>
 #include <wg_volumemeter.h>

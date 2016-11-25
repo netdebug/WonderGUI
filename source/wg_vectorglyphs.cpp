@@ -30,6 +30,7 @@
 #include <wg_base.h>
 #include <wg_vectorglyphs.h>
 #include <wg_surface.h>
+#include <wg_surfacefactory.h>
 #include <assert.h>
 
 

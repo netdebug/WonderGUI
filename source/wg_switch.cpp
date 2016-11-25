@@ -82,6 +82,9 @@ void WgSwitch::SetValue( const float value )
 
 void WgSwitch::SetColor( WgColor color )
 {
+    if( color == m_onColor )
+        return;
+    
     m_onColor = color;
     const float tint = 0.25f;
     m_offColor = color;

@@ -493,7 +493,8 @@ bool WgScrollPanel::SetVSlider( WgVSlider* pSlider )
 		pSlider->SetSliderTarget( &m_sliderTargets[0] );
 
 	_updateElementGeo( Size() );
-	pSlider->SetSlider( ViewOfsY(), ViewLenY() );
+    if(pSlider)
+        pSlider->SetSlider( ViewOfsY(), ViewLenY() );
 	_requestRender( m_elements[YDRAG].m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
 	return true;
 }

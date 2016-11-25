@@ -12,6 +12,8 @@
     <File Name="wg_gfxdevice_soft.h"/>
     <File Name="wg_surface_soft.cpp"/>
     <File Name="wg_surface_soft.h"/>
+    <File Name="wg_surfacefactory_soft.cpp"/>
+    <File Name="wg_surfacefactory_soft.h"/>
   </VirtualDirectory>
   <Settings Type="Static Library">
     <GlobalSettings>

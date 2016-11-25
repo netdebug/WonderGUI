@@ -107,17 +107,32 @@ void WgGfxDevice::Blit( const WgSurface* pSrc, int dx, int dy )
 
 void WgGfxDevice::StretchBlit( const WgSurface * pSrc, bool bTriLinear, float mipmapBias )
 {
-	StretchBlitSubPixel( pSrc, 0, 0, (float) pSrc->Width(), (float) pSrc->Height(), 0, 0, (float) m_canvasSize.w, (float) m_canvasSize.h, bTriLinear, mipmapBias );
+	StretchBlit( pSrc, WgRect(0, 0, pSrc->Width(),pSrc->Height()), WgRect(0,0,m_canvasSize.w,m_canvasSize.h), bTriLinear, mipmapBias );
 }
 
 void WgGfxDevice::StretchBlit( const WgSurface * pSrc, const WgRect& dest, bool bTriLinear, float mipmapBias )
 {
-	StretchBlitSubPixel( pSrc, 0, 0, (float) pSrc->Width(), (float) pSrc->Height(), (float) dest.x, (float) dest.y, (float) dest.w, (float) dest.h, bTriLinear, mipmapBias );
+	StretchBlit( pSrc, WgRect(0, 0, pSrc->Width(),pSrc->Height()), dest, bTriLinear, mipmapBias );
 }
 
 void WgGfxDevice::StretchBlit( const WgSurface * pSrc, const WgRect& src, const WgRect& dest, bool bTriLinear, float mipmapBias )
 {
-	StretchBlitSubPixel( pSrc, (float) src.x, (float) src.y, (float) src.w, (float) src.h, (float) dest.x, (float) dest.y, (float) dest.w, (float) dest.h, bTriLinear, mipmapBias );
+	float srcW = (float) src.w;
+	float srcH = (float) src.h;
+
+	float destW = (float) dest.w;
+	float destH = (float) dest.h;
+
+	if( pSrc->scaleMode() == WG_SCALEMODE_INTERPOLATE )
+	{
+		if( srcW < destW )
+			srcW--;
+
+		if( srcH < destH )
+			srcH--;
+	}
+
+	StretchBlitSubPixel( pSrc, (float) src.x, (float) src.y, srcW, srcH, (float) dest.x, (float) dest.y, destW, destH, bTriLinear, mipmapBias );
 }
 
 //____ TileBlit() ______________________________________________________________
@@ -257,6 +272,15 @@ void WgGfxDevice::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, c
 
 void WgGfxDevice::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias)
 {
+	if( pSrc->scaleMode() == WG_SCALEMODE_INTERPOLATE )
+	{
+		if( sw < dw )
+			sw--;
+
+		if( sh < dh )
+			sh--;
+	}
+
 	float cx = std::max(float(clip.x), dx);
 	float cy = std::max(float(clip.y), dy);
 	float cw = std::min(float(clip.x + clip.w), dx + dw) - cx;

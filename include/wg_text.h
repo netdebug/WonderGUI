@@ -182,8 +182,8 @@ public:
 
 	void				setProperties( const WgTextpropPtr& pProp );
 
-	void				setColor( const WgColor color );
-	void				setColor( const WgColor color, WgMode mode );
+	bool				setColor( const WgColor color );
+	bool				setColor( const WgColor color, WgMode mode );
 
 	void				setStyle( WgFontStyle style );
 	void				setStyle( WgFontStyle style, WgMode mode );

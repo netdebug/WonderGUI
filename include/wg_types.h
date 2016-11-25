@@ -639,6 +639,16 @@ enum WgAccessMode
 	WG_READ_WRITE
 };
 
+//____ ScaleMode ____________________________________________________________
+
+enum WgScaleMode
+{
+	WG_SCALEMODE_NEAREST,
+	WG_SCALEMODE_INTERPOLATE,
+};
+
+
+
 //____ WgPixelType _____________________________________________________________
 
 enum WgPixelType

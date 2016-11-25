@@ -32,6 +32,11 @@
 #	include <wg_surface.h>
 #endif
 
+#ifndef WG_SURFACEFACTORY_DOT_H
+#	include <wg_surfacefactory.h>
+#endif
+
+
 #include <vector>
 
 //____ WgScaleImage __________________________________________________________
@@ -68,7 +73,7 @@ public:
     {
         unsigned char* pSrc = (unsigned char*)src->Lock(WG_READ_ONLY);
         unsigned char* pDest = (unsigned char*)dest->Lock(WG_WRITE_ONLY);
-        
+
         bool quit = false;
         Resize_HQ_4ch(pSrc,
                       src->Pitch()/4,
@@ -78,7 +83,7 @@ public:
                       dest->Height(),
                       &quit );
 
-        src->Unlock();
+		src->Unlock();
         dest->Unlock();
         
 

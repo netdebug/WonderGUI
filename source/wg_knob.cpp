@@ -21,7 +21,6 @@
 =========================================================================*/
 
 
-#include <stdlib.h>
 #include <wg_knob.h>
 #include <wg_gfxdevice.h>
 #include <wg_base.h>
@@ -108,7 +107,7 @@ void WgKnob::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRe
 	{
         m_iNextPixel = 0;
         drawCircle(_canvas.x + sz/2, _canvas.y + sz/2, sz/2, sz/2);
-        pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_lineColor, m_pAACol);
+        pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_pAACol);
         
         const float d = 45.0f;
         // Draw the index line
@@ -117,7 +116,7 @@ void WgKnob::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRe
 
         m_iNextPixel = 0;
         drawLine(_canvas.x + rad, _canvas.y + rad, _canvas.x + rad + x, _canvas.y + rad + y);
-        pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_lineColor, m_pAACol);
+        pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_pAACol);
 	}
 }
 
@@ -178,7 +177,7 @@ void WgKnob::drawLine(float x0, float y0, float x1, float y1)
     float xend;
     float yend;
         
-    bool steep = fabsf(y1 - y0) > abs(x1 - x0);
+    bool steep = fabsf(y1 - y0) > fabs(x1 - x0);
         
     if(steep) {
         std::swap(x0,y0);
