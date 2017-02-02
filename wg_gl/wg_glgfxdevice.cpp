@@ -110,7 +110,8 @@ const char steepSlopeFragmentShader[] =
 "out vec4 outColor;                     "
 "void main()                            "
 "{                                      "
-"   outColor = color * clamp(w - abs(gl_FragCoord.x - s + gl_FragCoord.y * slope), 0.0, 1.0); "
+"   outColor.rgb = color.rgb;           "
+"   outColor.a = color.a * clamp(w - abs(gl_FragCoord.x - s + gl_FragCoord.y * slope), 0.0, 1.0); "
 "}                                      ";
 
 
@@ -124,7 +125,8 @@ const char mildSlopeFragmentShader[] =
 "out vec4 outColor;                     "
 "void main()                            "
 "{                                      "
-"   outColor = color * clamp(w - abs(gl_FragCoord.y - s + gl_FragCoord.x * slope), 0.0, 1.0); "
+"   outColor.rgb = color.rgb;           "
+"   outColor.a = color.a * clamp(w - abs(gl_FragCoord.y - s + gl_FragCoord.x * slope), 0.0, 1.0); "
 "}                                      ";
 
 

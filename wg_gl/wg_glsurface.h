@@ -37,6 +37,7 @@
 #	endif
 #endif
 
+
 #ifndef WG_SURFACE_DOT_H
 #	include <wg_surface.h>
 #endif

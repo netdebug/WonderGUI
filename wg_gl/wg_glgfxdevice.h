@@ -38,7 +38,6 @@
 #	endif
 #endif
 
-
 #ifndef	WG_GFXDEVICE_DOT_H
 #	include <wg_gfxdevice.h>
 #endif
