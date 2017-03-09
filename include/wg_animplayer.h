@@ -69,6 +69,10 @@ public:
 
 	WgSize			PreferredSize() const;
 
+    void SetTint(WgColor kColor);
+    const WgColor& GetTint() { return m_kTintColor; }
+    void RemoveTint();
+
 protected:
 	void			_onCloneContent( const WgWidget * _pOrg );
 	void			_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
@@ -89,6 +93,8 @@ private:
 	bool			m_bPlaying;
 	double			m_playPos;
 	float			m_speed;
+
+    WgColor         m_kTintColor;
 };
 
 

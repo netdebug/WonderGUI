@@ -44,6 +44,8 @@ WgAnimPlayer::WgAnimPlayer()
 
 	m_bPlaying		= false;
 	m_speed			= 1.f;
+    
+    m_kTintColor    = WgColor( 0xff, 0xff, 0xff, 0xff );
 }
 
 //____ ~WgAnimPlayer() _______________________________________________________
@@ -235,6 +237,18 @@ WgSize WgAnimPlayer::PreferredSize() const
 		return WgSize(0,0);
 }
 
+void WgAnimPlayer::SetTint(WgColor kColor)
+{
+    if((kColor.r == m_kTintColor.r) && (kColor.g == m_kTintColor.g) && (kColor.b == m_kTintColor.b) && (kColor.a == m_kTintColor.a))
+        return;
+    
+    
+    m_kTintColor = kColor;
+    
+    _requestRender();
+}
+void WgAnimPlayer::RemoveTint() { SetTint(WgColor(0,0,0,0)); }
+
 //_____ _playPosUpdated() ______________________________________________________
 
 void WgAnimPlayer::_playPosUpdated()
@@ -289,6 +303,11 @@ PACE_FUSION_NO_USER_CALLBACK
 #endif
 void WgAnimPlayer::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
+    if( m_kTintColor.argb != 0)
+    {
+        pDevice->SetTintColor( m_kTintColor );
+    }
+    
 	if( m_pAnim && m_bEnabled )
 		pDevice->ClipBlitBlock( _clip, m_animFrame, _canvas );
 	else if( m_pStaticBlock )
@@ -299,6 +318,9 @@ void WgAnimPlayer::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 
 		pDevice->ClipBlitBlock( _clip, m_pStaticBlock->GetBlock(mode,_canvas.Size()), _canvas );
 	}
+    
+    // Reset tint color
+    pDevice->SetTintColor( WgColor( 0xff, 0xff, 0xff, 0xff ) );
 }
 
 //____ _onRefresh() _______________________________________________________
