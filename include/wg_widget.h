@@ -48,6 +48,7 @@ class WgCapsule;
 class WgLayer;
 class WgEventHandler;
 class WgPatches;
+class WgGeometrics;
 
 
 class WgWidget : public WgWeakPtrTarget
@@ -182,11 +183,11 @@ protected:
 
 	// To be overloaded by Widget
 
-	virtual void	_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches );
-	virtual void	_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip );
-	virtual void	_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode );
+	virtual void	_renderPatches( WgGfxDevice * pDevice, const WgGeometrics& _geometrics, WgPatches * _pPatches );
+	virtual void	_onCollectPatches( WgPatches& container, const WgGeometrics& geometrics, const WgRect& clip );
+	virtual void	_onMaskPatches( WgPatches& patches, const WgGeometrics& geometrics, const WgRect& clip, WgBlendMode blendMode );
 	virtual void	_onCloneContent( const WgWidget * _pOrg ) = 0;
-	virtual void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
+	virtual void	_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip );
 	virtual void	_onNewSize( const WgSize& size );
 	virtual void	_onRefresh();
 

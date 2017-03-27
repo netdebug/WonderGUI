@@ -23,7 +23,7 @@
 #include <wg_oscilloscope.h>
 #include <wg_gfxdevice.h>
 #include <wg_base.h>
-
+#include <wg_geometrics.h>
 
 #include "Debug.h"
 
@@ -418,29 +418,31 @@ void WgOscilloscope::_onCloneContent( const WgWidget * _pOrg )
 
 //____ _onRender() ____________________________________________________________
 
-void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
+void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
 {
+	WgRect	canvas = geometrics.canvas();
+		
 	// Render background
 	if( m_pBG )
-		m_pBG->Render( pDevice, WG_STATE_NORMAL, _canvas, _clip );
+		m_pBG->Render( pDevice, WG_STATE_NORMAL, canvas, _clip );
 
-	float centerX = _canvas.x + _canvas.w/2.f;
-	float centerY = _canvas.y + _canvas.h/2.f;
-	float scaleX = (_canvas.w-1)/2.f;
-	float scaleY = (_canvas.h-1)/2.f;
+	float centerX = canvas.x + canvas.w/2.f;
+	float centerY = canvas.y + canvas.h/2.f;
+	float scaleX = (canvas.w-1)/2.f;
+	float scaleY = (canvas.h-1)/2.f;
 
 	// Draw HGridLines
 	for( int i = 0; i < m_nHGridLines; i++ )
 	{
 		int ofsY = (int) (m_pHGridLines[i] * scaleY + centerY);
-		pDevice->ClipDrawHorrLine( _clip, WgCoord(_canvas.x,ofsY), _canvas.w, m_gridColor );
+		pDevice->ClipDrawHorrLine( _clip, WgCoord(canvas.x,ofsY), canvas.w, m_gridColor );
 	}
 
 	// Draw VGridLines
 	for( int i = 0; i < m_nVGridLines; i++ )
 	{
 		int ofsX = (int) (m_pVGridLines[i] * scaleX + centerX);
-		pDevice->ClipDrawVertLine( _clip, WgCoord(ofsX,_canvas.y), _canvas.h, m_gridColor );
+		pDevice->ClipDrawVertLine( _clip, WgCoord(ofsX,canvas.y), canvas.h, m_gridColor );
 	}
 
     // Nothing to draw (yet)
@@ -453,10 +455,10 @@ void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 		
 //	antiAlias(_clip.w, _clip.x, m_pDisplayPoints + _clip.x - _canvas.x);
 
-	if( _clip.x > _canvas.x )
-		_antiAlias(_clip.w+1, m_pDisplayPoints + _clip.x - _canvas.x-1, WgCoord( _clip.x-1, _canvas.y ) );
+	if( _clip.x > canvas.x )
+		_antiAlias(_clip.w+1, m_pDisplayPoints + _clip.x - canvas.x-1, WgCoord( _clip.x-1, canvas.y ) );
 	else
-		_antiAlias(_clip.w, m_pDisplayPoints + _clip.x - _canvas.x, WgCoord( _clip.x, _canvas.y ) );
+		_antiAlias(_clip.w, m_pDisplayPoints + _clip.x - canvas.x, WgCoord( _clip.x, canvas.y ) );
 
 	pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_pAACol);
 

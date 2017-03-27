@@ -27,6 +27,7 @@
 #include <wg_util.h>
 #include <wg_rootpanel.h>
 #include <wg_eventhandler.h>
+#include <wg_geometrics.h>
 #include <assert.h>
 
 static const char	c_widgetType[] = {"Checkbox"};
@@ -293,8 +294,10 @@ Uint32 WgCheckBox::GetTextAreaWidth()
 
 //____ _onRender() ________________________________________________________
 
-void WgCheckBox::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
+void WgCheckBox::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
 {
+	WgRect	canvas = geometrics.canvas();
+
 	// Get correct mode
 
 	WgMode	mode = WG_MODE_NORMAL;
@@ -327,15 +330,15 @@ void WgCheckBox::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const 
 	WgBlock			bgBlock;
 
 	if( pBgBlockset )
-		bgBlock = pBgBlockset->GetBlock(mode,_canvas);
+		bgBlock = pBgBlockset->GetBlock(mode,canvas);
 
 	// Blit background
 
-	pDevice->ClipBlitBlock( _clip, bgBlock, _canvas );
+	pDevice->ClipBlitBlock( _clip, bgBlock,.canvas );
 
 	// Get the content rect and icon rect
 
-	WgRect contentRect	= bgBlock.ContentRect(_canvas);
+	WgRect contentRect	= bgBlock.ContentRect(canvas);
 	WgRect iconRect		= _getIconRect( contentRect, pIconBlockset );
 
 	// Get block for icon

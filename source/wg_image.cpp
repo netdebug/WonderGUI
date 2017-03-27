@@ -25,6 +25,7 @@
 #include <wg_image.h>
 #include <wg_gfxdevice.h>
 #include <wg_util.h>
+#include <wg_geometrics.h>
 
 
 static const char	c_widgetType[] = {"Image"};
@@ -95,18 +96,20 @@ void WgImage::_onCloneContent( const WgWidget * _pOrg )
 
 //____ _onRender() _____________________________________________________________
 
-void WgImage::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
+void WgImage::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
 {
 	if( !m_pGfx )
 		return;
 
+	WgRect	canvas = geometrics.canvas();
+
 	WgBlock	block;
 	if( m_bEnabled )
-		block = m_pGfx->GetBlock(WG_MODE_NORMAL, _canvas);
+		block = m_pGfx->GetBlock(WG_MODE_NORMAL, canvas);
 	else
-		block = m_pGfx->GetBlock(WG_MODE_DISABLED, _canvas);
+		block = m_pGfx->GetBlock(WG_MODE_DISABLED, canvas);
 
-	pDevice->ClipBlitBlock( _clip, block, _canvas);
+	pDevice->ClipBlitBlock( _clip, block, canvas);
 }
 
 //____ _onAlphaTest() ___________________________________________________________

@@ -101,8 +101,8 @@ protected:
 
 	//
 
-	void			_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip );
-	void			_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode );
+	void			_onCollectPatches( WgPatches& container, const WgGeometrics& geometrics, const WgRect& clip );
+	void			_onMaskPatches( WgPatches& patches, const WgGeometrics& geometrics, const WgRect& clip, WgBlendMode blendMode );
 	void			_onCloneContent( const WgWidget * _pOrg );
 	void			_onNewSize( const WgSize& size );
 

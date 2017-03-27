@@ -25,6 +25,7 @@
 #include <wg_util.h>
 
 #include <wg_patches.h>
+#include <wg_geometrics.h>
 
 #ifndef WG_GFXDEVICE_DOT_H
 #	include <wg_gfxdevice.h>
@@ -98,23 +99,23 @@ void WgPanel::_onCloneContent( const WgPanel * _pOrg )
 
 //____ _onCollectPatches() _______________________________________________________
 
-void WgPanel::_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip )
+void WgPanel::_onCollectPatches( WgPatches& container, const WgGeometrics& geometrics, const WgRect& clip )
 {
 	if( m_pSkin )
-		container.Add( WgRect( geo, clip ) );
+		container.Add( WgRect( geometrics.canvas(), clip ) );
 	else
-		WgContainer::_onCollectPatches( container, geo, clip );
+		WgContainer::_onCollectPatches( container, geometrics.canvas(), clip );
 
 }
 
 
 //____ _onMaskPatches() __________________________________________________________
 
-void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode )
+void WgPanel::_onMaskPatches( WgPatches& patches, const WgGeometrics& geometrics, const WgRect& clip, WgBlendMode blendMode )
 {
 	if( m_pSkin && m_pSkin->IsOpaque() )
 	{
-		patches.Sub( WgRect(geo,clip) );
+		patches.Sub( WgRect(geometrics.canvas(),clip) );
 		return;
 	}	
 	
@@ -128,7 +129,11 @@ void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRec
 			while(p)
 			{
 				if( p->IsVisible() )
-					p->Widget()->_onMaskPatches( patches, childGeo + geo.Pos(), clip, blendMode );
+				{
+					WgGeometrics geom( childGeo + geometrics.baseGeo().Pos(), geometrics );					
+					p->Widget()->_onMaskPatches( patches, geom, clip, blendMode );
+				}
+				}
 				p = static_cast<WgPanelHook*>(_nextHookWithGeo( childGeo, p ));
 			}
 			break;
@@ -136,17 +141,17 @@ void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRec
 		case WG_MASKOP_SKIP:
 			break;
 		case WG_MASKOP_MASK:
-			patches.Sub( WgRect(geo,clip) );
+			patches.Sub( WgRect(geometrics.canvas(),clip) );
 			break;
 	}
 }
 
 //____ _onRender() ___________________________________________________________________
 
-void WgPanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
+void WgPanel::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
 {
 	if( m_pSkin )
-		m_pSkin->Render( pDevice, WG_STATE_NORMAL,_canvas, _clip );
+		m_pSkin->Render( pDevice, WG_STATE_NORMAL,geometrics.canvas(), _clip );
 }
 
 //____ WgPanelHook::Parent() __________________________________________________

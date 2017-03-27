@@ -19,6 +19,10 @@
 #include <wg_glsurface.h>
 #include <wg_gfxdevice_soft.h>
 #include <wg_glgfxdevice.h>
+#include <wg_surfacefactory_soft.h>
+#include <wg_gl/wg_glsurfacefactory.h>
+
+
 #include <sdl_wglib.h>
 #include <wg_boxskin.h>
 #include <wg_volumemeter.h>
@@ -105,7 +109,7 @@ int main ( int argc, char** argv )
 
 	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(width,height), type, (unsigned char *) pScreen->pixels, pScreen->pitch );
 	WgGfxDeviceSoft * pGfxDevice = new WgGfxDeviceSoft( pCanvas );
-	pGfxDevice->SetBilinearFiltering( true );
+//	pGfxDevice->SetBilinearFiltering( true );
 
 
 
@@ -171,7 +175,7 @@ int main ( int argc, char** argv )
 	
 	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
 	pOverlaySkin->SetStateColor( WG_STATE_NORMAL, WgColor::transparent, WgColor::red );	
-	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 0 );
+//	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 0 );
 	
 
 
@@ -293,7 +297,7 @@ int main ( int argc, char** argv )
 		{
 			nUpdatedRects = 1;
 
-			const WgRect r = pRoot->Geo();
+			const WgRect r = pRoot->Canvas();
 
 			updatedRects[0].x = r.x;
 			updatedRects[0].y = r.y;

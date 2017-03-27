@@ -232,6 +232,7 @@
     <File Name="source/wg_blob.cpp"/>
     <File Name="source/wg_frameskin.cpp"/>
     <File Name="source/wg_simpleline.cpp"/>
+    <File Name="include/wg_geometrics.h"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

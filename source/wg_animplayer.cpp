@@ -25,6 +25,7 @@
 #include <wg_surface.h>
 #include <wg_gfxdevice.h>
 #include <wg_util.h>
+#include <wg_geometrics.h>
 
 #include <wg_eventhandler.h>
 #include <math.h>
@@ -301,22 +302,24 @@ void WgAnimPlayer::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHa
 #ifdef SOFTUBE_USE_PACE_FUSION
 PACE_FUSION_NO_USER_CALLBACK
 #endif
-void WgAnimPlayer::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
+void WgAnimPlayer::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
 {
+	WgRect	canvas = geometrics.canvas();
+		
     if( m_kTintColor.argb != 0)
     {
         pDevice->SetTintColor( m_kTintColor );
     }
     
 	if( m_pAnim && m_bEnabled )
-		pDevice->ClipBlitBlock( _clip, m_animFrame, _canvas );
+		pDevice->ClipBlitBlock( _clip, m_animFrame, canvas );
 	else if( m_pStaticBlock )
 	{
 		WgMode mode = WG_MODE_NORMAL;
 		if( !m_bEnabled )
 			mode = WG_MODE_DISABLED;
 
-		pDevice->ClipBlitBlock( _clip, m_pStaticBlock->GetBlock(mode,_canvas.Size()), _canvas );
+		pDevice->ClipBlitBlock( _clip, m_pStaticBlock->GetBlock(mode,canvas.Size()), canvas );
 	}
     
     // Reset tint color

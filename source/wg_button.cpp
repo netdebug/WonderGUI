@@ -28,6 +28,7 @@
 #include <wg_key.h>
 #include <wg_event.h>
 #include <wg_eventhandler.h>
+#include <wg_geometrics.h>
 
 static const char	c_widgetType[] = {"Button"};
 
@@ -210,24 +211,22 @@ void WgButton::_onNewSize( const WgSize& size )
 
 //____ _onRender() _____________________________________________________________
 
-void WgButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
+void WgButton::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geom, const WgRect& _clip )
 {
-	WgRect cli = _clip;
-	WgRect can = _canvas;
-	WgRect win = _window;
-
+	WgRect	canvas = geom.canvas();
+	
 	WgBlock	block;
 
 	if( m_pBgGfx )
-		block = m_pBgGfx->GetBlock(m_mode, _canvas);
+		block = m_pBgGfx->GetBlock(m_mode, canvas);
 
 	// Render background
 
-	pDevice->ClipBlitBlock( _clip, block, _canvas );
+	pDevice->ClipBlitBlock( _clip, block, canvas );
 
 	// Get content rect with displacement.
 
-	WgRect contentRect = block.ContentRect(_canvas );
+	WgRect contentRect = block.ContentRect( canvas );
 
 	// Get icon and text rect from content rect
 

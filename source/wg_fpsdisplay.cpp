@@ -27,6 +27,7 @@
 #include	<wg_char.h>
 #include	<wg_pen.h>
 #include	<wg_base.h>
+#include	<wg_geometrics.h>
 
 static const char	c_widgetType[] = {"FpsDisplay"};
 
@@ -92,9 +93,10 @@ WgSize WgFpsDisplay::PreferredSize() const
 
 //____ _onRender() ________________________________________________________
 
-void WgFpsDisplay::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
+void WgFpsDisplay::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
 {
-
+	WgRect	canvas = geometrics.canvas();
+	
 	const int	cCurrentFrames = 10;
 	int currOfs = ((int)m_tickBufferOfs) - cCurrentFrames;
 	if( currOfs < 0 )
@@ -137,14 +139,14 @@ void WgFpsDisplay::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 	WgChar	temp2[40];
 	const char *	pTemp;
 
-	WgPen	pen( pDevice, _canvas, _clip );
+	WgPen	pen( pDevice, canvas, _clip );
 	WgTextAttr attr;
 
 	WgTextTool::AddPropAttributes(attr, WgBase::GetDefaultTextprop());
 	WgTextTool::AddPropAttributes(attr, m_pProp);
 
 	pen.SetAttributes( attr );
-	pen.SetPos( WgCoord(_canvas.x, _canvas.y + pen.GetBaseline()) );
+	pen.SetPos( WgCoord(canvas.x, canvas.y + pen.GetBaseline()) );
 
 	int height = pen.GetLineSpacing();
 
@@ -157,21 +159,21 @@ void WgFpsDisplay::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 	pTemp = temp;
 	sprintf( temp, "Min: %.2f", fpsMin );
 	WgTextTool::readString( pTemp, temp2, 39 );
-	pen.SetPosX( _canvas.x );
+	pen.SetPosX( canvas.x );
 	pen.MoveY( height );
 	pDevice->PrintLine( pen, attr, temp2 );
 
 	pTemp = temp;
 	sprintf( temp, "Avg: %.2f", fpsAvg );
 	WgTextTool::readString( pTemp, temp2, 39 );
-	pen.SetPosX( _canvas.x );
+	pen.SetPosX( canvas.x );
 	pen.MoveY( height );
 	pDevice->PrintLine( pen, attr, temp2 );
 
 	pTemp = temp;
 	sprintf( temp, "Max: %.2f", fpsMax );
 	WgTextTool::readString( pTemp, temp2, 39 );
-	pen.SetPosX( _canvas.x );
+	pen.SetPosX( canvas.x );
 	pen.MoveY( height );
 	pDevice->PrintLine( pen, attr, temp2 );
 }

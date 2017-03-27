@@ -42,6 +42,7 @@
 
 class WgGfxDevice;
 class WgWidget;
+class WgGeometrics;
 
 class WgRootPanel : public WgWidgetHolder
 {
@@ -50,13 +51,18 @@ public:
 	WgRootPanel( WgGfxDevice * pGfxDevice );
 	~WgRootPanel();
 
-	bool					SetGfxDevice( WgGfxDevice * pDevice );
+	void					SetGfxDevice( WgGfxDevice * pDevice );
 	inline WgGfxDevice * 	GfxDevice() const { return m_pGfxDevice; };
 
 	inline WgEventHandler *	EventHandler() const { return m_pEventHandler; }
 
-	bool					SetGeo( const WgRect& geo );
-	WgRect					Geo() const;
+	void					SetLayoutGeo( const WgSize& geo );
+	WgSize					LayoutGeo() const;
+
+	void					SetCanvas( const WgRect& canvas );
+	WgRect					Canvas() const;
+
+	float					CanvasScale() const { return m_canvasScale; }
 
 	bool					SetVisible( bool bVisible );
 	bool					IsVisible() const { return m_bVisible; }
@@ -141,8 +147,11 @@ protected:
 	bool 				_focusRequested( WgHook * pBranch, WgWidget * pWidgetRequesting );
 	bool 				_focusReleased( WgHook * pBranch, WgWidget * pWidgetReleasing );
 
-	WgPatches			m_dirtyPatches;		// Dirty patches that needs to be rendered.
-	WgPatches			m_updatedPatches;	// Patches that were updated in last rendering session.
+	void				_updateGeoAndCanvas();
+
+
+	WgPatches			m_dirtyPatches;		// Dirty patches that needs to be rendered. Pixel geometry.
+	WgPatches			m_updatedPatches;	// Patches that were updated in last rendering session. Pixel geometry.
 
 	WgSkinPtr			m_pUpdatedRectOverlay;
 	int					m_afterglowFrames;
@@ -153,8 +162,14 @@ protected:
 	WgGfxDevice *		m_pGfxDevice;
 	WgEventHandler *	m_pEventHandler;
 	Hook				m_hook;
-	WgRect				m_geo;
-	bool				m_bHasGeo;
+
+	WgSize				m_setLayoutGeo;
+	WgSize				m_layoutGeo;
+
+	WgRect				m_setCanvas;
+	WgRect				m_canvas;
+	float				m_canvasScale;
+
 	bool				m_bVisible;
 };
 

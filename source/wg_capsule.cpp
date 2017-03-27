@@ -177,18 +177,18 @@ WgSize WgCapsule::PreferredSize() const
 
 //____ _onCollectPatches() _____________________________________________________
 
-void WgCapsule::_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip )
+void WgCapsule::_onCollectPatches( WgPatches& container, const WgGeometrics& geometrics, const WgRect& clip )
 {
 	if( m_hook.Widget() )
-		m_hook.Widget()->_onCollectPatches( container, geo, clip );
+		m_hook.Widget()->_onCollectPatches( container, geometrics, clip );
 }
 
 //____ _onMaskPatches() ________________________________________________________
 
-void WgCapsule::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode )
+void WgCapsule::_onMaskPatches( WgPatches& patches, const WgGeometrics& geometrics, const WgRect& clip, WgBlendMode blendMode )
 {
 	if( m_hook.Widget() )
-		m_hook.Widget()->_onMaskPatches( patches, geo, clip, blendMode );
+		m_hook.Widget()->_onMaskPatches( patches, geometrics, clip, blendMode );
 }
 
 //____ _onCloneContent() _______________________________________________________

@@ -20,6 +20,10 @@ class WgPanelHook;
 
 namespace WgUtil
 {
+	WgCoord 	layoutToCanvas( const WgCoord& pos, float scaleFactor );
+	WgRect 		layoutToCanvas( const WgRect& geo, float scaleFactor );
+	
+	
 	bool		AdjustScaledArea(const WgBlock& block, WgRect& area);
 
 	bool		MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect area, int opacityTreshold );

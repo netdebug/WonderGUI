@@ -64,6 +64,22 @@ WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, in
 	m_fScaleAlpha = 1.f;
 }
 
+WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, int pitch, const WgPixelFormat& pixelFormat )
+{
+	WgUtil::PixelTypeToFormat(type, m_pixelFormat);
+	
+	m_size	= size;
+    m_pitch = ((size.w*m_pixelFormat.bits/8)+3)&0xFFFFFFFC;
+	m_pData = new Uint8[ m_pitch*size.h ];
+	m_bOwnsData = true;
+	m_fScaleAlpha = 1.f;
+
+	m_pPixels = (uint8_t *) m_pData;
+    _copyFrom( &pixelFormat, pPixels, pitch, size, size );
+    m_pPixels = 0;	
+}
+
+
 WgSurfaceSoft::WgSurfaceSoft( const WgSurfaceSoft * pOther )
 {
 	_copy( pOther );

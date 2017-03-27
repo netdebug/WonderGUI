@@ -28,6 +28,7 @@
 #include <wg_util.h>
 #include <wg_eventhandler.h>
 #include <wg_menulayer.h>
+#include <wg_geometrics.h>
 
 static const char	c_widgetType[] = {"Combobox"};
 
@@ -936,19 +937,21 @@ void WgCombobox::_onUpdate( const WgUpdateInfo& _updateInfo )
 
 //____ _onRender() ________________________________________________________
 
-void WgCombobox::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
+void WgCombobox::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
 {
+	WgRect	canvas = geometrics.canvas();
+	
 	// Render the textbox
 	if(m_pTextBoxBg)
 	{
-		const WgBlock&	block = m_pTextBoxBg->GetBlock( m_mode, _canvas.Size() );
-		WgRect			dest( _canvas );
+		const WgBlock&	block = m_pTextBoxBg->GetBlock( m_mode, canvas.Size() );
+		WgRect			dest( canvas );
 		pDevice->ClipBlitBlock( _clip, block, dest );
 	}
 
 	// Print the text
 
-	WgRect r( _canvas );
+	WgRect r( canvas );
 	if( m_pTextBoxBg )
 		r.Shrink( m_pTextBoxBg->Padding() );
 

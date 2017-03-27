@@ -25,6 +25,8 @@
 #include <wg_panel.h>
 
 #include <wg_patches.h>
+#include <wg_geometrics.h>
+#include <wg_util.h>
 
 #ifndef WG_GFXDEVICE_DOT_H
 #	include <wg_gfxdevice.h>
@@ -254,15 +256,16 @@ class WidgetRenderContext
 {
 public:
 	WidgetRenderContext() : pWidget(0) {}
-	WidgetRenderContext( WgWidget * pWidget, const WgRect& geo ) : pWidget(pWidget), geo(geo) {}
+	WidgetRenderContext( WgWidget * pWidget, const WgGeometrics& _geom ) : pWidget(pWidget), geom(_geom) {}
 
-	WgWidget *	pWidget;
-	WgRect		geo;
-	WgPatches	patches;
+	WgWidget *		pWidget;
+	WgGeometrics	geom;
+	WgPatches		patches;
 };
 
-void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches )
+void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgGeometrics& _geometrics, WgPatches * _pPatches )
 {
+	WgRect	canvas = _geometrics.canvas();
 
 	// We start by eliminating dirt outside our geometry
 
@@ -270,15 +273,15 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 
 	for( const WgRect * pRect = _pPatches->Begin() ; pRect != _pPatches->End() ; pRect++ )
 	{
-		if( _canvas.IntersectsWith( *pRect ) )
-			patches.Push( WgRect(*pRect,_canvas) );
+		if( canvas.IntersectsWith( *pRect ) )
+			patches.Push( WgRect(*pRect,canvas) );
 	}
 
 
 	// Render container itself
 	
 	for( const WgRect * pRect = patches.Begin() ; pRect != patches.End() ; pRect++ )
-		_onRender(pDevice, _canvas, _window, *pRect );
+		_onRender(pDevice, _geometrics, *pRect );
 		
 	
 	// Render children
@@ -296,12 +299,12 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 		WgHook * p = _firstHookWithGeo( childGeo );
 		while(p)
 		{
-			WgRect geo = childGeo + _canvas.Pos();
+			WgGeometrics geom( childGeo + _geometrics.baseGeo().Pos(), _geometrics );
 
 			bool bVisibleHook = IsPanel()?static_cast<WgPanelHook*>(p)->IsVisible():true;
 
-			if( bVisibleHook && geo.IntersectsWith( dirtBounds ) )
-				renderList.push_back( WidgetRenderContext(p->Widget(), geo ) );
+			if( bVisibleHook && geom.canvas().IntersectsWith( dirtBounds ) )
+				renderList.push_back( WidgetRenderContext(p->Widget(), geom ) );
 
 			p = _nextHookWithGeo( childGeo, p );
 		}
@@ -314,7 +317,7 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 
 			p->patches.Push( &patches );
 
-			p->pWidget->_onMaskPatches( patches, p->geo, p->geo, pDevice->GetBlendMode() );		//TODO: Need some optimizations here, grandchildren can be called repeatedly! Expensive!
+			p->pWidget->_onMaskPatches( patches, p->geom, p->geom.canvas(), pDevice->GetBlendMode() );		//TODO: Need some optimizations here, grandchildren can be called repeatedly! Expensive!
 
 			if( patches.IsEmpty() )
 				break;
@@ -325,7 +328,7 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 		for( int i = 0 ; i < (int) renderList.size() ; i++ )
 		{
 			WidgetRenderContext * p = &renderList[i];
-			p->pWidget->_renderPatches( pDevice, p->geo, p->geo, &p->patches );
+			p->pWidget->_renderPatches( pDevice, p->geom, &p->patches );
 		}
 
 	}
@@ -336,10 +339,12 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 
 		while(p)
 		{
-			WgRect canvas = childGeo + _canvas.Pos();
+
+			WgGeometrics geom( childGeo + _geometrics.baseGeo().Pos(), _geometrics);
+
 			bool bVisibleHook = IsPanel()?static_cast<WgPanelHook*>(p)->IsVisible():true;
-			if( bVisibleHook && canvas.IntersectsWith( dirtBounds ) )
-				p->Widget()->_renderPatches( pDevice, canvas, canvas, &patches );
+			if( bVisibleHook && geom.canvas().IntersectsWith( dirtBounds ) )
+				p->Widget()->_renderPatches( pDevice, geom, &patches );
 			p = _nextHookWithGeo( childGeo, p );
 		}
 
@@ -363,25 +368,33 @@ void WgContainer::_onCloneContent( const WgContainer * _pOrg )
 
 //____ _onCollectPatches() _______________________________________________________
 
-void WgContainer::_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip )
+void WgContainer::_onCollectPatches( WgPatches& container, const WgGeometrics& _geometrics, const WgRect& clip )
 {
+	WgCoord	ofs = _geometrics.baseGeo().Pos();
+
 	WgRect childGeo;
-	WgHook * p = _firstHookWithGeo( childGeo );
+	WgHook * p = _firstHookWithGeo( childGeo );	
 
 	while(p)
 	{
 		bool bVisibleHook = IsPanel()?static_cast<WgPanelHook*>(p)->IsVisible():true;
 		if( bVisibleHook )
-			p->Widget()->_onCollectPatches( container, childGeo + geo.Pos(), clip );
+		{
+			WgGeometrics geom( childGeo + ofs, _geometrics );
+			
+			p->Widget()->_onCollectPatches( container, geom, clip );
+		}
 		p = _nextHookWithGeo( childGeo, p );
 	}
 }
 
 //____ _onMaskPatches() __________________________________________________________
 
-void WgContainer::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode )
+void WgContainer::_onMaskPatches( WgPatches& patches, const WgGeometrics& _geometrics, const WgRect& clip, WgBlendMode blendMode )
 {
 	// Default implementation, should probably be made redundant over time...
+
+	WgCoord	ofs = _geometrics.baseGeo().Pos();
 
 	WgRect childGeo;
 	WgHook * p = _firstHookWithGeo( childGeo );
@@ -390,7 +403,10 @@ void WgContainer::_onMaskPatches( WgPatches& patches, const WgRect& geo, const W
 	{
 		bool bVisibleHook = IsPanel()?static_cast<WgPanelHook*>(p)->IsVisible():true;
 		if( bVisibleHook )
-			p->Widget()->_onMaskPatches( patches, childGeo + geo.Pos(), clip, blendMode );
+		{
+			WgGeometrics geom( childGeo + ofs, _geometrics );
+			p->Widget()->_onMaskPatches( patches, geom, clip, blendMode );			
+		}
 		p = _nextHookWithGeo( childGeo, p );
 	}
 }
