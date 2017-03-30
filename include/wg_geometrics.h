@@ -37,10 +37,14 @@ public:
 	inline WgRect	baseGeo() const { return m_baseGeo; }
 	inline WgRect	baseWindow() const { return m_baseWindow; }
 
-	inline WgRect 	canvas() const;
-	inline WgRect 	window() const;
+	inline WgRect 	canvas() const { return scaleToCanvas( m_baseGeo ); }
+	inline WgRect 	window() const { return scaleToCanvas( m_baseWindow ); }
 	
 	inline float	scale() const { return m_scale; }
+
+	inline WgRect	scaleToCanvas( const WgRect& baseRect ) const;
+	inline WgCoord	scaleToCanvas( const WgCoord& basePos ) const;
+	
 	
 
 private:
@@ -53,28 +57,26 @@ private:
 };
 
 
-WgRect WgGeometrics::canvas() const
+
+inline WgRect WgGeometrics::scaleToCanvas( const WgRect& baseRect ) const
 {
 	WgRect cnv;
 
-	cnv.x = (int) m_baseGeo.x * m_scale;
-	cnv.y = (int) m_baseGeo.y * m_scale;
-	cnv.w = (int) (m_baseGeo.x + m_baseGeo.w) * m_scale - cnv.x;
-	cnv.h = (int) (m_baseGeo.y + m_baseGeo.h) * m_scale - cnv.y;
+	cnv.x = (int) baseRect.x * m_scale;
+	cnv.y = (int) baseRect.y * m_scale;
+	cnv.w = (int) (baseRect.x + baseRect.w) * m_scale - cnv.x;
+	cnv.h = (int) (baseRect.y + baseRect.h) * m_scale - cnv.y;
 
-	return cnv;
+	return cnv;		
 }
 
-WgRect WgGeometrics::window() const
+inline WgCoord WgGeometrics::scaleToCanvas( const WgCoord& basePos ) const
 {
-	WgRect win;
-
-	win.x = (int) m_baseWindow.x * m_scale;
-	win.y = (int) m_baseWindow.y * m_scale;
-	win.w = (int) (m_baseWindow.x + m_baseGeo.w) * m_scale - win.x;
-	win.h = (int) (m_baseWindow.y + m_baseGeo.h) * m_scale - win.y;
-
-	return win;
+	WgCoord cnv;
+	
+	cnv.x = (int) basePos.x * m_scale;
+	cnv.y = (int) basePos.y * m_scale;
+	return cnv;			
 }
 
 
