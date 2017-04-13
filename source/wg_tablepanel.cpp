@@ -1869,16 +1869,16 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 			else if( i == m_lastSortColumn )
 				mode = WG_MODE_SPECIAL;
 
-			pDevice->ClipBlitBlock( _clip, m_pHeaderGfx->GetBlock(mode,r2), r2 );
+			pDevice->ClipBlitBlock( _clip, m_pHeaderGfx->GetBlock(mode,m_scale), r2 );
 
 			if( i == m_lastSortColumn && m_pAscendGfx && m_pDescendGfx )
 			{
 				WgBlock block;
 
 				if( m_lastSortColumnAscendStatus )
-					block = m_pAscendGfx->GetBlock(mode);
+					block = m_pAscendGfx->GetBlock(mode,m_scale);
 				else
-					block = m_pDescendGfx->GetBlock(mode);
+					block = m_pDescendGfx->GetBlock(mode,m_scale);
 
 				WgRect dest = WgUtil::OrigoToRect( m_sortMarkerAlignment, r2.Size(), block.Size() );
 				dest += m_sortMarkerOfs;
@@ -1951,7 +1951,7 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 			if( pRow->IsSelected() )
 			{
 				if(HasSelectedRowBg() == true)
-					pDevice->ClipBlitBlock(u, m_pSelectedRowGfx->GetBlock(WG_MODE_NORMAL,r), r );
+					pDevice->ClipBlitBlock(u, m_pSelectedRowGfx->GetBlock(WG_MODE_NORMAL,m_scale), r );
 				else
 					pDevice->Fill( u, m_selectedRowColor );
 			}
@@ -1968,7 +1968,7 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 				{
 					WgBlocksetPtr p = m_pRowBlocks[ iRowColor % m_nRowBlocks ];
 					if( p )
-						pDevice->ClipBlitBlock(u, p->GetBlock(WG_MODE_NORMAL,r), r );
+						pDevice->ClipBlitBlock(u, p->GetBlock(WG_MODE_NORMAL,m_scale), r );
 				}
 
 			}
@@ -2036,7 +2036,7 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 				{
 					WgBlocksetPtr p = m_pRowBlocks[ iRowColor % m_nRowBlocks ];
 					if( p )
-						pDevice->ClipBlitBlock(u, p->GetBlock(WG_MODE_NORMAL), r );
+						pDevice->ClipBlitBlock(u, p->GetBlock(WG_MODE_NORMAL,m_scale), r );
 				}
 			}
 

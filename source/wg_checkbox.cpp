@@ -327,7 +327,7 @@ void WgCheckBox::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const 
 	WgBlock			bgBlock;
 
 	if( pBgBlockset )
-		bgBlock = pBgBlockset->GetBlock(mode,_canvas);
+		bgBlock = pBgBlockset->GetBlock(mode,m_scale);
 
 	// Blit background
 
@@ -343,7 +343,7 @@ void WgCheckBox::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const 
 	WgBlock		iconBlock;
 
 	if( pIconBlockset )
-		iconBlock = pIconBlockset->GetBlock(mode,iconRect);
+		iconBlock = pIconBlockset->GetBlock(mode,m_scale);
 
 	// Blit icon
 
@@ -483,18 +483,18 @@ bool WgCheckBox::_onAlphaTest( const WgCoord& ofs )
 	if( m_bChecked )
 	{
 		if( m_pBlockChecked )
-			bgBlock = m_pBlockChecked->GetBlock(mode,bgSize);
+			bgBlock = m_pBlockChecked->GetBlock(mode,m_scale);
 
 		if( m_pIconChecked )
-			iconBlock = m_pIconChecked->GetBlock(mode,iconRect);
+			iconBlock = m_pIconChecked->GetBlock(mode,m_scale);
 	}
 	else
 	{
 		if( m_pBlockUnchecked )
-			bgBlock = m_pBlockUnchecked->GetBlock(mode,bgSize);
+			bgBlock = m_pBlockUnchecked->GetBlock(mode,m_scale);
 
 		if( m_pIconUnchecked )
-			iconBlock = m_pIconUnchecked->GetBlock(mode,iconRect);
+			iconBlock = m_pIconUnchecked->GetBlock(mode,m_scale);
 	}
 
 

@@ -273,7 +273,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 		case WG_EVENT_MOUSE_POSITION:
 		{
 			WgCoord pos = static_cast<const WgEvent::MousePosition*>(_pEvent)->PointerPos();
-			WgRect inputRect = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode).ContentRect( Size() ): WgRect( 0,0, Size() );
+			WgRect inputRect = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( Size() ): WgRect( 0,0, Size() );
 
 			if( _isSelectable() && inputRect.Contains( pos ) )
 			{
@@ -295,7 +295,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 
 			if( pEvent->Button() == 1 )
 			{
-				WgRect inputRect = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode).ContentRect( Size() ): WgRect( 0,0, Size() );
+				WgRect inputRect = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( Size() ): WgRect( 0,0, Size() );
 
 				if( m_mode == WG_MODE_SELECTED && m_pMenu )
 				{
@@ -371,7 +371,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 					}
 
 					int x = pEvent->PointerPos().x + m_viewOfs;
-					int leftBorder = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode).ContentRect( Size() ).x : 0;
+					int leftBorder = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( Size() ).x : 0;
 
 					m_pText->CursorGotoCoord( WgCoord(x, 0), WgRect(leftBorder,0,1000000,1000000) );
 					_adjustViewOfs();
@@ -941,7 +941,7 @@ void WgCombobox::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const 
 	// Render the textbox
 	if(m_pTextBoxBg)
 	{
-		const WgBlock&	block = m_pTextBoxBg->GetBlock( m_mode, _canvas.Size() );
+		const WgBlock&	block = m_pTextBoxBg->GetBlock( m_mode, m_scale );
 		WgRect			dest( _canvas );
 		pDevice->ClipBlitBlock( _clip, block, dest );
 	}
@@ -1082,7 +1082,7 @@ bool WgCombobox::_onAlphaTest( const WgCoord& ofs )
 
 	WgSize sz = Size();
 
-	return WgUtil::MarkTestBlock( ofs, m_pTextBoxBg->GetBlock(m_mode,sz), WgRect( WgCoord(0,0), sz ), m_markOpacity );
+	return WgUtil::MarkTestBlock( ofs, m_pTextBoxBg->GetBlock(m_mode,m_scale), WgRect( WgCoord(0,0), sz ), m_markOpacity );
 }
 
 //____ _onGotInputFocus() ______________________________________________

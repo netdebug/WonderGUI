@@ -268,7 +268,7 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, c
 
 	WgBlock	bgBlock;
 	if( m_pBgGfx )
-		bgBlock = m_pBgGfx->GetBlock(m_mode,_canvas.Size());
+		bgBlock = m_pBgGfx->GetBlock(m_mode,m_scale);
 
 	if( m_bRefreshing && m_pRefreshAnim && m_animTarget != ICON )
 	{
@@ -328,7 +328,7 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, c
 		pDevice->ClipBlitBlock( _clip, animBlock, iconRect );
 	}
 	else if( m_pIconGfx )
-		pDevice->ClipBlitBlock( _clip, m_pIconGfx->GetBlock(m_mode, iconRect.Size()), iconRect );
+		pDevice->ClipBlitBlock( _clip, m_pIconGfx->GetBlock(m_mode, m_scale), iconRect );
 
 	// Print text
 

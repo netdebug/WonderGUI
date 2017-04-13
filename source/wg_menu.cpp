@@ -580,9 +580,9 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 	if( m_pBgGfx )
 	{
 		if( m_bEnabled )
-			pDevice->ClipBlitBlock( clip, m_pBgGfx->GetBlock(WG_MODE_NORMAL,window), window );
+			pDevice->ClipBlitBlock( clip, m_pBgGfx->GetBlock(WG_MODE_NORMAL,m_scale), window );
 		else
-			pDevice->ClipBlitBlock( clip, m_pBgGfx->GetBlock(WG_MODE_DISABLED,window), window );
+			pDevice->ClipBlitBlock( clip, m_pBgGfx->GetBlock(WG_MODE_DISABLED,m_scale), window );
 	}
 
 
@@ -616,7 +616,7 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 					WgRect	dest( window.x + m_sepBorders.left, yPos + m_sepBorders.top,
 									window.w - m_sepBorders.Width(), m_pSepGfx->Height() );
 
-					pDevice->ClipBlitBlock( sepClip, m_pSepGfx->GetBlock(WG_MODE_NORMAL,dest), dest );
+					pDevice->ClipBlitBlock( sepClip, m_pSepGfx->GetBlock(WG_MODE_NORMAL,m_scale), dest );
 					yPos += m_sepHeight;
 				}
 			}
@@ -639,7 +639,7 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 
 				WgRect tileClip( contentClip, tileDest);
 
-				_renderTile( pDevice, tileClip, tileDest, item-1, mode );
+				_renderTile( pDevice, tileClip, tileDest, item-1, mode, m_scale );
 
 				// Print the text (if any)
 
@@ -700,7 +700,7 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 							int y = yPos + (m_entryHeight - h)/2;
 							int x = xPosIcon + (m_iconFieldWidth - w)/2;
 
-							pDevice->ClipBlitBlock( contentClip, pIcon->GetBlock(mode), WgRect(x,y,w,h) );
+							pDevice->ClipBlitBlock( contentClip, pIcon->GetBlock(mode,m_scale), WgRect(x,y,w,h) );
 						}
 					}
 					break;
@@ -722,7 +722,7 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 							int y = yPos + (m_entryHeight - h)/2;
 							int x = xPosIcon + (m_iconFieldWidth - w)/2;
 
-							pDevice->ClipBlitBlock( contentClip, pGfx->GetBlock(mode), WgRect(x,y,w,h) );
+							pDevice->ClipBlitBlock( contentClip, pGfx->GetBlock(mode,m_scale), WgRect(x,y,w,h) );
 						}
 					}
 					break;
@@ -743,7 +743,7 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 							int y = yPos + (m_entryHeight - h)/2;
 							int x = xPosIcon + (m_iconFieldWidth - w)/2;
 
-							pDevice->ClipBlitBlock( contentClip, pGfx->GetBlock(mode), WgRect(x,y,w,h) );
+							pDevice->ClipBlitBlock( contentClip, pGfx->GetBlock(mode,m_scale), WgRect(x,y,w,h) );
 						}
 					}
 					break;

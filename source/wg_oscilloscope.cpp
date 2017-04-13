@@ -473,7 +473,7 @@ void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 		dest.x = x - dest.w / 2;
 		dest.y = y - dest.h / 2;
 
-		pDevice->ClipBlitBlock( _clip, m_pMarkerGfx->GetBlock(WG_MODE_NORMAL), dest );
+		pDevice->ClipBlitBlock( _clip, m_pMarkerGfx->GetBlock(WG_MODE_NORMAL,m_scale), dest );
 	}
 
 }

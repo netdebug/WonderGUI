@@ -84,7 +84,7 @@ void WgTileHolder::_cloneContent( const WgTileHolder * _pOrg )
 
 //____ _renderTile() __________________________________________________________
 
-void WgTileHolder::_renderTile( WgGfxDevice * pDevice, const WgRect& clip, const WgRect& dest, int _tileNb, WgMode mode )
+void WgTileHolder::_renderTile( WgGfxDevice * pDevice, const WgRect& clip, const WgRect& dest, int _tileNb, WgMode mode, int scale )
 {
 	int tileNb = _tileNb & 0x1;
 
@@ -99,7 +99,7 @@ void WgTileHolder::_renderTile( WgGfxDevice * pDevice, const WgRect& clip, const
 	{
 		WgBlocksetPtr p = m_pTileBlocks[tileNb];
 		if( p && !p->IsModeSkipable(mode) )
-			pDevice->ClipBlitBlock(clip, p->GetBlock(mode, dest.Size() ), dest );
+			pDevice->ClipBlitBlock(clip, p->GetBlock(mode, scale ), dest );
 	}
 }
 

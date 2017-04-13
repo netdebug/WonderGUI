@@ -90,7 +90,7 @@ public:
 private:
 
     void		_setPixelDetails( WgPixelType type );
-    void		_initBuffer();
+
 
 
     GLuint 		m_texture;			// GL texture handle.

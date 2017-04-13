@@ -223,9 +223,9 @@ void WgMenubar::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const W
 	if( m_pBgGfx )
 	{
 		if( m_bEnabled )
-			bgBlock = m_pBgGfx->GetBlock(WG_MODE_NORMAL,_canvas.Size());
+			bgBlock = m_pBgGfx->GetBlock(WG_MODE_NORMAL,m_scale);
 		else
-			bgBlock = m_pBgGfx->GetBlock(WG_MODE_DISABLED,_canvas.Size());
+			bgBlock = m_pBgGfx->GetBlock(WG_MODE_DISABLED,m_scale);
 
 		pDevice->ClipBlitBlock( _clip, bgBlock, _canvas );
 	}
@@ -290,7 +290,7 @@ void WgMenubar::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const W
 			if( m_pEntryGfx )
 			{
 				WgRect	dest( posX, window.y, pI->m_width + b.Width(), window.h );
-				pDevice->ClipBlitBlock( clip, m_pEntryGfx->GetBlock(mode,dest), dest );
+				pDevice->ClipBlitBlock( clip, m_pEntryGfx->GetBlock(mode,m_scale), dest );
 
 				pTextColors = m_pEntryGfx->TextColors();
 			}

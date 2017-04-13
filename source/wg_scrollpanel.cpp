@@ -1127,7 +1127,7 @@ void WgScrollPanel::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas
 		{
 			WgRect clip( canvas, *pRect );
 			if( clip.w > 0 || clip.h > 0 )
-				pDevice->ClipBlitBlock( clip, m_pFillerBlocks->GetBlock( mode, m_geoFiller ), canvas );
+				pDevice->ClipBlitBlock( clip, m_pFillerBlocks->GetBlock( mode, m_scale ), canvas );
 		}
 
 	}
@@ -1191,7 +1191,7 @@ bool WgScrollPanel::_onAlphaTest( const WgCoord& ofs )
 	{
 		WgMode mode = m_bEnabled?WG_MODE_NORMAL:WG_MODE_DISABLED;
 
-		if( WgUtil::MarkTestBlock( ofs, m_pFillerBlocks->GetBlock(mode, m_geoFiller), m_geoFiller, m_markOpacity ) )
+		if( WgUtil::MarkTestBlock( ofs, m_pFillerBlocks->GetBlock(mode, m_scale), m_geoFiller, m_markOpacity ) )
 			return true;
 	}
 

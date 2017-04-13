@@ -1038,7 +1038,7 @@ WgTab * WgTablist::_pos2Tab( int x, int y ) const
 				((unsigned) y) > pSrc->Padding().top && y < sz.h - pSrc->Padding().bottom )
 				bHit = true;
 			else
-				bHit = WgUtil::MarkTestBlock( WgCoord(x, y), pSrc->GetBlock( _getTabMode(*pTab), WgSize(w,sz.h) ), WgRect(0,0,w,sz.h), m_markOpacity);
+				bHit = WgUtil::MarkTestBlock( WgCoord(x, y), pSrc->GetBlock( _getTabMode(*pTab), m_scale ), WgRect(0,0,w,sz.h), m_markOpacity);
 
 			if( bHit )
 			{
@@ -1132,7 +1132,7 @@ void WgTablist::_renderTab( WgGfxDevice * pDevice, WgTab& tab, WgRect dest, cons
 
 	WgMode	mode = _getTabMode(tab);
 
-	WgBlock block = pSrc->GetBlock(mode,dest);
+	WgBlock block = pSrc->GetBlock(mode,m_scale);
 
 	pDevice->ClipBlitBlock( clip, block, dest );
 

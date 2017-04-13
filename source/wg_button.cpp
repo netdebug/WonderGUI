@@ -219,7 +219,7 @@ void WgButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const Wg
 	WgBlock	block;
 
 	if( m_pBgGfx )
-		block = m_pBgGfx->GetBlock(m_mode, _canvas);
+		block = m_pBgGfx->GetBlock(m_mode, m_scale);
 
 	// Render background
 
@@ -237,7 +237,7 @@ void WgButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const Wg
 	// Render icon
 
 	if( m_pIconGfx )
-		pDevice->ClipBlitBlock( _clip, m_pIconGfx->GetBlock(m_mode, iconRect.Size()), iconRect );
+		pDevice->ClipBlitBlock( _clip, m_pIconGfx->GetBlock(m_mode, m_scale), iconRect );
 
 	// Print text
 
@@ -424,7 +424,7 @@ bool WgButton::_onAlphaTest( const WgCoord& ofs )
 
 	//TODO: Take icon into account.
 
-	return	WgUtil::MarkTestBlock( ofs, m_pBgGfx->GetBlock(m_mode,sz), WgRect(0,0,sz), m_markOpacity );
+	return	WgUtil::MarkTestBlock( ofs, m_pBgGfx->GetBlock(m_mode,m_scale), WgRect(0,0,sz), m_markOpacity );
 }
 
 //____ _onGotInputFocus() ______________________________________________________
