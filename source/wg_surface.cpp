@@ -278,6 +278,30 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoo
     return retVal;
 }
 
+bool WgSurface::CopyFrom( const WgPixelFormat * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const WgRect& srcRect, WgCoord dest )
+{
+    if( !pSrcPixels || !pSrcFormat || pSrcFormat->type == WG_PIXEL_UNKNOWN || m_pixelFormat.type == WG_PIXEL_UNKNOWN )
+        return false;
+    
+    // Save old locks and lock the way we want.
+    
+    WgAccessMode 	dstOldMode 		= m_accessMode;
+    
+    WgRect dstRect = _lockAndAdjustRegion( WG_WRITE_ONLY, WgRect(dest.x,dest.y,srcRect.w,srcRect.h) );
+    
+    // Do the copying
+    
+    bool retVal = _copyFrom( pSrcFormat, (uint8_t*) pSrcPixels, srcPitch, srcRect, dstRect );
+    
+    // Release any temporary locks
+    
+    if( dstOldMode == WG_NO_ACCESS )
+        Unlock();    
+    
+    return retVal;
+}
+
+
 //____ _copyFrom() _________________________________________________________
 
 bool WgSurface::_copyFrom( const WgPixelFormat * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const WgRect& srcRect, const WgRect& dstRect )

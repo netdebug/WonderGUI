@@ -90,6 +90,8 @@
 #define WG_IS_LITTLE_ENDIAN 0
 #endif
 
+#define WG_SCALE_BINALS		12
+#define WG_SCALE_BASE		(1<<WG_SCALE_BINALS)
 
 template<typename T> inline T WgMin(const T &a, const T &b) { return a < b ? a : b; }
 template<typename T> inline T WgMax(const T &a, const T &b) { return a > b ? a : b; }

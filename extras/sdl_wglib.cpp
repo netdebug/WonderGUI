@@ -1,7 +1,7 @@
 #include <sdl_wglib.h>
 //#include <wg_surface_sdl.h>
 #include <wg_surface_soft.h>
-#include <wg_surfacefactory.h>
+#include <wg_surfacefactory_soft.h>
 #include <wondergui.h>
 
 

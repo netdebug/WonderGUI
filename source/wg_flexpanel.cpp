@@ -450,8 +450,8 @@ bool WgFlexHook::Move( const WgCoord& ofs )
 	if( !m_bFloating )
 		return false;
 
-	m_placementGeo = m_realGeo;
-	m_placementGeo -= m_pParent->Anchor(m_anchor)->Position(m_pParent->Size());
+//	m_placementGeo = m_realGeo;
+//	m_placementGeo -= m_pParent->Anchor(m_anchor)->Position(m_pParent->Size());
 	m_placementGeo += ofs;
 
 	_refreshRealGeo();
@@ -465,8 +465,8 @@ bool WgFlexHook::MoveX( int x )
 	if( !m_bFloating )
 		return false;
 
-	m_placementGeo = m_realGeo;
-	m_placementGeo -= m_pParent->Anchor(m_anchor)->Position(m_pParent->Size());
+//	m_placementGeo = m_realGeo;
+//	m_placementGeo -= m_pParent->Anchor(m_anchor)->Position(m_pParent->Size());
 	m_placementGeo.x += x;
 
 	_refreshRealGeo();
@@ -480,8 +480,8 @@ bool WgFlexHook::MoveY( int y )
 	if( !m_bFloating )
 		return false;
 
-	m_placementGeo = m_realGeo;
-	m_placementGeo -= m_pParent->Anchor(m_anchor)->Position(m_pParent->Size());
+//	m_placementGeo = m_realGeo;
+//	m_placementGeo -= m_pParent->Anchor(m_anchor)->Position(m_pParent->Size());
 	m_placementGeo.y += y;
 
 	_refreshRealGeo();
@@ -527,20 +527,37 @@ WgContainer * WgFlexHook::_parent() const
 
 void WgFlexHook::_refreshRealGeo()
 {
+//	PROBLEM: HOW DO WE HANDLE placementGeo WHERE SIZE HAS BEEN TAKEN FROM PREFERRED SIZE???
+	
+	
 	WgRect	newGeo;
 	WgSize	parentSize = m_pParent->Size();
 
+	int scale = m_pParent->m_scale;
+	
+	WgBorders scaledPadding( (m_padding.left * scale) >> WG_SCALE_BINALS,
+							 (m_padding.top * scale) >> WG_SCALE_BINALS,
+							 (m_padding.right * scale) >> WG_SCALE_BINALS,
+							 (m_padding.bottom * scale) >> WG_SCALE_BINALS );
+
 	if( m_bFloating )
 	{
+		// Scale placementGeo
+				
+		WgRect scaledGeo( (m_placementGeo.x * scale) >> WG_SCALE_BINALS,
+						  (m_placementGeo.y * scale) >> WG_SCALE_BINALS,
+						  (m_placementGeo.w * scale) >> WG_SCALE_BINALS,
+						  (m_placementGeo.h * scale) >> WG_SCALE_BINALS );
+		
 		// Calculate size
 
-		WgSize sz = _sizeFromPolicy( m_placementGeo.Size() + m_padding, m_widthPolicy, m_heightPolicy );
+		WgSize sz = _sizeFromPolicy( scaledGeo.Size() + scaledPadding, m_widthPolicy, m_heightPolicy );
 
 		// Calculate position
 
-		WgCoord pos = m_pParent->Anchor(m_anchor)->Position( parentSize );	// Anchor,
+		WgCoord pos = m_pParent->Anchor(m_anchor)->Position( parentSize, scale );	// Anchor,
 		pos -= WgUtil::OrigoToOfs( m_hotspot, sz );						// hotspot
-		pos += m_placementGeo.Pos();										// and Offset.
+		pos += scaledGeo.Pos();											// and Offset.
 
 		// Limit size/pos according to parent
 
@@ -561,12 +578,12 @@ void WgFlexHook::_refreshRealGeo()
 	}
 	else
 	{
-		WgCoord topLeft = m_pParent->Anchor(m_anchorTopLeft)->Position( parentSize );
-		WgCoord bottomRight = m_pParent->Anchor(m_anchorBottomRight)->Position( parentSize );
+		WgCoord topLeft = m_pParent->Anchor(m_anchorTopLeft)->Position( parentSize, scale );
+		WgCoord bottomRight = m_pParent->Anchor(m_anchorBottomRight)->Position( parentSize, scale );
 
 		newGeo = WgRect(topLeft,bottomRight);
 	}
-    newGeo.Shrink( m_padding );
+    newGeo.Shrink( scaledPadding );
 
 
 	// Request render and update positions.
@@ -586,14 +603,26 @@ WgSize WgFlexHook::_sizeNeededForGeo()
 {
 	WgSize sz;
 
+	int scale = m_pParent->m_scale;
+	
+	WgBorders scaledPadding( (m_padding.left * scale) >> WG_SCALE_BINALS,
+							 (m_padding.top * scale) >> WG_SCALE_BINALS,
+							 (m_padding.right * scale) >> WG_SCALE_BINALS,
+							 (m_padding.bottom * scale) >> WG_SCALE_BINALS );
+
 	if( m_bFloating )
 	{
-        WgRect geo = m_placementGeo + m_padding;
+		WgRect scaledGeo( (m_placementGeo.x * scale) >> WG_SCALE_BINALS,
+						  (m_placementGeo.y * scale) >> WG_SCALE_BINALS,
+						  (m_placementGeo.w * scale) >> WG_SCALE_BINALS,
+						  (m_placementGeo.h * scale) >> WG_SCALE_BINALS );
+
+        WgRect geo = scaledGeo + scaledPadding;
         
 		const WgFlexAnchor * pa = m_pParent->Anchor(m_anchor);
 
 		WgCoord hotspot = WgUtil::OrigoToOfs(m_hotspot,geo.Size());
-		WgCoord offset = pa->Offset() + geo.Pos() - hotspot;
+		WgCoord offset = (pa->Offset()*scale)/WG_SCALE_BASE + geo.Pos() - hotspot;
 
 		int leftOfAnchor = 0 - offset.x;
 		int rightOfAnchor = offset.x + geo.w;
@@ -622,13 +651,13 @@ WgSize WgFlexHook::_sizeNeededForGeo()
 	}
 	else
 	{
-		sz = m_pWidget->PreferredSize() + m_padding;
+		sz = m_pWidget->PreferredSize() + scaledPadding;
 
 		const WgFlexAnchor * pa1 = m_pParent->Anchor(m_anchorTopLeft);
 		const WgFlexAnchor * pa2 = m_pParent->Anchor(m_anchorBottomRight);
 
-		sz += WgSize(pa1->OffsetX(),pa1->OffsetY());
-		sz -= WgSize(pa2->OffsetX(),pa2->OffsetY());
+		sz += WgSize((pa1->OffsetX()*scale)>>WG_SCALE_BINALS,(pa1->OffsetY()*scale)>>WG_SCALE_BINALS);
+		sz -= WgSize((pa2->OffsetX()*scale)>>WG_SCALE_BINALS,(pa2->OffsetY()*scale)>>WG_SCALE_BINALS);
 
 		sz.w = (int) (sz.w / (float) (pa2->RelativeX() - pa1->RelativeX()));
 		sz.h = (int) (sz.w / (float) (pa2->RelativeY() - pa1->RelativeY()));

@@ -188,6 +188,7 @@ protected:
 	virtual void	_onCloneContent( const WgWidget * _pOrg ) = 0;
 	virtual void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
 	virtual void	_onNewSize( const WgSize& size );
+	virtual void	_setScale( int scale );
 	virtual void	_onRefresh();
 
 	virtual void	_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler );
@@ -206,6 +207,7 @@ protected:
 	Uint32			m_id;
 	WgHook *		m_pHook;
 
+	int				m_scale;
 	WgPointerStyle	m_pointerStyle;
 
 	WgString		m_tooltip;

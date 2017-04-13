@@ -170,7 +170,8 @@ public:
 	int		OffsetY() const { return m_pixelOfs.y; }
 	WgCoord	Offset() const { return m_pixelOfs; }
 
-	WgCoord	Position( const WgSize& parentSize ) const { return WgCoord((int)(m_xRelative*parentSize.w), (int)(m_yRelative*parentSize.h)) + m_pixelOfs; }
+	WgCoord	Position( const WgSize& parentSize, int scaleFactor ) const { return WgCoord( ((int)(m_xRelative*parentSize.w))+((m_pixelOfs.x*scaleFactor)>>WG_SCALE_BINALS), 
+																						  ((int)(m_yRelative*parentSize.h)) +((m_pixelOfs.y*scaleFactor)>>WG_SCALE_BINALS) ); }
 
 private:
 	WgFlexAnchor() : m_xRelative(0.f), m_yRelative(0.f), m_pixelOfs(0,0) {};

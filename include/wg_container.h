@@ -81,6 +81,9 @@ class WgContainer : public WgWidgetHolder, public WgWidget
 		virtual bool			IsLayer() const;
 		virtual WgLayer *		CastToLayer();
 		virtual const WgLayer *	CastToLayer() const;
+		
+		void					SetScale( int scale );
+		int						Scale() const { return m_scale; }
 
 
 	protected:
@@ -92,6 +95,7 @@ class WgContainer : public WgWidgetHolder, public WgWidget
 
 		virtual void	_onNewRoot( WgRootPanel * pRoot );
 
+		virtual void	_setScale( int scale );
 
 		virtual void	_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches );
 		virtual WgHook* _firstHookWithGeo( WgRect& geo ) const = 0;

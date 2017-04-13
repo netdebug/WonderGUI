@@ -42,6 +42,7 @@ WgRootPanel::WgRootPanel()
 	m_pGfxDevice = 0;
 	m_pEventHandler = new WgEventHandler(this);
 	m_hook.m_pRoot = this;
+	m_scale = WG_SCALE_BASE;
 
 }
 
@@ -55,6 +56,7 @@ WgRootPanel::WgRootPanel( WgGfxDevice * pGfxDevice )
 	m_pGfxDevice = pGfxDevice;
 	m_pEventHandler = new WgEventHandler(this);
 	m_hook.m_pRoot = this;
+	m_scale = WG_SCALE_BASE;
 }
 
 //____ Destructor _____________________________________________________________
@@ -345,6 +347,18 @@ WgWidget * WgRootPanel::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 		return m_hook.Widget()->CastToContainer()->FindWidget( ofs, mode );
 
 	return m_hook.Widget();
+}
+
+//____ SetScale() ______________________________________________________________
+
+void WgRootPanel::SetScale( int scale )
+{
+	if( m_scale != scale )
+	{
+		m_scale = scale;
+		if( m_hook.Widget() )
+			m_hook.Widget()->_setScale(m_scale);
+	}
 }
 
 
