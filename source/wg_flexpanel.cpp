@@ -1164,6 +1164,23 @@ void WgFlexPanel::_onNewSize( const WgSize& size )
 	}
 }
 
+
+//____ _setScale() ____________________________________________________________
+
+void WgFlexPanel::_setScale( int scale )
+{
+	WgPanel::_setScale( scale );
+	
+	WgFlexHook * pHook = m_hooks.Last();
+
+	while( pHook )
+	{
+		pHook->_refreshRealGeo();
+		pHook = pHook->Prev();
+	}	
+}
+
+
 //____ _firstHookWithGeo() _____________________________________________________
 
 WgHook * WgFlexPanel::_firstHookWithGeo( WgRect& writeGeo ) const

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CodeLite_Project Name="wondergui" InternalType="Library">
+<CodeLite_Project Name="wondergui" InternalType="Library" Version="10.0.0">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -232,7 +232,6 @@
     <File Name="source/wg_blob.cpp"/>
     <File Name="source/wg_frameskin.cpp"/>
     <File Name="source/wg_simpleline.cpp"/>
-    <File Name="include/wg_geometrics.h"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

@@ -1451,7 +1451,8 @@ void WgScrollHook::_requestRender( const WgRect& rect )
 
 void WgScrollHook::_requestResize()
 {
-	//TODO: Figure out how this should work and implement.
+	m_pView->_updateElementGeo( m_pView->Size() );
+	m_pView->_requestRender( m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
 }
 
 //____ WgScrollHook::_prevHook() ___________________________________________________

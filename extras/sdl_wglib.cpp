@@ -230,6 +230,7 @@ namespace sdl_wglib
 
 		WgResDB * pDB = new WgResDB();
 
+
 		// Create standard button
 
 		WgButton * pButton = new WgButton();
