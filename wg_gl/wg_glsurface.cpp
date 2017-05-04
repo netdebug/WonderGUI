@@ -77,6 +77,9 @@ WgGlSurface::WgGlSurface( WgSize size, WgPixelType type )
                  m_accessFormat, GL_UNSIGNED_BYTE, NULL );
 	glBindBuffer( GL_PIXEL_UNPACK_BUFFER, 0 );
 
+	m_pAlphaBuffer = 0;
+
+
 	GLenum err = glGetError();
 	
 //	const GLubyte * pErr = gluErrorString(err);
@@ -115,6 +118,8 @@ WgGlSurface::WgGlSurface( WgSize size, WgPixelType type, uint8_t * pPixels, int 
     
     glBindBuffer( GL_PIXEL_UNPACK_BUFFER, 0 );
 	assert( glGetError() == 0);
+
+	m_pAlphaBuffer = _genAlphaBuffer( m_size, (uint8_t*) pBlob->Content(), m_pitch, m_pixelFormat );
 }
 
 
@@ -147,6 +152,9 @@ WgGlSurface::WgGlSurface( WgSurface * pOther )
                  m_accessFormat, GL_UNSIGNED_BYTE, NULL );
     
     glBindBuffer( GL_PIXEL_UNPACK_BUFFER, 0 );
+
+	m_pAlphaBuffer = _genAlphaBuffer( m_size, (uint8_t*) pBlob->Content(), m_pitch, m_pixelFormat );
+
 	assert( glGetError() == 0);
 }
 
@@ -170,6 +178,25 @@ void WgGlSurface::_setPixelDetails( WgPixelType type )
     WgUtil::PixelTypeToFormat(type, m_pixelFormat);
 }
 
+uint8_t * WgGlSurface::_genAlphaBuffer( WgSize size, uint8_t * pPixels, int pitch, const WgPixelFormat& pixelFormat )
+{
+	if( pixelFormat.type != WG_PIXEL_BGRA_8 )
+		return 0;
+		
+	m_pAlphaBuffer = new uint8_t[size.w*size.h];
+	
+	uint8_t * p = m_pAlphaBuffer;
+	
+	for( int y = 0 ; y < size.h ; y++ )
+	{
+		for( int x = 0 ; x < size.w ; x++ )
+			* p++ = pPixels[y*pitch+x*4+3];
+	}	
+	
+	return m_pAlphaBuffer;
+}
+
+
 //____ Destructor ______________________________________________________________
 
 WgGlSurface::~WgGlSurface()
@@ -179,6 +206,9 @@ WgGlSurface::~WgGlSurface()
 
     if( m_buffer )
         glDeleteBuffers ( 1, &m_buffer );
+
+	if( m_pAlphaBuffer )
+		delete [] m_pAlphaBuffer;
 
     glDeleteTextures( 1, &m_texture );
 	assert(glGetError() == 0);
@@ -400,35 +430,9 @@ uint32_t WgGlSurface::GetPixel( WgCoord coord ) const
 
 uint8_t WgGlSurface::GetOpacity( WgCoord coord ) const
 {
-    if( m_accessFormat == GL_RGBA8 && m_accessMode != WG_WRITE_ONLY )
+	if( m_pAlphaBuffer )
     {
-        uint8_t a;
-        
-        if( m_accessMode == WG_NO_ACCESS )
-        {
-			assert(glGetError() == 0);
-            // Quick lock of surface
-            
-            glBindBuffer( GL_PIXEL_UNPACK_BUFFER, m_buffer );
-            uint8_t * pPixel = (uint8_t*) glMapBuffer( GL_PIXEL_UNPACK_BUFFER, GL_READ_ONLY );
-            
-            //
-            
-            a = pPixel[(m_size.w*coord.y+coord.x)*m_pixelWgSize+3];
-            
-            // Quick unlock of surface
-            
-            glUnmapBuffer( GL_PIXEL_UNPACK_BUFFER );
-            glBindBuffer( GL_PIXEL_UNPACK_BUFFER, 0 );
-            
-			assert(glGetError() == 0);
-        }
-        else
-        {
-            a = m_pPixels[(m_size.w*coord.y+coord.x)*m_pixelWgSize+3];
-        }
-        
-        return a;
+        return m_pAlphaBuffer[m_size.w*coord.y+coord.x];            
     }
     else
         return 255;

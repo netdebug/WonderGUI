@@ -40,3 +40,8 @@ WgSurface * WgSurfaceFactorySoft::CreateSurface( const WgSize& size, WgPixelType
 {
 	return new WgSurfaceSoft( size, type );
 }
+
+WgSurface * WgSurfaceFactorySoft::CreateSurface( const WgSize& size, WgPixelType type, uint8_t * pPixels, int pitch, const WgPixelFormat& pixelFormat ) const
+{
+    return 	new WgSurfaceSoft(size,type,pPixels, pitch, pixelFormat);	
+}
