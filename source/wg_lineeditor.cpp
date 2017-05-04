@@ -27,7 +27,6 @@
 #include 	<wg_gfxdevice.h>
 #include 	<wg_pen.h>
 #include 	<wg_eventhandler.h>
-#include	<wg_geometrics.h>
 
 static const char	c_widgetType[] = {"LineEditor"};
 
@@ -182,8 +181,9 @@ void WgLineEditor::_onCloneContent( const WgWidget * _pOrg )
 
 //____ _onRender() _____________________________________________________________
 
-void WgLineEditor::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
+void WgLineEditor::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
+
 	WgText * pText = &m_text;
 	if( m_bPasswordMode )
 	{
@@ -213,7 +213,7 @@ void WgLineEditor::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometr
 
 	}
 
-	WgRect r = geometrics.canvas();
+	WgRect r = _canvas;
 	r.x -= m_viewOfs;
 	r.w += m_viewOfs;
 

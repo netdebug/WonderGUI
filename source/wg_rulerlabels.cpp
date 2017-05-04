@@ -1,8 +1,6 @@
 
 #include <wg_rulerlabels.h>
 #include <wg_gfxdevice.h>
-#include <wg_geometrics.h>
-
 
 static const char	c_widgetType[] = {"RulerLabels"};
 
@@ -125,19 +123,17 @@ WgSize WgRulerLabels::PreferredSize() const
 
 //____ _onRender() _____________________________________________________________________
 
-void WgRulerLabels::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
+void WgRulerLabels::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	WgRect	canvas = geometrics.canvas();
-
 	if( m_direction == WG_UP || m_direction == WG_DOWN )
 	{
 		Label * pLabel = m_labels.First();
 		while( pLabel )
 		{
 			int height = pLabel->text.height();
-			int ofs = (int) (canvas.h * pLabel->offset);
+			int ofs = (int) (_canvas.h * pLabel->offset);
 			if( m_direction == WG_UP )
-				ofs = canvas.h - ofs;
+				ofs = _canvas.h - ofs;
 			
 			switch( pLabel->text.alignment() )
 			{
@@ -157,7 +153,7 @@ void WgRulerLabels::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geomet
 					break;
 			}
 			
-			pDevice->PrintText( _clip, &pLabel->text, WgRect( canvas.x, canvas.y + ofs, canvas.w, height ) );				
+			pDevice->PrintText( _clip, &pLabel->text, WgRect( _canvas.x, _canvas.y + ofs, _canvas.w, height ) );				
 			pLabel = pLabel->Next();
 		}
 	}
@@ -167,9 +163,9 @@ void WgRulerLabels::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geomet
 		while( pLabel )
 		{
 			int width = pLabel->text.width();
-			int ofs = (int) (canvas.w * pLabel->offset);
+			int ofs = (int) (_canvas.w * pLabel->offset);
 			if( m_direction == WG_LEFT )
-				ofs = canvas.w - ofs;
+				ofs = _canvas.w - ofs;
 			
 			switch( pLabel->text.alignment() )
 			{
@@ -189,7 +185,7 @@ void WgRulerLabels::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geomet
 					break;
 			}
 			
-			pDevice->PrintText( _clip, &pLabel->text, WgRect( canvas.x + ofs, canvas.y, width, canvas.h ) );				
+			pDevice->PrintText( _clip, &pLabel->text, WgRect( _canvas.x + ofs, _canvas.y, width, _canvas.h ) );				
 			pLabel = pLabel->Next();
 		}
 	}

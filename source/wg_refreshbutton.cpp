@@ -28,7 +28,6 @@
 #include <wg_charseq.h>
 #include <wg_util.h>
 #include <wg_key.h>
-#include <wg_geometrics.h>
 
 static const char	c_widgetType[] = {"RefreshButton"};
 
@@ -263,15 +262,13 @@ void WgRefreshButton::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * 
 
 //____ _onRender() _____________________________________________________________
 
-void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
+void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	WgRect	canvas = geometrics.canvas();
-
 	// Render background or animation
 
 	WgBlock	bgBlock;
 	if( m_pBgGfx )
-		bgBlock = m_pBgGfx->GetBlock(m_mode,canvas.Size());
+		bgBlock = m_pBgGfx->GetBlock(m_mode,_canvas.Size());
 
 	if( m_bRefreshing && m_pRefreshAnim && m_animTarget != ICON )
 	{
@@ -281,8 +278,8 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geom
 		{
 			case BUTTON_CENTERED:
 			{
-				WgRect dest = (	canvas.x + (canvas.w - animBlock.Width())/2,
-								canvas.y + (canvas.h - animBlock.Height())/2,
+				WgRect dest = (	_canvas.x + (_canvas.w - animBlock.Width())/2,
+								_canvas.y + (_canvas.h - animBlock.Height())/2,
 								animBlock.Size() );
 
 				pDevice->ClipBlitBlock( _clip, animBlock, dest );
@@ -291,7 +288,7 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geom
 
 			case BUTTON_STRETCHED:
 			{
-				pDevice->ClipBlitBlock( _clip, animBlock, canvas );
+				pDevice->ClipBlitBlock( _clip, animBlock, _canvas );
 			}
 			break;
 
@@ -301,12 +298,12 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geom
 	}
 	else
 	{
-		pDevice->ClipBlitBlock( _clip, bgBlock, canvas );
+		pDevice->ClipBlitBlock( _clip, bgBlock, _canvas );
 	}
 
 	// Get content rect with displacement.
 
-	WgRect contentRect = bgBlock.ContentRect( canvas );
+	WgRect contentRect = bgBlock.ContentRect( _canvas );
 
 	// Get icon and text rect from content rect
 

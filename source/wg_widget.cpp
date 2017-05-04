@@ -24,9 +24,8 @@
 #include <wg_types.h>
 #include <wg_gfxdevice.h>
 
-#include <wg_rootpanel.h>
-#include <wg_eventhandler.h>
-#include <wg_geometrics.h>
+#	include <wg_rootpanel.h>
+#	include <wg_eventhandler.h>
 
 //____ Constructor ____________________________________________________________
 
@@ -281,8 +280,7 @@ void WgWidget::_queueEvent( WgEvent::Event * pEvent )
 
 //____ _renderPatches() ________________________________________________________
 
-//void WgWidget::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches )
-void WgWidget::_renderPatches( WgGfxDevice * pDevice, const WgGeometrics& geometrics, WgPatches * _pPatches )
+void WgWidget::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches )
 {
 	for( const WgRect * pRect = _pPatches->Begin() ; pRect != _pPatches->End() ; pRect++ )
 	{
@@ -303,20 +301,20 @@ void WgWidget::_renderPatches( WgGfxDevice * pDevice, const WgGeometrics& geomet
 
 //____ Fillers _______________________________________________________________
 
-void WgWidget::_onCollectPatches( WgPatches& container, const WgGeometrics& geo, const WgRect& clip )
+void WgWidget::_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip )
 {
-		container.Add( WgRect( geo.canvas, clip ) );
+		container.Add( WgRect( geo, clip ) );
 }
 
-void WgWidget::_onMaskPatches( WgPatches& patches, const WgGeometrics& geo, const WgRect& clip, WgBlendMode blendMode )
+void WgWidget::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode )
 {
 	if( (m_bOpaque && blendMode == WG_BLENDMODE_BLEND) || blendMode == WG_BLENDMODE_OPAQUE )
 	{
-		patches.Sub( WgRect( geo.canvas, clip ) );
+		patches.Sub( WgRect( geo, clip ) );
 	}
 }
 
-void WgWidget::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geo, const WgRect& clip )
+void WgWidget::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
 }
 

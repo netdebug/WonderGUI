@@ -34,8 +34,6 @@
 #include	<wg_base.h>
 #include	<wg_eventhandler.h>
 #include	<wg_patches.h>
-#include	<wg_geometrics.h>
-#include	<wg_util.h>
 
 static const char	c_widgetType[] = {"Menu"};
 static const char	c_hookType[] = {"MenuSliderHook"};
@@ -574,12 +572,9 @@ void WgMenu::_markFirstFilteredEntry()
 
 //____ _onRender() _____________________________________________________________
 
-void WgMenu::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& clip )
+void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRect& window, const WgRect& clip )
 {
-	WgRect	canvas = geometrics.canvas();
-	WgRect	window = geometrics.window();
 
-	
 	// Render background
 
 	if( m_pBgGfx )
@@ -1196,19 +1191,17 @@ void WgMenu::_itemSelected()
 
 //____ _renderPatches() ________________________________________________________
 
-void WgMenu::_renderPatches( WgGfxDevice * pDevice, const WgGeometrics& geometrics, WgPatches * _pPatches )
+void WgMenu::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches )
 {
-	WgRect	canvas = geometrics.canvas();
-
-	WgRect sliderGeo = _sliderGeo( canvas );
+	WgRect sliderGeo = _sliderGeo( _canvas );
 
 	for( const WgRect * pRect = _pPatches->Begin() ; pRect != _pPatches->End() ; pRect++ )
 	{
 		// Render menu itself
 
-		WgRect clip( canvas, *pRect );
+		WgRect clip( _canvas, *pRect );
 		if( clip.w > 0 || clip.h > 0 )
-			_onRender( pDevice, geometrics, clip );
+			_onRender( pDevice, _canvas, _window, clip );
 
 		// Render slider if present.
 
@@ -1223,27 +1216,25 @@ void WgMenu::_renderPatches( WgGfxDevice * pDevice, const WgGeometrics& geometri
 
 //____ _onCollectPatches() _____________________________________________________
 
-void WgMenu::_onCollectPatches( WgPatches& container, const WgGeometrics& geom, const WgRect& clip )
+void WgMenu::_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip )
 {
-	container.Add( WgRect( geom.canvas(), clip ) );
+	container.Add( WgRect( geo, clip ) );
 }
 
 //____ _onMaskPatches() ________________________________________________________
 
-void WgMenu::_onMaskPatches( WgPatches& patches, const WgGeometrics& geometrics, const WgRect& clip, WgBlendMode blendMode )
+void WgMenu::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode )
 {
-	WgRect	canvas = geometrics.canvas();
-	
 	if( (m_bOpaque && blendMode == WG_BLENDMODE_BLEND) || blendMode == WG_BLENDMODE_OPAQUE )
 	{
-		patches.Sub( WgRect( canvas, clip ) );
+		patches.Sub( WgRect( geo, clip ) );
 	}
 	else if( blendMode == WG_BLENDMODE_BLEND && m_pBgGfx )
 	{
 		if( m_pBgGfx->IsOpaque() )
-			patches.Sub( WgRect( canvas, clip ) );
+			patches.Sub( WgRect( geo, clip ) );
 		else if( m_pBgGfx->HasOpaqueCenter() )
-			patches.Sub( WgRect( canvas - m_pBgGfx->Frame(), clip ) );
+			patches.Sub( WgRect( geo - m_pBgGfx->Frame(), clip ) );
 	}
 }
 

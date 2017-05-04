@@ -6,27 +6,6 @@
 #include <wg_widget.h>
 #include <wg_panel.h>
 
-
-//____ layoutToCanvas() ____________________________________________________
-
-WgCoord WgUtil::layoutToCanvas( const WgCoord& pos, float scaleFactor )
-{
-	return WgCoord( (int) pos.x * scaleFactor, (int) pos.y * scaleFactor );
-}
-
-WgRect WgUtil::layoutToCanvas( const WgRect& geo, float scaleFactor )
-{
-	WgRect canvas;
-
-	canvas.x = (int) geo.x * scaleFactor;
-	canvas.y = (int) geo.y * scaleFactor;
-	canvas.w = (int) (geo.x + geo.w) * scaleFactor - canvas.x;
-	canvas.h = (int) (geo.y + geo.h) * scaleFactor - canvas.y;
-
-	return canvas;
-}
-
-
 bool WgUtil::AdjustScaledArea(const WgBlock& block, WgRect& area)
 {
 	if( block.IsFixedSize() )

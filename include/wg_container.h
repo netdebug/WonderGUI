@@ -93,7 +93,7 @@ class WgContainer : public WgWidgetHolder, public WgWidget
 		virtual void	_onNewRoot( WgRootPanel * pRoot );
 
 
-		virtual void	_renderPatches( WgGfxDevice * pDevice, const WgGeometrics& _geometrics, WgPatches * _pPatches );
+		virtual void	_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches );
 		virtual WgHook* _firstHookWithGeo( WgRect& geo ) const = 0;
 		virtual WgHook* _nextHookWithGeo( WgRect& geo, WgHook * pHook ) const = 0;
 
@@ -106,8 +106,8 @@ class WgContainer : public WgWidgetHolder, public WgWidget
 		virtual WgModalLayer *	_getModalLayer() const;
 		virtual WgMenuLayer*	_getMenuLayer() const;
 
-		virtual void	_onCollectPatches( WgPatches& container, const WgGeometrics& geometrics, const WgRect& clip );
-		virtual void	_onMaskPatches( WgPatches& patches, const WgGeometrics& geometrics, const WgRect& clip, WgBlendMode blendMode );
+		virtual void	_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode );
+		virtual void	_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip );
 		virtual bool 	_onAlphaTest( const WgCoord& ofs );
 		virtual void	_onCloneContent( const WgContainer * _pOrg );
 

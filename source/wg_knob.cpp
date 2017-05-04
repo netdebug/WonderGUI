@@ -24,7 +24,6 @@
 #include <wg_knob.h>
 #include <wg_gfxdevice.h>
 #include <wg_base.h>
-#include <wg_geometrics.h>
 
 #include "Debug.h"
 
@@ -97,19 +96,17 @@ void WgKnob::_onCloneContent( const WgWidget * _pOrg )
 
 //____ _onRender() _____________________________________________________________
 #define PI 3.141592653f
-void WgKnob::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
+void WgKnob::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	WgRect	canvas = geometrics.canvas();
-	
-	//    pDevice->Fill( _clip, WgColor::black );
+//    pDevice->Fill( _clip, WgColor::black );
 
-    int rad = (WgMin( canvas.w, canvas.h ) - 1) / 2;
+    int rad = (WgMin( _canvas.w,_canvas.h ) - 1) / 2;
     int sz = 2*rad + 1; // Rad is the radius (even). Total size will be 2*radius + 1 middle point
     
 	if( sz > 1 )
 	{
         m_iNextPixel = 0;
-        drawCircle(canvas.x + sz/2, canvas.y + sz/2, sz/2, sz/2);
+        drawCircle(_canvas.x + sz/2, _canvas.y + sz/2, sz/2, sz/2);
         pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_pAACol);
         
         const float d = 45.0f;
@@ -118,7 +115,7 @@ void WgKnob::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, c
         const float y =  cos(d*PI/180.0f + m_fValue*(360.0f-d*2)*PI/180.0f)*(0.92f*float(sz)/2.0f);
 
         m_iNextPixel = 0;
-        drawLine(canvas.x + rad, canvas.y + rad, canvas.x + rad + x, canvas.y + rad + y);
+        drawLine(_canvas.x + rad, _canvas.y + rad, _canvas.x + rad + x, _canvas.y + rad + y);
         pDevice->ClipPlotPixels(_clip, m_iNextPixel, m_pAAPix, m_pAACol);
 	}
 }

@@ -36,7 +36,6 @@
 #include	<wg_gfxdevice.h>
 #include	<wg_texttool.h>
 #include	<wg_menulayer.h>
-#include	<wg_geometrics.h>
 
 static const char	c_widgetType[] = {"Menubar"};
 
@@ -215,10 +214,8 @@ WgSize WgMenubar::PreferredSize() const
 
 //____ _onRender() ________________________________________________________
 
-void WgMenubar::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip )
+void WgMenubar::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	WgRect	canvas = geometrics.canvas();
-		
 	// Render background
 
 	WgBlock bgBlock;
@@ -226,11 +223,11 @@ void WgMenubar::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics
 	if( m_pBgGfx )
 	{
 		if( m_bEnabled )
-			bgBlock = m_pBgGfx->GetBlock(WG_MODE_NORMAL, canvas.Size());
+			bgBlock = m_pBgGfx->GetBlock(WG_MODE_NORMAL,_canvas.Size());
 		else
-			bgBlock = m_pBgGfx->GetBlock(WG_MODE_DISABLED, canvas.Size());
+			bgBlock = m_pBgGfx->GetBlock(WG_MODE_DISABLED,_canvas.Size());
 
-		pDevice->ClipBlitBlock( _clip, bgBlock, canvas );
+		pDevice->ClipBlitBlock( _clip, bgBlock, _canvas );
 	}
 
 	// Take backgrounds content borders into account
@@ -240,12 +237,12 @@ void WgMenubar::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics
 
 	if( m_pBgGfx )
 	{
-		window = bgBlock.ContentRect( canvas );
+		window = bgBlock.ContentRect( _canvas );
 		clip.Intersection( window, _clip );
 	}
 	else
 	{
-		window = canvas;
+		window = _canvas;
 		clip = _clip;
 	}
 

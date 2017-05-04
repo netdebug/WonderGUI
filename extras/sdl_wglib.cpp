@@ -1,7 +1,6 @@
 #include <sdl_wglib.h>
 //#include <wg_surface_sdl.h>
 #include <wg_surface_soft.h>
-#include <wg_surfacefactory.h>
 #include <wondergui.h>
 
 
@@ -125,10 +124,7 @@ namespace sdl_wglib
 
 		WgSize dimensions( bmp->w, bmp->h );
 
-		WgPixelFormat	pixelFormat;
-		ConvertPixelFormat( &pixelFormat, bmp->format );
-
-		WgSurface * pSurf = factory.CreateSurface( dimensions, type, (uint8_t*) bmp->pixels, bmp->pitch, pixelFormat );
+		WgSurface * pSurf = factory.CreateSurface( dimensions, type );
 
 		if( !pSurf )
 		{
@@ -136,7 +132,17 @@ namespace sdl_wglib
 			return 0;
 		}
 
-		SDL_FreeSurface( bmp );
+		
+		WgPixelFormat	pixelFormat;
+		ConvertPixelFormat( &pixelFormat, bmp->format );
+
+		if( !pSurf->CopyFrom( &pixelFormat, (uint8_t*) bmp->pixels, bmp->pitch, dimensions, dimensions) )
+		{
+			printf("Unable to copy loaded bitmap '%s' to surface.\n", path);
+			delete pSurf;
+			return 0;
+		};
+
 		return pSurf;
 	}
 

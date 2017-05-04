@@ -265,10 +265,9 @@ protected:
 	//
 
 	void		_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler );
-
-	void		_renderPatches( WgGfxDevice * pDevice, const WgGeometrics& _geometrics, WgPatches * _pPatches );
-	void		_onCollectPatches( WgPatches& container, const WgGeometrics& geometrics, const WgRect& clip );
-	void		_onMaskPatches( WgPatches& patches, const WgGeometrics& geometrics, const WgRect& clip, WgBlendMode blendMode );
+	void		_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches );
+	void		_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip );
+	void		_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode );
 
 	bool		_onAlphaTest( const WgCoord& ofs );
 	void		_onCloneContent( const WgWidget * _pOrg );

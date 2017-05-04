@@ -25,8 +25,6 @@
 #include <wg_scaleimage.h>
 #include <wg_gfxdevice.h>
 #include <wg_util.h>
-#include <wg_geometrics.h>
-#include <wg_geometrics.h>
 
 
 static const char	c_widgetType[] = {"ScaleImage"};
@@ -263,14 +261,12 @@ void WgScaleImage::_onCloneContent( const WgWidget * _pOrg )
 
 //____ _onRender() _____________________________________________________________
 
-void WgScaleImage::_onRender( WgGfxDevice * pDevice, const WgGeometrics& geometrics, const WgRect& _clip)
+void WgScaleImage::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip)
 {
 	if( !m_pGenSurface )
 		return;
 
-	WgRect	canvas = geometrics.canvas();
-
-	pDevice->ClipBlit( _clip, m_pGenSurface, canvas.x + m_imgRect.x, canvas.y + m_imgRect.y );
+	pDevice->ClipBlit( _clip, m_pGenSurface, _canvas.x + m_imgRect.x, _canvas.y + m_imgRect.y );
 }
 
 //____ _onAlphaTest() ___________________________________________________________

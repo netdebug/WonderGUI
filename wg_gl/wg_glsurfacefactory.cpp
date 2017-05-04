@@ -39,10 +39,3 @@ WgSurface * WgGlSurfaceFactory::CreateSurface( const WgSize& size, WgPixelType t
 {
     return 	new WgGlSurface(size,type);
 }
-
-
-
-WgSurface * WgGlSurfaceFactory::CreateSurface( const WgSize& size, WgPixelType type, uint8_t * pPixels, int pitch, const WgPixelFormat& pixelFormat ) const
-{
-    return 	new WgGlSurface(size,type,pPixels, pitch, pixelFormat);	
-}
