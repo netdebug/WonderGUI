@@ -185,8 +185,8 @@ public:
 										const WgRect& selected, const WgRect& disabled, const WgRect& special,
 										WgBorders frame, WgBorders padding, WgCoord shiftMarked, WgCoord shiftPressed );
 
-	bool				SetSize( WgSize size, int alt = 0 );
-	bool				SetPos( WgMode mode, WgCoord pos, int alt = 0 );
+//	bool				SetSize( WgSize size, int alt = 0 );
+//	bool				SetPos( WgMode mode, WgCoord pos, int alt = 0 );
 
 	void				SetTextColors( const WgColorsetPtr& colors );
 	void				SetFrame( const WgBorders& frame, int alt = 0 );
@@ -203,18 +203,18 @@ public:
 
 	inline WgColorsetPtr	TextColors() const { return m_pTextColors; }
 	WgColor				TextColor( WgMode mode ) const;
-	WgRect				Rect( WgMode mode, int alt = 0 ) const;
-	WgSize				Size( int alt = 0 ) const;
-	int					Width( int alt = 0 ) const;
-	int					Height( int alt = 0 ) const;
+	WgRect				Rect( WgMode mode, int scale ) const;
+	WgSize				Size( int scale ) const;
+	int					Width( int scale ) const;
+	int					Height( int scale ) const;
 
-	int					MinWidth( int alt = 0 ) const;
-	int					MinHeight( int alt = 0 ) const;
-	WgSize				MinSize( int alt = 0 ) const;
+	int					MinWidth( int scale ) const;
+	int					MinHeight( int scale ) const;
+	WgSize				MinSize( int scale ) const;
 		
-	const WgSurface *	Surface( int alt = 0 ) const;
-	WgBorders			Frame( int alt = 0 ) const;
-	WgBorders			Padding( int alt = 0 ) const;
+	const WgSurface *	Surface( int scale ) const;
+	WgBorders			Frame( int scale ) const;
+	WgBorders			Padding( int scale ) const;
 	WgCoord				ContentShift( WgMode mode, int alt = 0 ) const;
 	inline Uint32		Flags() const { return m_flags; }
 

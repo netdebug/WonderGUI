@@ -387,31 +387,6 @@ const WgBlockset::Alt_Data*	WgBlockset::_getAltForScale( int scale ) const
 	return &m_base;
 }
 
-//____ SetPos() _______________________________________________________________
-
-bool WgBlockset::SetPos( WgMode mode, WgCoord pos, int alt )
-{
-	Alt_Data * p = _getAlt(alt);
-	if( !p )
-		return false;
-
-	p->x[mode] = pos.x;
-	p->y[mode] = pos.y;
-	return true;
-}
-
-//____ SetSize() ______________________________________________________________
-
-bool WgBlockset::SetSize( WgSize size, int alt )
-{
-	Alt_Data * p = _getAlt(alt);
-	if( !p )
-		return false;
-
-	p->w = size.w;
-	p->h = size.h;
-	return true;
-}
 
 //____ TextColor() _____________________________________________________________
 
@@ -426,9 +401,9 @@ WgColor WgBlockset::TextColor( WgMode mode ) const
 
 //____ Rect() __________________________________________________________________
 
-WgRect WgBlockset::Rect( WgMode mode, int alt ) const
+WgRect WgBlockset::Rect( WgMode mode, int scale ) const
 {
-	const Alt_Data * p = _getAlt(alt);
+	const Alt_Data * p = _getAltForScale(scale);
 	if( !p )
 		return WgRect();
 
@@ -437,9 +412,9 @@ WgRect WgBlockset::Rect( WgMode mode, int alt ) const
 
 //____ Size() __________________________________________________________________
 
-WgSize WgBlockset::Size( int alt ) const
+WgSize WgBlockset::Size( int scale ) const
 {
-	const Alt_Data * p = _getAlt(alt);
+	const Alt_Data * p = _getAltForScale(scale);
 	if( !p )
 		return WgSize();
 
@@ -449,9 +424,9 @@ WgSize WgBlockset::Size( int alt ) const
 
 //____ Width() _________________________________________________________________
 
-int WgBlockset::Width( int alt ) const
+int WgBlockset::Width( int scale ) const
 {
-	const Alt_Data * p = _getAlt(alt);
+	const Alt_Data * p = _getAltForScale(scale);
 	if( !p )
 		return 0;
 
@@ -460,9 +435,9 @@ int WgBlockset::Width( int alt ) const
 
 //____ Height() ________________________________________________________________
 
-int WgBlockset::Height( int alt ) const
+int WgBlockset::Height( int scale ) const
 {
-	const Alt_Data * p = _getAlt(alt);
+	const Alt_Data * p = _getAltForScale(scale);
 	if( !p )
 		return 0;
 
@@ -471,9 +446,9 @@ int WgBlockset::Height( int alt ) const
 
 //____ MinSize() _______________________________________________________________
 
-WgSize WgBlockset::MinSize( int alt ) const
+WgSize WgBlockset::MinSize( int scale ) const
 {
-	const Alt_Data * p = _getAlt(alt);
+	const Alt_Data * p = _getAltForScale(scale);
 	if( !p )
 		return WgSize();
 
@@ -482,9 +457,9 @@ WgSize WgBlockset::MinSize( int alt ) const
 
 //____ MinWidth() ______________________________________________________________
 
-int WgBlockset::MinWidth( int alt ) const
+int WgBlockset::MinWidth( int scale ) const
 {
-	const Alt_Data * p = _getAlt(alt);
+	const Alt_Data * p = _getAltForScale(scale);
 	if( !p )
 		return 0;
 
@@ -493,9 +468,9 @@ int WgBlockset::MinWidth( int alt ) const
 
 //____ MinHeight() _____________________________________________________________
 
-int WgBlockset::MinHeight( int alt ) const
+int WgBlockset::MinHeight( int scale ) const
 {
-	const Alt_Data * p = _getAlt(alt);
+	const Alt_Data * p = _getAltForScale(scale);
 	if( !p )
 		return 0;
 
@@ -504,9 +479,9 @@ int WgBlockset::MinHeight( int alt ) const
 
 //____ Surface() _______________________________________________________________
 
-const WgSurface * WgBlockset::Surface( int alt ) const
+const WgSurface * WgBlockset::Surface( int scale ) const
 {
-	const Alt_Data * p = _getAlt(alt);
+	const Alt_Data * p = _getAltForScale(scale);
 	if( !p )
 		return 0;
 
@@ -516,14 +491,39 @@ const WgSurface * WgBlockset::Surface( int alt ) const
 
 //____ Frame() ____________________________________________________________
 
-WgBorders WgBlockset::Frame( int alt ) const
+WgBorders WgBlockset::Frame( int scale ) const
 {
-	const Alt_Data * p = _getAlt(alt);
+	const Alt_Data * p = _getAltForScale(scale);
 	if( !p )
 		return WgBorders();
 
 	return p->frame;
 }
+
+
+//____ Padding() ____________________________________________________
+
+WgBorders WgBlockset::Padding( int scale ) const
+{
+	const Alt_Data * p = _getAltForScale(scale);
+	if( !p )
+		return WgBorders();
+
+	return p->padding;
+}
+
+
+//____ ContentShift() __________________________________________________
+
+WgCoord WgBlockset::ContentShift( WgMode mode, int scale ) const
+{
+	const Alt_Data * p = _getAltForScale(scale);
+	if( !p )
+		return WgCoord();
+
+	return WgCoord(p->contentShift[mode]);
+}
+
 
 //____ SetFrame() ________________________________________________________
 
@@ -536,16 +536,6 @@ void WgBlockset::SetFrame( const WgBorders& frame, int alt )
 	p->frame = frame;
 }
 
-//____ Padding() ____________________________________________________
-
-WgBorders WgBlockset::Padding( int alt ) const
-{
-	const Alt_Data * p = _getAlt(alt);
-	if( !p )
-		return WgBorders();
-
-	return p->padding;
-}
 
 //____ SetPadding() ____________________________________________________
 
@@ -558,17 +548,6 @@ void WgBlockset::SetPadding( const WgBorders& padding, int alt )
 	p->padding = padding;
 }
 
-
-//____ ContentShift() __________________________________________________
-
-WgCoord WgBlockset::ContentShift( WgMode mode, int alt ) const
-{
-	const Alt_Data * p = _getAlt(alt);
-	if( !p )
-		return WgCoord();
-
-	return WgCoord(p->contentShift[mode]);
-}
 
 //____ SetContentShift() _______________________________________________
 

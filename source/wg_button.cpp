@@ -114,9 +114,9 @@ Uint32 WgButton::GetTextAreaWidth()
 	WgRect	contentRect(0,0,Size());
 
 	if( m_pBgGfx )
-		contentRect.Shrink(m_pBgGfx->Padding());
+		contentRect.Shrink(m_pBgGfx->Padding(m_scale));
 
-	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx ) );
+	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx, m_scale ) );
 
 	return textRect.w;
 }
@@ -128,14 +128,14 @@ int WgButton::HeightForWidth( int width ) const
 	int height = 0;
 
 	if( m_pBgGfx )
-		height = m_pBgGfx->Height();
+		height = m_pBgGfx->Height(m_scale);
 
 	if( m_text.nbChars() != 0 )
 	{
 		WgBorders padding;
 
 		if( m_pBgGfx )
-			padding = m_pBgGfx->Padding();
+			padding = m_pBgGfx->Padding(m_scale);
 
 		int heightForText = m_text.heightForWidth(width-padding.Width()) + padding.Height();
 		if( heightForText > height )
@@ -155,14 +155,14 @@ WgSize WgButton::PreferredSize() const
 	WgSize bestSize;
 
 	if( m_pBgGfx )
-		bestSize = m_pBgGfx->Size();
+		bestSize = m_pBgGfx->Size(m_scale);
 
 	if( m_text.nbChars() != 0 )
 	{
 		WgSize textSize = m_text.unwrappedSize();
 
 		if( m_pBgGfx )
-			textSize += m_pBgGfx->Padding();
+			textSize += m_pBgGfx->Padding(m_scale);
 
 		if( textSize.w > bestSize.w )
 			bestSize.w = textSize.w;
@@ -200,9 +200,9 @@ void WgButton::_onNewSize( const WgSize& size )
 	WgRect	contentRect(0,0,Size());
 
 	if( m_pBgGfx )
-		contentRect.Shrink(m_pBgGfx->Padding());
+		contentRect.Shrink(m_pBgGfx->Padding(m_scale));
 
-	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx ) );
+	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx, m_scale ) );
 
 	m_text.setLineWidth(textRect.w);
 }
@@ -231,7 +231,7 @@ void WgButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const Wg
 
 	// Get icon and text rect from content rect
 
-	WgRect iconRect = _getIconRect( contentRect, m_pIconGfx );
+	WgRect iconRect = _getIconRect( contentRect, m_pIconGfx, m_scale );
 	WgRect textRect = _getTextRect( contentRect, iconRect );
 
 	// Render icon

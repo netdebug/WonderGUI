@@ -77,7 +77,7 @@ void WgImage::SetSource( const WgBlocksetPtr& pBlockset )
 WgSize WgImage::PreferredSize() const
 {
 	if( m_pGfx )
-		return (m_pGfx->Size()*m_scale) / WG_SCALE_BASE;
+		return (m_pGfx->Size(m_scale)*m_scale) / WG_SCALE_BASE;
 
 	return WgSize(1,1);
 }

@@ -222,16 +222,16 @@ void WgWidgetSlider::_headerFooterChanged()
 	if( m_bHorizontal )
 	{
 		if( m_pBtnFwdGfx )
-			fwdLen = m_pBtnFwdGfx->Width();
+			fwdLen = m_pBtnFwdGfx->Width(m_scale);
 		if( m_pBtnBwdGfx )
-			bwdLen = m_pBtnBwdGfx->Width();
+			bwdLen = m_pBtnBwdGfx->Width(m_scale);
 	}
 	else
 	{
 		if( m_pBtnFwdGfx )
-			fwdLen = m_pBtnFwdGfx->Height();
+			fwdLen = m_pBtnFwdGfx->Height(m_scale);
 		if( m_pBtnBwdGfx )
-			bwdLen = m_pBtnBwdGfx->Height();
+			bwdLen = m_pBtnBwdGfx->Height(m_scale);
 	}
 
 	int	headerLen = 0;
@@ -313,9 +313,9 @@ void	WgWidgetSlider::_viewToPosLen( int * _wpPos, int * _wpLen )
 	int		minLen;
 
 	if( m_bHorizontal )
-		minLen = m_pBarGfx->MinWidth();
+		minLen = m_pBarGfx->MinWidth(m_scale);
 	else
-		minLen = m_pBarGfx->MinHeight();
+		minLen = m_pBarGfx->MinHeight(m_scale);
 
 	if( minLen < 4 )
 		minLen = 4;
@@ -397,16 +397,16 @@ void WgWidgetSlider::_updateMinSize()
 
 	if( m_pBgGfx )
 	{
-		minW = Max( minW, m_pBgGfx->MinWidth() );
-		minH = Max( minH, m_pBgGfx->MinHeight() );
+		minW = Max( minW, m_pBgGfx->MinWidth(m_scale) );
+		minH = Max( minH, m_pBgGfx->MinHeight(m_scale) );
 	}
 
 	// Check min w/h for BarGfx.
 
 	if( m_pBarGfx )
 	{
-		minW = Max( minW, m_pBarGfx->MinWidth() );
-		minH = Max( minH, m_pBarGfx->MinHeight() );
+		minW = Max( minW, m_pBarGfx->MinWidth(m_scale) );
+		minH = Max( minH, m_pBarGfx->MinHeight(m_scale) );
 	}
 
 
@@ -422,16 +422,16 @@ void WgWidgetSlider::_updateMinSize()
 
 	if( m_pBtnFwdGfx && (m_btnLayout & (HEADER_FWD | FOOTER_FWD)) )
 	{
-		minW = Max( minW, m_pBtnFwdGfx->Width() );
-		minH = Max( minH, m_pBtnFwdGfx->Height() );
+		minW = Max( minW, m_pBtnFwdGfx->Width(m_scale) );
+		minH = Max( minH, m_pBtnFwdGfx->Height(m_scale) );
 	}
 
 	// Check min w/h for backward button.
 
 	if( m_pBtnBwdGfx && (m_btnLayout & (HEADER_BWD | FOOTER_BWD)) )
 	{
-		minW = Max( minW, m_pBtnBwdGfx->Width() );
-		minH = Max( minH, m_pBtnBwdGfx->Height() );
+		minW = Max( minW, m_pBtnBwdGfx->Width(m_scale) );
+		minH = Max( minH, m_pBtnBwdGfx->Height(m_scale) );
 	}
 
 	// Set if changed.

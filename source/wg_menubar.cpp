@@ -452,7 +452,7 @@ void WgMenubar::_onCloneContent( const WgWidget * _pOrg )
 WgBorders WgMenubar::GetEntryBorders() const
 {
 	if( m_pEntryGfx )
-		return m_pEntryGfx->Padding();
+		return m_pEntryGfx->Padding(m_scale);
 	else
 		return WgBorders(10,0,10,0);		// 10 pixels on each side as default margin. Should do something more intelligent here, like taking fonts avgSpacing into account...
 }
@@ -474,8 +474,8 @@ bool WgMenubar::OpenMenu( Uint32 nb )
 
 	if( m_pBgGfx )
 	{
-		pos.x += m_pBgGfx->Padding().left;
-		pos.y += m_pBgGfx->Padding().top;
+		pos.x += m_pBgGfx->Padding(m_scale).left;
+		pos.y += m_pBgGfx->Padding(m_scale).top;
 	}
 
 	int bordersWidth = GetEntryBorders().Width();
@@ -537,8 +537,8 @@ Uint32 WgMenubar::GetItemAtAbsPos( int x, int y )
 
 	if( m_pBgGfx )
 	{
-		pos.x -= m_pBgGfx->Padding().left;
-		pos.y -= m_pBgGfx->Padding().top;
+		pos.x -= m_pBgGfx->Padding(m_scale).left;
+		pos.y -= m_pBgGfx->Padding(m_scale).top;
 	}
 
 	if( y > 0 && x > 0 && y < (int) Size().h )

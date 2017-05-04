@@ -950,7 +950,7 @@ void WgCombobox::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const 
 
 	WgRect r( _canvas );
 	if( m_pTextBoxBg )
-		r.Shrink( m_pTextBoxBg->Padding() );
+		r.Shrink( m_pTextBoxBg->Padding(m_scale) );
 
 	WgRect	textClip( r, _clip );
 
@@ -1031,7 +1031,7 @@ void WgCombobox::_adjustViewOfs()
 
 		int geoWidth = Size().w;
 		if( m_pTextBoxBg )
-			geoWidth -= m_pTextBoxBg->Padding().Width();
+			geoWidth -= m_pTextBoxBg->Padding(m_scale).Width();
 
 		int	lineWidth = m_pText->getSoftLineWidth( 0 ) + cursBearing+cursWidth;
 

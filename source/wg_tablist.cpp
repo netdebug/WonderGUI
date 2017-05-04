@@ -643,10 +643,10 @@ WgSize WgTablist::PreferredSize() const
 		WgBlocksetPtr pBg = _getTabSource(pTab);
 		if( pBg )
 		{
-			h = pBg->Height();
+			h = pBg->Height(m_scale);
 			int textH = pTab->m_text.height();
-			if( h - pBg->Padding().Height() < textH )
-				h = textH + pBg->Padding().Height();
+			if( h - pBg->Padding(m_scale).Height() < textH )
+				h = textH + pBg->Padding(m_scale).Height();
 		}
 		else
 			h = pTab->m_text.height();
@@ -992,10 +992,10 @@ int WgTablist::_calcTabsWantedWidth( WgTab * pTab ) const
 	WgBlocksetPtr pSrc = _getTabSource(pTab);
 	if( pSrc )
 	{
-		width += pSrc->Padding().Width();
+		width += pSrc->Padding(m_scale).Width();
 
-		if( width < pSrc->MinWidth() )
-			width = pSrc->MinWidth();
+		if( width < pSrc->MinWidth(m_scale) )
+			width = pSrc->MinWidth(m_scale);
 	}
 
 	if( width < m_minTabWidth )
@@ -1034,8 +1034,8 @@ WgTab * WgTablist::_pos2Tab( int x, int y ) const
 
 			if( m_bTabOpaqueForMouse && x >= 0 && y >= 0 && x < (int) w && y < sz.h )
 				bHit = true;
-			else if( ((unsigned) x) > pSrc->Padding().left && ((unsigned) x) < w - pSrc->Padding().right &&
-				((unsigned) y) > pSrc->Padding().top && y < sz.h - pSrc->Padding().bottom )
+			else if( ((unsigned) x) > pSrc->Padding(m_scale).left && ((unsigned) x) < w - pSrc->Padding(m_scale).right &&
+				((unsigned) y) > pSrc->Padding(m_scale).top && y < sz.h - pSrc->Padding(m_scale).bottom )
 				bHit = true;
 			else
 				bHit = WgUtil::MarkTestBlock( WgCoord(x, y), pSrc->GetBlock( _getTabMode(*pTab), m_scale ), WgRect(0,0,w,sz.h), m_markOpacity);

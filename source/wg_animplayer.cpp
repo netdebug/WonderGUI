@@ -232,7 +232,7 @@ WgSize WgAnimPlayer::PreferredSize() const
 	if( m_pAnim )
 		return m_pAnim->Size();
 	else if( m_pStaticBlock )
-		return m_pStaticBlock->Size();
+		return m_pStaticBlock->Size(m_scale);
 	else
 		return WgSize(0,0);
 }

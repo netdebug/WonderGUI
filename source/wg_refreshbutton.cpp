@@ -188,7 +188,7 @@ void WgRefreshButton::_onNewSize( const WgSize& size )
 	Uint32 w = size.w;
 
 	if( m_pBgGfx )
-		w -= m_pBgGfx->Padding().Width();
+		w -= m_pBgGfx->Padding(m_scale).Width();
 	m_refreshText.setLineWidth(w);
 
 	WgButton::_onNewSize( size );
@@ -309,7 +309,7 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, c
 
 	WgSize iconSize;
 	if( m_pIconGfx )
-		iconSize = m_pIconGfx->Size();
+		iconSize = m_pIconGfx->Size(m_scale);
 	else if( m_animTarget == ICON && m_pRefreshAnim )
 		iconSize = m_pRefreshAnim->Size();
 
