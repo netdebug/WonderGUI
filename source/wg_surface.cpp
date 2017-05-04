@@ -216,6 +216,22 @@ void WgSurface::ClearMetaData()
 	m_nMetaBytes = 0;
 }
 
+
+bool WgSurface::unload()
+{
+	return false;
+}
+
+bool WgSurface::isLoaded()
+{
+	return true;
+}
+
+void WgSurface::reload()
+{
+}
+
+
 //____ setScaleMode() __________________________________________________________
 
 void WgSurface::setScaleMode( WgScaleMode mode )

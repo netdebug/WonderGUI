@@ -96,6 +96,9 @@ public:
 	void				ClearMetaData();
 
 
+	virtual bool		unload();
+	virtual bool		isLoaded();
+	virtual void		reload();
 	
 	// Softube specific...
 	

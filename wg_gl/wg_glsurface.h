@@ -82,24 +82,24 @@ public:
 
 	static WgSize	MaxSize();
 
+	bool		unload();
+	bool		isLoaded();
+	void		reload();
+
+
 private:
 
     void		_setPixelDetails( WgPixelType type );
     void		_initBuffer();
-	uint8_t * 	_genAlphaBuffer( WgSize size, uint8_t * pPixels, int pitch, const WgPixelFormat& pixelFormat );
 
 
     GLuint 		m_texture;			// GL texture handle.
     GLint       m_internalFormat;   // GL_RGB8 or GL_RGBA8.
     GLenum		m_accessFormat;		// GL_BGR or GL_BGRA.
-    WgBlobPtr     m_pBlob;
+    WgBlobPtr   m_pBlob;
     
-    GLuint		m_buffer;			// Pointer at GL pixel buffer, if any.
     WgSize		m_size;				// Width and height in pixels.
     uint32_t	m_pixelWgSize;		// WgSize in bytes of a pixel.
-
-	uint8_t * 	m_pAlphaBuffer;
-
 };
 
 #endif //WG_GLSURFACE_DOT_H
