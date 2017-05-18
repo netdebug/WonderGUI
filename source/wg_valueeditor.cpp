@@ -864,6 +864,15 @@ void WgValueEditor::_onLostInputFocus()
 	_requestRender();
 }
 
+//____ _setScale() _____________________________________________________________
+
+void WgValueEditor::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+	m_text.SetScale(scale);
+}
+
 
 //____ SelectAllText() __________________________________________________________
 

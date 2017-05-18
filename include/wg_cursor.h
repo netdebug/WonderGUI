@@ -79,7 +79,7 @@ public:
 	int					BearingY( Mode m ) const { return m_bearing[m].y; };
 	WgCoord				Bearing( Mode m ) const { return m_bearing[m]; }
 	int					Advance( Mode m ) const { return m_advance[m]; };
-	int					Width( Mode m ) const { return m_pAnim[m]->Size().w; }
+	int					Width( Mode m ) const { return m_pAnim[m]->Size(WG_SCALE_BASE).w; }
 	WgGfxAnim * 		Anim( Mode m ) const { return m_pAnim[m]; };
 	float				SizeRatio(Mode m ) const { return m_sizeRatio[m]; }
 

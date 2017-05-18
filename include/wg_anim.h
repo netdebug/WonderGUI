@@ -95,7 +95,7 @@ protected:
 
 	WgKeyFrame *		_keyFrame( int64_t ticks, WgKeyFrame * pProximity = 0 ) const;
 
-private:
+protected:
 	
 	float				m_scale;			// Only used for getKeyFrame
 	int					m_duration;

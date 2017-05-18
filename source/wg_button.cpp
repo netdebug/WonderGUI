@@ -207,6 +207,15 @@ void WgButton::_onNewSize( const WgSize& size )
 	m_text.setLineWidth(textRect.w);
 }
 
+//____ _setScale() _____________________________________________________________
+
+void WgButton::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+	m_text.SetScale(scale);
+}
+
 
 //____ _onRender() _____________________________________________________________
 

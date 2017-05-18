@@ -230,7 +230,7 @@ bool WgAnimPlayer::Stop()
 WgSize WgAnimPlayer::PreferredSize() const
 {
 	if( m_pAnim )
-		return m_pAnim->Size();
+		return m_pAnim->Size(m_scale);
 	else if( m_pStaticBlock )
 		return m_pStaticBlock->Size(m_scale);
 	else
@@ -256,7 +256,7 @@ void WgAnimPlayer::_playPosUpdated()
 	if( !m_pAnim )
 		return;
 
-	WgBlock block = m_pAnim->GetBlock( (int64_t) m_playPos );
+	WgBlock block = m_pAnim->GetBlock( (int64_t) m_playPos, m_scale );
 
 	if( block != m_animFrame )
 	{

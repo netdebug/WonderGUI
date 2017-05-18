@@ -103,6 +103,7 @@ protected:
 		void		_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
 		void		_onCloneContent( const WgWidget * _pOrg );
 		virtual void _onNewSize( const WgSize& size );
+		void 		_setScale( int scale );
 
 		WgMode		_getRenderMode();
 

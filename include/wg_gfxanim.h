@@ -43,6 +43,8 @@ class WgSurface;
 class WgGfxFrame;
 
 
+#define MAX_ANIM_ALT 5
+
 //____ Class WgGfxAnim ________________________________________________________
 
 class	WgGfxAnim : public WgAnim
@@ -52,10 +54,12 @@ public:
 	WgGfxAnim( WgSize size, WgBorders gfxBorders = WgBorders(), Uint32 blockFlags = 0 );
 
 	void		SetSize( WgSize size );
-	WgSize		Size() const { return m_size; }
+	WgSize		Size(int scale) const;
+
+	void		SetAlternative( int alt, int activationScale, WgSize size, WgBorders gfxBorders );
 
 	void		SetGfxBorders( WgBorders borders );
-	WgBorders	GfxBorders() const { return m_borders; }
+	WgBorders	GfxBorders() const { return m_borders[0]; }
 
 	void		SetBlockFlags( Uint32 flags );
 	Uint32		BlockFlags() const { return m_blockFlags; }
@@ -66,17 +70,22 @@ public:
 	int			AddFrames( WgSurface * pSurf, WgCoord arrayOfs, WgSize arraySize, int duration, int nFrames = 0, WgSize spacing = WgSize() );
 	int			AddFrames( WgSurface * pSurf, int duration, int nFrames = 0, WgSize spacing = WgSize() );
 
+	bool		SetAltFrame( int pos, int alt, WgSurface * pSurf, WgCoord ofs );
+
+	int			SetAltFrames( int frameOffset, int scaleFactor, WgSurface * pSurf, WgCoord arrayOfs, WgSize arraySize, int nFrames = 0, WgSize spacing = WgSize() );
+
 	WgGfxFrame * GetFrame( int64_t ticks, WgGfxFrame * pProximity = 0 ) const;
 
 	WgGfxFrame * GetFirstFrame(void) {return (WgGfxFrame *) WgAnim::_firstKeyFrame(); };
 	WgGfxFrame * GetLastFrame(void) {return (WgGfxFrame *) WgAnim::_lastKeyFrame(); };
 
-	WgBlock		 GetBlock( int64_t tick, WgGfxFrame * pProximity = 0 ) const;
+	WgBlock		 GetBlock( int64_t tick, int scale, WgGfxFrame * pProximity = 0 ) const;
 
 protected:
 
-	WgSize		m_size;
-	WgBorders	m_borders;
+	int			m_activationScale[MAX_ANIM_ALT];		// Ńeeds to be in increasing order 
+	WgSize		m_size[MAX_ANIM_ALT];
+	WgBorders	m_borders[MAX_ANIM_ALT];
 	Uint32		m_blockFlags;
 };
 
@@ -85,13 +94,16 @@ protected:
 class WgGfxFrame : public WgKeyFrame
 {
 public:
+	WgGfxFrame();
+
+
 	// Derived from WgKeyFrame: Uint32	timestamp
 
 	WgGfxFrame * GetNext(void) {return (WgGfxFrame *) WgKeyFrame::Next();};
 	WgGfxFrame * GetPrev(void) {return (WgGfxFrame *) WgKeyFrame::Prev();};
 
-	WgSurface *	pSurf;
-	WgCoord		ofs;
+	WgSurface *	pSurf[MAX_ANIM_ALT];
+	WgCoord		ofs[MAX_ANIM_ALT];
 };
 
 #endif //WG_GFXANIM_DOT_H

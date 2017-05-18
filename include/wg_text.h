@@ -273,6 +273,10 @@ public:
 	bool				SetMaxChars( int max );
 	int					MaxChars() const { return m_maxChars; }
 
+	void				SetScale( int scale );
+	int					Scale() const { return m_scale; }
+	
+
 	void					SetEditMode(WgTextEditMode mode);							// Maybe should be protected with Widgets/Items as friends?
 	inline WgTextEditMode	GetEditMode() const { return m_editMode; }
 	inline bool				IsEditable() const { return m_editMode == WG_TEXT_EDITABLE; }
@@ -477,6 +481,8 @@ protected:
 
 	bool			m_bWrap;
 	bool			m_bAutoEllipsis;	// Use ellipsis for text that doesn't fit.
+
+	int				m_scale;
 
 	WgTextHolder *	m_pHolder;
 

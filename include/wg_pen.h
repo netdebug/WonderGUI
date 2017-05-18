@@ -64,6 +64,7 @@ public:
 	void					SetClipRect( const WgRect& clip );
 	inline void				SetDevice( WgGfxDevice * pDevice ) { m_pDevice = pDevice; }
 	void					SetTextNode( WgTextNode * pNode ) { m_pTextNode = pNode; _onAttrChanged(); }
+	void					SetScale( int scale );
 
 	void					SetOrigo( const WgCoord& pos ) { m_origo = pos; }
 
@@ -164,6 +165,7 @@ private:
 	bool			m_bClip;		// Set if we have a clipping rectangle.
 	WgRect			m_clipRect;		// Clipping rectangle used for ClipBlit().
 
+	int				m_scale;		// Widget scale, for text sizes.
 
 };
 

@@ -386,6 +386,17 @@ void WgCheckBox::_onNewSize( const WgSize& size )
 }
 
 
+//____ _setScale() _____________________________________________________________
+
+void WgCheckBox::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+	m_text.SetScale(scale);
+}
+
+
+
 //____ _onCloneContent() _______________________________________________________
 
 void WgCheckBox::_onCloneContent( const WgWidget * _pOrg )

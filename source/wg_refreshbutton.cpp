@@ -194,6 +194,15 @@ void WgRefreshButton::_onNewSize( const WgSize& size )
 	WgButton::_onNewSize( size );
 }
 
+//____ _setScale() _____________________________________________________________
+
+void WgRefreshButton::_setScale( int scale )
+{
+	WgButton::_setScale(scale);
+
+	m_refreshText.SetScale(scale);
+}
+
 
 //____ _onEvent() _____________________________________________________________
 
@@ -272,7 +281,7 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, c
 
 	if( m_bRefreshing && m_pRefreshAnim && m_animTarget != ICON )
 	{
-		WgBlock animBlock = m_pRefreshAnim->GetBlock( m_animTimer );
+		WgBlock animBlock = m_pRefreshAnim->GetBlock( m_animTimer, m_scale );
 
 		switch( m_animTarget )
 		{
@@ -311,7 +320,7 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, c
 	if( m_pIconGfx )
 		iconSize = m_pIconGfx->Size(m_scale);
 	else if( m_animTarget == ICON && m_pRefreshAnim )
-		iconSize = m_pRefreshAnim->Size();
+		iconSize = m_pRefreshAnim->Size(m_scale);
 
 	WgRect iconRect = _getIconRect( contentRect, iconSize );
 	WgRect textRect = _getTextRect( contentRect, iconRect );
@@ -323,7 +332,7 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, c
 	{
 		// Render animation
 
-		WgBlock animBlock = m_pRefreshAnim->GetBlock( m_animTimer );
+		WgBlock animBlock = m_pRefreshAnim->GetBlock( m_animTimer, m_scale );
 
 		pDevice->ClipBlitBlock( _clip, animBlock, iconRect );
 	}
