@@ -385,7 +385,7 @@ void decButtonPressed( const WgEvent::Event * pEvent)
 
 WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 {
-	WgResDB * pDB = sdl_wglib::LoadStdWidgets( "../resources/blocks.png", WgSurfaceFactorySoft() );
+	WgResDB * pDB = sdl_wglib::LoadStdWidgets( "../resources/blocks.png", "../resources/blocks_x2.png", "../resources/blocks_x4.png", WgSurfaceFactorySoft() );
 	if( !pDB )
 		return 0;
 
