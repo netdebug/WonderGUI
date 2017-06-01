@@ -27,7 +27,6 @@
 #endif
 
 #ifdef WIN32
-#	include <windows.h>
 #	include <gl/glew.h>
 #	include <gl/gl.h>
 #else
@@ -49,6 +48,7 @@ public:
     WgGlGfxDevice( WgSize canvas );
     ~WgGlGfxDevice();
 
+	void    SetViewportOffset( WgCoord ofs );
     void	SetCanvas( WgSize canvas );
 
     void	SetTintColor( WgColor color );
@@ -59,6 +59,8 @@ public:
     bool	BeginRender();
     bool	EndRender();
 
+	void    Clear( WgColor col );
+	
     void	Fill( const WgRect& rect, const WgColor& col );
 
     void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col );
@@ -152,8 +154,14 @@ protected:
     GLboolean	m_glBlendEnabled;
     GLint		m_glBlendSrc;
     GLint		m_glBlendDst;
-    WgSize		m_size;
+	GLint		m_glViewport[4];
+	GLint		m_glScissorBox[4];
 
+	//
+	
+	WgSize		m_size;
+	WgCoord     m_viewportOffset;
+	
 };
 
 #endif //WG_GLGFXDEVICE_DOT_H

@@ -438,6 +438,7 @@ void WgEventLogger::OnEvent( const WgEvent::Event * _pEvent )
 			break;
 		}
 
+                /*
 		case WG_EVENT_MENUITEM_SELECT:
 		{
 			id = "MenuitemSelect";
@@ -469,6 +470,7 @@ void WgEventLogger::OnEvent( const WgEvent::Event * _pEvent )
 			sprintf( params, "menu=%ld", (long int)pEvent->Menu() );
 			break;
 		}
+                */
 
 		case WG_EVENT_MODAL_MOVE_OUTSIDE:
 			id = "ModalMoveOutside";

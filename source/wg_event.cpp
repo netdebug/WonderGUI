@@ -33,7 +33,7 @@
 #include <wg_slider.h>
 #include <wg_textdisplay.h>
 #include <wg_lineeditor.h>
-#include <wg_menu.h>
+//#include <wg_menu.h>
 #include <wg_tablepanel.h>
 
 namespace WgEvent
@@ -768,7 +768,8 @@ namespace WgEvent
 	}
 
 	//____ Menu event methods __________________________________________________
-
+  // Menu is not used by Softube. Remove this code to avoid having to bring in a lot of source files just related to menus
+  /* 
 	WgMenu *	MenuitemEvent::Menu() const
 	{
 		WgWidget * pWidget = m_pWidget.GetRealPtr();
@@ -823,7 +824,7 @@ namespace WgEvent
 	{
 		return m_pWidget.GetRealPtr();
 	}
-
+  */
 	//____ Modal event methods ___________________________________________________
 
 	ModalMoveOutside::ModalMoveOutside( WgWidget * pWidget )
@@ -848,13 +849,14 @@ namespace WgEvent
 	}
 
 	//____ Table event methods _________________________________________________
-
+  
 	WgTablePanel * TableCellEvent::Table() const
 	{
+          /*
 		WgWidget * pWidget = m_pWidget.GetRealPtr();
 		if( pWidget && pWidget->Type() == WgMenu::GetClass() )
 			return static_cast<WgTablePanel*>(pWidget);
-
+          */
 		return 0;		
 	}
 	

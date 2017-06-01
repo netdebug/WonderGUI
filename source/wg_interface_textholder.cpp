@@ -100,24 +100,29 @@ void Wg_Interface_TextHolder::ClearText()
 
 void Wg_Interface_TextHolder::SetText( const WgCharSeq& seq )
 {
+    DBGM(DBG_GUI_APP, ("GUI_APP: SetText 1 called: %s", seq.GetUTF8().ptr) );
+
     m_pText->setText( seq );
 	_textModified();
 }
 
 void Wg_Interface_TextHolder::SetText( const WgCharBuffer * pBuffer )
 {
+    DBGM(DBG_GUI_APP, ("GUI_APP: SetText 2 called") );
 	m_pText->setText( pBuffer );
 	_textModified();
 }
 
 void Wg_Interface_TextHolder::SetText( const WgString& str )
 {
+    DBGM(DBG_GUI_APP, ("GUI_APP: SetText 3 called") );
 	m_pText->setText( str );
 	_textModified();
 }
 
 void Wg_Interface_TextHolder::SetText( const WgText * pText )
 {
+    DBGM(DBG_GUI_APP, ("GUI_APP: SetText 4 called") );
 	m_pText->setText( pText );
 	_textModified();
 }
