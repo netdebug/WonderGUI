@@ -34,6 +34,8 @@ WgSurface::WgSurface()
 	m_pMetaData		= 0;
 	m_nMetaBytes	= 0;
 	m_scaleMode		= WG_SCALEMODE_INTERPOLATE;		// For Softube...
+    m_scaleFactor   = WG_SCALE_BASE;
+    m_iResource      = -1;                           // handy for debugging
 
 	memset( &m_pixelFormat, 0, sizeof(WgPixelFormat) );
 }

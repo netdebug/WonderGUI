@@ -362,6 +362,14 @@ void WgWidgetSlider::_onDisable( void )
 	_requestRender();
 }
 
+//____ _setScale() _____________________________________________________________
+
+void WgWidgetSlider::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+}
+
 //____ _onRefresh() _______________________________________________________
 
 void WgWidgetSlider::_onRefresh( void )
@@ -376,6 +384,8 @@ WgSize WgWidgetSlider::PreferredSize() const
 	WgSize sz = m_minSize;
 
 	// Add 50 pixels in the sliders direction for best size.
+
+	int addPix = (50*m_scale) >> WG_SCALE_BINALS; 
 
 	if( m_bHorizontal )
 		sz.w += 50;

@@ -113,6 +113,7 @@ class	WgWidgetSlider : public WgWidget
 		bool	_onAlphaTest( const WgCoord& ofs );
 		void	_onEnable();
 		void	_onDisable();
+		void 	_setScale( int scale );
 
 		bool	_setSlider( float pos, float size );		// Set slider pos/size without notifying target (but should post events).
 

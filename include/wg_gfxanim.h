@@ -54,7 +54,7 @@ public:
 	WgGfxAnim( WgSize size, WgBorders gfxBorders = WgBorders(), Uint32 blockFlags = 0 );
 
 	void		SetSize( WgSize size );
-	WgSize		Size(int scale) const;
+	WgSize		Size(int scale = WG_SCALE_BASE) const;
 
 	void		SetAlternative( int alt, int activationScale, WgSize size, WgBorders gfxBorders );
 

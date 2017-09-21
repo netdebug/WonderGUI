@@ -70,6 +70,9 @@ public:
 
 	// Methods for floating hooks
 
+    void    SetScaleGeo( bool bScale );
+    bool    ScaleGeo() const { return m_bScaleGeo; }
+    
 	bool	SetAnchor( int anchor );
 	bool	SetHotspot( WgOrigo hotspot );
 
@@ -146,8 +149,9 @@ protected:
 	WgSizePolicy	m_heightPolicy;
 
 	int				m_anchor;
-	WgOrigo	m_hotspot;
+	WgOrigo         m_hotspot;
 	WgRect			m_placementGeo;	// Widgets geo relative anchor and hotspot.
+    bool            m_bScaleGeo;   // true = scale is applied to placement geo.
 
 	//Only used for anchored hooks.
 
@@ -243,6 +247,8 @@ private:
 	void			_onCloneContent( const WgWidget * _pOrg );
 	void			_onNewSize( const WgSize& size );
 	void			_setScale( int scale );
+
+    WgSize          _scaledPreferredSize( WgWidget * pWidget );
 
 
 	void			_onRequestRender( const WgRect& rect, const WgFlexHook * pHook );	// rect is in our coordinate system.

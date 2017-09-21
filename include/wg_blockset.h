@@ -196,8 +196,6 @@ public:
 	bool				SetScale(bool bScale);
 	bool				SetFixedSize(bool bFixedSize);						//TODO: Make center-mode enum of fixed-size/tile/stretch/scale.
 
-
-
 	inline WgBlock		GetBlock( WgMode mode, int scale ) const { return _getBlock( mode, _getAltForScale(scale), scale ); }
 
 

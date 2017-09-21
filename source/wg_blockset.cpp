@@ -414,11 +414,8 @@ WgRect WgBlockset::Rect( WgMode mode, int scale ) const
 
 WgSize WgBlockset::Size( int scale ) const
 {
-	const Alt_Data * p = _getAltForScale(scale);
-	if( !p )
-		return WgSize();
-
-	return WgSize( p->w, p->h );
+    int factor = m_base.pSurf->ScaleFactor();
+	return WgSize( m_base.w * scale / factor, m_base.h * scale / factor );
 }
 
 
@@ -426,55 +423,40 @@ WgSize WgBlockset::Size( int scale ) const
 
 int WgBlockset::Width( int scale ) const
 {
-	const Alt_Data * p = _getAltForScale(scale);
-	if( !p )
-		return 0;
-
-	return p->w;
+    int factor = m_base.pSurf->ScaleFactor();
+    return m_base.w * scale / factor;
 }
 
 //____ Height() ________________________________________________________________
 
 int WgBlockset::Height( int scale ) const
 {
-	const Alt_Data * p = _getAltForScale(scale);
-	if( !p )
-		return 0;
-
-	return p->h;
+    int factor = m_base.pSurf->ScaleFactor();
+    return m_base.h * scale / factor;
 }
 
 //____ MinSize() _______________________________________________________________
 
 WgSize WgBlockset::MinSize( int scale ) const
 {
-	const Alt_Data * p = _getAltForScale(scale);
-	if( !p )
-		return WgSize();
-
-	return p->frame.Size();
+    int factor = m_base.pSurf->ScaleFactor();
+	return m_base.frame.Size()*scale/factor;
 }
 
 //____ MinWidth() ______________________________________________________________
 
 int WgBlockset::MinWidth( int scale ) const
 {
-	const Alt_Data * p = _getAltForScale(scale);
-	if( !p )
-		return 0;
-
-	return p->frame.Width();
+    int factor = m_base.pSurf->ScaleFactor();
+    return m_base.frame.Width()*scale/factor;
 }
 
 //____ MinHeight() _____________________________________________________________
 
 int WgBlockset::MinHeight( int scale ) const
 {
-	const Alt_Data * p = _getAltForScale(scale);
-	if( !p )
-		return 0;
-
-	return p->frame.Height();
+    int factor = m_base.pSurf->ScaleFactor();
+    return m_base.frame.Height()*scale/factor;
 }
 
 //____ Surface() _______________________________________________________________

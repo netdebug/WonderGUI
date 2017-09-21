@@ -149,6 +149,11 @@ public:
 	bool		SetViewPixelOfsX( int x );
 	bool		SetViewPixelOfsY( int y );
 
+    bool		SetScaledViewPixelOfs( int x, int y );
+    bool		SetScaledViewPixelOfsX( int x );
+    bool		SetScaledViewPixelOfsY( int y );
+
+    
 	bool		SetViewOfs( float x, float y );
 	bool		SetViewOfsX( float x );
 	bool		SetViewOfsY( float y );

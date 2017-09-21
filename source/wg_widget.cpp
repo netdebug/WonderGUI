@@ -121,7 +121,21 @@ void WgWidget::_onNewHook( WgHook * pHook )
 			_onNewRoot( pNewRoot );
 	}
 
-	m_pHook = pHook;
+    m_pHook = pHook;
+
+    if( pHook )
+    {
+        int scale;
+        WgContainer * p =  pHook->_parent();
+        if( p )
+            scale = p->m_scale;
+        else
+            scale = pHook->Root()->Scale();
+        
+        if( scale != m_scale )
+            _setScale( scale );
+    }
+
 }
 
 //____ _onNewRoot() ___________________________________________________________

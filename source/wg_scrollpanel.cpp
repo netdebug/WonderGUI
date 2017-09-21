@@ -380,6 +380,33 @@ bool WgScrollPanel::SetViewPixelOfsY( int y )
 	return SetViewPixelOfs(m_viewPixOfs.x, y);
 }
 
+
+//____ SetScaledViewPixelOfs() _____________________________________________________
+
+bool WgScrollPanel::SetScaledViewPixelOfs( int x, int y )
+{
+    return SetViewPixelOfs((x*m_scale)>>WG_SCALE_BINALS, (y*m_scale)>>WG_SCALE_BINALS);
+//    return SetViewPixelOfs(x, y );
+}
+
+
+//____ SetScaledViewPixelOfsX() _____________________________________________________
+
+bool WgScrollPanel::SetScaledViewPixelOfsX( int x )
+{
+    return SetViewPixelOfs((x*m_scale)>>WG_SCALE_BINALS, m_viewPixOfs.y);
+//    return SetViewPixelOfs(x, m_viewPixOfs.y);
+}
+
+//____ SetScaledViewPixelOfsY() _____________________________________________________
+
+bool WgScrollPanel::SetScaledViewPixelOfsY( int y )
+{
+    return SetViewPixelOfs(m_viewPixOfs.x,(y*m_scale)>>WG_SCALE_BINALS);
+//    return SetViewPixelOfs(m_viewPixOfs.x,y );
+}
+
+
 //____ SetViewOfs() ___________________________________________________________
 
 bool WgScrollPanel::SetViewOfs( float x, float y )

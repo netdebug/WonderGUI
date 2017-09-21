@@ -187,7 +187,7 @@ const char plotVertexShader[] =
 
 "#version 330 core\n"
 "uniform vec2 dimensions;                                  "
-"layout(location = 0) in vec2 pos;                         "
+"layout(location = 0) in ivec2 pos;                         "
 "in vec4 inColor;                                       "
 "out vec4 color;"
 "void main()                                                "
@@ -975,11 +975,10 @@ void WgGlGfxDevice::PlotPixels( int nCoords, const WgCoord * pCoords, const WgCo
     
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
     glBufferData(GL_ARRAY_BUFFER, sizeof(WgCoord)*nCoords, pCoords, GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(
+    glVertexAttribIPointer(
                           0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
                           2,                  // size
                           GL_INT,             // type
-                          GL_FALSE,           // normalized?
                           0,                  // stride
                           (void*)0            // array buffer offset
                           );

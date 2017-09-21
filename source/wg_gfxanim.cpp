@@ -54,14 +54,10 @@ WgGfxAnim::WgGfxAnim( WgSize size, WgBorders gfxBorders, Uint32 blockFlags )
 
 WgSize WgGfxAnim::Size(int scale) const
 {
-	int alt = 0;
-	for( int i = 1 ; i < MAX_ANIM_ALT ; i++ )
-	{
-		if( m_activationScale[i] <= scale )
-			alt = i;
-	}
-	
-	return m_size[alt];
+    WgGfxFrame * pFrame = (WgGfxFrame *) WgAnim::_firstKeyFrame();
+    int factor = pFrame ? pFrame->pSurf[0]->ScaleFactor() : WG_SCALE_BASE;
+    
+	return m_size[0]*scale/factor;
 }
 
 
