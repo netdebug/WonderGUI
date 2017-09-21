@@ -276,10 +276,14 @@ bool WgScaleImage::_onAlphaTest( const WgCoord& ofs )
 	if( !m_pGenSurface )
 		return	false;												// No visible pixel, so don't accept the mark...
 
-	Uint8 opacity = m_pGenSurface->GetOpacity(ofs);
-	if( opacity > 0 )
-		return true;
 
+	if (m_imgRect.Contains(ofs))
+	{
+		WgCoord ofs2 = ofs - m_imgRect.Pos();
+		Uint8 opacity = m_pGenSurface->GetOpacity(ofs2);
+		if (opacity > 0)
+			return true;
+	}
 	return false;
 }
 

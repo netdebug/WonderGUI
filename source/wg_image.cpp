@@ -77,7 +77,7 @@ void WgImage::SetSource( const WgBlocksetPtr& pBlockset )
 WgSize WgImage::PreferredSize() const
 {
 	if( m_pGfx )
-		return m_pGfx->Size();
+		return (m_pGfx->Size(m_scale)*m_scale) / WG_SCALE_BASE;
 
 	return WgSize(1,1);
 }
@@ -102,9 +102,9 @@ void WgImage::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 
 	WgBlock	block;
 	if( m_bEnabled )
-		block = m_pGfx->GetBlock(WG_MODE_NORMAL, _canvas);
+		block = m_pGfx->GetBlock(WG_MODE_NORMAL, m_scale);
 	else
-		block = m_pGfx->GetBlock(WG_MODE_DISABLED, _canvas);
+		block = m_pGfx->GetBlock(WG_MODE_DISABLED, m_scale);
 
 	pDevice->ClipBlitBlock( _clip, block, _canvas);
 }
@@ -122,7 +122,7 @@ bool WgImage::_onAlphaTest( const WgCoord& ofs )
 
 	WgSize sz = Size();
 
-	return WgUtil::MarkTestBlock( ofs, m_pGfx->GetBlock(mode,sz), WgRect(0,0,sz.w,sz.h), m_markOpacity );
+	return WgUtil::MarkTestBlock( ofs, m_pGfx->GetBlock(mode,m_scale), WgRect(0,0,sz.w,sz.h), m_markOpacity );
 }
 
 //____ _onEnable() _____________________________________________________________

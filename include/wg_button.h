@@ -86,6 +86,8 @@ protected:
 	void			_onEnable();
 	void			_onDisable();
 	virtual void	_onNewSize( const WgSize& size );
+	void 			_setScale( int scale );
+
 	void			_onGotInputFocus();
 	void			_onLostInputFocus();
 

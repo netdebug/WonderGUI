@@ -197,6 +197,7 @@ void WgLineEditor::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 
 		pText->SetWrap(false);
 		pText->SetAutoEllipsis(false);
+		pText->SetScale(m_text.Scale());
 		pText->setAlignment(m_text.alignment());
 		pText->setProperties(m_text.getProperties());
 		pText->setSelectionProperties(m_text.getSelectionProperties());
@@ -620,6 +621,15 @@ void WgLineEditor::_onNewSize( const WgSize& size )
 {
 	_adjustViewOfs();
 	_requestRender();
+}
+
+//____ _setScale() _____________________________________________________________
+
+void WgLineEditor::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+	m_text.SetScale(scale);
 }
 
 

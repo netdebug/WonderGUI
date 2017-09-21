@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CodeLite_Project Name="bench" InternalType="Console">
+<CodeLite_Project Name="bench" InternalType="Console" Version="10.0.0">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -20,12 +20,13 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="code">
-    <File Name="main.cpp" ExcludeProjConfig=""/>
+    <File Name="main.cpp" ExcludeProjConfig="Debug"/>
     <File Name="../extras/sdl_wglib.cpp"/>
     <File Name="../extras/sdl_wglib.h"/>
     <File Name="testwidget.cpp"/>
     <File Name="testwidget.h"/>
     <File Name="main_gl.cpp" ExcludeProjConfig="Debug"/>
+    <File Name="main_scaletest.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Release">
     <Project Name="wondergui"/>

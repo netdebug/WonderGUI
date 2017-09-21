@@ -70,6 +70,9 @@ public:
 
 	// Methods for floating hooks
 
+    void    SetScaleGeo( bool bScale );
+    bool    ScaleGeo() const { return m_bScaleGeo; }
+    
 	bool	SetAnchor( int anchor );
 	bool	SetHotspot( WgOrigo hotspot );
 
@@ -146,8 +149,9 @@ protected:
 	WgSizePolicy	m_heightPolicy;
 
 	int				m_anchor;
-	WgOrigo	m_hotspot;
+	WgOrigo         m_hotspot;
 	WgRect			m_placementGeo;	// Widgets geo relative anchor and hotspot.
+    bool            m_bScaleGeo;   // true = scale is applied to placement geo.
 
 	//Only used for anchored hooks.
 
@@ -170,7 +174,8 @@ public:
 	int		OffsetY() const { return m_pixelOfs.y; }
 	WgCoord	Offset() const { return m_pixelOfs; }
 
-	WgCoord	Position( const WgSize& parentSize ) const { return WgCoord((int)(m_xRelative*parentSize.w), (int)(m_yRelative*parentSize.h)) + m_pixelOfs; }
+	WgCoord	Position( const WgSize& parentSize, int scaleFactor ) const { return WgCoord( ((int)(m_xRelative*parentSize.w))+((m_pixelOfs.x*scaleFactor)>>WG_SCALE_BINALS), 
+																						  ((int)(m_yRelative*parentSize.h)) +((m_pixelOfs.y*scaleFactor)>>WG_SCALE_BINALS) ); }
 
 private:
 	WgFlexAnchor() : m_xRelative(0.f), m_yRelative(0.f), m_pixelOfs(0,0) {};
@@ -241,6 +246,9 @@ private:
 
 	void			_onCloneContent( const WgWidget * _pOrg );
 	void			_onNewSize( const WgSize& size );
+	void			_setScale( int scale );
+
+    WgSize          _scaledPreferredSize( WgWidget * pWidget );
 
 
 	void			_onRequestRender( const WgRect& rect, const WgFlexHook * pHook );	// rect is in our coordinate system.

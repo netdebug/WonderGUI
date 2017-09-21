@@ -420,6 +420,15 @@ void WgTextDisplay::_onLostInputFocus()
 	}
 }
 
+//____ _setScale() _____________________________________________________________
+
+void WgTextDisplay::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+	m_text.SetScale(scale);
+}
+
 
 
 //____ _textModified() _________________________________________________________

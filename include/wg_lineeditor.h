@@ -92,6 +92,7 @@ protected:
 	void	_onEnable();
 	void	_onDisable();
 	void	_onNewSize( const WgSize& size );
+	void 	_setScale( int scale );
 
 	void	_textModified();
 

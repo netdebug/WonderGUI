@@ -1,7 +1,7 @@
 #include <sdl_wglib.h>
 //#include <wg_surface_sdl.h>
 #include <wg_surface_soft.h>
-#include <wg_surfacefactory.h>
+#include <wg_surfacefactory_soft.h>
 #include <wondergui.h>
 
 
@@ -142,7 +142,7 @@ namespace sdl_wglib
 
 	//____ LoadStdWidgets() _____________________________________________________
 
-	WgResDB * LoadStdWidgets( const char * pImagePath, const WgSurfaceFactory& factory )
+	WgResDB * LoadStdWidgets( const char * pImagePath, const char * pImagePathX2, const char * pImagePathX4, const WgSurfaceFactory& factory )
 	{
 		const int HSLIDER_BTN_OFS 		= 1;
 		const int VSLIDER_BTN_OFS 		= HSLIDER_BTN_OFS + 19;
@@ -157,9 +157,37 @@ namespace sdl_wglib
 		const int COMBOBOX_OFS			= SPLITS_AND_FRAME_OFS + 10;
 		const int TILES_OFS				= 192;
 
+		WgSurface * surfaces[3];
+
 		WgSurface * pSurface = LoadSurface( pImagePath, factory );
 		if( !pSurface )
 			return 0;
+
+		surfaces[0] = pSurface;
+		surfaces[1] = pSurface;
+		surfaces[2] = pSurface;
+
+		if( pImagePathX2 )
+		{
+			WgSurface * pSurfaceX2 = LoadSurface( pImagePathX2, factory );
+			if( !pSurfaceX2 )
+				return 0;
+				
+			surfaces[1] = pSurfaceX2;
+			surfaces[2] = pSurfaceX2;
+		}
+
+
+		if( pImagePathX4 )
+		{
+			WgSurface * pSurfaceX4 = LoadSurface( pImagePathX4, factory );
+			if( !pSurfaceX4 )
+				return 0;
+				
+			surfaces[2] = pSurfaceX4;
+		}
+		
+
 
 		WgBlocksetPtr pHSliderBtnBwdBlocks	= WgBlockset::CreateFromRow(pSurface, WgRect(1,HSLIDER_BTN_OFS,74,17), 4, 2, WG_OPAQUE);
 		pHSliderBtnBwdBlocks->SetFrame(WgBorders(3));
@@ -202,9 +230,35 @@ namespace sdl_wglib
 		WgBlocksetPtr pRadiobuttonCheckedBlocks = WgBlockset::CreateFromRow(pSurface, WgRect(53,RADIOBUTTON_OFS,50,11), 4, 2, WG_OPAQUE);
 		pRadiobuttonCheckedBlocks->SetPadding(WgBorders(3));
 
-		WgBlocksetPtr pButtonBlocks = WgBlockset::CreateFromRow(pSurface, WgRect(1,BUTTON_OFS,38,8), 4, 2, WG_OPAQUE);
-		pButtonBlocks->SetFrame(WgBorders(3));
-		pButtonBlocks->SetPadding(WgBorders(4));
+
+		WgRect buttonRects[4] { WgRect(1,BUTTON_OFS,8,8), WgRect(1+10,BUTTON_OFS,8,8), WgRect(1+20,BUTTON_OFS,8,8), WgRect(1+30,BUTTON_OFS,8,8) };
+		WgBorders buttonFrame(3);
+		WgBorders buttonPadding(4);
+		
+		WgBlocksetPtr pButtonBlocks = WgBlockset::CreateFromRects(pSurface, buttonRects[0], buttonRects[1], buttonRects[2], buttonRects[3], WG_OPAQUE);
+		pButtonBlocks->SetFrame(buttonFrame);
+		pButtonBlocks->SetPadding(buttonPadding);
+
+		for( int i = 0 ; i < 2 ; i++ )
+		{
+			for( int r = 0 ; r < 4 ; r++ )
+			{
+				buttonRects[r].x *= 2;
+				buttonRects[r].y *= 2;
+				buttonRects[r].w *= 2;
+				buttonRects[r].h *= 2;
+			}
+			
+			buttonFrame = WgBorders( buttonFrame.left*2, buttonFrame.top*2, buttonFrame.right*2, buttonFrame.bottom*2 );
+			buttonPadding = WgBorders( buttonPadding.left*2, buttonPadding.top*2, buttonPadding.right*2, buttonPadding.bottom*2 );
+			
+			pButtonBlocks->AddAlternative( WG_SCALE_BASE << i+1, surfaces[i+1], buttonRects[0], buttonRects[1], buttonRects[2], buttonRects[3], buttonRects[3], 
+					buttonFrame, buttonPadding, WgCoord(), WgCoord() );
+			
+		}
+
+
+
 
 		WgBlocksetPtr pPlateBlocks = WgBlockset::CreateFromRow(pSurface, WgRect(1,PLATE_OFS,38,8), 4, 2, WG_OPAQUE);
 		pPlateBlocks->SetFrame(WgBorders(3));
@@ -229,6 +283,7 @@ namespace sdl_wglib
 
 
 		WgResDB * pDB = new WgResDB();
+
 
 		// Create standard button
 

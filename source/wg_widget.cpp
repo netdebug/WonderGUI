@@ -31,7 +31,7 @@
 
 WgWidget::WgWidget():m_id(0), m_pHook(0), m_pointerStyle(WG_POINTER_DEFAULT),
 					m_markOpacity( 1 ), m_bEnabled(true), m_bOpaque(false),
-					m_bFocused(false), m_bTabLock(false), m_bReceiveTick(false)
+					m_bFocused(false), m_bTabLock(false), m_bReceiveTick(false), m_scale(WG_SCALE_BASE)
 {
 #ifdef WG_DEBUG_DIRTY_RECTS
     update = false;
@@ -121,7 +121,21 @@ void WgWidget::_onNewHook( WgHook * pHook )
 			_onNewRoot( pNewRoot );
 	}
 
-	m_pHook = pHook;
+    m_pHook = pHook;
+
+    if( pHook )
+    {
+        int scale;
+        WgContainer * p =  pHook->_parent();
+        if( p )
+            scale = p->m_scale;
+        else
+            scale = pHook->Root()->Scale();
+        
+        if( scale != m_scale )
+            _setScale( scale );
+    }
+
 }
 
 //____ _onNewRoot() ___________________________________________________________
@@ -321,6 +335,11 @@ void WgWidget::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const Wg
 void WgWidget::_onNewSize( const WgSize& size )
 {
 	_requestRender();
+}
+
+void WgWidget::_setScale( int scale )
+{
+	m_scale = scale;
 }
 
 void WgWidget::_onRefresh()

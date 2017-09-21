@@ -380,6 +380,33 @@ bool WgScrollPanel::SetViewPixelOfsY( int y )
 	return SetViewPixelOfs(m_viewPixOfs.x, y);
 }
 
+
+//____ SetScaledViewPixelOfs() _____________________________________________________
+
+bool WgScrollPanel::SetScaledViewPixelOfs( int x, int y )
+{
+    return SetViewPixelOfs((x*m_scale)>>WG_SCALE_BINALS, (y*m_scale)>>WG_SCALE_BINALS);
+//    return SetViewPixelOfs(x, y );
+}
+
+
+//____ SetScaledViewPixelOfsX() _____________________________________________________
+
+bool WgScrollPanel::SetScaledViewPixelOfsX( int x )
+{
+    return SetViewPixelOfs((x*m_scale)>>WG_SCALE_BINALS, m_viewPixOfs.y);
+//    return SetViewPixelOfs(x, m_viewPixOfs.y);
+}
+
+//____ SetScaledViewPixelOfsY() _____________________________________________________
+
+bool WgScrollPanel::SetScaledViewPixelOfsY( int y )
+{
+    return SetViewPixelOfs(m_viewPixOfs.x,(y*m_scale)>>WG_SCALE_BINALS);
+//    return SetViewPixelOfs(m_viewPixOfs.x,y );
+}
+
+
 //____ SetViewOfs() ___________________________________________________________
 
 bool WgScrollPanel::SetViewOfs( float x, float y )
@@ -1127,7 +1154,7 @@ void WgScrollPanel::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas
 		{
 			WgRect clip( canvas, *pRect );
 			if( clip.w > 0 || clip.h > 0 )
-				pDevice->ClipBlitBlock( clip, m_pFillerBlocks->GetBlock( mode, m_geoFiller ), canvas );
+				pDevice->ClipBlitBlock( clip, m_pFillerBlocks->GetBlock( mode, m_scale ), canvas );
 		}
 
 	}
@@ -1191,7 +1218,7 @@ bool WgScrollPanel::_onAlphaTest( const WgCoord& ofs )
 	{
 		WgMode mode = m_bEnabled?WG_MODE_NORMAL:WG_MODE_DISABLED;
 
-		if( WgUtil::MarkTestBlock( ofs, m_pFillerBlocks->GetBlock(mode, m_geoFiller), m_geoFiller, m_markOpacity ) )
+		if( WgUtil::MarkTestBlock( ofs, m_pFillerBlocks->GetBlock(mode, m_scale), m_geoFiller, m_markOpacity ) )
 			return true;
 	}
 
@@ -1451,7 +1478,8 @@ void WgScrollHook::_requestRender( const WgRect& rect )
 
 void WgScrollHook::_requestResize()
 {
-	//TODO: Figure out how this should work and implement.
+	m_pView->_updateElementGeo( m_pView->Size() );
+	m_pView->_requestRender( m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
 }
 
 //____ WgScrollHook::_prevHook() ___________________________________________________

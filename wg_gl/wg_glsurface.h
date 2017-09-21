@@ -26,7 +26,6 @@
 #define GL_GLEXT_PROTOTYPES 1
 
 #ifdef WIN32
-#	include <windows.h>
 #	include <gl/glew.h>
 #	include <gl/gl.h>
 #else
@@ -90,7 +89,7 @@ public:
 private:
 
     void		_setPixelDetails( WgPixelType type );
-    void		_initBuffer();
+
 
 
     GLuint 		m_texture;			// GL texture handle.

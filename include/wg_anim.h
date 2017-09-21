@@ -86,6 +86,9 @@ protected:
 
 	// Meant to be overloaded with public methods returning right type.
 
+    const WgKeyFrame *	_firstKeyFrame( void ) const {return m_keyframes.First();};
+    const WgKeyFrame *	_lastKeyFrame( void ) const {return m_keyframes.Last();};
+
 	WgKeyFrame *		_firstKeyFrame( void ) {return m_keyframes.First();};
 	WgKeyFrame *		_lastKeyFrame( void ) {return m_keyframes.Last();};
 
@@ -95,7 +98,7 @@ protected:
 
 	WgKeyFrame *		_keyFrame( int64_t ticks, WgKeyFrame * pProximity = 0 ) const;
 
-private:
+protected:
 	
 	float				m_scale;			// Only used for getKeyFrame
 	int					m_duration;

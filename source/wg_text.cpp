@@ -80,6 +80,8 @@ void WgText::Init()
 	m_pCursor		= 0;
 	m_pCursorStyle	= 0;
 
+	m_scale = WG_SCALE_BASE;
+
 	m_markedLinkMode = WG_MODE_NORMAL;
 
 	m_alignment		= WG_NORTHWEST;
@@ -371,6 +373,7 @@ int WgText::getSoftLineWidthPart( int _line, int startCol, int nCol ) const
 	WgTextAttr	attr;
 
 	pen.SetTextNode( m_pManagerNode );
+	pen.SetScale( m_scale );
 
 	for( int i = 0 ; i < nCol ; i++ )
 	{
@@ -1416,6 +1419,18 @@ const WgChar * WgText::getSoftLineText( int line ) const
 	return m_buffer.Chars() + m_pSoftLines[line].ofs;
 }
 
+//____ SetScale() ______________________________________________________________
+
+void WgText::SetScale( int scale )
+{
+	if( scale != m_scale )
+	{
+		m_scale = scale;
+		_regenSoftLines();
+		_refreshAllLines();
+	}
+}
+
 //____ SetWrap() ______________________________________________________________
 
 void WgText::SetWrap( bool bWrap )
@@ -1568,6 +1583,7 @@ int WgText::_countWriteSoftLines( int maxWidth, const WgChar * pStart, WgTextLin
 	maxWidth -= _cursorMaxWidth();
 
 	pen.SetTextNode( m_pManagerNode );
+	pen.SetScale( m_scale );
 
 	while( !bEndOfText )
 	{
@@ -1797,6 +1813,7 @@ void WgText::_refreshLineInfo( WgTextLine * pLine ) const
 
 	WgPen pen;
 	pen.SetTextNode( m_pManagerNode );
+	pen.SetScale( m_scale );
 
 	// We must have at least one character, even if it is just CR/LF or EndOfString.
 
@@ -2029,6 +2046,7 @@ int WgText::CoordToColumn( int line, const WgCoord& coord, const WgRect& contain
 	Uint16	hProp = 0xFFFF;
 	WgPen pen;
 	pen.SetTextNode( m_pManagerNode );
+	pen.SetScale( m_scale );
 	pen.SetOrigo( WgCoord(xStart,0) );
 	pen.SetPosX(xStart);
 
@@ -2165,7 +2183,7 @@ int WgText::PosToCoordX( const WgTextPos& _pos, const WgRect& container ) const
 	Uint16	hProp = 0xFFFF;
 	WgPen pen;
 	pen.SetTextNode( m_pManagerNode );
-	
+	pen.SetScale( m_scale );
 	int startX = LineStartX( pos.line, container );
 	pen.SetOrigo( WgCoord(startX,0) );
 	pen.SetPosX(startX);

@@ -1044,7 +1044,7 @@ WgRect WgTablePanel::GetCellGeo( int row, int column )
 	// Adjust for header
 
 	if( m_bShowHeader && m_pHeaderGfx )
-		r.y += m_pHeaderGfx->Height();
+		r.y += m_pHeaderGfx->Height(m_scale);
 
 
 	WgTableRow * pRow = m_rows.First();
@@ -1551,9 +1551,9 @@ void WgTablePanel::ShowHeader( bool bShow )
 		if( m_pHeaderGfx )
 		{
 			if( bShow )
-				newHeight += m_pHeaderGfx->Height();
+				newHeight += m_pHeaderGfx->Height(m_scale);
 			else
-				newHeight -= m_pHeaderGfx->Height();
+				newHeight -= m_pHeaderGfx->Height(m_scale);
 		}
 
 		_setContentSize( WgSize( m_contentSize.w, newHeight ) );
@@ -1601,7 +1601,7 @@ void WgTablePanel::_updateContentSize()
 	// Possibly add header to height
 
 	if( m_bShowHeader && m_pHeaderGfx )
-		size.h += m_pHeaderGfx->Height();
+		size.h += m_pHeaderGfx->Height(m_scale);
 
 	// Set size and request render
 
@@ -1714,9 +1714,9 @@ int WgTablePanel::_getMarkedRow( int y, WgTableRow*& pSaveRow, int& saveYOfs )
 
 	if( m_bShowHeader && m_pHeaderGfx )
 	{
-		if( y < m_pHeaderGfx->Height() )
+		if( y < m_pHeaderGfx->Height(m_scale) )
 			return -1;	// on header.
-		y -=  m_pHeaderGfx->Height();
+		y -=  m_pHeaderGfx->Height(m_scale);
 	}
 
 	//
@@ -1845,7 +1845,7 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 
 	if( m_bShowHeader && m_pHeaderGfx )
 	{
-		WgRect	headerArea( _canvas.x, _window.y, _canvas.w, m_pHeaderGfx->Height() );
+		WgRect	headerArea( _canvas.x, _window.y, _canvas.w, m_pHeaderGfx->Height(m_scale) );
 		WgRect  r2 = headerArea;
 
 		for( int i = 0 ; i < m_nColumns ; i++ )
@@ -1869,16 +1869,16 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 			else if( i == m_lastSortColumn )
 				mode = WG_MODE_SPECIAL;
 
-			pDevice->ClipBlitBlock( _clip, m_pHeaderGfx->GetBlock(mode,r2), r2 );
+			pDevice->ClipBlitBlock( _clip, m_pHeaderGfx->GetBlock(mode,m_scale), r2 );
 
 			if( i == m_lastSortColumn && m_pAscendGfx && m_pDescendGfx )
 			{
 				WgBlock block;
 
 				if( m_lastSortColumnAscendStatus )
-					block = m_pAscendGfx->GetBlock(mode);
+					block = m_pAscendGfx->GetBlock(mode,m_scale);
 				else
-					block = m_pDescendGfx->GetBlock(mode);
+					block = m_pDescendGfx->GetBlock(mode,m_scale);
 
 				WgRect dest = WgUtil::OrigoToRect( m_sortMarkerAlignment, r2.Size(), block.Size() );
 				dest += m_sortMarkerOfs;
@@ -1888,7 +1888,7 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 
 			WgRect rText = r2;
 			if( m_pHeaderGfx )
-				rText.Shrink( m_pHeaderGfx->Padding() );
+				rText.Shrink( m_pHeaderGfx->Padding(m_scale) );
 
 			m_pColumns[i]._getTextObj()->setProperties( m_pHeaderProps );
 			pDevice->PrintText( _clip, m_pColumns[i]._getTextObj(), rText );
@@ -1896,13 +1896,13 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 			r2.x += r2.w - 1;	// HACK: Overlap last pixel to avoid double separator graphics between two headers
 		}
 
-		r.y += m_pHeaderGfx->Height();
+		r.y += m_pHeaderGfx->Height(m_scale);
 
 		// Modify clipping rectangle for view content (we don't want to draw over header)
 
-		if(  _clip.y < _window.y + m_pHeaderGfx->Height())
+		if(  _clip.y < _window.y + m_pHeaderGfx->Height(m_scale))
 		{
-			int diff = _window.y + m_pHeaderGfx->Height() - _clip.y;
+			int diff = _window.y + m_pHeaderGfx->Height(m_scale) - _clip.y;
 			clipView.y += diff;
 			clipView.h -= diff;
 			if( clipView.h < 1 )
@@ -1951,7 +1951,7 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 			if( pRow->IsSelected() )
 			{
 				if(HasSelectedRowBg() == true)
-					pDevice->ClipBlitBlock(u, m_pSelectedRowGfx->GetBlock(WG_MODE_NORMAL,r), r );
+					pDevice->ClipBlitBlock(u, m_pSelectedRowGfx->GetBlock(WG_MODE_NORMAL,m_scale), r );
 				else
 					pDevice->Fill( u, m_selectedRowColor );
 			}
@@ -1968,7 +1968,7 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 				{
 					WgBlocksetPtr p = m_pRowBlocks[ iRowColor % m_nRowBlocks ];
 					if( p )
-						pDevice->ClipBlitBlock(u, p->GetBlock(WG_MODE_NORMAL,r), r );
+						pDevice->ClipBlitBlock(u, p->GetBlock(WG_MODE_NORMAL,m_scale), r );
 				}
 
 			}
@@ -2036,7 +2036,7 @@ void WgTablePanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 				{
 					WgBlocksetPtr p = m_pRowBlocks[ iRowColor % m_nRowBlocks ];
 					if( p )
-						pDevice->ClipBlitBlock(u, p->GetBlock(WG_MODE_NORMAL), r );
+						pDevice->ClipBlitBlock(u, p->GetBlock(WG_MODE_NORMAL,m_scale), r );
 				}
 			}
 
@@ -2140,7 +2140,7 @@ WgTableColumn *WgTablePanel::_getHeaderColumnAt( const WgCoord& pos )
 	if(pos.x < 0 || pos.y < 0)
 		return NULL;
 
-	if( m_bShowHeader && m_pHeaderGfx && m_pHeaderGfx->Height() > pos.y )
+	if( m_bShowHeader && m_pHeaderGfx && m_pHeaderGfx->Height(m_scale) > pos.y )
 	{
 		int xOfs = pos.x;
 		for( int col = 0 ; col < m_nColumns ; col++ )

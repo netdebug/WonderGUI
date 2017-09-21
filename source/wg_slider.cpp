@@ -222,16 +222,16 @@ void WgWidgetSlider::_headerFooterChanged()
 	if( m_bHorizontal )
 	{
 		if( m_pBtnFwdGfx )
-			fwdLen = m_pBtnFwdGfx->Width();
+			fwdLen = m_pBtnFwdGfx->Width(m_scale);
 		if( m_pBtnBwdGfx )
-			bwdLen = m_pBtnBwdGfx->Width();
+			bwdLen = m_pBtnBwdGfx->Width(m_scale);
 	}
 	else
 	{
 		if( m_pBtnFwdGfx )
-			fwdLen = m_pBtnFwdGfx->Height();
+			fwdLen = m_pBtnFwdGfx->Height(m_scale);
 		if( m_pBtnBwdGfx )
-			bwdLen = m_pBtnBwdGfx->Height();
+			bwdLen = m_pBtnBwdGfx->Height(m_scale);
 	}
 
 	int	headerLen = 0;
@@ -313,9 +313,9 @@ void	WgWidgetSlider::_viewToPosLen( int * _wpPos, int * _wpLen )
 	int		minLen;
 
 	if( m_bHorizontal )
-		minLen = m_pBarGfx->MinWidth();
+		minLen = m_pBarGfx->MinWidth(m_scale);
 	else
-		minLen = m_pBarGfx->MinHeight();
+		minLen = m_pBarGfx->MinHeight(m_scale);
 
 	if( minLen < 4 )
 		minLen = 4;
@@ -362,6 +362,14 @@ void WgWidgetSlider::_onDisable( void )
 	_requestRender();
 }
 
+//____ _setScale() _____________________________________________________________
+
+void WgWidgetSlider::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+}
+
 //____ _onRefresh() _______________________________________________________
 
 void WgWidgetSlider::_onRefresh( void )
@@ -376,6 +384,8 @@ WgSize WgWidgetSlider::PreferredSize() const
 	WgSize sz = m_minSize;
 
 	// Add 50 pixels in the sliders direction for best size.
+
+	int addPix = (50*m_scale) >> WG_SCALE_BINALS; 
 
 	if( m_bHorizontal )
 		sz.w += 50;
@@ -397,16 +407,16 @@ void WgWidgetSlider::_updateMinSize()
 
 	if( m_pBgGfx )
 	{
-		minW = Max( minW, m_pBgGfx->MinWidth() );
-		minH = Max( minH, m_pBgGfx->MinHeight() );
+		minW = Max( minW, m_pBgGfx->MinWidth(m_scale) );
+		minH = Max( minH, m_pBgGfx->MinHeight(m_scale) );
 	}
 
 	// Check min w/h for BarGfx.
 
 	if( m_pBarGfx )
 	{
-		minW = Max( minW, m_pBarGfx->MinWidth() );
-		minH = Max( minH, m_pBarGfx->MinHeight() );
+		minW = Max( minW, m_pBarGfx->MinWidth(m_scale) );
+		minH = Max( minH, m_pBarGfx->MinHeight(m_scale) );
 	}
 
 
@@ -422,16 +432,16 @@ void WgWidgetSlider::_updateMinSize()
 
 	if( m_pBtnFwdGfx && (m_btnLayout & (HEADER_FWD | FOOTER_FWD)) )
 	{
-		minW = Max( minW, m_pBtnFwdGfx->Width() );
-		minH = Max( minH, m_pBtnFwdGfx->Height() );
+		minW = Max( minW, m_pBtnFwdGfx->Width(m_scale) );
+		minH = Max( minH, m_pBtnFwdGfx->Height(m_scale) );
 	}
 
 	// Check min w/h for backward button.
 
 	if( m_pBtnBwdGfx && (m_btnLayout & (HEADER_BWD | FOOTER_BWD)) )
 	{
-		minW = Max( minW, m_pBtnBwdGfx->Width() );
-		minH = Max( minH, m_pBtnBwdGfx->Height() );
+		minW = Max( minW, m_pBtnBwdGfx->Width(m_scale) );
+		minH = Max( minH, m_pBtnBwdGfx->Height(m_scale) );
 	}
 
 	// Set if changed.
@@ -471,10 +481,10 @@ void WgWidgetSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 	// Render header buttons
 
 	if( m_pBtnBwdGfx && (m_btnLayout & HEADER_BWD) )
-		_renderButton( pDevice, _clip, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_HEADER_BWD]) );
+		_renderButton( pDevice, _clip, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_HEADER_BWD],m_scale) );
 
 	if( m_pBtnFwdGfx && (m_btnLayout & HEADER_FWD) )
-		_renderButton( pDevice, _clip, dest, m_pBtnFwdGfx->GetBlock(m_mode[C_HEADER_FWD]) );
+		_renderButton( pDevice, _clip, dest, m_pBtnFwdGfx->GetBlock(m_mode[C_HEADER_FWD],m_scale) );
 
 	// Render background (if any).
 
@@ -484,7 +494,7 @@ void WgWidgetSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 		dest.h = Size().h - m_headerLen - m_footerLen;
 
 	if( m_pBgGfx )
-		pDevice->ClipBlitBlock( _clip, m_pBgGfx->GetBlock(m_mode[C_BG]), dest );
+		pDevice->ClipBlitBlock( _clip, m_pBgGfx->GetBlock(m_mode[C_BG],m_scale), dest );
 
 	// Render the bar
 
@@ -500,7 +510,7 @@ void WgWidgetSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 		else
 			barDest = WgRect( dest.x, dest.y + barPos, dest.w, barLen );
 
-		pDevice->ClipBlitBlock( _clip, m_pBarGfx->GetBlock(m_mode[C_BAR]), barDest );
+		pDevice->ClipBlitBlock( _clip, m_pBarGfx->GetBlock(m_mode[C_BAR],m_scale), barDest );
 	}
 
 	// Render footer buttons
@@ -511,10 +521,10 @@ void WgWidgetSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 		dest.y += dest.h;
 
 	if( m_pBtnBwdGfx && (m_btnLayout & FOOTER_BWD) )
-		_renderButton( pDevice, _clip, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_FOOTER_BWD]) );
+		_renderButton( pDevice, _clip, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_FOOTER_BWD],m_scale) );
 
 	if( m_pBtnFwdGfx && (m_btnLayout & FOOTER_FWD) )
-		_renderButton( pDevice, _clip, dest, m_pBtnFwdGfx->GetBlock(m_mode[C_FOOTER_FWD]) );
+		_renderButton( pDevice, _clip, dest, m_pBtnFwdGfx->GetBlock(m_mode[C_FOOTER_FWD],m_scale) );
 }
 
 //____ _onAlphaTest() ______________________________________________________
@@ -558,13 +568,13 @@ WgWidgetSlider::Component WgWidgetSlider::_findMarkedComponent( WgCoord ofs )
 
 	if( m_pBtnBwdGfx && (m_btnLayout & HEADER_BWD) )
 	{
-		if( _markTestButton( ofs, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_HEADER_BWD])) )
+		if( _markTestButton( ofs, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_HEADER_BWD],m_scale)) )
 			return C_HEADER_BWD;
 	}
 
 	if( m_pBtnFwdGfx && (m_btnLayout & HEADER_FWD) )
 	{
-		if( _markTestButton( ofs, dest, m_pBtnFwdGfx->GetBlock(m_mode[C_HEADER_FWD])) )
+		if( _markTestButton( ofs, dest, m_pBtnFwdGfx->GetBlock(m_mode[C_HEADER_FWD],m_scale)) )
 			return C_HEADER_FWD;
 	}
 
@@ -577,13 +587,13 @@ WgWidgetSlider::Component WgWidgetSlider::_findMarkedComponent( WgCoord ofs )
 
 	if( m_pBtnBwdGfx && (m_btnLayout & FOOTER_BWD) )
 	{
-		if( _markTestButton( ofs, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_FOOTER_BWD])) )
+		if( _markTestButton( ofs, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_FOOTER_BWD],m_scale)) )
 			return C_FOOTER_BWD;
 	}
 
 	if( m_pBtnFwdGfx && (m_btnLayout & FOOTER_FWD) )
 	{
-		if( _markTestButton( ofs, dest, m_pBtnFwdGfx->GetBlock(m_mode[C_FOOTER_FWD])) )
+		if( _markTestButton( ofs, dest, m_pBtnFwdGfx->GetBlock(m_mode[C_FOOTER_FWD],m_scale)) )
 			return C_FOOTER_FWD;
 	}
 
@@ -607,7 +617,7 @@ WgWidgetSlider::Component WgWidgetSlider::_findMarkedComponent( WgCoord ofs )
 		r.h -= m_headerLen + m_footerLen;
 	}
 
-	if( m_pBgGfx && WgUtil::MarkTestBlock( ofs, m_pBgGfx->GetBlock(m_mode[C_BG]), r, m_markOpacity ) )
+	if( m_pBgGfx && WgUtil::MarkTestBlock( ofs, m_pBgGfx->GetBlock(m_mode[C_BG],m_scale), r, m_markOpacity ) )
 		return C_BG;
 
 	return C_NONE;
@@ -891,7 +901,7 @@ bool WgWidgetSlider::_markTestSlider( WgCoord ofs )
 		area.h = barLen;
 	}
 
-	return WgUtil::MarkTestBlock( ofs, m_pBarGfx->GetBlock(m_mode[C_BAR]), area, m_markOpacity );
+	return WgUtil::MarkTestBlock( ofs, m_pBarGfx->GetBlock(m_mode[C_BAR],m_scale), area, m_markOpacity );
 }
 
 //____ _setSlider() ____________________________________________________________

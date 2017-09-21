@@ -74,6 +74,7 @@ WgGlSurface::WgGlSurface( WgSize size, WgPixelType type )
                  m_accessFormat, GL_UNSIGNED_BYTE, NULL );
 
 
+
 	GLenum err = glGetError();
 	
 //	const GLubyte * pErr = gluErrorString(err);
@@ -157,7 +158,6 @@ void WgGlSurface::_setPixelDetails( WgPixelType type )
     
     WgUtil::PixelTypeToFormat(type, m_pixelFormat);
 }
-
 
 
 //____ Destructor ______________________________________________________________

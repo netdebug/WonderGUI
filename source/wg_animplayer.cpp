@@ -230,9 +230,9 @@ bool WgAnimPlayer::Stop()
 WgSize WgAnimPlayer::PreferredSize() const
 {
 	if( m_pAnim )
-		return m_pAnim->Size();
+		return m_pAnim->Size(m_scale);
 	else if( m_pStaticBlock )
-		return m_pStaticBlock->Size();
+		return m_pStaticBlock->Size(m_scale);
 	else
 		return WgSize(0,0);
 }
@@ -256,7 +256,7 @@ void WgAnimPlayer::_playPosUpdated()
 	if( !m_pAnim )
 		return;
 
-	WgBlock block = m_pAnim->GetBlock( (int64_t) m_playPos );
+	WgBlock block = m_pAnim->GetBlock( (int64_t) m_playPos, m_scale );
 
 	if( block != m_animFrame )
 	{
@@ -316,7 +316,7 @@ void WgAnimPlayer::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 		if( !m_bEnabled )
 			mode = WG_MODE_DISABLED;
 
-		pDevice->ClipBlitBlock( _clip, m_pStaticBlock->GetBlock(mode,_canvas.Size()), _canvas );
+		pDevice->ClipBlitBlock( _clip, m_pStaticBlock->GetBlock(mode,m_scale), _canvas );
 	}
     
     // Reset tint color
@@ -362,7 +362,7 @@ bool WgAnimPlayer::_onAlphaTest( const WgCoord& ofs )
 		if( !m_bEnabled )
 			mode = WG_MODE_DISABLED;
 
-		return WgUtil::MarkTestBlock( ofs, m_pStaticBlock->GetBlock(mode,sz), WgRect(0,0,sz), m_markOpacity );
+		return WgUtil::MarkTestBlock( ofs, m_pStaticBlock->GetBlock(mode,m_scale), WgRect(0,0,sz), m_markOpacity );
 	}
 	return false;
 }

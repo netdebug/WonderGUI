@@ -68,7 +68,7 @@ protected:
 
 	virtual void	_tilesModified() = 0;
 
-	void			_renderTile( WgGfxDevice * pDevice, const WgRect& clip, const WgRect& dest, int tileNb, WgMode mode );
+	void			_renderTile( WgGfxDevice * pDevice, const WgRect& clip, const WgRect& dest, int tileNb, WgMode mode, int scale );
 	void			_cloneContent( const WgTileHolder * _pOrg );
 
 	WgColorsetPtr 	m_pTileColors[2];

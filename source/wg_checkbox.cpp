@@ -167,13 +167,13 @@ WgSize WgCheckBox::PreferredSize() const
 
 	if( m_pBlockUnchecked )
 	{
-		bgPreferredSize = m_pBlockUnchecked->Size();
-		textPreferredSize += m_pBlockUnchecked->Padding();
+		bgPreferredSize = m_pBlockUnchecked->Size(m_scale);
+		textPreferredSize += m_pBlockUnchecked->Padding(m_scale);
 	}
 
 	if( m_pIconUnchecked )
 	{
-		iconPreferredSize = m_pIconUnchecked->Size() + m_iconBorders.Size();
+		iconPreferredSize = m_pIconUnchecked->Size(m_scale) + m_iconBorders.Size();
 
 		//TODO: Add magic for how icon influences textPreferredSize based on origo, iconBorders, iconScale and bgPreferredSize
 	}
@@ -283,9 +283,9 @@ Uint32 WgCheckBox::GetTextAreaWidth()
 	WgSize	iconSize;
 
 	if( m_pIconUnchecked )
-		iconSize = m_pIconUnchecked->Size();
+		iconSize = m_pIconUnchecked->Size(m_scale);
 	else if( m_pIconChecked )
-		iconSize = m_pIconChecked->Size();
+		iconSize = m_pIconChecked->Size(m_scale);
 
 	return _getTextRect( widgetSize, _getIconRect( WgRect(0,0,widgetSize), iconSize ) ).w;
 }
@@ -327,7 +327,7 @@ void WgCheckBox::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const 
 	WgBlock			bgBlock;
 
 	if( pBgBlockset )
-		bgBlock = pBgBlockset->GetBlock(mode,_canvas);
+		bgBlock = pBgBlockset->GetBlock(mode,m_scale);
 
 	// Blit background
 
@@ -336,14 +336,14 @@ void WgCheckBox::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const 
 	// Get the content rect and icon rect
 
 	WgRect contentRect	= bgBlock.ContentRect(_canvas);
-	WgRect iconRect		= _getIconRect( contentRect, pIconBlockset );
+	WgRect iconRect		= _getIconRect( contentRect, pIconBlockset, m_scale );
 
 	// Get block for icon
 
 	WgBlock		iconBlock;
 
 	if( pIconBlockset )
-		iconBlock = pIconBlockset->GetBlock(mode,iconRect);
+		iconBlock = pIconBlockset->GetBlock(mode,m_scale);
 
 	// Blit icon
 
@@ -384,6 +384,17 @@ void WgCheckBox::_onNewSize( const WgSize& size )
 {
 	m_text.setLineWidth( GetTextAreaWidth() );
 }
+
+
+//____ _setScale() _____________________________________________________________
+
+void WgCheckBox::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+	m_text.SetScale(scale);
+}
+
 
 
 //____ _onCloneContent() _______________________________________________________
@@ -435,7 +446,7 @@ bool WgCheckBox::_markTestTextArea( int _x, int _y )
 {
 	WgBlocksetPtr	pIconBlockset = m_bChecked?m_pIconChecked:m_pIconUnchecked;
 
-	WgRect	contentRect = _getTextRect( Size(), _getIconRect( Size(), pIconBlockset ) );
+	WgRect	contentRect = _getTextRect( Size(), _getIconRect( Size(), pIconBlockset, m_scale ) );
 
 	if( m_text.CoordToOfs( WgCoord(_x,_y), contentRect ) != -1 )
 		return true;
@@ -478,23 +489,23 @@ bool WgCheckBox::_onAlphaTest( const WgCoord& ofs )
 	WgBlock iconBlock;
 
 	WgSize	bgSize		= Size();
-	WgRect	iconRect	= _getIconRect( bgSize, pIconBlockset );
+	WgRect	iconRect	= _getIconRect( bgSize, pIconBlockset, m_scale );
 
 	if( m_bChecked )
 	{
 		if( m_pBlockChecked )
-			bgBlock = m_pBlockChecked->GetBlock(mode,bgSize);
+			bgBlock = m_pBlockChecked->GetBlock(mode,m_scale);
 
 		if( m_pIconChecked )
-			iconBlock = m_pIconChecked->GetBlock(mode,iconRect);
+			iconBlock = m_pIconChecked->GetBlock(mode,m_scale);
 	}
 	else
 	{
 		if( m_pBlockUnchecked )
-			bgBlock = m_pBlockUnchecked->GetBlock(mode,bgSize);
+			bgBlock = m_pBlockUnchecked->GetBlock(mode,m_scale);
 
 		if( m_pIconUnchecked )
-			iconBlock = m_pIconUnchecked->GetBlock(mode,iconRect);
+			iconBlock = m_pIconUnchecked->GetBlock(mode,m_scale);
 	}
 
 

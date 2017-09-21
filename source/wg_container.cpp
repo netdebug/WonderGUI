@@ -169,6 +169,16 @@ WgWidget * WgContainer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 	return pResult;
 }
 
+
+//____ SetScale() ______________________________________________________________
+
+void WgContainer::SetScale( int scale )
+{
+	if( m_scale != scale )
+		_setScale(scale);
+}
+
+
 //____ _onNewRoot() ___________________________________________________________
 
 void WgContainer::_onNewRoot( WgRootPanel * pRoot )
@@ -247,6 +257,21 @@ void WgContainer::_onDisable()
 		p = p->NextSibling();
 	}
 }
+
+//____ _setScale() _________________________________________________________
+
+void WgContainer::_setScale( int scale )
+{
+	WgWidget::_setScale( scale );
+
+	WgWidget * p = FirstWidget();
+	while( p )
+	{
+		p->_setScale( scale );
+		p = p->NextSibling();
+	}	
+}
+
 
 //____ _renderPatches() _____________________________________________________
 // Default implementation for panel rendering patches.

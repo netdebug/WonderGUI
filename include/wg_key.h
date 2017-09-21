@@ -62,6 +62,8 @@ enum WgKey
     WG_KEY_MAC_CONTROL,
     WG_KEY_WIN_START,
 
+	WG_KEY_SPACE,
+
 	WG_KEY_UNMAPPED		// This one must always be last!
 };
 

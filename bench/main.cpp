@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include <wg_surface_soft.h>
+#include <wg_surfacefactory_soft.h>
 #include <wg_glsurface.h>
 #include <wg_gfxdevice_soft.h>
 #include <wg_glgfxdevice.h>

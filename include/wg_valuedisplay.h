@@ -73,6 +73,7 @@ protected:
 	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip );
 	void	_onEnable();
 	void	_onDisable();
+	void 	_setScale( int scale );
 
 	void	_regenText();
 

@@ -244,7 +244,7 @@ void WgGfxDeviceSoft::FillSubPixel( const WgRectF& rect, const WgColor& col )
 	int x2 = (int) (rect.x + rect.w);
 	int y2 = (int) (rect.y + rect.h);
 		
-	Fill( WgRect( x1,y1,x2-x1,y2-y1 ), col );
+	Fill( WgRect( x1,y1,x2-x1,y2-y1 ), col );	// Don't apply tint, done inside Fill().
 	
 	// Optimize calls
 	
@@ -296,6 +296,16 @@ void WgGfxDeviceSoft::FillSubPixel( const WgRectF& rect, const WgColor& col )
 
 void WgGfxDeviceSoft::DrawLine( WgCoord beg, WgCoord end, WgColor color, float thickness )
 {
+	if( !m_pCanvas || !m_pCanvas->m_pData )
+		return;
+
+	WgColor fillColor = color * m_tintColor;
+
+	// Skip calls that won't affect destination
+
+	if( fillColor.a == 0 && (m_blendMode == WG_BLENDMODE_BLEND || m_blendMode == WG_BLENDMODE_ADD) )
+		return;
+
 	Uint8 *	pRow;
 	int		rowInc, pixelInc;
 	int 	length, width;
@@ -340,13 +350,23 @@ void WgGfxDeviceSoft::DrawLine( WgCoord beg, WgCoord end, WgColor color, float t
 		pRow = m_pCanvas->m_pData + beg.y * rowInc;		
 	}
 
-	_drawLineSegment( pRow, rowInc, pixelInc, length, width, pos, slope, color );
+	_drawLineSegment( pRow, rowInc, pixelInc, length, width, pos, slope, fillColor );
 }
 
 //____ ClipDrawLine() __________________________________________________________
 
 void WgGfxDeviceSoft::ClipDrawLine( const WgRect& clip, WgCoord beg, WgCoord end, WgColor color, float thickness )
 {
+	if( !m_pCanvas || !m_pCanvas->m_pData )
+		return;
+
+	WgColor fillColor = color * m_tintColor;
+
+	// Skip calls that won't affect destination
+
+	if( fillColor.a == 0 && (m_blendMode == WG_BLENDMODE_BLEND || m_blendMode == WG_BLENDMODE_ADD) )
+		return;
+
 	Uint8 *	pRow;
 	int		rowInc, pixelInc;
 	int 	length, width;
@@ -430,7 +450,7 @@ void WgGfxDeviceSoft::ClipDrawLine( const WgRect& clip, WgCoord beg, WgCoord end
 		clipEnd = (clip.x + clip.w) <<16;
 	}
 
-	_clipDrawLineSegment( clipStart, clipEnd, pRow, rowInc, pixelInc, length, width, pos, slope, color );
+	_clipDrawLineSegment( clipStart, clipEnd, pRow, rowInc, pixelInc, length, width, pos, slope, fillColor );
 }
 
 //____ _drawLineSegment() ______________________________________________________
@@ -1096,7 +1116,14 @@ void WgGfxDeviceSoft::_genCurveTab()
 
 void WgGfxDeviceSoft::DrawElipse( const WgRect& rect, WgColor color )
 {
-	if( rect.h < 2 || rect.w < 1 )
+	WgColor fillColor = color * m_tintColor;
+
+	// Skip calls that won't affect destination
+
+	if( fillColor.a == 0 && (m_blendMode == WG_BLENDMODE_BLEND || m_blendMode == WG_BLENDMODE_ADD) )
+		return;
+
+	if( !m_pCanvas || !m_pCanvas->m_pData || rect.h < 2 || rect.w < 1 )
 		return;
 
 	int sectionHeight = rect.h/2;
@@ -1119,11 +1146,11 @@ void WgGfxDeviceSoft::DrawElipse( const WgRect& rect, WgColor color )
 		peakOfs = ((m_pCurveTab[sinOfs>>16] * maxWidth) >> 8);
 		endOfs = (m_pCurveTab[(sinOfs+(sinOfsInc-1))>>16] * maxWidth) >> 8;
 
-		_drawHorrFadeLine( pLineBeg + i*pitch, center + begOfs -256, center + peakOfs -256, center + endOfs, color );
-		_drawHorrFadeLine( pLineBeg + i*pitch, center - endOfs, center - peakOfs, center - begOfs +256, color );
+		_drawHorrFadeLine( pLineBeg + i*pitch, center + begOfs -256, center + peakOfs -256, center + endOfs, fillColor );
+		_drawHorrFadeLine( pLineBeg + i*pitch, center - endOfs, center - peakOfs, center - begOfs +256, fillColor );
 
-		_drawHorrFadeLine( pLineBeg + (sectionHeight*2-i-1)*pitch, center + begOfs -256, center + peakOfs -256, center + endOfs, color );
-		_drawHorrFadeLine( pLineBeg + (sectionHeight*2-i-1)*pitch, center - endOfs, center - peakOfs, center - begOfs +256, color );
+		_drawHorrFadeLine( pLineBeg + (sectionHeight*2-i-1)*pitch, center + begOfs -256, center + peakOfs -256, center + endOfs, fillColor );
+		_drawHorrFadeLine( pLineBeg + (sectionHeight*2-i-1)*pitch, center - endOfs, center - peakOfs, center - begOfs +256, fillColor );
 
 		begOfs = peakOfs;
 		sinOfs += sinOfsInc;
@@ -1294,7 +1321,14 @@ void WgGfxDeviceSoft::_drawHorrFadeLine( Uint8 * pLineStart, int begOfs, int pea
 
 void WgGfxDeviceSoft::ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color )
 {
-	if( rect.h < 2 || rect.w < 1 )
+	WgColor fillColor = color * m_tintColor;
+
+	// Skip calls that won't affect destination
+
+	if( fillColor.a == 0 && (m_blendMode == WG_BLENDMODE_BLEND || m_blendMode == WG_BLENDMODE_ADD) )
+		return;
+
+	if( !m_pCanvas || !m_pCanvas->m_pData || rect.h < 2 || rect.w < 1 )
 		return;
 
 	if( !rect.IntersectsWith(clip) )
@@ -1325,15 +1359,15 @@ void WgGfxDeviceSoft::ClipDrawElipse( const WgRect& clip, const WgRect& rect, Wg
 
 		if( rect.y + i >= clip.y && rect.y + i < clip.y + clip.h ) 
 		{		
-			_clipDrawHorrFadeLine( clip.x, clip.x+clip.w, pLineBeg + i*pitch, center + begOfs -256, center + peakOfs -256, center + endOfs, color );
-			_clipDrawHorrFadeLine( clip.x, clip.x+clip.w, pLineBeg + i*pitch, center - endOfs, center - peakOfs, center - begOfs +256, color );
+			_clipDrawHorrFadeLine( clip.x, clip.x+clip.w, pLineBeg + i*pitch, center + begOfs -256, center + peakOfs -256, center + endOfs, fillColor );
+			_clipDrawHorrFadeLine( clip.x, clip.x+clip.w, pLineBeg + i*pitch, center - endOfs, center - peakOfs, center - begOfs +256, fillColor );
 		}
 
 		int y2 = sectionHeight*2-i-1;
 		if( rect.y + y2 >= clip.y && rect.y + y2 < clip.y + clip.h ) 
 		{
-			_clipDrawHorrFadeLine( clip.x, clip.x+clip.w, pLineBeg + y2*pitch, center + begOfs -256, center + peakOfs -256, center + endOfs, color );
-			_clipDrawHorrFadeLine( clip.x, clip.x+clip.w, pLineBeg + y2*pitch, center - endOfs, center - peakOfs, center - begOfs +256, color );
+			_clipDrawHorrFadeLine( clip.x, clip.x+clip.w, pLineBeg + y2*pitch, center + begOfs -256, center + peakOfs -256, center + endOfs, fillColor );
+			_clipDrawHorrFadeLine( clip.x, clip.x+clip.w, pLineBeg + y2*pitch, center - endOfs, center - peakOfs, center - begOfs +256, fillColor );
 		}
 
 		begOfs = peakOfs;

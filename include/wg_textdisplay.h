@@ -103,6 +103,8 @@ protected:
 	void	_onDisable();
 	void	_onGotInputFocus();
 	void	_onLostInputFocus();
+	void 	_setScale( int scale );
+
 
 private:
 	void	_textModified();

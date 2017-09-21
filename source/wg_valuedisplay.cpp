@@ -153,3 +153,12 @@ void WgValueDisplay::_onDisable( void )
 	m_text.setMode(WG_MODE_DISABLED);
 	_requestRender();
 }
+
+//____ _setScale() _____________________________________________________________
+
+void WgValueDisplay::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+	m_text.SetScale(scale);
+}

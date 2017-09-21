@@ -108,6 +108,8 @@ protected:
 	bool	_onAlphaTest( const WgCoord& ofs );
 	void	_onEnable();
 	void	_onDisable();
+	void 	_setScale( int scale );
+	
 	
 	bool			m_bChecked;
 

@@ -31,7 +31,7 @@
 #include <wg_animplayer.h>
 #include <wg_tablist.h>
 #include <wg_valueeditor.h>
-#include <wg_menu.h>
+//#include <wg_menu.h>
 
 
 
@@ -654,7 +654,7 @@ WgEventFilter	WgEventFilter::KnobTurn( WgWidget * pWidget )
 }
 
 //____ MenuitemSelect() __________________________________________________________
-
+/*
 WgEventFilter	WgEventFilter::MenuitemSelect()
 {
 	return WgEventFilter( WG_EVENT_MENUITEM_SELECT, 0, _filterMenuitemEvent );
@@ -718,7 +718,7 @@ WgEventFilter	WgEventFilter::MenuitemUncheck( WgMenu * pWidget, int itemId )
 {
 	return WgEventFilter( WG_EVENT_MENUITEM_UNCHECK, pWidget, _filterMenuitemEvent, itemId );
 }
-
+*/
 
 //_____________________________________________________________________________
 
@@ -844,6 +844,7 @@ bool WgEventFilter::_filterTabPress( const WgEvent::Event * pEvent, const WgEven
 
 bool WgEventFilter::_filterMenuitemEvent( const WgEvent::Event * pEvent, const WgEventFilter& filter )
 {
+  /*
 	if( pEvent->Type() == filter.EventType() && (!filter.Widget() || filter.Widget() == pEvent->Widget()) )
 	{
 		if( filter.m_data1 == 0 )
@@ -856,5 +857,6 @@ bool WgEventFilter::_filterMenuitemEvent( const WgEvent::Event * pEvent, const W
 				return true;
 		}
 	}
+  */
 	return false;
 }

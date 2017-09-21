@@ -66,6 +66,9 @@ public:
 	inline void				DeleteChild() { SetChild(0); }
 	WgWidget * 				ReleaseChild();
 
+	void					SetScale( int scale );
+	int						Scale() const { return m_scale; }
+
 	// Inherited from WgWidgetHolder
 
 	bool					DeleteChild( WgWidget * pWidget );
@@ -117,7 +120,7 @@ protected:
 		WgCoord			ScreenPos() const;
 		WgRect			ScreenGeo() const;
 
-		WgRootPanel*			Root() const;
+		WgRootPanel*	Root() const;
 
 	protected:
 
@@ -141,6 +144,7 @@ protected:
 	bool 				_focusRequested( WgHook * pBranch, WgWidget * pWidgetRequesting );
 	bool 				_focusReleased( WgHook * pBranch, WgWidget * pWidgetReleasing );
 
+
 	WgPatches			m_dirtyPatches;		// Dirty patches that needs to be rendered.
 	WgPatches			m_updatedPatches;	// Patches that were updated in last rendering session.
 
@@ -156,6 +160,7 @@ protected:
 	WgRect				m_geo;
 	bool				m_bHasGeo;
 	bool				m_bVisible;
+	int					m_scale;
 };
 
 

@@ -69,6 +69,8 @@ void WgPen::_init()
 	m_tabWidth = 80;
 
 	m_bClip = false;
+	
+	m_scale = WG_SCALE_BASE;
 }
 
 //____ SetClipRect() __________________________________________________________
@@ -82,6 +84,14 @@ void WgPen::SetClipRect( const WgRect& clip )
 		m_bClip = true;
 }
 
+
+//____ SetScale() ______________________________________________________________
+
+void WgPen::SetScale( int scale )
+{
+	m_scale = scale;
+	_onAttrChanged();
+}
 
 
 //____ _onAttrChanged() __________________________________________________________
@@ -98,6 +108,8 @@ void WgPen::_onAttrChanged()
 		m_size = (int) m_pTextNode->GetSize( m_pFont, m_style, m_wantedSize );
 	else
 		m_size = m_wantedSize;
+
+	m_size = m_size * m_scale >> WG_SCALE_BINALS;
 
 	m_pGlyphs = m_pFont->GetGlyphset( m_style, m_size );
 }
@@ -364,7 +376,7 @@ void WgPen::AdvancePosCursor( const WgCursorInstance& instance )
 
 	if( pAnim->BlockFlags() & WG_SCALE_CENTER )
 	{
-		float	scaleValue = (pCursor->SizeRatio(mode) * GetLineSpacing())/pAnim->Size().h;
+		float	scaleValue = (pCursor->SizeRatio(mode) * GetLineSpacing())/pAnim->Size(WG_SCALE_BASE).h;
 		advance = (int) (advance * scaleValue);
 	}
 

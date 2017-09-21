@@ -95,14 +95,16 @@ public:
 	void				SetMetaData( void * pData, int byts );
 	void				ClearMetaData();
 
-
-	virtual bool		unload();
-	virtual bool		isLoaded();
-	virtual void		reload();
+    void                SetScaleFactor( int factor ) { m_scaleFactor = factor; }
+    int                 ScaleFactor() const { return m_scaleFactor; }
+    
+    
 	
 	// Softube specific...
 	
 	void    PutPixels(const std::vector<int> &x, const std::vector<int> &y, const std::vector<Uint32> &col, int length, bool replace);
+    
+    void    SetResourceID(int iResource) { m_iResource = iResource; }
 	
 protected:
 	WgSurface();
@@ -120,6 +122,10 @@ protected:
 
 	void *				m_pMetaData;
 	int					m_nMetaBytes;
+    
+    int                 m_scaleFactor;      // Scale of surface content. Default is WG_SCALE_BASE.
+    
+    int                 m_iResource;         // handy to have when debugging
 };
 
 

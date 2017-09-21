@@ -150,6 +150,8 @@ protected:
 
 	struct Alt_Data
 	{
+		int					scale;
+
 		const WgSurface *	pSurf;
 		WgBorders			frame;
 		WgBorders			padding;
@@ -166,8 +168,6 @@ protected:
 	public:
 		LINK_METHODS( LinkedAlt );
 
-		WgSize		activationSize;	// If (dest_width <= size.w) or (dest_height <= size.h) this or a smaller Alt will be used. Setting either size.w or size.h
-									// to 0 ignores that dimension in the comparison. Setting both to 0 makes it accessible only by other ways.
 		Alt_Data	data;
 	};
 
@@ -181,12 +181,12 @@ public:
 	static WgBlocksetPtr CreateFromColumn( WgSurface * pSurf, const WgRect& rect, int nBlocks, int spacing=0, int flags = 0 );
 
 
-	bool				AddAlternative( WgSize activationSize, const WgSurface * pSurf, const WgRect& normal, const WgRect& marked,
+	bool				AddAlternative( int activationScale, const WgSurface * pSurf, const WgRect& normal, const WgRect& marked,
 										const WgRect& selected, const WgRect& disabled, const WgRect& special,
 										WgBorders frame, WgBorders padding, WgCoord shiftMarked, WgCoord shiftPressed );
 
-	bool				SetSize( WgSize size, int alt = 0 );
-	bool				SetPos( WgMode mode, WgCoord pos, int alt = 0 );
+//	bool				SetSize( WgSize size, int alt = 0 );
+//	bool				SetPos( WgMode mode, WgCoord pos, int alt = 0 );
 
 	void				SetTextColors( const WgColorsetPtr& colors );
 	void				SetFrame( const WgBorders& frame, int alt = 0 );
@@ -196,30 +196,23 @@ public:
 	bool				SetScale(bool bScale);
 	bool				SetFixedSize(bool bFixedSize);						//TODO: Make center-mode enum of fixed-size/tile/stretch/scale.
 
-
-
-	inline WgBlock		GetBlock( WgMode mode, WgSize destSize ) const { return _getBlock( mode, _getAlt(destSize) ); }
-	inline WgBlock		GetBlock( WgMode mode, int alt = 0 ) const { return _getBlock( mode, _getAlt(alt) ); }
-	inline bool			HasBlock( WgMode mode, int alt = 0 ) const;
-
-	int					NbAlternatives() const;
-	WgSize				ActivationSize( int alt ) const;
+	inline WgBlock		GetBlock( WgMode mode, int scale ) const { return _getBlock( mode, _getAltForScale(scale), scale ); }
 
 
 	inline WgColorsetPtr	TextColors() const { return m_pTextColors; }
 	WgColor				TextColor( WgMode mode ) const;
-	WgRect				Rect( WgMode mode, int alt = 0 ) const;
-	WgSize				Size( int alt = 0 ) const;
-	int					Width( int alt = 0 ) const;
-	int					Height( int alt = 0 ) const;
+	WgRect				Rect( WgMode mode, int scale ) const;
+	WgSize				Size( int scale ) const;
+	int					Width( int scale ) const;
+	int					Height( int scale ) const;
 
-	int					MinWidth( int alt = 0 ) const;
-	int					MinHeight( int alt = 0 ) const;
-	WgSize				MinSize( int alt = 0 ) const;
+	int					MinWidth( int scale ) const;
+	int					MinHeight( int scale ) const;
+	WgSize				MinSize( int scale ) const;
 		
-	const WgSurface *	Surface( int alt = 0 ) const;
-	WgBorders			Frame( int alt = 0 ) const;
-	WgBorders			Padding( int alt = 0 ) const;
+	const WgSurface *	Surface( int scale ) const;
+	WgBorders			Frame( int scale ) const;
+	WgBorders			Padding( int scale ) const;
 	WgCoord				ContentShift( WgMode mode, int alt = 0 ) const;
 	inline Uint32		Flags() const { return m_flags; }
 
@@ -248,11 +241,10 @@ private:
 	static WgBlockset * _alloc( const WgSurface * pSurf, int flags );
 
 	Alt_Data *		_getAlt( int n );
-	Alt_Data *		_getAlt( WgSize destSize );
 	const Alt_Data*	_getAlt( int n ) const;
-	const Alt_Data*	_getAlt( WgSize destSize ) const;
+	const Alt_Data*	_getAltForScale( int scale ) const;
 
-	inline WgBlock	_getBlock( WgMode mode, const Alt_Data * pAlt ) const;
+	inline WgBlock	_getBlock( WgMode mode, const Alt_Data * pAlt, int scale ) const;
 
 	WgColorsetPtr				m_pTextColors;		// Default colors for text placed on this block.
 	Uint32						m_flags;
@@ -265,7 +257,7 @@ private:
 };
 
 
-inline WgBlock WgBlockset::_getBlock(WgMode m, const Alt_Data * p) const
+inline WgBlock WgBlockset::_getBlock(WgMode m, const Alt_Data * p, int scale) const
 {
 	if( !p )
 		return WgBlock();
@@ -273,20 +265,10 @@ inline WgBlock WgBlockset::_getBlock(WgMode m, const Alt_Data * p) const
 	const Uint32 SKIP_MASK = WG_SKIP_NORMAL | WG_SKIP_MARKED | WG_SKIP_SELECTED | WG_SKIP_DISABLED | WG_SKIP_SPECIAL;
 	Uint32 flags = m_flags & ~SKIP_MASK;
 	flags |= IsModeSkipable(m) ? WG_SKIP_NORMAL : 0;	// reuse bit
+
 	return WgBlock( p->pSurf, WgRect(p->x[m], p->y[m], p->w, p->h), p->frame, p->padding, p->contentShift[m], flags );
 }
 
-inline bool WgBlockset::HasBlock(WgMode m, int alt) const
-{
-	const Alt_Data * p = _getAlt(alt);
-	if( !p )
-		return false;
-
-	if( p->x[m] != p->x[WG_MODE_NORMAL] || p->y[m] != p->y[WG_MODE_NORMAL] )
-		return true;
-
-	return false;
-}
 
 inline bool WgBlockset::IsModeSkipable(WgMode m) const
 {

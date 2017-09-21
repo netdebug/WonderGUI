@@ -206,6 +206,21 @@ bool WgRulerLabels::_onAlphaTest( const WgCoord& ofs )
 	return false;
 }
 
+//____ _setScale() _____________________________________________________________
+
+void WgRulerLabels::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+	Label * pLabel = m_labels.First();
+	while( pLabel )
+	{
+		pLabel->text.SetScale(scale);
+		pLabel = pLabel->Next();
+	}
+}
+
+
 //____ _onTextModified() _________________________________________________________________
 
 void WgRulerLabels::_textModified( WgText * pText )

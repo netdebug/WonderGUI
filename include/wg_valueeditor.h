@@ -88,6 +88,7 @@ class WgValueEditor : public WgWidget, public Wg_Interface_ValueHolder
 		void	_onGotInputFocus();
 		void	_onLostInputFocus();
 		void	_onRefresh();
+		void 	_setScale( int scale );
 
 		WgWidget*	_getWidget() { return this; }
 

@@ -469,11 +469,11 @@ void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 		int x = m_pMarkers[i].x;
 		int y = (int) (m_pMarkers[i].y*scaleY+centerY);
 
-		dest.SetSize( m_pMarkerGfx->Size() );
+		dest.SetSize( m_pMarkerGfx->Size(m_scale) );
 		dest.x = x - dest.w / 2;
 		dest.y = y - dest.h / 2;
 
-		pDevice->ClipBlitBlock( _clip, m_pMarkerGfx->GetBlock(WG_MODE_NORMAL), dest );
+		pDevice->ClipBlitBlock( _clip, m_pMarkerGfx->GetBlock(WG_MODE_NORMAL,m_scale), dest );
 	}
 
 }

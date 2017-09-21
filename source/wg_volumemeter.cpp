@@ -170,9 +170,9 @@ void WgVolumeMeter::SetValue( float fPeak, float fHold )
 WgSize WgVolumeMeter::PreferredSize() const
 {
 	if( m_direction == WG_UP || m_direction == WG_DOWN )
-		return WgSize(10,5*m_nLEDs);
+		return WgSize((10*m_scale)>>WG_SCALE_BINALS,(5*m_nLEDs*m_scale)>>WG_SCALE_BINALS);
 	else
-		return WgSize(5*m_nLEDs,10);
+		return WgSize((5*m_nLEDs*m_scale)>>WG_SCALE_BINALS,(10*m_scale)>>WG_SCALE_BINALS);
 }
 
 //____ _onNewSize() ____________________________________________________________________

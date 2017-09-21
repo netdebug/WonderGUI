@@ -122,7 +122,7 @@ bool WgMenu::SetSeparatorSource( const WgBlocksetPtr pGfx, const WgBorders& bord
 
 	m_pSepGfx		= pGfx;
 	m_sepBorders	= borders;
-	m_sepHeight		= m_pSepGfx->Height() + m_sepBorders.Height();
+	m_sepHeight		= m_pSepGfx->Height(m_scale) + m_sepBorders.Height();
 
 	_adjustSize();
 	_requestRender();
@@ -204,7 +204,7 @@ void WgMenu::_refreshEntryHeight()
 		//
 
 		if( m_pTileBlocks[0] )
-			m_entryHeight +=  m_pTileBlocks[0]->Padding().Height();
+			m_entryHeight +=  m_pTileBlocks[0]->Padding(m_scale).Height();
 
 		if( m_entryHeight < m_minTileSize.h )
 			m_entryHeight = m_minTileSize.h;
@@ -445,17 +445,17 @@ int  WgMenu::WidthForHeight( int height ) const
 
 	int sliderWidth = 0;
 
-	if( m_pSliderBgGfx && m_pSliderBgGfx->Width() > sliderWidth )
-		sliderWidth = m_pSliderBgGfx->Width();
+	if( m_pSliderBgGfx && m_pSliderBgGfx->Width(m_scale) > sliderWidth )
+		sliderWidth = m_pSliderBgGfx->Width(m_scale);
 
-	if( m_pSliderBarGfx && m_pSliderBarGfx->Width() > sliderWidth )
-		sliderWidth = m_pSliderBarGfx->Width();
+	if( m_pSliderBarGfx && m_pSliderBarGfx->Width(m_scale) > sliderWidth )
+		sliderWidth = m_pSliderBarGfx->Width(m_scale);
 
-	if( m_pSliderBtnFwdGfx && m_pSliderBtnFwdGfx->Width() > sliderWidth )
-		sliderWidth = m_pSliderBtnFwdGfx->Width();
+	if( m_pSliderBtnFwdGfx && m_pSliderBtnFwdGfx->Width(m_scale) > sliderWidth )
+		sliderWidth = m_pSliderBtnFwdGfx->Width(m_scale);
 
-	if( m_pSliderBtnBwdGfx && m_pSliderBtnBwdGfx->Width() > sliderWidth )
-		sliderWidth = m_pSliderBtnBwdGfx->Width();
+	if( m_pSliderBtnBwdGfx && m_pSliderBtnBwdGfx->Width(m_scale) > sliderWidth )
+		sliderWidth = m_pSliderBtnBwdGfx->Width(m_scale);
 
 	return m_defaultSize.w + sliderWidth;
 }
@@ -501,7 +501,7 @@ void WgMenu::_calcEntryMinWidth( WgMenuEntry * pEntry )
 WgBorders WgMenu::_getPadding() const
 {
 	if( m_pBgGfx )
-		return m_pBgGfx->Padding();
+		return m_pBgGfx->Padding(m_scale);
 	else
 		return WgBorders(0);
 }
@@ -580,9 +580,9 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 	if( m_pBgGfx )
 	{
 		if( m_bEnabled )
-			pDevice->ClipBlitBlock( clip, m_pBgGfx->GetBlock(WG_MODE_NORMAL,window), window );
+			pDevice->ClipBlitBlock( clip, m_pBgGfx->GetBlock(WG_MODE_NORMAL,m_scale), window );
 		else
-			pDevice->ClipBlitBlock( clip, m_pBgGfx->GetBlock(WG_MODE_DISABLED,window), window );
+			pDevice->ClipBlitBlock( clip, m_pBgGfx->GetBlock(WG_MODE_DISABLED,m_scale), window );
 	}
 
 
@@ -614,9 +614,9 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 					WgRect sepClip(clip, WgRect(canvas.x, canvas.y + contentBorders.top, canvas.w, canvas.h - contentBorders.Height() ) );
 
 					WgRect	dest( window.x + m_sepBorders.left, yPos + m_sepBorders.top,
-									window.w - m_sepBorders.Width(), m_pSepGfx->Height() );
+									window.w - m_sepBorders.Width(), m_pSepGfx->Height(m_scale) );
 
-					pDevice->ClipBlitBlock( sepClip, m_pSepGfx->GetBlock(WG_MODE_NORMAL,dest), dest );
+					pDevice->ClipBlitBlock( sepClip, m_pSepGfx->GetBlock(WG_MODE_NORMAL,m_scale), dest );
 					yPos += m_sepHeight;
 				}
 			}
@@ -639,7 +639,7 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 
 				WgRect tileClip( contentClip, tileDest);
 
-				_renderTile( pDevice, tileClip, tileDest, item-1, mode );
+				_renderTile( pDevice, tileClip, tileDest, item-1, mode, m_scale );
 
 				// Print the text (if any)
 
@@ -687,8 +687,8 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 						WgBlocksetPtr pIcon = ((WgMenuEntry*)pItem)->GetIcon();
 						if( pIcon )
 						{
-							int w = pIcon->Width();
-							int h = pIcon->Height();
+							int w = pIcon->Width(m_scale);
+							int h = pIcon->Height(m_scale);
 
 							//
 
@@ -700,7 +700,7 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 							int y = yPos + (m_entryHeight - h)/2;
 							int x = xPosIcon + (m_iconFieldWidth - w)/2;
 
-							pDevice->ClipBlitBlock( contentClip, pIcon->GetBlock(mode), WgRect(x,y,w,h) );
+							pDevice->ClipBlitBlock( contentClip, pIcon->GetBlock(mode,m_scale), WgRect(x,y,w,h) );
 						}
 					}
 					break;
@@ -716,13 +716,13 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 
 						if( pGfx )
 						{
-							int w = pGfx->Width();
-							int h = pGfx->Height();
+							int w = pGfx->Width(m_scale);
+							int h = pGfx->Height(m_scale);
 
 							int y = yPos + (m_entryHeight - h)/2;
 							int x = xPosIcon + (m_iconFieldWidth - w)/2;
 
-							pDevice->ClipBlitBlock( contentClip, pGfx->GetBlock(mode), WgRect(x,y,w,h) );
+							pDevice->ClipBlitBlock( contentClip, pGfx->GetBlock(mode,m_scale), WgRect(x,y,w,h) );
 						}
 					}
 					break;
@@ -737,13 +737,13 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 
 						if( pGfx )
 						{
-							int w = pGfx->Width();
-							int h = pGfx->Height();
+							int w = pGfx->Width(m_scale);
+							int h = pGfx->Height(m_scale);
 
 							int y = yPos + (m_entryHeight - h)/2;
 							int x = xPosIcon + (m_iconFieldWidth - w)/2;
 
-							pDevice->ClipBlitBlock( contentClip, pGfx->GetBlock(mode), WgRect(x,y,w,h) );
+							pDevice->ClipBlitBlock( contentClip, pGfx->GetBlock(mode,m_scale), WgRect(x,y,w,h) );
 						}
 					}
 					break;
@@ -1234,7 +1234,7 @@ void WgMenu::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect
 		if( m_pBgGfx->IsOpaque() )
 			patches.Sub( WgRect( geo, clip ) );
 		else if( m_pBgGfx->HasOpaqueCenter() )
-			patches.Sub( WgRect( geo - m_pBgGfx->Frame(), clip ) );
+			patches.Sub( WgRect( geo - m_pBgGfx->Frame(m_scale), clip ) );
 	}
 }
 
@@ -1403,7 +1403,7 @@ void WgMenu::_adjustSize()
 
 	int minSep = m_sepBorders.Width();
 	if( m_pSepGfx )
-		minSep += m_pSepGfx->MinWidth();
+		minSep += m_pSepGfx->MinWidth(m_scale);
 
 	WgMenuItem * pItem = m_items.First();
 	while( pItem )

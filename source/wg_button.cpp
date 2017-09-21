@@ -114,9 +114,9 @@ Uint32 WgButton::GetTextAreaWidth()
 	WgRect	contentRect(0,0,Size());
 
 	if( m_pBgGfx )
-		contentRect.Shrink(m_pBgGfx->Padding());
+		contentRect.Shrink(m_pBgGfx->Padding(m_scale));
 
-	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx ) );
+	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx, m_scale ) );
 
 	return textRect.w;
 }
@@ -128,14 +128,14 @@ int WgButton::HeightForWidth( int width ) const
 	int height = 0;
 
 	if( m_pBgGfx )
-		height = m_pBgGfx->Height();
+		height = m_pBgGfx->Height(m_scale);
 
 	if( m_text.nbChars() != 0 )
 	{
 		WgBorders padding;
 
 		if( m_pBgGfx )
-			padding = m_pBgGfx->Padding();
+			padding = m_pBgGfx->Padding(m_scale);
 
 		int heightForText = m_text.heightForWidth(width-padding.Width()) + padding.Height();
 		if( heightForText > height )
@@ -155,14 +155,14 @@ WgSize WgButton::PreferredSize() const
 	WgSize bestSize;
 
 	if( m_pBgGfx )
-		bestSize = m_pBgGfx->Size();
+		bestSize = m_pBgGfx->Size(m_scale);
 
 	if( m_text.nbChars() != 0 )
 	{
 		WgSize textSize = m_text.unwrappedSize();
 
 		if( m_pBgGfx )
-			textSize += m_pBgGfx->Padding();
+			textSize += m_pBgGfx->Padding(m_scale);
 
 		if( textSize.w > bestSize.w )
 			bestSize.w = textSize.w;
@@ -200,11 +200,20 @@ void WgButton::_onNewSize( const WgSize& size )
 	WgRect	contentRect(0,0,Size());
 
 	if( m_pBgGfx )
-		contentRect.Shrink(m_pBgGfx->Padding());
+		contentRect.Shrink(m_pBgGfx->Padding(m_scale));
 
-	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx ) );
+	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx, m_scale ) );
 
 	m_text.setLineWidth(textRect.w);
+}
+
+//____ _setScale() _____________________________________________________________
+
+void WgButton::_setScale( int scale )
+{
+	WgWidget::_setScale(scale);
+
+	m_text.SetScale(scale);
 }
 
 
@@ -219,7 +228,7 @@ void WgButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const Wg
 	WgBlock	block;
 
 	if( m_pBgGfx )
-		block = m_pBgGfx->GetBlock(m_mode, _canvas);
+		block = m_pBgGfx->GetBlock(m_mode, m_scale);
 
 	// Render background
 
@@ -231,13 +240,13 @@ void WgButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const Wg
 
 	// Get icon and text rect from content rect
 
-	WgRect iconRect = _getIconRect( contentRect, m_pIconGfx );
+	WgRect iconRect = _getIconRect( contentRect, m_pIconGfx, m_scale );
 	WgRect textRect = _getTextRect( contentRect, iconRect );
 
 	// Render icon
 
 	if( m_pIconGfx )
-		pDevice->ClipBlitBlock( _clip, m_pIconGfx->GetBlock(m_mode, iconRect.Size()), iconRect );
+		pDevice->ClipBlitBlock( _clip, m_pIconGfx->GetBlock(m_mode, m_scale), iconRect );
 
 	// Print text
 
@@ -424,7 +433,7 @@ bool WgButton::_onAlphaTest( const WgCoord& ofs )
 
 	//TODO: Take icon into account.
 
-	return	WgUtil::MarkTestBlock( ofs, m_pBgGfx->GetBlock(m_mode,sz), WgRect(0,0,sz), m_markOpacity );
+	return	WgUtil::MarkTestBlock( ofs, m_pBgGfx->GetBlock(m_mode,m_scale), WgRect(0,0,sz), m_markOpacity );
 }
 
 //____ _onGotInputFocus() ______________________________________________________
