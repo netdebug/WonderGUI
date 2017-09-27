@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -14,17 +14,18 @@
     <ProjectGuid>{57861DF7-4FBE-4E46-9494-F953F233D7DC}</ProjectGuid>
     <RootNamespace>wondergui</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -43,7 +44,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
-    <IncludePath>C:\Users\Tord\Workspace\freetype\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\freetype\include;..\freetype\include\freetype2;.;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
@@ -96,7 +97,6 @@
     <ClInclude Include="include\wg_color.h" />
     <ClInclude Include="include\wg_colorset.h" />
     <ClInclude Include="include\wg_colorskin.h" />
-    <ClInclude Include="include\wg_combobox.h" />
     <ClInclude Include="include\wg_container.h" />
     <ClInclude Include="include\wg_cursor.h" />
     <ClInclude Include="include\wg_cursorinstance.h" />
@@ -128,10 +128,6 @@
     <ClInclude Include="include\wg_listpanel.h" />
     <ClInclude Include="include\wg_mempool.h" />
     <ClInclude Include="include\wg_memstack.h" />
-    <ClInclude Include="include\wg_menu.h" />
-    <ClInclude Include="include\wg_menubar.h" />
-    <ClInclude Include="include\wg_menuitem.h" />
-    <ClInclude Include="include\wg_menulayer.h" />
     <ClInclude Include="include\wg_modallayer.h" />
     <ClInclude Include="include\wg_orderedselectable.h" />
     <ClInclude Include="include\wg_oscilloscope.h" />
@@ -160,6 +156,7 @@
     <ClInclude Include="include\wg_stackpanel.h" />
     <ClInclude Include="include\wg_string.h" />
     <ClInclude Include="include\wg_surface.h" />
+    <ClInclude Include="include\wg_surfacefactory.h" />
     <ClInclude Include="include\wg_switch.h" />
     <ClInclude Include="include\wg_tablepanel.h" />
     <ClInclude Include="include\wg_tablist.h" />
@@ -205,7 +202,6 @@
     <ClCompile Include="source\wg_color.cpp" />
     <ClCompile Include="source\wg_colorset.cpp" />
     <ClCompile Include="source\wg_colorskin.cpp" />
-    <ClCompile Include="source\wg_combobox.cpp" />
     <ClCompile Include="source\wg_container.cpp" />
     <ClCompile Include="source\wg_cursor.cpp" />
     <ClCompile Include="source\wg_cursorinstance.cpp" />
@@ -235,10 +231,6 @@
     <ClCompile Include="source\wg_listpanel.cpp" />
     <ClCompile Include="source\wg_mempool.cpp" />
     <ClCompile Include="source\wg_memstack.cpp" />
-    <ClCompile Include="source\wg_menu.cpp" />
-    <ClCompile Include="source\wg_menubar.cpp" />
-    <ClCompile Include="source\wg_menuitem.cpp" />
-    <ClCompile Include="source\wg_menulayer.cpp" />
     <ClCompile Include="source\wg_modallayer.cpp" />
     <ClCompile Include="source\wg_orderedselectable.cpp" />
     <ClCompile Include="source\wg_oscilloscope.cpp" />

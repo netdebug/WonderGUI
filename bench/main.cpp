@@ -29,8 +29,6 @@
 
 #include "testwidget.h"
 
-void DBG_ASSERT(bool x) {}
-
 
 extern std::ostream cout;
 
@@ -348,7 +346,7 @@ void updateOscilloscope( WgOscilloscope * pOsc, int ofs, float freq, float ampli
 
 WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 {
-	WgResDB * pDB = sdl_wglib::LoadStdWidgets( "../resources/blocks.png", WgSurfaceFactorySoft() );
+	WgResDB * pDB = sdl_wglib::LoadStdWidgets( "../resources/blocks.png", "../resources/blocks_x2.png", "../resources/blocks_x4.png", WgSurfaceFactorySoft() );
 	if( !pDB )
 		return 0;
 
@@ -379,15 +377,11 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	WgSurface * pBigImg = sdl_wglib::LoadSurface("../resources/frog.jpg", WgSurfaceFactorySoft() );
 	WgBlocksetPtr pBigBlock = WgBlockset::CreateFromSurface( pBigImg );
 
-	// MenuPanel
-
-	WgMenuLayer * pMenuLayer = new WgMenuLayer();
-	pRoot->SetChild( pMenuLayer );
 
 	// Bottom Flex
 
 	WgFlexPanel * pBottom = new WgFlexPanel();
-	pMenuLayer->SetBase( pBottom );
+	pRoot->SetChild( pBottom );
 	pBottom->SetSkin( WgColorSkin::Create( WgColor::black ) );
 
 	// Main Flex

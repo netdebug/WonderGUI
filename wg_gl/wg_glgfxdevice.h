@@ -49,7 +49,8 @@ public:
     ~WgGlGfxDevice();
 
 	void    SetViewportOffset( WgCoord ofs );
-    void	SetCanvas( WgSize canvas );
+    bool    setCanvas( WgSize dimensions );
+    bool    setCanvas( WgSurface * pCanvas );
 
     void	SetTintColor( WgColor color );
     bool	SetBlendMode( WgBlendMode blendMode );
@@ -96,18 +97,26 @@ public:
 
     void	FillSubPixel( const WgRectF& rect, const WgColor& col );
 
+    void    StretchBlitSubPixelWithInvert(WgSurface * pSrc, float sx, float sy, float sw, float sh,
+            float dx, float dy, float dw, float dh);
+
 protected:
 
     void	_initTables();
     void	_setBlendMode( WgBlendMode blendMode );
 
     GLuint  _createGLProgram( const char * pVertexShader, const char * pFragmentShader );
-   
+    void    _updateProgramDimensions();
+    bool    _setFramebuffer();   
     
     bool	m_bRendering;
 
     float	m_lineThicknessTable[17];
-    
+
+    GLuint  m_framebufferId;
+
+    WgSize  m_defaultFramebufferSize;
+
     // Device programs
     
     GLuint  m_fillProg;
@@ -156,6 +165,8 @@ protected:
     GLint		m_glBlendDst;
 	GLint		m_glViewport[4];
 	GLint		m_glScissorBox[4];
+    GLint       m_glReadFrameBuffer;
+    GLint       m_glDrawFrameBuffer;
 
 	//
 	

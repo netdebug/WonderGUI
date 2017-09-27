@@ -252,7 +252,7 @@ namespace sdl_wglib
 			buttonFrame = WgBorders( buttonFrame.left*2, buttonFrame.top*2, buttonFrame.right*2, buttonFrame.bottom*2 );
 			buttonPadding = WgBorders( buttonPadding.left*2, buttonPadding.top*2, buttonPadding.right*2, buttonPadding.bottom*2 );
 			
-			pButtonBlocks->AddAlternative( WG_SCALE_BASE << i+1, surfaces[i+1], buttonRects[0], buttonRects[1], buttonRects[2], buttonRects[3], buttonRects[3], 
+			pButtonBlocks->AddAlternative( WG_SCALE_BASE << (i+1), surfaces[i+1], buttonRects[0], buttonRects[1], buttonRects[2], buttonRects[3], buttonRects[3], 
 					buttonFrame, buttonPadding, WgCoord(), WgCoord() );
 			
 		}
@@ -322,11 +322,11 @@ namespace sdl_wglib
 		pDB->AddWidget( "vslider", pVSlider );
 
 		// Create standard menubar
-
+/*
 		WgMenubar * pMenubar = new WgMenubar();
 		pMenubar->SetBgSource( pPlateBlocks );
 		pDB->AddWidget( "menubar", pMenubar );
-
+*/
 		// Create Background bitmaps
 
 		WgImage * pBgCheckeredGrey = new WgImage();
@@ -338,7 +338,7 @@ namespace sdl_wglib
 		pDB->AddWidget( "bg_blue_gradient", pBgBlueGradient );
 
 		// Create standard menu
-
+/*
 		WgMenu * pMenu = new WgMenu();
 		pMenu->SetBgSource( pPlateBlocks, 16, 16 );
 		pMenu->SetSeparatorSource( pHSplitBlocks, WgBorders(1) );
@@ -347,13 +347,13 @@ namespace sdl_wglib
 		pMenu->SetSliderSource( pSliderBackBlocks, pSliderBlocks, pVSliderBtnBwdBlocks, pVSliderBtnFwdBlocks );
 		pMenu->SetTileColors( pSelectionColors );
 		pDB->AddWidget( "menu", pMenu );
-
+*/
 		// Create standard combobox
-
+/*
 		WgCombobox * pCombobox = new WgCombobox();
 		pCombobox->SetSource( pComboboxBlocks );
 		pDB->AddWidget( "combobox", pCombobox );
-
+*/
 		// Create standard view
 		
 		{

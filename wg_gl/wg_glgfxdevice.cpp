@@ -263,7 +263,9 @@ WgGlGfxDevice::WgGlGfxDevice( WgSize canvas ) : WgGfxDevice(canvas)
     glBindVertexArray(m_texCoordArrayId);
     glGenBuffers(1, &m_texCoordBufferId);
     glBindVertexArray(0);
-    
+
+    glGenFramebuffers(1, &m_framebufferId);
+
     SetCanvas( canvas );
     SetTintColor( WgColor::white );
     
@@ -292,38 +294,94 @@ void WgGlGfxDevice::SetViewportOffset( WgCoord ofs )
 }
 
 
-//____ SetCanvas() __________________________________________________________________
 
-void WgGlGfxDevice::SetCanvas( WgSize canvas )
+//____ setCanvas() __________________________________________________________________
+
+bool WgGlGfxDevice::setCanvas( Size dimensions )
 {
-    m_canvasSize 	= canvas;
-    assert( glGetError() == 0 );
-    
-    glUseProgram( m_fillProg );
-    GLint dimLoc = glGetUniformLocation( m_fillProg, "dimensions");
-    glUniform2f(dimLoc, canvas.w, canvas.h);
-    
-    glUseProgram( m_aaFillProg );
-    dimLoc = glGetUniformLocation( m_aaFillProg, "dimensions");
-    glUniform2f(dimLoc, canvas.w, canvas.h);
-    
-    glUseProgram( m_mildSlopeProg );
-    dimLoc = glGetUniformLocation( m_mildSlopeProg, "dimensions");
-    glUniform2f(dimLoc, canvas.w, canvas.h);
-    
-    glUseProgram( m_steepSlopeProg );
-    dimLoc = glGetUniformLocation( m_steepSlopeProg, "dimensions");
-    glUniform2f(dimLoc, canvas.w, canvas.h);
-    
-    glUseProgram( m_blitProg );
-    dimLoc = glGetUniformLocation( m_blitProg, "dimensions");
-    glUniform2f(dimLoc, canvas.w, canvas.h);
-    glUniform1i( m_blitProgTexIdLoc, 0 );
-    
-    glUseProgram( m_plotProg );
-    dimLoc = glGetUniformLocation( m_plotProg, "dimensions");
-    glUniform2f(dimLoc, canvas.w, canvas.h);
-    assert( glGetError() == 0 );
+    m_pCanvas                   = nullptr;
+    m_bFlipY                    = true;
+    m_canvasSize                = dimensions; 
+    m_defaultFramebufferSize    = dimensions;
+    _updateProgramDimensions();
+
+    if (m_bRendering)
+        return _setFramebuffer();
+
+    return true;
+}
+
+bool WgGlGfxDevice::setCanvas( WgSurface * _pSurface )
+{
+    if (!_pSurface)
+        return setCanvas(m_defaultFramebufferSize);     // Revert back to default frame buffer.
+
+    WgGlSurface * pSurface = static_cast<GlSurface*>(_pSurface);
+
+    m_pCanvas       = pSurface;
+    m_bFlipY        = false;
+    m_canvasSize    = pSurface->size();
+    _updateProgramDimensions();
+
+    if (m_bRendering)
+        return _setFramebuffer();
+
+    return true;
+}
+
+//____ _setFramebuffer() ____________________________________________________
+
+bool WgGlGfxDevice::_setFramebuffer()
+{
+    if (m_pCanvas)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferId);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast<GlSurface*>(m_pCanvas)->getTexture(), 0);
+
+        GLenum drawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
+        glDrawBuffers(1, drawBuffers);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            return false;
+        }
+    }
+    else
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    return true;
+}
+
+
+//____ _updateProgramDimensions() ____________________________________________
+
+void WgGlGfxDevice::_updateProgramDimensions()
+{
+    glUseProgram(m_fillProg);
+    GLint dimLoc = glGetUniformLocation(m_fillProg, "dimensions");
+    glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
+
+    glUseProgram(m_aaFillProg);
+    dimLoc = glGetUniformLocation(m_aaFillProg, "dimensions");
+    glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
+
+    glUseProgram(m_mildSlopeProg);
+    dimLoc = glGetUniformLocation(m_mildSlopeProg, "dimensions");
+    glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
+
+    glUseProgram(m_steepSlopeProg);
+    dimLoc = glGetUniformLocation(m_steepSlopeProg, "dimensions");
+    glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
+
+    glUseProgram(m_blitProg);
+    dimLoc = glGetUniformLocation(m_blitProg, "dimensions");
+    glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
+    glUniform1i(m_blitProgTexIdLoc, 0);
+
+    glUseProgram(m_plotProg);
+    dimLoc = glGetUniformLocation(m_plotProg, "dimensions");
+    glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
 }
 
 //____ SetTintColor() __________________________________________________________
@@ -377,7 +435,12 @@ bool WgGlGfxDevice::BeginRender()
     glGetIntegerv(GL_BLEND_DST, &m_glBlendDst);
     glGetIntegerv(GL_VIEWPORT, m_glViewport);
     glGetIntegerv(GL_SCISSOR_BOX, m_glScissorBox);
-    
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_glReadFrameBuffer);
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &m_glDrawFrameBuffer);  
+
+    // Set correct framebuffer
+
+    _setFramebuffer();
     
     //  Modify states
     
@@ -422,7 +485,9 @@ bool WgGlGfxDevice::EndRender()
     
     glViewport( m_glViewport[0], m_glViewport[1], m_glViewport[2], m_glViewport[3] );
     glScissor( m_glScissorBox[0], m_glScissorBox[1], m_glScissorBox[2], m_glScissorBox[3] );
-    
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_glReadFrameBuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_glDrawFrameBuffer);
+
     assert( glGetError() == 0 );
     m_bRendering = false;
     return true;
@@ -740,6 +805,99 @@ void WgGlGfxDevice::StretchBlitSubPixel( const WgSurface * pSrc, float sx, float
 
     assert( 0 == (err = glGetError()) );
 }
+
+//____ StretchBlitSubPixelWithInvert() ___________________________________________________
+
+void WgGlGfxDevice::StretchBlitSubPixelWithInvert( const WgSurface * pSrc, float sx, float sy,
+                                        float sw, float sh,
+                                        float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias )
+{
+    GLenum err;
+    assert( 0 == (err = glGetError()) );
+
+    if( pSrc->scaleMode() == WG_SCALEMODE_INTERPOLATE )
+    {
+        if( sw < dw )
+            sx += 0.5f;
+        
+        if( sh < dh )
+            sy += 0.5f;
+    }
+    
+    if( !pSrc )
+        return;
+    
+    float tw = (float) pSrc->Width();
+    float th = (float) pSrc->Height();
+    
+    float   sx1 = sx/tw;
+    float   sx2 = (sx+sw)/tw;
+    float   sy1 = 1.f - (sy/th);
+    float   sy2 = 1.f - (sy+sh)/th;
+    
+    float   dx1 = dx;
+    float   dx2 = dx + dw;
+    float   dy1 = m_canvasSize.h - dy;
+    float   dy2 = dy1 - dh;
+    
+    m_vertexBufferData[0] = dx1;
+    m_vertexBufferData[1] = dy1;
+    m_vertexBufferData[2] = dx2;
+    m_vertexBufferData[3] = dy1;
+    m_vertexBufferData[4] = dx2;
+    m_vertexBufferData[5] = dy2;
+    m_vertexBufferData[6] = dx1;
+    m_vertexBufferData[7] = dy2;
+    
+    m_texCoordBufferData[0] = sx1;
+    m_texCoordBufferData[1] = sy1;
+    m_texCoordBufferData[2] = sx2;
+    m_texCoordBufferData[3] = sy1;
+    m_texCoordBufferData[4] = sx2;
+    m_texCoordBufferData[5] = sy2;
+    m_texCoordBufferData[6] = sx1;
+    m_texCoordBufferData[7] = sy2;
+    
+    glActiveTexture(GL_TEXTURE0 );
+    glBindTexture(GL_TEXTURE_2D, ((const WgGlSurface*)pSrc)->GetTexture());
+    
+    glUseProgram( m_blitProg );
+    
+    glBindVertexArray(m_vertexArrayId);
+    
+    
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertexBufferData), m_vertexBufferData, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(
+                          0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+                          2,                  // size
+                          GL_FLOAT,           // type
+                          GL_FALSE,           // normalized?
+                          0,                  // stride
+                          (void*)0            // array buffer offset
+                          );
+    
+    glBindBuffer(GL_ARRAY_BUFFER, m_texCoordArrayId);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(m_texCoordBufferData), m_texCoordBufferData, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(
+                          1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+                          2,                  // size
+                          GL_FLOAT,           // type
+                          GL_FALSE,           // normalized?
+                          0,                  // stride
+                          (void*)0            // array buffer offset
+                          );
+    
+    
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // Starting from vertex 0; 4 vertices total -> 2 triangles in the strip
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(0);
+
+    assert( 0 == (err = glGetError()) );
+}
+
 
 //____ _setBlendMode() _________________________________________________________
 

@@ -12,7 +12,7 @@ class WgSurface;
 class WgSurfaceFactory;
 class WgResDB;
 class WgFont;
-class WgPixelFormat;
+struct WgPixelFormat;
 
 namespace sdl_wglib
 {
