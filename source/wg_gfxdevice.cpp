@@ -35,15 +35,36 @@
 #include <wg_util.h>
 #include <wg_pen.h>
 
+int		WgGfxDevice::s_gfxDeviceCount = 0;
+int *	WgGfxDevice::s_pCurveTab = nullptr;
+
 //____ Constructor _____________________________________________________________
 
 WgGfxDevice::WgGfxDevice( WgSize canvasSize )
 {
+	m_pCanvas			= nullptr;
 	m_tintColor 		= WgColor(255,255,255);
 	m_blendMode 		= WG_BLENDMODE_BLEND;
 	m_bSaveDirtyRects 	= false;
 	m_renderFlags		= 0;
 	m_canvasSize		= canvasSize;
+
+	if (s_gfxDeviceCount == 0)
+	{
+		_genCurveTab();
+	}
+	s_gfxDeviceCount++;
+}
+
+//____ Destructor _________________________________________________________
+
+WgGfxDevice::~WgGfxDevice()
+{
+	s_gfxDeviceCount--;
+	if (s_gfxDeviceCount == 0)
+	{
+		delete[] s_pCurveTab;
+	}
 }
 
 //____ SetSaveDirtyRects() _____________________________________________________
@@ -1411,4 +1432,84 @@ void WgGfxDevice::_drawUnderline( const WgRect& clip, const WgText * pText, int 
 					_x + pUnderline->bearingX, _y + pUnderline->bearingY, pen.GetPosX() );
 }
 
+//____ _genCurveTab() ___________________________________________________________
 
+void WgGfxDevice::_genCurveTab()
+{
+	s_pCurveTab = new int[c_nCurveTabEntries];
+
+	//		double factor = 3.14159265 / (2.0 * c_nCurveTabEntries);
+
+	for (int i = 0; i < c_nCurveTabEntries; i++)
+	{
+		double y = 1.f - i / (double)c_nCurveTabEntries;
+		s_pCurveTab[i] = (int)(sqrt(1.f - y*y)*65536.f);
+	}
+}
+
+//____ _traceLine() __________________________________________________________
+
+void WgGfxDevice::_traceLine(int * pDest, int * pSrc, int nPoints, float thickness)
+{
+	static int brush[128];
+	static float prevThickness = -1.f;
+
+	int brushSteps = (int)(thickness / 2 + 0.99f);
+
+	// Generate brush
+
+	if (thickness != prevThickness)
+	{
+		int scaledThickness = (int)(thickness / 2 * 256);
+		for (int i = 0; i < brushSteps; i++)
+		{
+			brush[i] = (scaledThickness * s_pCurveTab[c_nCurveTabEntries - (i*c_nCurveTabEntries) / brushSteps - 1]) >> 16;
+			//				printf( "%d - %d - %d\n", i, brush[i], m_pCurveTab[(c_nCurveTabEntries - 1) - (i * c_nCurveTabEntries) / brushSteps]);
+		}
+	}
+
+	// Trace...
+
+	for (int i = 0; i < nPoints; i++)
+	{
+		// Start with top and bottom for current point
+
+		int top = pSrc[i] - brush[0];
+		int bottom = pSrc[i] + brush[0];
+
+		// Check brush's coverage from previous points
+
+		int end = WgMin(i + 1, brushSteps);
+
+		for (int j = 1; j < end; j++)
+		{
+			int topCover = pSrc[i - j] - brush[j];
+			int bottomCover = pSrc[i - j] + brush[j];
+
+			if (topCover < top)
+				top = topCover;
+			else if (bottomCover > bottom)
+				bottom = bottomCover;
+		}
+
+		// Check brush's coverage from following points
+
+		end = WgMin(nPoints - i, brushSteps);
+
+		for (int j = 1; j < end; j++)
+		{
+			int topCover = pSrc[i + j] - brush[j];
+			int bottomCover = pSrc[i + j] + brush[j];
+
+			if (topCover < top)
+				top = topCover;
+			else if (bottomCover > bottom)
+				bottom = bottomCover;
+		}
+
+		// Save traced values
+
+		*pDest++ = top;
+		*pDest++ = bottom;
+	}
+}

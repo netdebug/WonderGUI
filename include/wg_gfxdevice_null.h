@@ -58,6 +58,9 @@ public:
 	void	DrawFilledElipse( const WgRect& rect, WgColor color );
 
 	void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
+	void	ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topLine, const WgWaveLine& bottomLine, WgColor front, WgColor back);
+
+
 	void	ClipDrawArcNE( const WgRect& clip, const WgRect& rect, WgColor color );
 	void	ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color );
 	void	ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color );

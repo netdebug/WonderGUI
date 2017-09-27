@@ -41,8 +41,8 @@ public:
 	WgGfxDeviceSoft( WgSurfaceSoft * pCanvas );
 	~WgGfxDeviceSoft();
 
-	void	SetCanvas( WgSurfaceSoft * pCanvas );
-
+	bool	SetCanvas( WgSurface * pCanvas );
+	 
 	//
 
 	void	Fill( const WgRect& rect, const WgColor& col );
@@ -67,14 +67,18 @@ public:
 	void	FillSubPixel( const WgRectF& rect, const WgColor& col );
 	void	StretchBlitSubPixel( const WgSurface * pSrc, float sx, float sy, float sw, float sh,
 						   		 float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias );
-	
+
+	void	ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topBorder, const WgWaveLine& bottomBorder, WgColor frontFill, WgColor backFill);
+
+
 protected:
 
 	void	_initTables();
-	void	_genCurveTab();
 
 	void 	_drawLineSegment( Uint8 * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, WgColor color );
 	void 	_clipDrawLineSegment( int clipStart, int clipEnd, Uint8 * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, WgColor color );
+
+	void	_clipDrawWaveColumn(int clipBeg, int clipLen, uint8_t * pColumn, int leftPos[4], int rightPos[4], WgColor col[3], int linePitch);
 
 
 	void	_drawHorrFadeLine( Uint8 * pLineStart, int begOfs, int peakOfs, int endOfs, WgColor color );
@@ -106,8 +110,8 @@ protected:
 										int dx, int dy, int dw, int dh );
 	void	_stretchBlitBlend32(		const WgSurfaceSoft * pSrcSurf, float sx, float sy, float sw, float sh,
 										int dx, int dy, int dw, int dh );
-	void 	_stretchBlitBlend24(		const WgSurfaceSoft * pSrcSurf, float sx, float sy, float sw, float sh,
-										int dx, int dy, int dw, int dh );
+//	void 	_stretchBlitBlend24(		const WgSurfaceSoft * pSrcSurf, float sx, float sy, float sw, float sh,
+//										int dx, int dy, int dw, int dh );
 	void	_stretchBlitAdd32(			const WgSurfaceSoft * pSrcSurf, float sx, float sy, float sw, float sh,
 										int dx, int dy, int dw, int dh );
 	void	_stretchBlitAdd24(			const WgSurfaceSoft * pSrcSurf, float sx, float sy, float sw, float sh,
@@ -117,10 +121,9 @@ protected:
 	void	_stretchBlitInvert(			const WgSurfaceSoft * pSrcSurf, float sx, float sy, float sw, float sh,
 										int dx, int dy, int dw, int dh );
 
-	WgSurfaceSoft * m_pCanvas;
+	WgSurfaceSoft * m_pCanvas;			// Yes, we are shadowing WgSurface::m_pCanvas with a pointer to a subclass. Easy hack.
 	Uint8			m_limitTable[512];
 	int				m_lineThicknessTable[17];
-	int *			m_pCurveTab;
     Uint8 *         m_pDivTab;
 };
 

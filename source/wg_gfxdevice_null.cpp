@@ -82,3 +82,7 @@ void WgGfxDeviceNull::ClipDrawElipse( const WgRect& clip, const WgRect& rect, Wg
 void WgGfxDeviceNull::ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color )
 {
 }
+
+void WgGfxDeviceNull::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topLine, const WgWaveLine& bottomLine, WgColor front, WgColor back)
+{
+}

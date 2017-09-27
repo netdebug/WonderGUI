@@ -22,6 +22,8 @@
 
 #include <wg_glgfxdevice.h>
 #include <wg_glsurface.h>
+#include <wg_glsurfacefactory.h>
+#include <wg_base.h>
 #include <assert.h>
 #include <math.h>
 #include <algorithm>
@@ -63,6 +65,74 @@ const char fillFragmentShader[] =
 "{                                      "
 "   outColor = color;                   "
 "}                                      ";
+
+const char horrWaveFragmentShader[] =
+
+"#version 330 core\n"
+"layout(origin_upper_left, pixel_center_integer) in vec4 gl_FragCoord;"
+"uniform isamplerBuffer texId;          "
+"uniform vec2 windowOfs;				"
+"uniform vec4 topBorderColor;           "
+"uniform vec4 bottomBorderColor;        "
+"uniform vec4 frontColor;               "
+"uniform vec4 backColor;                "
+"out vec4 outColor;                     "
+"void main()                            "
+"{										"
+"	vec2 ofs = gl_FragCoord.xy - windowOfs;"
+"   int column = int(ofs.x)*9;			"
+"  float aFrac = texelFetch(texId, column).r/65536.0;"
+"  float aInc = texelFetch(texId, column+1).r/65536.0;"
+"  float dFrac = texelFetch(texId, column+6).r/65536.0;"
+"  float dInc = texelFetch(texId, column+7).r/65536.0;"
+
+"  aFrac = clamp(aFrac + aInc*ofs.y,0.0,1.0);"
+"  dFrac = clamp(dFrac + dInc*ofs.y,0.0,1.0);"
+
+"  if (aFrac == 0.0 || dFrac == 1.0) "
+"	discard; "
+
+"  float bFrac = texelFetch(texId, column+2).r/65536.0;"
+"  float bInc = texelFetch(texId, column+3).r/65536.0;"
+"  float cFrac = texelFetch(texId, column+4).r/65536.0;"
+"  float cInc = texelFetch(texId, column+5).r/65536.0;"
+"  int bFlipped = texelFetch(texId, column+8).r;"
+
+"  bFrac = clamp(bFrac + bInc*ofs.y,0.0,1.0);"
+"  cFrac = clamp(cFrac + cInc*ofs.y,0.0,1.0);"
+
+
+" aFrac -= bFrac;"
+" bFrac -= cFrac;"
+" cFrac -= dFrac;"
+" dFrac = 0.0;"
+
+" if(bFlipped != 0) "
+" { "
+"	float x = aFrac;"
+"	aFrac = cFrac;"
+"	cFrac = x;"
+"	dFrac = bFrac;"
+"	bFrac = 0.0;"
+" }"
+
+"  aFrac *= topBorderColor.a;"
+"  bFrac *= frontColor.a;"
+"  cFrac *= bottomBorderColor.a;"
+"  dFrac *= backColor.a;"
+
+"  float totalAlpha = aFrac + bFrac + cFrac + dFrac;"
+"  aFrac /= totalAlpha; "
+"  bFrac /= totalAlpha; "
+"  cFrac /= totalAlpha; "
+"  dFrac /= totalAlpha; "
+
+"   outColor.a = totalAlpha;  "
+"   outColor.r = aFrac*topBorderColor.r + bFrac*frontColor.r + cFrac*bottomBorderColor.r + dFrac*backColor.r;  "
+"   outColor.g = aFrac*topBorderColor.g + bFrac*frontColor.g + cFrac*bottomBorderColor.g + dFrac*backColor.g;  "
+"   outColor.b = aFrac*topBorderColor.b + bFrac*frontColor.b + cFrac*bottomBorderColor.b + dFrac*backColor.b;  "
+"}                                      ";
+
 
 /* Original, unoptimized versions
  
@@ -220,7 +290,7 @@ const char plotFragmentShader[] =
 WgGlGfxDevice::WgGlGfxDevice( WgSize canvas ) : WgGfxDevice(canvas)
 {
     m_bRendering = false;
-    
+
     _initTables();
     
     m_fillProg = _createGLProgram( fillVertexShader, fillFragmentShader );
@@ -251,7 +321,15 @@ WgGlGfxDevice::WgGlGfxDevice( WgSize canvas ) : WgGfxDevice(canvas)
     m_blitProg = _createGLProgram( blitVertexShader, blitFragmentShader );
     m_blitProgTintLoc = glGetUniformLocation( m_blitProg, "tint" );
     m_blitProgTexIdLoc = glGetUniformLocation( m_blitProg, "texId" );
-    
+
+	m_horrWaveProg = _createGLProgram(fillVertexShader, horrWaveFragmentShader);
+	m_horrWaveProgTexIdLoc = glGetUniformLocation(m_horrWaveProg, "texId");
+	m_horrWaveProgWindowOfsLoc = glGetUniformLocation(m_horrWaveProg, "windowOfs");
+	m_horrWaveProgTopBorderColorLoc = glGetUniformLocation(m_horrWaveProg, "topBorderColor");
+	m_horrWaveProgBottomBorderColorLoc = glGetUniformLocation(m_horrWaveProg, "bottomBorderColor");
+	m_horrWaveProgFrontFillLoc = glGetUniformLocation(m_horrWaveProg, "frontColor");
+	m_horrWaveProgBackFillLoc = glGetUniformLocation(m_horrWaveProg, "backColor");
+
     m_plotProg = _createGLProgram( plotVertexShader, plotFragmentShader );
     m_plotProgTintLoc = glGetUniformLocation( m_plotProg, "tint" );
     
@@ -265,6 +343,9 @@ WgGlGfxDevice::WgGlGfxDevice( WgSize canvas ) : WgGfxDevice(canvas)
     glBindVertexArray(0);
 
     glGenFramebuffers(1, &m_framebufferId);
+
+	glGenTextures(1, &m_horrWaveBufferTexture);
+	glGenBuffers(1, &m_horrWaveBufferTextureData);
 
     SetCanvas( canvas );
     SetTintColor( WgColor::white );
@@ -295,12 +376,11 @@ void WgGlGfxDevice::SetViewportOffset( WgCoord ofs )
 
 
 
-//____ setCanvas() __________________________________________________________________
+//____ SetCanvas() __________________________________________________________________
 
-bool WgGlGfxDevice::setCanvas( Size dimensions )
+bool WgGlGfxDevice::SetCanvas( WgSize dimensions )
 {
     m_pCanvas                   = nullptr;
-    m_bFlipY                    = true;
     m_canvasSize                = dimensions; 
     m_defaultFramebufferSize    = dimensions;
     _updateProgramDimensions();
@@ -311,16 +391,15 @@ bool WgGlGfxDevice::setCanvas( Size dimensions )
     return true;
 }
 
-bool WgGlGfxDevice::setCanvas( WgSurface * _pSurface )
+bool WgGlGfxDevice::SetCanvas( WgSurface * _pSurface )
 {
     if (!_pSurface)
-        return setCanvas(m_defaultFramebufferSize);     // Revert back to default frame buffer.
+        return SetCanvas(m_defaultFramebufferSize);     // Revert back to default frame buffer.
 
-    WgGlSurface * pSurface = static_cast<GlSurface*>(_pSurface);
+    WgGlSurface * pSurface = static_cast<WgGlSurface*>(_pSurface);
 
     m_pCanvas       = pSurface;
-    m_bFlipY        = false;
-    m_canvasSize    = pSurface->size();
+    m_canvasSize    = pSurface->Size();
     _updateProgramDimensions();
 
     if (m_bRendering)
@@ -336,7 +415,7 @@ bool WgGlGfxDevice::_setFramebuffer()
     if (m_pCanvas)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferId);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast<GlSurface*>(m_pCanvas)->getTexture(), 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast<WgGlSurface*>(m_pCanvas)->GetTexture(), 0);
 
         GLenum drawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
         glDrawBuffers(1, drawBuffers);
@@ -382,6 +461,10 @@ void WgGlGfxDevice::_updateProgramDimensions()
     glUseProgram(m_plotProg);
     dimLoc = glGetUniformLocation(m_plotProg, "dimensions");
     glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
+
+	glUseProgram(m_horrWaveProg);
+	dimLoc = glGetUniformLocation(m_horrWaveProg, "dimensions");
+	glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
 }
 
 //____ SetTintColor() __________________________________________________________
@@ -808,9 +891,8 @@ void WgGlGfxDevice::StretchBlitSubPixel( const WgSurface * pSrc, float sx, float
 
 //____ StretchBlitSubPixelWithInvert() ___________________________________________________
 
-void WgGlGfxDevice::StretchBlitSubPixelWithInvert( const WgSurface * pSrc, float sx, float sy,
-                                        float sw, float sh,
-                                        float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias )
+void WgGlGfxDevice::StretchBlitSubPixelWithInvert(const WgSurface * pSrc, float sx, float sy, float sw, float sh,
+	float dx, float dy, float dw, float dh)
 {
     GLenum err;
     assert( 0 == (err = glGetError()) );
@@ -948,7 +1030,10 @@ void WgGlGfxDevice::_setBlendMode( WgBlendMode blendMode )
 
 GLuint WgGlGfxDevice::_createGLProgram( const char * pVertexShader, const char * pFragmentShader )
 {
-    GLenum err;
+	char log[1024];
+	GLsizei logLen;
+	
+	GLenum err;
     assert( (err = glGetError()) == 0 );
     
     GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -959,7 +1044,10 @@ GLuint WgGlGfxDevice::_createGLProgram( const char * pVertexShader, const char *
     glShaderSource(vertexShaderID, 1, &pVertexShader, NULL);
     assert( (err = glGetError()) == 0 );
     glCompileShader(vertexShaderID);
-    assert( (err = glGetError()) == 0 );
+
+	glGetShaderInfoLog(fragmentShaderID, 1023, &logLen, log);
+
+	assert( (err = glGetError()) == 0 );
     
     glShaderSource(fragmentShaderID, 1, &pFragmentShader, NULL);
     assert( (err = glGetError()) == 0 );
@@ -1279,6 +1367,233 @@ void WgGlGfxDevice::ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end
     DrawLine( begin, end, color, thickness );
     glScissor( 0, 0, m_canvasSize.w, m_canvasSize.h );
     assert( 0 == (err = glGetError()) );
+}
+
+//____ ClipDrawHorrWave() _____________________________________________________
+
+void WgGlGfxDevice::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topBorder, const WgWaveLine& bottomBorder, WgColor frontFill, WgColor backFill)
+{
+	if (topBorder.length <= length || bottomBorder.length <= length)
+		length = min(topBorder.length, bottomBorder.length) - 1;
+
+	// Do early rough X-clipping with margin (need to trace lines with margin of thickest line).
+
+	int ofs = 0;
+	if (clip.x > begin.x || clip.x + clip.w < begin.x + length)
+	{
+		int margin = (int)(max(topBorder.thickness, bottomBorder.thickness) / 2 + 0.99);
+
+		if (clip.x > begin.x + margin)
+		{
+			ofs = clip.x - begin.x - margin;
+			begin.x += ofs;
+			length -= ofs;
+		}
+
+		if (begin.x + length - margin > clip.x + clip.w)
+			length = clip.x + clip.w - begin.x + margin;
+
+		if (length <= 0)
+			return;
+	}
+
+	// Generate line traces
+
+	int	traceBufferSize = (length + 1) * 2 * sizeof(int) * 2;	// length+1 * values per point * sizeof(int) * 2 separate traces.
+	char * pTraceBuffer = WgBase::MemStackAlloc(traceBufferSize);
+	int * pTopBorderTrace = (int*)pTraceBuffer;
+	int * pBottomBorderTrace = (int*)(pTraceBuffer + traceBufferSize / 2);
+
+	_traceLine(pTopBorderTrace, topBorder.pWave + ofs, length + 1, topBorder.thickness);
+	_traceLine(pBottomBorderTrace, bottomBorder.pWave + ofs, length + 1, bottomBorder.thickness);
+
+
+
+	// Do proper X-clipping
+
+	int startColumn = 0;
+	if (begin.x < clip.x)
+	{
+		startColumn = clip.x - begin.x;
+		length -= startColumn;
+		begin.x += startColumn;
+	}
+
+	if (begin.x + length > clip.x + clip.w)
+		length = clip.x + clip.w - begin.x;
+
+	// Box in drawing area
+
+	WgRect box;
+	box.x = begin.x;
+	box.w = length;
+
+	int top = INT_MAX;
+	int bottom = INT_MIN;
+
+	for (int i = startColumn; i <= length + startColumn; i++)
+	{
+		int t = pTopBorderTrace[i * 2] < pBottomBorderTrace[i * 2] ? pTopBorderTrace[i * 2] : pBottomBorderTrace[i * 2];
+		int b = pTopBorderTrace[i * 2 + 1] > pBottomBorderTrace[i * 2 + 1] ? pTopBorderTrace[i * 2 + 1] : pBottomBorderTrace[i * 2 + 1];
+
+		if (t < top) top = t;
+		if (b > bottom) bottom = b;
+	}
+
+	top = begin.y + (top >> 8);
+	bottom = begin.y + ((bottom + 255) >> 8);
+
+
+	box.y = top > clip.y ? top : clip.y;
+	box.h = bottom < (clip.y + clip.h) ? bottom - box.y : clip.y + clip.h - box.y;
+
+	if (box.w <= 0 || box.h <= 0)
+		return;
+
+	// Render columns
+
+	int pos[2][4];						// Startpositions for the 4 fields of the column (topBorder, fill, bottomBorder, line end) for left and right edge of pixel column. 16 binals.
+
+	int		textureBufferDataSize = (length) * sizeof(int) * 9;
+	int * pTextureBufferData = (int*)WgBase::MemStackAlloc(textureBufferDataSize);
+	int * wpBuffer = pTextureBufferData;
+	bool  bFlipped = false;
+
+	for (int i = startColumn; i <= length + startColumn; i++)
+	{
+		// Old right pos becomes new left pos and old left pos will be reused for new right pos
+
+		int * pLeftPos = pos[i % 2];
+		int * pRightPos = pos[(i + 1) % 2];
+
+		// Check if lines have intersected and in that case swap top and bottom lines and colors
+
+		if (pTopBorderTrace[i * 2] > pBottomBorderTrace[i * 2])
+		{
+			swap(pTopBorderTrace, pBottomBorderTrace);
+			bFlipped = !bFlipped;
+
+			// We need to regenerate leftpos since we now have swapped top and bottom line.
+
+			if (i > startColumn)
+			{
+				int j = i - 1;
+				pLeftPos[0] = pTopBorderTrace[j * 2] << 8;
+				pLeftPos[1] = pTopBorderTrace[j * 2 + 1] << 8;
+
+				pLeftPos[2] = pBottomBorderTrace[j * 2] << 8;
+				pLeftPos[3] = pBottomBorderTrace[j * 2 + 1] << 8;
+
+				if (pLeftPos[2] < pLeftPos[1])
+				{
+					pLeftPos[2] = pLeftPos[1];
+					if (pLeftPos[3] < pLeftPos[2])
+						pLeftPos[3] = pLeftPos[2];
+				}
+			}
+		}
+
+		// Generate new rightpos table
+
+		pRightPos[0] = pTopBorderTrace[i * 2] << 8;
+		pRightPos[1] = pTopBorderTrace[i * 2 + 1] << 8;
+
+		pRightPos[2] = pBottomBorderTrace[i * 2] << 8;
+		pRightPos[3] = pBottomBorderTrace[i * 2 + 1] << 8;
+
+
+		if (pRightPos[2] < pRightPos[1])
+		{
+			pRightPos[2] = pRightPos[1];
+			if (pRightPos[3] < pRightPos[2])
+				pRightPos[3] = pRightPos[2];
+		}
+
+		// Render the column
+
+		if (i > startColumn)
+		{
+			// Calculate start amount and increment for our 4 fields
+
+			for (int i = 0; i < 4; i++)
+			{
+				int yBeg;
+				int64_t xInc;
+
+				if (pLeftPos[i] < pRightPos[i])
+				{
+					yBeg = pLeftPos[i];
+					xInc = (int64_t)65536 * 65536 / (pRightPos[i] - pLeftPos[i] + 1);
+				}
+				else
+				{
+					yBeg = pRightPos[i];
+					xInc = (int64_t)65536 * 65536 / (pLeftPos[i] - pRightPos[i] + 1);
+				}
+
+				WG_LIMIT(xInc, (int64_t)0, (int64_t)65536);
+
+				int64_t startAmount = -((xInc * yBeg) >> 16);
+
+				*wpBuffer++ = (int)startAmount;
+				*wpBuffer++ = (int)xInc;
+			}
+			*wpBuffer++ = (int)bFlipped;
+		}
+	}
+
+	// Now we have the data generated, setup GL to operate on it
+
+	glBindBuffer(GL_TEXTURE_BUFFER, m_horrWaveBufferTextureData);
+	glBufferData(GL_TEXTURE_BUFFER, textureBufferDataSize, pTextureBufferData, GL_STREAM_DRAW);
+
+	int	dx1 = box.x;
+	int	dy1 = m_canvasSize.h - box.y;
+	int dx2 = box.x + box.w;
+	int dy2 = m_canvasSize.h - (box.y + box.h);
+
+	m_vertexBufferData[0] = (GLfloat)dx1;
+	m_vertexBufferData[1] = (GLfloat)dy1;
+	m_vertexBufferData[2] = (GLfloat)dx2;
+	m_vertexBufferData[3] = (GLfloat)dy1;
+	m_vertexBufferData[4] = (GLfloat)dx2;
+	m_vertexBufferData[5] = (GLfloat)dy2;
+	m_vertexBufferData[6] = (GLfloat)dx1;
+	m_vertexBufferData[7] = (GLfloat)dy2;
+
+	glUseProgram(m_horrWaveProg);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, m_horrWaveBufferTexture);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, m_horrWaveBufferTextureData);
+	glUniform1i(m_horrWaveProgTexIdLoc, 0);
+	glUniform2f(m_horrWaveProgWindowOfsLoc, begin.x, begin.y);
+	glUniform4f(m_horrWaveProgTopBorderColorLoc, topBorder.color.r / 255.f, topBorder.color.g / 255.f, topBorder.color.b / 255.f, topBorder.color.a / 255.f);
+	glUniform4f(m_horrWaveProgBottomBorderColorLoc, bottomBorder.color.r / 255.f, bottomBorder.color.g / 255.f, bottomBorder.color.b / 255.f, bottomBorder.color.a / 255.f);
+	glUniform4f(m_horrWaveProgFrontFillLoc, frontFill.r / 255.f, frontFill.g / 255.f, frontFill.b / 255.f, frontFill.a / 255.f);
+	glUniform4f(m_horrWaveProgBackFillLoc, backFill.r / 255.f, backFill.g / 255.f, backFill.b / 255.f, backFill.a / 255.f);
+
+	glBindVertexArray(m_vertexArrayId);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertexBufferData), m_vertexBufferData, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(
+		0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		2,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+	);
+
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // Starting from vertex 0; 4 vertices total -> 2 triangles in the strip
+	glDisableVertexAttribArray(0);
+
+	// Free temporary work memory
+
+	WgBase::MemStackRelease(textureBufferDataSize);
+	WgBase::MemStackRelease(traceBufferSize);
 }
 
 

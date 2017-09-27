@@ -51,6 +51,16 @@
 #endif
 */
 
+//____ WgWaveLine ___________________________________________________________
+
+struct WgWaveLine
+{
+	int		length;
+	float	thickness;
+	WgColor	color;
+	int *	pWave;			// Pixel offset with 8 binals.
+};
+
 class	WgBlock;
 class	WgRect;
 class	WgBorders;
@@ -76,7 +86,7 @@ public:
 		WG_ORIENT_MASK					= 0x7,
 	};
 
-	virtual ~WgGfxDevice() {};
+	virtual ~WgGfxDevice();
 
 	virtual void	SetTintColor( WgColor color );
 	virtual bool	SetBlendMode( WgBlendMode blendMode );
@@ -89,6 +99,9 @@ public:
 	inline bool			GetSaveDirtyRects() const { return m_bSaveDirtyRects; }
 
 	// Geometry related methods.
+
+	virtual bool	SetCanvas(WgSurface * pCanvas) = 0;
+	WgSurface *		Canvas() const { return m_pCanvas;  }
 
 	inline WgSize	CanvasSize() const { return m_canvasSize; }
 
@@ -109,6 +122,8 @@ public:
 
 	virtual void	DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f ) = 0;
 	virtual void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f ) = 0;
+
+	virtual void	ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topBorder, const WgWaveLine& bottomBorder, WgColor frontFill, WgColor backFill) = 0;
 
 
 	virtual void	DrawArcNE( const WgRect& rect, WgColor color ) = 0;
@@ -207,6 +222,20 @@ protected:
 
 	virtual void	_drawUnderline( const WgRect& clip, const WgText * pText, int _x, int _y, int ofs, int maxChars );
 
+
+	// Static, shared data
+
+	static	int		s_gfxDeviceCount;				// Number of existing gfxDevices. Ref count for shared data.
+
+	void	_genCurveTab();
+	void	_traceLine(int * pDest, int * pSrc, int nPoints, float thickness);
+
+	const static int c_nCurveTabEntries = 1024;
+	static int *	s_pCurveTab;
+
+	//
+
+	WgSurface *	m_pCanvas;
 
 	WgColor		m_tintColor;		// Current Tint color.
 	WgBlendMode	m_blendMode;		// Current BlendMode.

@@ -49,8 +49,8 @@ public:
     ~WgGlGfxDevice();
 
 	void    SetViewportOffset( WgCoord ofs );
-    bool    setCanvas( WgSize dimensions );
-    bool    setCanvas( WgSurface * pCanvas );
+    bool    SetCanvas( WgSize dimensions );
+    bool    SetCanvas( WgSurface * pCanvas );
 
     void	SetTintColor( WgColor color );
     bool	SetBlendMode( WgBlendMode blendMode );
@@ -75,6 +75,7 @@ public:
     void	DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
     void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
 
+	void	ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topLine, const WgWaveLine& bottomLine, WgColor front, WgColor back);
 
     void	DrawArcNE( const WgRect& rect, WgColor color );
     void	DrawElipse( const WgRect& rect, WgColor color );
@@ -97,7 +98,7 @@ public:
 
     void	FillSubPixel( const WgRectF& rect, const WgColor& col );
 
-    void    StretchBlitSubPixelWithInvert(WgSurface * pSrc, float sx, float sy, float sw, float sh,
+    void    StretchBlitSubPixelWithInvert(const WgSurface * pSrc, float sx, float sy, float sw, float sh,
             float dx, float dy, float dw, float dh);
 
 protected:
@@ -146,7 +147,16 @@ protected:
     GLint   m_steepSlopeProgWLoc;
     GLint   m_steepSlopeProgSlopeLoc;
     
-    
+	GLuint  m_horrWaveProg;
+	GLuint	m_horrWaveBufferTexture;
+	GLuint	m_horrWaveBufferTextureData;
+	GLint	m_horrWaveProgTexIdLoc;
+	GLint	m_horrWaveProgWindowOfsLoc;
+	GLint	m_horrWaveProgTopBorderColorLoc;
+	GLint	m_horrWaveProgBottomBorderColorLoc;
+	GLint	m_horrWaveProgFrontFillLoc;
+	GLint	m_horrWaveProgBackFillLoc;
+
     GLuint  m_vertexArrayId;
     GLuint  m_vertexBufferId;
     GLfloat m_vertexBufferData[8];         // Space to store a quad (through triangle strip)

@@ -24,6 +24,7 @@
 
 #include <wg_gfxdevice_soft.h>
 #include <wg_surface_soft.h>
+#include <wg_base.h>
 
 #include <assert.h>
 #include <math.h>
@@ -45,14 +46,13 @@ WgGfxDeviceSoft::WgGfxDeviceSoft() : WgGfxDevice(WgSize(0,0))
 {
 	m_pCanvas = 0;
 	_initTables();
-	_genCurveTab();
 }
-
+ 
 WgGfxDeviceSoft::WgGfxDeviceSoft( WgSurfaceSoft * pCanvas ) : WgGfxDevice( pCanvas?pCanvas->Size():WgSize() )
 {
 	m_pCanvas = pCanvas;
+	WgGfxDevice::m_pCanvas = pCanvas;
 	_initTables();
-	_genCurveTab();
 }
 
 //____ Destructor ______________________________________________________________
@@ -61,14 +61,17 @@ WgGfxDeviceSoft::~WgGfxDeviceSoft()
 {
 	delete m_pCanvas;
 	delete [] m_pDivTab;
-	delete [] m_pCurveTab;
 }
 
 //____ SetCanvas() _______________________________________________________________
 
-void WgGfxDeviceSoft::SetCanvas( WgSurfaceSoft * pCanvas )
+bool WgGfxDeviceSoft::SetCanvas( WgSurface * pCanvas )
 {
-	m_pCanvas = pCanvas;
+	if (pCanvas && pCanvas->Type() != WgSurfaceSoft::GetClass() )
+		return false;
+
+	m_pCanvas = static_cast<WgSurfaceSoft*>(pCanvas);
+	WgGfxDevice::m_pCanvas = pCanvas;
 	if( pCanvas )
 		m_canvasSize = pCanvas->Size();
 	else
@@ -640,6 +643,315 @@ void WgGfxDeviceSoft::_clipDrawLineSegment( int clipStart, int clipEnd, Uint8 * 
 	}
 }
 
+//____ ClipDrawHorrWave() _____________________________________________________
+
+void WgGfxDeviceSoft::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topBorder, const WgWaveLine& bottomBorder, WgColor frontFill, WgColor backFill)
+{
+	if (!m_pCanvas || !m_pCanvas->m_pData)
+		return;
+
+	if (topBorder.length <= length || bottomBorder.length <= length)
+		length = WgMin(topBorder.length, bottomBorder.length) - 1;
+
+	// Do early rough X-clipping with margin (need to trace lines with margin of thickest line).
+
+	int ofs = 0;
+	if (clip.x > begin.x || clip.x + clip.w < begin.x + length)
+	{
+		int margin = (int)(WgMax(topBorder.thickness, bottomBorder.thickness) / 2 + 0.99);
+
+		if (clip.x > begin.x + margin)
+		{
+			ofs = clip.x - begin.x - margin;
+			begin.x += ofs;
+			length -= ofs;
+		}
+
+		if (begin.x + length - margin > clip.x + clip.w)
+			length = clip.x + clip.w - begin.x + margin;
+
+		if (length <= 0)
+			return;
+	}
+
+	// Generate line traces
+
+	int	bufferSize = (length + 1) * 2 * sizeof(int) * 2;	// length+1 * values per point * sizeof(int) * 2 separate traces.
+	char * pBuffer = WgBase::MemStackAlloc(bufferSize);
+	int * pTopBorderTrace = (int*)pBuffer;
+	int * pBottomBorderTrace = (int*)(pBuffer + bufferSize / 2);
+
+	_traceLine(pTopBorderTrace, topBorder.pWave + ofs, length + 1, topBorder.thickness);
+	_traceLine(pBottomBorderTrace, bottomBorder.pWave + ofs, length + 1, bottomBorder.thickness);
+
+	// Do proper X-clipping
+
+	int startColumn = 0;
+	if (begin.x < clip.x)
+	{
+		startColumn = clip.x - begin.x;
+		length -= startColumn;
+		begin.x += startColumn;
+	}
+
+	if (begin.x + length > clip.x + clip.w)
+		length = clip.x + clip.w - begin.x;
+
+	// Render columns
+
+	uint8_t * pColumn = m_pCanvas->m_pData + begin.y * m_pCanvas->m_pitch + begin.x * (m_pCanvas->m_pixelFormat.bits / 8);
+	int pos[2][4];						// Startpositions for the 4 fields of the column (topline, fill, bottomline, line end) for left and right edge of pixel column. 16 binals.
+
+	int clipBeg = clip.y - begin.y;
+	int clipLen = clip.h;
+
+	WgColor	col[4];
+	col[0] = topBorder.color;
+	col[1] = frontFill;
+	col[2] = bottomBorder.color;
+	col[3] = backFill;
+
+
+	for (int i = startColumn; i <= length + startColumn; i++)
+	{
+		// Old right pos becomes new left pos and old left pos will be reused for new right pos
+
+		int * pLeftPos = pos[i % 2];
+		int * pRightPos = pos[(i + 1) % 2];
+
+		// Check if lines have intersected and in that case swap top and bottom lines and colors
+
+		if (pTopBorderTrace[i * 2] > pBottomBorderTrace[i * 2])
+		{
+			std::swap(col[0], col[2]);
+			std::swap(col[1], col[3]);
+			std::swap(pTopBorderTrace, pBottomBorderTrace);
+
+			// We need to regenerate leftpos since we now have swapped top and bottom line.
+
+			if (i > startColumn)
+			{
+				int j = i - 1;
+				pLeftPos[0] = pTopBorderTrace[j * 2] << 8;
+				pLeftPos[1] = pTopBorderTrace[j * 2 + 1] << 8;
+
+				pLeftPos[2] = pBottomBorderTrace[j * 2] << 8;
+				pLeftPos[3] = pBottomBorderTrace[j * 2 + 1] << 8;
+
+				if (pLeftPos[2] < pLeftPos[1])
+				{
+					pLeftPos[2] = pLeftPos[1];
+					if (pLeftPos[3] < pLeftPos[2])
+						pLeftPos[3] = pLeftPos[2];
+				}
+			}
+		}
+
+		// Generate new rightpos table
+
+		pRightPos[0] = pTopBorderTrace[i * 2] << 8;
+		pRightPos[1] = pTopBorderTrace[i * 2 + 1] << 8;
+
+		pRightPos[2] = pBottomBorderTrace[i * 2] << 8;
+		pRightPos[3] = pBottomBorderTrace[i * 2 + 1] << 8;
+
+
+		if (pRightPos[2] < pRightPos[1])
+		{
+			pRightPos[2] = pRightPos[1];
+			if (pRightPos[3] < pRightPos[2])
+				pRightPos[3] = pRightPos[2];
+		}
+
+		// Render the column
+
+		if (i > startColumn)
+		{
+			_clipDrawWaveColumn(clipBeg, clipLen, pColumn, pLeftPos, pRightPos, col, m_pCanvas->m_pitch);
+			pColumn += m_pCanvas->m_pixelFormat.bits / 8;
+		}
+	}
+
+	// Free temporary work memory
+
+	WgBase::MemStackRelease(bufferSize);
+}
+
+
+//_____ _clipDrawWaveColumn() ________________________________________________
+
+void WgGfxDeviceSoft::_clipDrawWaveColumn(int clipBeg, int clipLen, uint8_t * pColumn, int leftPos[4], int rightPos[4], WgColor col[3], int linePitch)
+{
+	// 16 binals on leftPos, rightPos and most calculations.
+
+	int i = 0;
+
+	int amount[4];
+	int inc[4];
+
+	int columnBeg = (WgMin(leftPos[0], rightPos[0]) & 0xFFFF0000) + 32768;		// Column starts in middle of first pixel
+
+																				// Calculate start amount and increment for our 4 fields
+
+	for (int i = 0; i < 4; i++)
+	{
+		int yBeg;
+		int64_t xInc;
+
+		if (leftPos[i] < rightPos[i])
+		{
+			yBeg = leftPos[i];
+			xInc = (int64_t)65536 * 65536 / (rightPos[i] - leftPos[i] + 1);
+		}
+		else
+		{
+			yBeg = rightPos[i];
+			xInc = (int64_t)65536 * 65536 / (leftPos[i] - rightPos[i] + 1);
+		}
+
+		WG_LIMIT(xInc, (int64_t)0, (int64_t)65536);
+
+		inc[i] = (int)xInc;
+
+		int64_t startAmount = -((xInc * (yBeg - columnBeg)) >> 16);
+		amount[i] = (int)startAmount;
+	}
+
+	// Do clipping
+
+	if (columnBeg < (clipBeg << 16))
+	{
+		int64_t forwardAmount = (clipBeg << 16) - columnBeg;
+
+		for (int i = 0; i < 4; i++)
+			amount[i] += (inc[i] * forwardAmount) >> 16;
+
+		columnBeg = (clipBeg << 16);
+	}
+
+	uint8_t * pDstClip = pColumn + (clipBeg + clipLen) * linePitch;
+
+	// Render the column
+
+	uint8_t * pDst = pColumn + linePitch * (columnBeg >> 16);
+
+	switch (m_blendMode)
+	{
+	case WG_BLENDMODE_BLEND:
+	{
+		// First render loop, run until we are fully into fill (or later section).
+		// This needs to cover all possibilities since topLine, fill and bottomLine might be less than 1 pixel combined
+		// in which case they should all be rendered.
+
+		while (amount[1] < 65536 && pDst < pDstClip)
+		{
+			int aFrac = amount[0];
+			int bFrac = amount[1];
+			int cFrac = amount[2];
+			int dFrac = amount[3];
+			WG_LIMIT(aFrac, 0, 65536);
+			WG_LIMIT(bFrac, 0, 65536);
+			WG_LIMIT(cFrac, 0, 65536);
+			WG_LIMIT(dFrac, 0, 65536);
+
+			aFrac = ((aFrac - bFrac)*col[0].a) / 255;
+			bFrac = ((bFrac - cFrac)*col[1].a) / 255;
+			cFrac = ((cFrac - dFrac)*col[2].a) / 255;
+
+			int backFraction = 65536 - aFrac - bFrac - cFrac;
+
+			pDst[0] = (pDst[0] * backFraction + col[0].b * aFrac + col[1].b * bFrac + col[2].b * cFrac) >> 16;
+			pDst[1] = (pDst[1] * backFraction + col[0].g * aFrac + col[1].g * bFrac + col[2].g * cFrac) >> 16;
+			pDst[2] = (pDst[2] * backFraction + col[0].r * aFrac + col[1].r * bFrac + col[2].r * cFrac) >> 16;
+			pDst += linePitch;
+
+			for (int i = 0; i < 4; i++)
+				amount[i] += inc[i];
+		}
+
+		// Second render loop, optimzed fill-section loop until bottomLine starts to fade in.
+
+		if (amount[2] <= 0 && pDst < pDstClip)
+		{
+			if (col[1].a == 255)
+			{
+				while (amount[2] <= 0 && pDst < pDstClip)
+				{
+					pDst[0] = col[1].b;
+					pDst[1] = col[1].g;
+					pDst[2] = col[1].r;
+					pDst += linePitch;
+
+					amount[2] += inc[2];
+					amount[3] += inc[3];
+				}
+			}
+			else
+			{
+				int fillFrac = (65536 * col[1].a) / 255;
+
+				int fillB = col[1].b * fillFrac;
+				int fillG = col[1].g * fillFrac;
+				int fillR = col[1].r * fillFrac;
+				int backFraction = 65536 - fillFrac;
+
+				while (amount[2] <= 0 && pDst < pDstClip)
+				{
+					pDst[0] = (pDst[0] * backFraction + fillB) >> 16;
+					pDst[1] = (pDst[1] * backFraction + fillG) >> 16;
+					pDst[2] = (pDst[2] * backFraction + fillR) >> 16;
+					pDst += linePitch;
+
+					amount[2] += inc[2];
+					amount[3] += inc[3];
+				}
+			}
+		}
+
+
+		// Third render loop, from when bottom line has started to fade in.
+		// We can safely ignore topLine (not visible anymore) and amount[2] is guaranteed to have reached 65536.
+
+		while (amount[3] < 65536 && pDst < pDstClip)
+		{
+			int cFrac = amount[2];
+			int dFrac = amount[3];
+			WG_LIMIT(cFrac, 0, 65536);
+			WG_LIMIT(dFrac, 0, 65536);
+
+			int bFrac = ((65536 - cFrac)*col[1].a) / 255;
+			cFrac = ((cFrac - dFrac)*col[2].a) / 255;
+
+			int backFraction = 65536 - bFrac - cFrac;
+
+			pDst[0] = (pDst[0] * backFraction + col[1].b * bFrac + col[2].b * cFrac) >> 16;
+			pDst[1] = (pDst[1] * backFraction + col[1].g * bFrac + col[2].g * cFrac) >> 16;
+			pDst[2] = (pDst[2] * backFraction + col[1].r * bFrac + col[2].r * cFrac) >> 16;
+			pDst += linePitch;
+
+			amount[2] += inc[2];
+			amount[3] += inc[3];
+		}
+		break;
+	}
+
+	case WG_BLENDMODE_ADD:
+		break;
+
+	case WG_BLENDMODE_INVERT:
+		break;
+
+	case WG_BLENDMODE_MULTIPLY:
+		break;
+
+	case WG_BLENDMODE_OPAQUE:
+		break;
+
+	default:
+		break;
+
+	}
+}
 
 
 
@@ -1096,21 +1408,6 @@ void WgGfxDeviceSoft::_plotAA( int _x, int _y, const WgColor& _col, WgBlendMode 
 }
 
 
-//____ _genCurveTab() ___________________________________________________________
-
-void WgGfxDeviceSoft::_genCurveTab()
-{
-	m_pCurveTab = new int[NB_CURVETAB_ENTRIES];
-
-	double factor = 3.14159265 / (2.0 * NB_CURVETAB_ENTRIES); 
-
-	for( int i = 0 ; i < NB_CURVETAB_ENTRIES ; i++ )
-	{
-		double y = 1.f - i/(double)NB_CURVETAB_ENTRIES;
-		m_pCurveTab[i] = (int) (sqrt(1.f - y*y)*65536.f);
-	}		
-}
-
 
 //____ DrawElipse() _______________________________________________________________
 
@@ -1143,8 +1440,8 @@ void WgGfxDeviceSoft::DrawElipse( const WgRect& rect, WgColor color )
 
 	for( int i = 0 ; i < sectionHeight ; i++ )
 	{
-		peakOfs = ((m_pCurveTab[sinOfs>>16] * maxWidth) >> 8);
-		endOfs = (m_pCurveTab[(sinOfs+(sinOfsInc-1))>>16] * maxWidth) >> 8;
+		peakOfs = ((s_pCurveTab[sinOfs>>16] * maxWidth) >> 8);
+		endOfs = (s_pCurveTab[(sinOfs+(sinOfsInc-1))>>16] * maxWidth) >> 8;
 
 		_drawHorrFadeLine( pLineBeg + i*pitch, center + begOfs -256, center + peakOfs -256, center + endOfs, fillColor );
 		_drawHorrFadeLine( pLineBeg + i*pitch, center - endOfs, center - peakOfs, center - begOfs +256, fillColor );
@@ -1354,8 +1651,8 @@ void WgGfxDeviceSoft::ClipDrawElipse( const WgRect& clip, const WgRect& rect, Wg
 
 	for( int i = 0 ; i < sectionHeight ; i++ )
 	{
-		peakOfs = ((m_pCurveTab[sinOfs>>16] * maxWidth) >> 8);
-		endOfs = (m_pCurveTab[(sinOfs+(sinOfsInc-1))>>16] * maxWidth) >> 8;
+		peakOfs = ((s_pCurveTab[sinOfs>>16] * maxWidth) >> 8);
+		endOfs = (s_pCurveTab[(sinOfs+(sinOfsInc-1))>>16] * maxWidth) >> 8;
 
 		if( rect.y + i >= clip.y && rect.y + i < clip.y + clip.h ) 
 		{		
@@ -1390,7 +1687,7 @@ void WgGfxDeviceSoft::DrawFilledElipse( const WgRect& rect, WgColor color )
 	{
 		for( int i = 0 ; i < rect.h/2 ; i++ )
 		{
-			int lineLen = ((m_pCurveTab[sinOfs>>16] * rect.w/2 + 32768)>>16)*pixelBytes;
+			int lineLen = ((s_pCurveTab[sinOfs>>16] * rect.w/2 + 32768)>>16)*pixelBytes;
 			Uint8 * pLineBeg = pLineCenter - lineLen;
 			Uint8 * pLineEnd = pLineCenter + lineLen;
 
@@ -1432,7 +1729,7 @@ void WgGfxDeviceSoft::ClipDrawFilledElipse( const WgRect& clip, const WgRect& re
 		{
 			if( rect.y + j*(rect.h/2) + i >= clip.y && rect.y + j*(rect.h/2) + i < clip.y + clip.h )
 			{
-				int lineLen = ((m_pCurveTab[sinOfs>>16] * rect.w/2 + 32768)>>16);
+				int lineLen = ((s_pCurveTab[sinOfs>>16] * rect.w/2 + 32768)>>16);
 	
 				int beg = rect.x + rect.w/2 - lineLen;
 				int end = rect.x + rect.w/2 + lineLen;
@@ -1480,7 +1777,7 @@ void WgGfxDeviceSoft::DrawArcNE( const WgRect& rect, WgColor color )
 
 	for( int i = 0 ; i < rect.h ; i++ )
 	{
-		Uint8 * pLineEnd = pLineBeg + ((m_pCurveTab[sinOfs>>16] * rect.w + 32768)>>16)*pixelBytes;
+		Uint8 * pLineEnd = pLineBeg + ((s_pCurveTab[sinOfs>>16] * rect.w + 32768)>>16)*pixelBytes;
 
 		for( Uint8 * p = pLineBeg ; p < pLineEnd ; p += pixelBytes )
 		{

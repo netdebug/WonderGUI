@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wondergui", "wondergui.vcxproj", "{57861DF7-4FBE-4E46-9494-F953F233D7DC}"
 EndProject
@@ -12,6 +12,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bench", "bench\bench.vcxpro
 		{55FCC58E-4C41-4C36-B85D-CA2FC7F20EB2} = {55FCC58E-4C41-4C36-B85D-CA2FC7F20EB2}
 		{57861DF7-4FBE-4E46-9494-F953F233D7DC} = {57861DF7-4FBE-4E46-9494-F953F233D7DC}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wg_gl", "wg_gl\wg_gl.vcxproj", "{81D3EB2B-52E7-442A-9BA0-07F9585EF684}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,8 +33,15 @@ Global
 		{F79D7F0E-CAEC-411C-AF2B-4386559FC74B}.Debug|x86.Build.0 = Debug|Win32
 		{F79D7F0E-CAEC-411C-AF2B-4386559FC74B}.Release|x86.ActiveCfg = Release|Win32
 		{F79D7F0E-CAEC-411C-AF2B-4386559FC74B}.Release|x86.Build.0 = Release|Win32
+		{81D3EB2B-52E7-442A-9BA0-07F9585EF684}.Debug|x86.ActiveCfg = Debug|Win32
+		{81D3EB2B-52E7-442A-9BA0-07F9585EF684}.Debug|x86.Build.0 = Debug|Win32
+		{81D3EB2B-52E7-442A-9BA0-07F9585EF684}.Release|x86.ActiveCfg = Release|Win32
+		{81D3EB2B-52E7-442A-9BA0-07F9585EF684}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CDC0ADD9-D566-498E-8846-813DC41BE9FD}
 	EndGlobalSection
 EndGlobal
