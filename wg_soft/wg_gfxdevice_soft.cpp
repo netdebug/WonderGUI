@@ -650,9 +650,6 @@ void WgGfxDeviceSoft::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int le
 	if (!m_pCanvas || !m_pCanvas->m_pData)
 		return;
 
-	if (topBorder.length <= length || bottomBorder.length <= length)
-		length = WgMin(topBorder.length, bottomBorder.length) - 1;
-
 	// Do early rough X-clipping with margin (need to trace lines with margin of thickest line).
 
 	int ofs = 0;
@@ -681,8 +678,8 @@ void WgGfxDeviceSoft::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int le
 	int * pTopBorderTrace = (int*)pBuffer;
 	int * pBottomBorderTrace = (int*)(pBuffer + bufferSize / 2);
 
-	_traceLine(pTopBorderTrace, topBorder.pWave + ofs, length + 1, topBorder.thickness);
-	_traceLine(pBottomBorderTrace, bottomBorder.pWave + ofs, length + 1, bottomBorder.thickness);
+	_traceLine(pTopBorderTrace, length+1, topBorder, ofs);
+	_traceLine(pBottomBorderTrace, length+1, bottomBorder, ofs);
 
 	// Do proper X-clipping
 

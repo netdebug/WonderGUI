@@ -1404,8 +1404,8 @@ void WgGlGfxDevice::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int leng
 	int * pTopBorderTrace = (int*)pTraceBuffer;
 	int * pBottomBorderTrace = (int*)(pTraceBuffer + traceBufferSize / 2);
 
-	_traceLine(pTopBorderTrace, topBorder.pWave + ofs, length + 1, topBorder.thickness);
-	_traceLine(pBottomBorderTrace, bottomBorder.pWave + ofs, length + 1, bottomBorder.thickness);
+	_traceLine(pTopBorderTrace, length+1, topBorder, ofs);
+	_traceLine(pBottomBorderTrace, length+1, bottomBorder, ofs);
 
 
 

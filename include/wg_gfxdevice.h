@@ -55,10 +55,11 @@
 
 struct WgWaveLine
 {
-	int		length;
-	float	thickness;
-	WgColor	color;
-	int *	pWave;			// Pixel offset with 8 binals.
+	int			length;
+	float		thickness;
+	WgColor		color;
+	int *		pWave;			// Pixel offset in 24.8 format.
+	int			hold;			// Value for extending the line if it is too short (or completely missing).
 };
 
 class	WgBlock;
@@ -228,7 +229,7 @@ protected:
 	static	int		s_gfxDeviceCount;				// Number of existing gfxDevices. Ref count for shared data.
 
 	void	_genCurveTab();
-	void	_traceLine(int * pDest, int * pSrc, int nPoints, float thickness);
+	void	_traceLine(int * pDest, int nPoints, const WgWaveLine& wave, int offset);
 
 	const static int c_nCurveTabEntries = 1024;
 	static int *	s_pCurveTab;

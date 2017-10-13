@@ -1449,11 +1449,12 @@ void WgGfxDevice::_genCurveTab()
 
 //____ _traceLine() __________________________________________________________
 
-void WgGfxDevice::_traceLine(int * pDest, int * pSrc, int nPoints, float thickness)
+void WgGfxDevice::_traceLine(int * pDest, int nPoints, const WgWaveLine& wave, int offset)
 {
 	static int brush[128];
 	static float prevThickness = -1.f;
 
+	float thickness = wave.thickness;
 	int brushSteps = (int)(thickness / 2 + 0.99f);
 
 	// Generate brush
@@ -1461,16 +1462,20 @@ void WgGfxDevice::_traceLine(int * pDest, int * pSrc, int nPoints, float thickne
 	if (thickness != prevThickness)
 	{
 		int scaledThickness = (int)(thickness / 2 * 256);
-		for (int i = 0; i < brushSteps; i++)
-		{
+
+		brush[0] = scaledThickness;
+		for (int i = 1; i < brushSteps; i++)
 			brush[i] = (scaledThickness * s_pCurveTab[c_nCurveTabEntries - (i*c_nCurveTabEntries) / brushSteps - 1]) >> 16;
-			//				printf( "%d - %d - %d\n", i, brush[i], m_pCurveTab[(c_nCurveTabEntries - 1) - (i * c_nCurveTabEntries) / brushSteps]);
-		}
+		prevThickness = thickness;
 	}
+
+	int nTracePoints = WgMax(0, WgMin(nPoints, wave.length - offset));
+	int nFillPoints = nPoints - nTracePoints;
 
 	// Trace...
 
-	for (int i = 0; i < nPoints; i++)
+	int * pSrc = wave.pWave + offset;
+	for (int i = 0; i < nTracePoints; i++)
 	{
 		// Start with top and bottom for current point
 
@@ -1511,5 +1516,18 @@ void WgGfxDevice::_traceLine(int * pDest, int * pSrc, int nPoints, float thickne
 
 		*pDest++ = top;
 		*pDest++ = bottom;
+	}
+
+	// Fill...
+
+	if (nFillPoints)
+	{
+		int top = wave.hold - brush[0];
+		int bottom = wave.hold + brush[0];
+		for (int i = 0; i < nFillPoints; i++)
+		{
+			*pDest++ = top;
+			*pDest++ = bottom;
+		}
 	}
 }
