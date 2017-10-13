@@ -25,7 +25,7 @@
 #include <wg_boxskin.h>
 #include <wg_volumemeter.h>
 #include <wg_simplevolumemeter.h>
-
+#include <wg_chart.h>
 
 #include "testwidget.h"
 
@@ -285,7 +285,7 @@ int main ( int argc, char** argv )
 //		pRoot->AddDirtyPatch( pRoot->Geo().Size() );
 
 		SDL_LockSurface( pScreen );
-
+/*
 		pGfxDevice->BeginRender();
 
 		pGfxDevice->Fill(pCanvas->Size(), WgColor::black);
@@ -296,9 +296,9 @@ int main ( int argc, char** argv )
 		//		pGfxDevice->blit(pMyCanvas, { 0,0,400,400 }, { 0,0 });
 		//		pGfxDevice->stretchBlit(pMyCanvas, { 0,0,400,400 }, { 0,0,200,200 });
 		pGfxDevice->EndRender();
+*/
 
-
-//		pRoot->Render();
+		pRoot->Render();
 		SDL_UnlockSurface( pScreen );
 
         // DRAWING ENDS HERE
@@ -430,6 +430,147 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 	WgFlexHook * pHook = pFlex->AddChild( pBackground );
 	pHook->SetAnchored( WG_NORTHWEST, WG_SOUTHEAST );
+
+
+
+	// Chart widget
+
+	WgChart * pChart = new WgChart();
+
+	float topSamples[10] = { 1.f,0.75f,0.5f,1.f,1.f,0.8f,0.8f,1.f,0.1f,0.1f };
+	float bottomSamples[10] = { 0.f,0.f,-1.f,-1.f,-1.f,-0.5f,-0.5f, -0.5f, 0.f,0.f };
+
+	float topSamples2[3] = { 2.f,1.f,0.5f };
+	float bottomSamples2[3] = { 2.f,1.f,0.5f };
+
+	float	topWave[2001];
+	float		bottomWave[2001];
+
+	WgWaveLine	topLine, bottomLine;
+
+	for (int i = 0; i < 2001; i++)
+	{
+		topWave[i] = (sin(i / 10.0) * 80);
+		bottomWave[i] = (-100 + sin(i / 20.0) * 6);
+	}
+
+
+
+	WgBoxSkinPtr pChartSkin = WgBoxSkin::Create(WgColor::white, WgBorders(0), WgColor::red);
+//	pChartSkin->SetContentPadding({ 20 });
+
+	int iWave = pChart->AddWave();
+	pChart->SetWaveSamples(iWave, 0, 1001, topWave, bottomWave);
+	pChart->SetWaveStyle(iWave, WgColor::antiquewhite, WgColor::brown, 2.f, WgColor::black, 8.f, WgColor::black);
+
+//	int iWave2 = pChart->AddWave();
+//	pChart->SetWaveSamples(iWave2, 2, 3, topSamples2, bottomSamples2, 0);
+
+
+	pChart->SetSkin( pChartSkin );
+	pChart->SetCanvasPadding({ 10 });
+
+	pChart->SetFixedValueRange(pChart->ValueRangeStart()+20, pChart->ValueRangeEnd()-20);
+
+	WgChart::GridLine valueGrid[3]{ {0.f,1.f,WgColor::red,"0"},{ 100.f,1.f,WgColor::red,"100" },{ -100.f,1.f,WgColor::red,"-100" } };
+
+	WgChart::GridLine sampleGrid[2]{ { 0.f,1.f,WgColor::grey,"0" },{ 100.f,1.f,WgColor::grey,"100" } };
+
+
+	WgBoxSkinPtr pLabelSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
+	pLabelSkin->SetContentPadding(3);
+
+	pChart->SetValueGridLines(3, valueGrid);
+	pChart->SetSampleGridLines(2, sampleGrid);
+	pChart->SetSampleLabelStyle(WG_CENTER, { 0,0 }, pLabelSkin, 0 );
+
+	pChart->SetValueLabelStyle(WG_SOUTHEAST, { 0,0 }, pLabelSkin, 0);
+
+
+//	pChart->SetFixedValueRange(-1, 1);
+
+
+	auto pWindow = new WgPackPanel();
+	pWindow->SetOrientation(WG_VERTICAL);
+	pWindow->SetSizeBroker(new WgUniformSizeBroker());
+
+	pWindow->AddChild(pChart)->SetWeight(2);
+
+
+	auto pButtonBar = new WgPackPanel();
+	pButtonBar->SetSizeBroker(new WgUniformSizeBroker());
+
+	auto pFiller = new WgFiller();
+	pFiller->SetColors(WgColorset::Create(WgColor::grey));
+
+
+	auto pValueScaleButton = (WgButton*)pDB->CloneWidget("button");
+	pValueScaleButton->SetText(" ");
+	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pValueScaleButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
+	{
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+
+		WgChart * pChart = static_cast<WgChart*>(pWin);
+
+		float first = pChart->ValueRangeStart() - drag.x / 5.f;
+		float last = pChart->ValueRangeEnd() + drag.x / 5.f;
+
+		pChart->SetFixedValueRange(first, last);
+	}, pChart);
+
+
+	auto pZoomButton = (WgButton*)pDB->CloneWidget("button");
+	pZoomButton->SetText(" ");
+	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pZoomButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
+	{
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+
+		WgChart * pChart = static_cast<WgChart*>(pWin);
+
+		float first = pChart->FirstSample();
+		float last = pChart->LastSample() + drag.x / 5.f;
+
+		pChart->SetFixedSampleRange(first, last);
+	}, pChart);
+
+
+	auto pScrollButton = (WgButton*)pDB->CloneWidget("button");
+	pScrollButton->SetText(" ");
+	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pScrollButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
+	{
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+
+		WgChart * pChart = static_cast<WgChart*>(pWin);
+
+		float first = pChart->FirstSample() + drag.x / 10.f;
+		float last = pChart->LastSample() + drag.x / 10.f;
+
+		pChart->SetFixedSampleRange(first,last);
+	}, pChart);
+
+
+	auto pResizeButton = (WgButton*)pDB->CloneWidget("button");
+	pResizeButton->SetText(" ");
+	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pResizeButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
+	{ 
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+		static_cast<WgFlexHook*>(pWin->Hook())->SetSize(WgSize(pWin->Size() + WgSize(drag.x, drag.y))/2); 
+	}, pWindow);
+
+	pButtonBar->AddChild(pFiller)->SetWeight(2);
+	pButtonBar->AddChild(pValueScaleButton)->SetWeight(0);
+	pButtonBar->AddChild(pZoomButton)->SetWeight(0);
+	pButtonBar->AddChild(pScrollButton)->SetWeight(0);
+	pButtonBar->AddChild(pResizeButton)->SetWeight(0);
+	pWindow->AddChild(pButtonBar)->SetWeight(0);
+
+
+
+	pHook = pFlex->AddChild(pWindow, WgRect(10, 10, 500, 300) );
+
+	pHook->SetScaleGeo(true);
+
+	pFlex->SetScale(WG_SCALE_BASE*2);
 
 
 	// LED Volume meter
@@ -661,7 +802,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 */
 
 	// Test oscilloscope
-
+/*
 	{
 		WgSurface * pImg = sdl_wglib::LoadSurface("../resources/blocks.png", WgSurfaceFactorySoft() );
 
@@ -684,7 +825,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 		
 		g_pOsc = pOsc;
 	}
-
+*/
 	// Test combobox
 /*
 	{
@@ -699,7 +840,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 	}
 */
-
+/*
 	// Test view
 
 	{
@@ -710,7 +851,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 		pView->SetContent( pImage );
 		addResizablePanel( pFlex, pView, pEventHandler );
 	}
-
+*/
 
 	// Test overlapping non-visible
 /*

@@ -92,6 +92,7 @@
     <ClInclude Include="include\wg_char.h" />
     <ClInclude Include="include\wg_charbuffer.h" />
     <ClInclude Include="include\wg_charseq.h" />
+    <ClInclude Include="include\wg_chart.h" />
     <ClInclude Include="include\wg_checkbox.h" />
     <ClInclude Include="include\wg_codepages.h" />
     <ClInclude Include="include\wg_color.h" />
@@ -197,6 +198,7 @@
     <ClCompile Include="source\wg_char.cpp" />
     <ClCompile Include="source\wg_charbuffer.cpp" />
     <ClCompile Include="source\wg_charseq.cpp" />
+    <ClCompile Include="source\wg_chart.cpp" />
     <ClCompile Include="source\wg_checkbox.cpp" />
     <ClCompile Include="source\wg_codepages.cpp" />
     <ClCompile Include="source\wg_color.cpp" />
