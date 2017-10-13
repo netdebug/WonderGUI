@@ -151,7 +151,7 @@ void WgBoxSkin::SetStateColor( WgStateEnum state, WgColor color, WgColor frameCo
 #ifdef SOFTUBE_USE_PACE_FUSION
 PACE_FUSION_NO_USER_CALLBACK
 #endif
-void WgBoxSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip ) const
+void WgBoxSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip, int scale ) const
 {
 	int i = _stateToIndex(state);
 	if( m_frame.Width() + m_frame.Height() == 0 )
@@ -160,11 +160,13 @@ void WgBoxSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _can
 	}
 	else
 	{
-		WgRect top( WgRect(_canvas.x, _canvas.y, _canvas.w, m_frame.top), _clip );
-		WgRect left( WgRect(_canvas.x, _canvas.y+m_frame.top, m_frame.left, _canvas.h - m_frame.Height()), _clip );
-		WgRect right( WgRect(_canvas.x + _canvas.w - m_frame.right, _canvas.y+m_frame.top, m_frame.right, _canvas.h - m_frame.Height()), _clip );
-		WgRect bottom( WgRect(_canvas.x, _canvas.y + _canvas.h - m_frame.bottom, _canvas.w, m_frame.bottom), _clip );
-		WgRect center( _canvas - m_frame, _clip );
+		WgBorders frame(m_frame.left *scale >> WG_SCALE_BINALS, m_frame.top *scale >> WG_SCALE_BINALS, m_frame.right *scale >> WG_SCALE_BINALS, m_frame.bottom *scale >> WG_SCALE_BINALS);
+
+		WgRect top( WgRect(_canvas.x, _canvas.y, _canvas.w, frame.top), _clip );
+		WgRect left( WgRect(_canvas.x, _canvas.y+frame.top, frame.left, _canvas.h - frame.Height()), _clip );
+		WgRect right( WgRect(_canvas.x + _canvas.w - frame.right, _canvas.y+frame.top, frame.right, _canvas.h - frame.Height()), _clip );
+		WgRect bottom( WgRect(_canvas.x, _canvas.y + _canvas.h - frame.bottom, _canvas.w, frame.bottom), _clip );
+		WgRect center( _canvas - frame, _clip );
 
 		pDevice->Fill( top, m_frameColor[i] );
 		pDevice->Fill( left, m_frameColor[i] );
@@ -178,44 +180,44 @@ void WgBoxSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _can
 
 //____ MinSize() ______________________________________________________________
 
-WgSize WgBoxSkin::MinSize() const
+WgSize WgBoxSkin::MinSize(int scale) const
 {
-	WgSize content = WgExtendedSkin::MinSize();
-	WgSize frame = m_frame.Size();
+	WgSize content = WgExtendedSkin::MinSize(scale);
+	WgSize frame = _scaledFrame(scale);
 
 	return WgSize( WgMax(content.w,frame.w), WgMax(content.h,frame.h) );
 }
 
 //____ PreferredSize() ________________________________________________________
 
-WgSize WgBoxSkin::PreferredSize() const
+WgSize WgBoxSkin::PreferredSize(int scale) const
 {
-	WgSize content = WgExtendedSkin::PreferredSize();
-	WgSize frame = m_frame.Size();
+	WgSize content = WgExtendedSkin::PreferredSize(scale);
+	WgSize frame = _scaledFrame(scale);
 
 	return WgSize( WgMax(content.w,frame.w), WgMax(content.h,frame.h) );
 }
 
 //____ SizeForContent() _______________________________________________________
 
-WgSize WgBoxSkin::SizeForContent( const WgSize contentSize ) const
+WgSize WgBoxSkin::SizeForContent( const WgSize contentSize, int scale ) const
 {
-	WgSize content = WgExtendedSkin::SizeForContent(contentSize);
-	WgSize frame = m_frame.Size();
+	WgSize content = WgExtendedSkin::SizeForContent(contentSize, scale);
+	WgSize frame = _scaledFrame(scale);
 
 	return WgSize( WgMax(content.w,frame.w), WgMax(content.h,frame.h) );
 }
 
 //____ MarkTest() _____________________________________________________________
 
-bool WgBoxSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const
+bool WgBoxSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const
 {
 	if( m_bOpaque )
 		return true;
 
 	int i = _stateToIndex(state);
 
-	WgRect center = WgRect(canvasSize) - m_frame;
+	WgRect center = ContentRect(WgRect(canvasSize), state, scale);
 	if( center.Contains(ofs) )
 		return m_color[i].a >= opacityTreshold;
 	else
@@ -242,12 +244,12 @@ bool WgBoxSkin::IsOpaque( WgState state ) const
 	return false;
 }
 
-bool WgBoxSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state ) const
+bool WgBoxSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state, int scale ) const
 {
 	if( m_bOpaque )
 		return true;
 
-	WgRect center = WgRect(canvasSize) - m_frame;
+	WgRect center = ContentRect(WgRect(canvasSize), state, scale);
 	int i = _stateToIndex(state);
 	if( center.Contains(rect) )
 		return m_color[i].a == 255;

@@ -49,23 +49,25 @@ public:
 	void	SetStateColor( WgStateEnum state, WgColor color );
 	void	SetStateColor( WgStateEnum state, WgColor color, WgColor frameColor );
 
-	void Render( WgGfxDevice * pDevice, WgState mode, const WgRect& _canvas, const WgRect& _clip ) const;
+	void Render( WgGfxDevice * pDevice, WgState mode, const WgRect& _canvas, const WgRect& _clip, int scale ) const;
 	
-	WgSize	MinSize() const;
-	WgSize	PreferredSize() const;
+	WgSize	MinSize(int scale) const;
+	WgSize	PreferredSize(int scale) const;
 
-	WgSize	SizeForContent( const WgSize contentSize ) const;
-	bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const;
+	WgSize	SizeForContent( const WgSize contentSize, int scale ) const;
+	bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const;
 
 	bool	IsOpaque() const;
 	bool	IsOpaque( WgState state ) const;
-	bool	IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state ) const;
+	bool	IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state, int scale ) const;
 
 
 private:
 	WgBoxSkin();
 	WgBoxSkin( WgColor color, WgBorders frame, WgColor frameColor );
 	void	_updateOpaqueFlag();
+	inline WgSize _scaledFrame(int scale) const { return WgSize((m_frame.Width()*scale) >> WG_SCALE_BINALS, (m_frame.Height()*scale) >> WG_SCALE_BINALS); }
+
 
 	bool		m_bOpaque;
 	WgColor		m_color[WG_NB_STATES];

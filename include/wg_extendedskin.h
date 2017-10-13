@@ -40,13 +40,16 @@ public:
 	virtual void	SetSelectedContentShift( WgCoord shift );
 	virtual void	SetFocusedContentShift( WgCoord shift );
 
-	virtual WgSize	MinSize() const;
-	virtual WgSize	PreferredSize() const;
+	virtual WgSize	MinSize( int scale ) const;
+	virtual WgSize	PreferredSize( int scale ) const;
 
-	virtual WgSize	SizeForContent( const WgSize contentSize ) const;
-	virtual WgRect	ContentRect( const WgRect& canvas, WgState state ) const;
+	virtual WgSize	SizeForContent( const WgSize contentSize, int scale ) const;
+	virtual WgRect	ContentRect( const WgRect& canvas, WgState state, int scale ) const;
 
 protected:
+
+	inline WgSize _scaledContentPadding(int scale) const { return WgSize((m_contentPadding.Width()*scale) >> WG_SCALE_BINALS, (m_contentPadding.Height()*scale) >> WG_SCALE_BINALS); }
+
 	WgBorders	m_contentPadding;
 	WgCoord		m_contentShift[WG_NB_STATES];	
 };

@@ -232,7 +232,7 @@ void WgBlockSkin::_scanStateBlockSectionArea( StateData * pState, WgOrigo sectio
 
 //____ Render() _______________________________________________________________
 	
-void WgBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip ) const
+void WgBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip, int scale ) const
 {
 	if( !m_pSurface )
 		return;
@@ -462,26 +462,26 @@ void WgBlockSkin::_renderNoClip( WgGfxDevice * pDevice, const StateData * pState
 
 //____ MinSize() ______________________________________________________________
 
-WgSize WgBlockSkin::MinSize() const
+WgSize WgBlockSkin::MinSize(int scale) const
 {
-	WgSize content = WgExtendedSkin::MinSize();
+	WgSize content = WgExtendedSkin::MinSize(scale);
 	WgSize frame = m_frame.Size();
 	return WgSize( WgMax(content.w, frame.w), WgMax(content.h, frame.h) );
 }
 
 //____ PreferredSize() ________________________________________________________
 
-WgSize WgBlockSkin::PreferredSize() const
+WgSize WgBlockSkin::PreferredSize(int scale) const
 {
-	WgSize sz = WgExtendedSkin::PreferredSize();
+	WgSize sz = WgExtendedSkin::PreferredSize(scale);
 	return WgSize( WgMax(m_dimensions.w,sz.w),WgMax(m_dimensions.h,sz.h) );
 }
 
 //____ SizeForContent() _______________________________________________________
 
-WgSize WgBlockSkin::SizeForContent( const WgSize contentSize ) const
+WgSize WgBlockSkin::SizeForContent( const WgSize contentSize, int scale ) const
 {
-	WgSize sz = WgExtendedSkin::SizeForContent(contentSize);
+	WgSize sz = WgExtendedSkin::SizeForContent(contentSize, scale);
 	WgSize min = m_frame.Size();
 
 	return WgSize( WgMax(sz.w,min.w), WgMax(sz.h,min.h) );
@@ -489,7 +489,7 @@ WgSize WgBlockSkin::SizeForContent( const WgSize contentSize ) const
 
 //____ MarkTest() _____________________________________________________________
 
-bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const
+bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const
 {
 	if( !m_pSurface )
 		return false;
@@ -596,7 +596,7 @@ bool WgBlockSkin::IsOpaque( WgState state ) const
 	return (m_state[_stateToIndex(state)].opaqueSections == ALL_SECTIONS);
 }
 
-bool WgBlockSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state ) const
+bool WgBlockSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state, int scale ) const
 {
 	// Quick exit in optimal case
 

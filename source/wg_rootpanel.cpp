@@ -297,7 +297,7 @@ bool WgRootPanel::RenderSection( const WgRect& _clip )
 		
 		for( const WgRect * pRect = m_afterglowRects[0].Begin() ; pRect != m_afterglowRects[0].End() ; pRect++ )
 		{
-			m_pUpdatedRectOverlay->Render( m_pGfxDevice, WG_STATE_FOCUSED, *pRect, clip );
+			m_pUpdatedRectOverlay->Render( m_pGfxDevice, WG_STATE_FOCUSED, *pRect, clip, WG_SCALE_BASE );		// Overlays are not scaled
 		}		
 
 		// Render overlays that have turned into afterglow
@@ -306,7 +306,7 @@ bool WgRootPanel::RenderSection( const WgRect& _clip )
 		{
 			for( const WgRect * pRect = m_afterglowRects[1].Begin() ; pRect != m_afterglowRects[1].End() ; pRect++ )
 			{
-				m_pUpdatedRectOverlay->Render( m_pGfxDevice, WG_STATE_NORMAL, *pRect, clip );
+				m_pUpdatedRectOverlay->Render( m_pGfxDevice, WG_STATE_NORMAL, *pRect, clip, WG_SCALE_BASE );	// Overlays are not scaled
 			}		
 		}
 

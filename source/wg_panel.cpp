@@ -79,7 +79,7 @@ void WgPanel::SetSkin( const WgSkinPtr& pSkin )
 bool WgPanel::_onAlphaTest( const WgCoord& ofs )
 {
 	if( m_pSkin )
-		return m_pSkin->MarkTest( ofs, Size(), WG_STATE_NORMAL, m_markOpacity);
+		return m_pSkin->MarkTest( ofs, Size(), WG_STATE_NORMAL, m_markOpacity, m_scale);
 	else
 		return false;		// By default cointainers have nothing to display themselves.
 }
@@ -146,7 +146,7 @@ void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRec
 void WgPanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
 	if( m_pSkin )
-		m_pSkin->Render( pDevice, WG_STATE_NORMAL,_canvas, _clip );
+		m_pSkin->Render( pDevice, WG_STATE_NORMAL,_canvas, _clip, m_scale );
 }
 
 //____ WgPanelHook::Parent() __________________________________________________

@@ -38,7 +38,7 @@ WgColorSkin::WgColorSkin( WgColor col )
 }
 
 	
-void WgColorSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip ) const
+void WgColorSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip, int scale ) const
 {
     
 	pDevice->Fill( WgRect(_clip, _canvas), m_color );
@@ -54,32 +54,32 @@ bool WgColorSkin::IsOpaque(WgState state) const
 	return m_color.a == 255 ? true : false;
 }
 
-bool WgColorSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state ) const
+bool WgColorSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state, int scale ) const
 {
 	return m_color.a == 255 ? true : false;
 }
 
-WgSize WgColorSkin::MinSize() const
+WgSize WgColorSkin::MinSize(int scale) const
 {
 	return WgSize(0,0);
 }
 
-WgSize WgColorSkin::PreferredSize() const
+WgSize WgColorSkin::PreferredSize(int scale) const
 {
 	return WgSize(0,0);
 }
 
-WgSize  WgColorSkin::SizeForContent( const WgSize contentSize ) const
+WgSize  WgColorSkin::SizeForContent( const WgSize contentSize, int scale ) const
 {
 	return contentSize;
 }
 
-WgRect  WgColorSkin::ContentRect( const WgRect& canvas, WgState state ) const
+WgRect  WgColorSkin::ContentRect( const WgRect& canvas, WgState state, int scale ) const
 {
 	return canvas;
 }
 
-bool WgColorSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const
+bool WgColorSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const
 {
 	return m_color.a >= opacityTreshold ? true : false;
 }

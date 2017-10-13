@@ -90,29 +90,33 @@ void WgExtendedSkin::SetFocusedContentShift( WgCoord shift )
 
 //____ MinSize() ______________________________________________________________
 
-WgSize WgExtendedSkin::MinSize() const
+WgSize WgExtendedSkin::MinSize(int scale) const
 {
-	return WgSize(m_contentPadding.Width(), m_contentPadding.Height() );
+	return _scaledContentPadding(scale);
 }
 
 //____ MinSize() ______________________________________________________________
 
-WgSize WgExtendedSkin::PreferredSize() const
+WgSize WgExtendedSkin::PreferredSize(int scale) const
 {
-	return WgSize(m_contentPadding.Width(), m_contentPadding.Height() );
+	return _scaledContentPadding(scale);
 }
 
 //____ SizeForContent() _______________________________________________________
 
-WgSize WgExtendedSkin::SizeForContent( const WgSize contentSize ) const
+WgSize WgExtendedSkin::SizeForContent( const WgSize contentSize, int scale ) const
 {
-	return contentSize + m_contentPadding;
+	return contentSize + _scaledContentPadding(scale);
 }
 
 //____ ContentRect() __________________________________________________________
 
-WgRect WgExtendedSkin::ContentRect( const WgRect& canvas, WgState state ) const
+WgRect WgExtendedSkin::ContentRect( const WgRect& canvas, WgState state, int scale ) const
 {
-	return (canvas - m_contentPadding) + m_contentShift[_stateToIndex(state)];
-}
+	WgCoord shift = m_contentShift[_stateToIndex(state)];
+	shift.x = shift.x * scale >> WG_SCALE_BINALS;
+	shift.y = shift.y * scale >> WG_SCALE_BINALS;
 
+	WgBorders padding(m_contentPadding.left *scale >> WG_SCALE_BINALS, m_contentPadding.top *scale >> WG_SCALE_BINALS, m_contentPadding.right *scale >> WG_SCALE_BINALS, m_contentPadding.bottom *scale >> WG_SCALE_BINALS);
+	return (canvas - padding) + shift;
+}

@@ -45,19 +45,19 @@ class WgSkin : public WgRefCounted
 public:
 	virtual ~WgSkin() {};
 	
-	virtual void Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip ) const = 0;
+	virtual void Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip, int scale ) const = 0;
 
-	virtual WgSize	MinSize() const = 0;
-	virtual WgSize	PreferredSize() const = 0;
+	virtual WgSize	MinSize( int scale ) const = 0;
+	virtual WgSize	PreferredSize( int scale ) const = 0;
 
-	virtual WgSize	SizeForContent( const WgSize contentSize ) const = 0;
-	virtual WgRect	ContentRect( const WgRect& canvas, WgState state ) const = 0;
+	virtual WgSize	SizeForContent( const WgSize contentSize, int scale ) const = 0;
+	virtual WgRect	ContentRect( const WgRect& canvas, WgState state, int scale ) const = 0;
 
-	virtual bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold ) const = 0;
+	virtual bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const = 0;
 
 	virtual bool	IsOpaque() const = 0;
 	virtual bool	IsOpaque( WgState state ) const = 0;
-	virtual bool	IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state ) const = 0;
+	virtual bool	IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state, int scale ) const = 0;
 	
 protected:
 	WgSkin() {};
