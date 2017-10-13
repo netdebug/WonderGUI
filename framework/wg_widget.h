@@ -130,6 +130,8 @@ public:
 	WgCoord			Local2abs( const WgCoord& cord ) const;		// Cordinate from local cordsys to global
 	WgCoord			Abs2local( const WgCoord& cord ) const; 		// Cordinate from global to local cordsys
 
+    int Scale() const { return m_scale; }
+    
 	// To be overloaded by Widget
 
 	virtual int		HeightForWidth( int width ) const;

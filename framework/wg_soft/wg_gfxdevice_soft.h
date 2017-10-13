@@ -42,7 +42,7 @@ public:
 	~WgGfxDeviceSoft();
 
 	bool	SetCanvas( WgSurface * pCanvas );
-	 
+
 	//
 
 	void	Fill( const WgRect& rect, const WgColor& col );

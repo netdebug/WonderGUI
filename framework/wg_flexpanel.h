@@ -106,7 +106,11 @@ public:
 	int				AnchorBottomRight() const { return m_anchorBottomRight; }
 
 	// Standard Hook methods
-
+    
+    WgCoord PointPos() const;
+    WgSize  PointSize() const;
+    WgRect  PointGeo() const;
+    
 	WgCoord			Pos() const { return m_realGeo.Pos(); }
 	WgSize			Size() const { 	return m_realGeo.Size(); }
 	WgRect			Geo() const { return m_realGeo; }

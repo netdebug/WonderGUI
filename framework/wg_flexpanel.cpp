@@ -85,6 +85,21 @@ bool WgFlexHook::SetAnchored()
 	return true;
 }
 
+WgCoord WgFlexHook::PointPos() const
+{
+    return WgCoord( (m_realGeo.x << WG_SCALE_BINALS) / m_pParent->m_scale, (m_realGeo.y << WG_SCALE_BINALS) / m_pParent->m_scale);
+}
+
+WgSize WgFlexHook::PointSize() const
+{
+    return WgSize((m_realGeo.w << WG_SCALE_BINALS) / m_pParent->m_scale, (m_realGeo.h << WG_SCALE_BINALS) / m_pParent->m_scale);
+}
+
+WgRect WgFlexHook::PointGeo() const
+{
+    return WgRect((m_realGeo.x << WG_SCALE_BINALS) / m_pParent->m_scale, (m_realGeo.y << WG_SCALE_BINALS) / m_pParent->m_scale, (m_realGeo.w << WG_SCALE_BINALS) / m_pParent->m_scale, (m_realGeo.h << WG_SCALE_BINALS) / m_pParent->m_scale);
+}
+
 bool  WgFlexHook::SetAnchored( int anchorTopLeft, int anchorBottomRight, WgBorders padding )
 {
 	int nbAnchors = m_pParent->NbAnchors();
