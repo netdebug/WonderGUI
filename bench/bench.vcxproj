@@ -45,7 +45,7 @@
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\..\glew\include;..\..\freetype\include;..;$(IncludePath)</IncludePath>
+    <IncludePath>..\framework;..\framework\opengl;..\framework\wg_soft;..\..\glew\include;..\..\freetype\include;..;$(IncludePath)</IncludePath>
     <LibraryPath>..\Debug;..\..\SDL2\lib\x86;..\..\SDL2_image\lib\x86;..\..\freetype\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

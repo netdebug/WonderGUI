@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="wg_glgfxdevice.cpp" />
-    <ClCompile Include="wg_glsurface.cpp" />
-    <ClCompile Include="wg_glsurfacefactory.cpp" />
+    <ClCompile Include="..\framework\opengl\wg_glgfxdevice.cpp" />
+    <ClCompile Include="..\framework\opengl\wg_glsurface.cpp" />
+    <ClCompile Include="..\framework\opengl\wg_glsurfacefactory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="wg_glgfxdevice.h" />
-    <ClInclude Include="wg_glsurface.h" />
-    <ClInclude Include="wg_glsurfacefactory.h" />
+    <ClInclude Include="..\framework\opengl\wg_glgfxdevice.h" />
+    <ClInclude Include="..\framework\opengl\wg_glsurface.h" />
+    <ClInclude Include="..\framework\opengl\wg_glsurfacefactory.h" />
   </ItemGroup>
 </Project>

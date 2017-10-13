@@ -10,6 +10,16 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\framework\wg_soft\wg_gfxdevice_soft.cpp" />
+    <ClCompile Include="..\framework\wg_soft\wg_surfacefactory_soft.cpp" />
+    <ClCompile Include="..\framework\wg_soft\wg_surface_soft.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\framework\wg_soft\wg_gfxdevice_soft.h" />
+    <ClInclude Include="..\framework\wg_soft\wg_surfacefactory_soft.h" />
+    <ClInclude Include="..\framework\wg_soft\wg_surface_soft.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{55FCC58E-4C41-4C36-B85D-CA2FC7F20EB2}</ProjectGuid>
     <RootNamespace>wg_soft</RootNamespace>
@@ -44,6 +54,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
+    <IncludePath>..\framework\wg_soft;..\framework;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
@@ -75,16 +86,6 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="wg_gfxdevice_soft.cpp" />
-    <ClCompile Include="wg_surfacefactory_soft.cpp" />
-    <ClCompile Include="wg_surface_soft.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="wg_gfxdevice_soft.h" />
-    <ClInclude Include="wg_surfacefactory_soft.h" />
-    <ClInclude Include="wg_surface_soft.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

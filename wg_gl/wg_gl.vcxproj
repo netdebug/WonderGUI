@@ -11,14 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="wg_glgfxdevice.cpp" />
-    <ClCompile Include="wg_glsurface.cpp" />
-    <ClCompile Include="wg_glsurfacefactory.cpp" />
+    <ClCompile Include="..\framework\opengl\wg_glgfxdevice.cpp" />
+    <ClCompile Include="..\framework\opengl\wg_glsurface.cpp" />
+    <ClCompile Include="..\framework\opengl\wg_glsurfacefactory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="wg_glgfxdevice.h" />
-    <ClInclude Include="wg_glsurface.h" />
-    <ClInclude Include="wg_glsurfacefactory.h" />
+    <ClInclude Include="..\framework\opengl\wg_glgfxdevice.h" />
+    <ClInclude Include="..\framework\opengl\wg_glsurface.h" />
+    <ClInclude Include="..\framework\opengl\wg_glsurfacefactory.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{81D3EB2B-52E7-442A-9BA0-07F9585EF684}</ProjectGuid>
@@ -54,7 +54,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
-    <IncludePath>..\freetype\include;..\..\glew\include;..\freetype\include\freetype2;.;$(IncludePath)</IncludePath>
+    <IncludePath>..\freetype\include;..\..\glew\include;..\freetype\include\freetype2;.;..\framework;..\framework\opengl;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
