@@ -35,7 +35,7 @@ static const char	c_widgetType[] = {"Chart"};
 
 WgChart::WgChart()
 {
-	m_defaultSize = WgSize(1,1);
+	m_defaultSize = WgSize(200,100);
 	m_bOpaque = false;
 	m_mode = WG_MODE_NORMAL;
 
@@ -75,9 +75,9 @@ const char * WgChart::GetClass()
 	return c_widgetType;
 }
 
-//____ SetPreferredSizeInPoints() _______________________________________________________
+//____ SetPreferredChartSize() _______________________________________________________
 
-void WgChart::SetPreferredSizeInPoints( const WgSize& size )
+void WgChart::SetPreferredChartSize( const WgSize& size )
 {
 	if( size != m_defaultSize )
 	{
@@ -92,6 +92,7 @@ WgSize WgChart::PreferredSize() const
 {
 	WgSize sz = (m_defaultSize * m_scale) / WG_SCALE_BASE;
 
+	sz += m_pixelPadding;
 	if (m_pSkin)
 		sz = m_pSkin->SizeForContent(sz,m_scale);
 
@@ -112,11 +113,14 @@ void WgChart::SetSkin(const WgSkinPtr& pSkin)
 void WgChart::SetCanvasPadding(WgBorders padding)
 {
 	m_pointPadding = padding;
-	m_pixelPadding = WgBorders( (padding.left * m_scale) >> WG_SCALE_BINALS, (padding.top * m_scale) >> WG_SCALE_BINALS, 
-								(padding.right * m_scale) >> WG_SCALE_BINALS, (padding.bottom * m_scale) >> WG_SCALE_BINALS );
+	WgBorders pixelPadding( (padding.left * m_scale) >> WG_SCALE_BINALS, (padding.top * m_scale) >> WG_SCALE_BINALS, 
+							(padding.right * m_scale) >> WG_SCALE_BINALS, (padding.bottom * m_scale) >> WG_SCALE_BINALS );
 
-	if (m_resizeResponder)
-		m_resizeResponder(this, Size() - m_pixelPadding);
+	if (pixelPadding != m_pixelPadding)
+	{
+		m_pixelPadding = pixelPadding;
+		_resampleAllWaves();
+	}
 }
 
 //____ CanvasPadding() ________________________________________________________
@@ -568,7 +572,7 @@ bool WgChart::_onAlphaTest( const WgCoord& ofs )
 void WgChart::_onNewSize(const WgSize& size)
 {
 	if (m_resizeResponder)
-		m_resizeResponder(this, size - m_pixelPadding);
+		m_resizeResponder(this, size);
 
 	_resampleAllWaves();
 	WgWidget::_onNewSize(size);
@@ -580,9 +584,9 @@ void WgChart::_setScale(int scale)
 {
 	WgWidget::_setScale(scale);
 
+	SetCanvasPadding(m_pointPadding);		// Update m_pixelPadding and resample if needed.
 	_requestResize();
 	_requestRender();
-//	_resampleAllWaves();					//This is wasteful, we are doing it twice if we got resized!
 }
 
 
