@@ -221,6 +221,7 @@ protected:
 
 	bool			m_bEnabled;		// Set when object is not disabled
 	bool			m_bFocused;		// Set when object is enabled and has keyboard focus
+	bool			m_bSelected;	
 };
 
 typedef class WgWeakPtr<WgWidget> WgWidgetWeakPtr;
