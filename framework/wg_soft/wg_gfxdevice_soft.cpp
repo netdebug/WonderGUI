@@ -112,7 +112,9 @@ void WgGfxDeviceSoft::Fill( const WgRect& rect, const WgColor& col )
 		{
             int dstPixelBytes = m_pCanvas->m_pixelFormat.bits/8;
             
-            if( dstPixelBytes == 4 )
+			// Removed optimized version, it clears alpha!!!
+
+  /*          if( dstPixelBytes == 4 )
             {
                 for( int y = 0 ; y < rect.h ; y++ )
                 {
@@ -125,7 +127,7 @@ void WgGfxDeviceSoft::Fill( const WgRect& rect, const WgColor& col )
                     pDst += m_pCanvas->m_pitch;
                 }
             }
-            else
+            else */
             {
                 for( int y = 0 ; y < rect.h ; y++ )
                 {

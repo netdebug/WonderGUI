@@ -508,7 +508,10 @@ bool WgGlGfxDevice::BeginRender()
     
     if( m_bRendering == true )
         return false;
-    
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		return false;
+
     // Remember GL states so we can restore in EndRender()
     
     m_glDepthTest 		= glIsEnabled(GL_DEPTH_TEST);
@@ -888,6 +891,49 @@ void WgGlGfxDevice::StretchBlitSubPixel( const WgSurface * pSrc, float sx, float
 
     assert( 0 == (err = glGetError()) );
 }
+
+//____ ClipBlitFromCanvas() _______________________________________________________
+
+void WgGlGfxDevice::ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, const WgRect& srcRect, int dx, int dy)
+{
+	if ((clip.x <= dx) && (clip.x + clip.w > dx + srcRect.w) &&
+		(clip.y <= dy) && (clip.y + clip.h > dy + srcRect.h))
+	{
+		StretchBlitSubPixelWithInvert(pSrc, srcRect.x, srcRect.y, srcRect.w, srcRect.h, dx, dy, srcRect.w, srcRect.h); // Totally inside clip-rect.
+		return;
+	}
+
+	if ((clip.x > dx + srcRect.w) || (clip.x + clip.w < dx) ||
+		(clip.y > dy + srcRect.h) || (clip.y + clip.h < dy))
+		return;																						// Totally outside clip-rect.
+
+																									// Do Clipping
+
+	WgRect	newSrc = srcRect;
+
+	if (dx < clip.x)
+	{
+		newSrc.w -= clip.x - dx;
+		newSrc.x += clip.x - dx;
+		dx = clip.x;
+	}
+
+	if (dy < clip.y)
+	{
+		newSrc.h -= clip.y - dy;
+		newSrc.y += clip.y - dy;
+		dy = clip.y;
+	}
+
+	if (dx + newSrc.w > clip.x + clip.w)
+		newSrc.w = (clip.x + clip.w) - dx;
+
+	if (dy + newSrc.h > clip.y + clip.h)
+		newSrc.h = (clip.y + clip.h) - dy;
+
+	StretchBlitSubPixelWithInvert(pSrc, newSrc.x, newSrc.y, newSrc.w, newSrc.h, dx, dy, newSrc.w, newSrc.h); 
+}
+
 
 //____ StretchBlitSubPixelWithInvert() ___________________________________________________
 
@@ -1373,9 +1419,6 @@ void WgGlGfxDevice::ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end
 
 void WgGlGfxDevice::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topBorder, const WgWaveLine& bottomBorder, WgColor frontFill, WgColor backFill)
 {
-	if (topBorder.length <= length || bottomBorder.length <= length)
-		length = min(topBorder.length, bottomBorder.length) - 1;
-
 	// Do early rough X-clipping with margin (need to trace lines with margin of thickest line).
 
 	int ofs = 0;

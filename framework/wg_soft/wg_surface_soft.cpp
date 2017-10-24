@@ -90,7 +90,7 @@ WgSurfaceSoft::WgSurfaceSoft( const WgSurfaceSoft * pOther )
 WgSurfaceSoft::~WgSurfaceSoft()
 {
 	if(m_bOwnsData)
-		delete m_pData;
+		delete [] m_pData;
 }
 
 //____ Type() __________________________________________________________________
