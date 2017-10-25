@@ -450,8 +450,8 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 	m_pScrollChart->SetSurfaceFactory(new WgSurfaceFactorySoft());
 
-	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 1.f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
-	m_pScrollChart->Start(5000);
+	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 5.f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
+	m_pScrollChart->Start(20000);
 
 	WgScrollChart::GridLine valueGrid[3]{ { 0.25f,1.f,WgColor::red,"0.25" },{ 0.5f,1.f,WgColor::red,"0.5" },{ -0.5f,1.f,WgColor::red,"-0.5" } };
 	WgBoxSkinPtr pLabelSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
@@ -1084,7 +1084,9 @@ bool eventLoop( WgEventHandler * pHandler )
 	if (m_pScrollChart)
 	{
 		int ticks = SDL_GetTicks();
-		m_pScrollChart->FeedSample(m_hWave1, (ticks % 900) / 900.f);
+		
+
+		m_pScrollChart->FeedSample(m_hWave1, sin(ticks / 1000.0)*0.9 );
 	}
 	sdl_wglib::BeginEvents( pHandler );
 

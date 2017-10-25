@@ -411,6 +411,9 @@ int	WgScrollChart::StartLineWave(float startSample, float thickness, WgColor col
 	w.simpleSampleFeeder = sampleFeeder;
 	w.samples.push_back({ (int) (m_sampleEndTimestamp - m_sampleBeginTimestamp),startSample,0 });
 
+	w.nextTopSample = startSample;
+	w.nextBottomSample = 0.f;
+
 	return w.id;
 }
 
@@ -438,6 +441,9 @@ int WgScrollChart::StartSimpleWave(float startSample, float floor, float topLine
 	w.simpleSampleFeeder = sampleFeeder;
 	w.samples.push_back({ (int)(m_sampleEndTimestamp - m_sampleBeginTimestamp),startSample,0 });
 
+	w.nextTopSample = startSample;
+	w.nextBottomSample = 0.f;
+
 	return w.id;
 }
 
@@ -464,6 +470,9 @@ int WgScrollChart::StartComplexWave(SamplePair startSample, float topLineThickne
 	w.backFill = backFill;
 	w.complexSampleFeeder = sampleFeeder;
 	w.samples.push_back({(int)(m_sampleEndTimestamp - m_sampleBeginTimestamp),startSample.top,startSample.bottom });
+
+	w.nextTopSample = startSample.top;
+	w.nextBottomSample = startSample.bottom;
 
 	return w.id;
 }
@@ -599,6 +608,58 @@ void WgScrollChart::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 		{
 			if (!wave.bStopped)
 			{
+/*				if (m_bDynamicValueRange)
+				{
+					if (wave.nextTopSample >= wave.maxSample)
+					{
+						if (wave.nextTopSample == wave.maxSample)
+							wave.maxSampleCount++;
+						else
+						{
+							wave.maxSample = wave.nextTopSample;
+							wave.maxSampleCount = 1;
+						}
+
+					}
+					if (wave.nextTopSample <= wave.minSample)
+					{
+						wave.minSample = wave.nextTopSample;
+						if (wave.nextTopSample == wave.minSample)
+							wave.minSampleCount++;
+						else
+						{
+							wave.minSample = wave.nextTopSample;
+							wave.minSampleCount = 1;
+						}
+					}
+
+					if (wave.type == WaveType::Complex)
+					{
+						if (wave.nextBottomSample >= wave.maxSample)
+						{
+							if (wave.nextBottomSample == wave.maxSample)
+								wave.maxSampleCount++;
+							else
+							{
+								wave.maxSample = wave.nextBottomSample;
+								wave.maxSampleCount = 1;
+							}
+
+						}
+						if (wave.nextBottomSample <= wave.minSample)
+						{
+							wave.minSample = wave.nextBottomSample;
+							if (wave.nextBottomSample == wave.minSample)
+								wave.minSampleCount++;
+							else
+							{
+								wave.minSample = wave.nextBottomSample;
+								wave.minSampleCount = 1;
+							}
+						}
+					}
+				}
+*/
 				wave.samples.back().length = ticks;
 				wave.samples.push_back({ 0, wave.nextTopSample, wave.nextBottomSample });
 			}
@@ -615,10 +676,17 @@ void WgScrollChart::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 			for (auto& wave : m_waves)
 			{
 				int waveCutAmount = cutAmount;
+//				bool bRefreshMinMax = false;
 
 				while (wave.samples.size() > 2 && wave.samples[0].length <= waveCutAmount )
 				{
-					waveCutAmount -= wave.samples[0].length;
+					const Sample& s = wave.samples[0];
+
+					waveCutAmount -= s.length;
+
+					
+//				if( s.top == wave.maxSample || s.top == wave.minSample || (wave.type == WaveType::Complex && (s.bottom == wave.maxSample ) 
+
 					wave.samples.pop_front();
 				}
 
@@ -640,9 +708,9 @@ void WgScrollChart::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 		m_scrollFraction += ticks;
 		
-		float samplesPerPixel = m_sampleTTL / (float) (_getScrollWindow().w +1);
+		float samplesPerPixel = m_sampleTTL / (float) m_pCanvas->Size().w;
 
-		m_scrollAmount =  (int) (m_scrollFraction / samplesPerPixel);
+		m_scrollAmount =  (int) ((m_scrollFraction-1) / samplesPerPixel);
 
 		m_scrollFraction -= m_scrollAmount * samplesPerPixel;
 
@@ -652,7 +720,7 @@ void WgScrollChart::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 			// Update window end and window start
 
-			m_windowEnd = m_sampleEndTimestamp - (int)(m_scrollFraction + 0.999);
+			m_windowEnd = m_sampleEndTimestamp - m_scrollFraction;
 
 			if (m_windowEnd > m_sampleTTL)
 				m_windowBegin = m_windowEnd - m_sampleTTL;
@@ -679,7 +747,7 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 	if (m_pCanvas)
 	{
 		WgSize sz = m_pCanvas->Size();
-		double	timestampInc = m_sampleTTL / (double)(_canvas.w + 1);
+		double	timestampInc = m_sampleTTL / (double)m_pCanvas->Size().w;
 
 		if (m_bRefreshCanvas)
 		{
@@ -715,6 +783,15 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 		}
 		else if (m_scrollAmount > 0)
 		{
+			// Adjust our windows to account for thicker lines
+
+			int margin = ((int)(_thickestLine() / 2)) + 1;
+
+			m_canvasOfs = (m_canvasOfs + m_pCanvas->Size().w - margin) % m_pCanvas->Size().w;
+			m_scrollAmount += margin;
+
+			//
+
 			WgSurface * pOldCanvas = pDevice->Canvas();
 			pDevice->SetCanvas(m_pCanvas);
 
@@ -760,14 +837,10 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 	WgWidget::_renderPatches(pDevice, _canvas, _window, _pPatches);
 }
 
+//____ _thickestLine() ________________________________________________________
 
-//____ _renderWaveSegment() ___________________________________________________
-
-void WgScrollChart::_renderWaveSegment(WgGfxDevice * pDevice, const WgRect& _canvas, double startTimestamp, double endTimestamp, float timestampInc)
+float WgScrollChart::_thickestLine() const
 {
-
-	// Find thickest line
-
 	float thickness = 0.f;
 
 	for (auto& w : m_waves)
@@ -778,10 +851,17 @@ void WgScrollChart::_renderWaveSegment(WgGfxDevice * pDevice, const WgRect& _can
 		if (w.bottomLineThickness > thickness)
 			thickness = w.bottomLineThickness;
 	}
+	return thickness;
+}
 
+
+//____ _renderWaveSegment() ___________________________________________________
+
+void WgScrollChart::_renderWaveSegment(WgGfxDevice * pDevice, const WgRect& _canvas, double startTimestamp, double endTimestamp, float timestampInc)
+{
 	// Get margin and resample start/end timestamps that take thickest line into account
 
-	int margin = ((int)(thickness / 2)) + 2;
+	int margin = ((int)(_thickestLine() / 2)) + 1;
 	double  resampleStartTimestamp = startTimestamp - timestampInc*margin;
 	double  resampleEndTimestamp = endTimestamp + timestampInc*margin;
 

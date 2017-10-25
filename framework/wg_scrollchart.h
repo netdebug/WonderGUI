@@ -182,6 +182,8 @@ protected:
 
 		float		minSample = 0.f;
 		float		maxSample = 0.f;
+		int			minSampleCount = 0;						// Ref count for minSample
+		int			maxSampleCount = 0;						// Ref count for maxSample
 
 		std::deque<Sample>	samples;
 
@@ -218,6 +220,7 @@ protected:
 	void		_resampleWavePortion(int& ofs, int& nSamples, int * pOutTop, int * pOutBottom, const WgScrollChart::Wave& wave, double startTimeStamp, double endTimeStamp, float timestampInc);
 	void		_renderGridLines(WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip);
 
+	float			_thickestLine() const;
 
 	WgRect	_getScrollWindow() const;
 
@@ -253,8 +256,8 @@ private:
 	int			m_sampleTTL;				// Samples Time To Live in millsec, before it has scrolled out.
 	int			m_waveIdCounter;
 
-	uint64_t	m_windowBegin;				// In milliseconds, oldest sample displayed
-	uint64_t	m_windowEnd;				// In milliseconds, latest sample displayed
+	double		m_windowBegin;				// In milliseconds, oldest sample displayed
+	double		m_windowEnd;				// In milliseconds, latest sample displayed
 
 	float		m_scrollFraction;			// Fractions of a pixel to scroll, measured in milliseconds
 	int			m_scrollAmount;				// Number of full pixels to scroll
