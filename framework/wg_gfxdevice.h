@@ -112,6 +112,11 @@ public:
 	virtual bool	EndRender();
 
 
+	// Special blit methods
+
+	virtual void	ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, const WgRect& src, int dx, int dy);	// Blit from surface that has been used as canvas. Will flip Y on OpenGL.
+
+
 	// Low level draw methods.
 
 	virtual void	Fill( const WgRect& rect, const WgColor& col ) = 0;

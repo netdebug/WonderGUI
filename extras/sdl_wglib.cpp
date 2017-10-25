@@ -40,6 +40,8 @@ namespace sdl_wglib
 
 	//____ BeginEvents() _______________________________________________________
 
+	bool g_bStopScroll = false;
+
 	void BeginEvents( WgEventHandler * pHandler )
 	{
 		g_pHandler = pHandler;
@@ -47,7 +49,8 @@ namespace sdl_wglib
 		// Add a tick event first as the first.
 
 		int ticks = SDL_GetTicks();
-		pHandler->QueueEvent( new WgEvent::Tick( ticks - g_ticks ) );
+		if( !g_bStopScroll )
+			pHandler->QueueEvent( new WgEvent::Tick( ticks - g_ticks ) );
 		g_ticks = ticks;
 	}
 
@@ -79,6 +82,14 @@ namespace sdl_wglib
 			}
 
 			case	SDL_MOUSEBUTTONDOWN:
+
+				if (event.button.button == 2)
+					g_bStopScroll = !g_bStopScroll;
+				if (event.button.button == 3)
+				{
+					g_pHandler->QueueEvent(new WgEvent::Tick(15));
+				}
+
 				if(event.button.button == 4 )
 					g_pHandler->QueueEvent( new WgEvent::MouseWheelRoll( 1, 1 ) );
 				else if(event.button.button == 5)
@@ -91,7 +102,7 @@ namespace sdl_wglib
 
 			case	SDL_MOUSEBUTTONUP:
 				if( event.button.button != 4 && event.button.button != 5 )
-					g_pHandler->QueueEvent( new WgEvent::MouseButtonRelease( event.button.button ) );
+					g_pHandler->QueueEvent( new WgEvent::MouseButtonRelease( event.button.button ) );	
 				break;
 		}
 	}

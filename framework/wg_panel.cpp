@@ -143,12 +143,17 @@ void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRec
 
 //____ _onRender() ___________________________________________________________________
 
-void WgPanel::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
+void WgPanel::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip)
 {
-	if( m_pSkin )
-		m_pSkin->Render( pDevice, WG_STATE_NORMAL,_canvas, _clip, m_scale );
-}
+	if (m_pSkin)
+	{
+		WgState	state;
+		state.setFocused(m_bFocused);
+		state.setSelected(m_bSelected);
 
+		m_pSkin->Render(pDevice, state, _canvas, _clip, m_scale);
+	}
+}
 //____ WgPanelHook::Parent() __________________________________________________
 
 WgPanel* WgPanelHook::Parent() const 

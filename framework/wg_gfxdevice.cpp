@@ -112,6 +112,14 @@ bool WgGfxDevice::EndRender()
 	return true;	// Assumed to be ok if device doesn't have its own method.
 }
 
+//_____ ClipBlitFromCanvas() ______________________________________________________
+
+void WgGfxDevice::ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, const WgRect& src, int dx, int dy)
+{
+	ClipBlit(clip, pSrc, src, dx, dy);		// Default is a normal blit, only OpenGL needs to flip (until that has been fixed)
+}
+
+
 //____ Blit() __________________________________________________________________
 
 void WgGfxDevice::Blit( const WgSurface* pSrc )

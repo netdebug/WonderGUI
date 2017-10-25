@@ -19,54 +19,85 @@
   should contact Tord Jansson [tord.jansson@gmail.com] for details.
 
 =========================================================================*/
-#ifndef WG_BLOCKSKIN_DOT_H
-#define WG_BLOCKSKIN_DOT_H
+#ifndef WG_BLOCKSKIN2_DOT_H
+#define WG_BLOCKSKIN2_DOT_H
+#pragma once
 
-#ifndef WG_EXTENDEDSKIN_DOT_H
-#	include <wg_extendedskin.h>
-#endif
+#include <wg_extendedskin.h>
+#include <wg_surface.h>
 
-class WgSurface;
 
+	
 class WgBlockSkin;
-typedef	WgSmartChildPtr<WgBlockSkin,WgExtendedSkinPtr>	WgBlockSkinPtr;
+typedef	WgSmartChildPtr<WgBlockSkin, WgExtendedSkinPtr>	WgBlockSkinPtr;
 
-
+	
 class WgBlockSkin : public WgExtendedSkin
 {
 	//TODO: Add sanity-checking to all Set-methods.
 	//TODO: Optimize rendering based on invisibleSections and opaqueSections!
-
-public:
-	static WgBlockSkinPtr Create();
 	
-	~WgBlockSkin() {};
+public:
+
+	//.____ Creation __________________________________________
+
+	static WgBlockSkinPtr Create();
+	static WgBlockSkinPtr CreateStatic( WgSurface * pSurface, WgRect block, WgBorders frame = WgBorders(0) );
+	static WgBlockSkinPtr CreateEnable( WgSurface * pSurface, WgSize blockSize, WgCoord ofsEnabled, WgCoord ofsDisabled, WgBorders frame = WgBorders(0) );
+	static WgBlockSkinPtr CreateClickable( WgSurface * pSurface, WgSize blockGeo, WgCoord blockStartOfs, WgSize blockPitch, WgBorders blockFrame = WgBorders(0) );
+	static WgBlockSkinPtr CreateSelectable( WgSurface * pSurface, WgSize blockGeo, WgCoord blockStartOfs, WgSize blockPitch, WgBorders blockFrame = WgBorders(0) );
+	static WgBlockSkinPtr CreateClickSelectable(WgSurface * pSurface, WgSize blockGeo, WgCoord blockStartOfs, WgSize blockPitch, WgBorders blockFrame = WgBorders(0) );
+	static WgBlockSkinPtr CreateClickSelectableWidget( WgSurface * pSurface, WgSize blockGeo, WgCoord blockStartOfs, WgSize blockPitch, WgBorders blockFrame = WgBorders(0) );
+	
+	static WgBlockSkinPtr CreateStaticFromSurface( WgSurface * pSurface, WgBorders frame = WgBorders(0) );
+	static WgBlockSkinPtr CreateEnableFromSurface( WgSurface * pSurface, int blockSpacing, WgBorders blockFrame = WgBorders(0) );
+	static WgBlockSkinPtr CreateClickableFromSurface( WgSurface * pSurface, int blockSpacing, WgBorders blockFrame = WgBorders(0) );
+	static WgBlockSkinPtr CreateSelectableFromSurface( WgSurface * pSurface, int blockSpacing, WgBorders blockFrame = WgBorders(0) );
+	static WgBlockSkinPtr CreateClickSelectableFromSurface( WgSurface * pSurface, int blockSpacing, WgBorders blockFrame = WgBorders(0) );
+	
+	//.____ Rendering ________________________________________________
+
+	void	Render( WgGfxDevice * pDevice, WgState state,  const WgRect& _canvas, const WgRect& _clip, int scale ) const override;
+	
+	//.____ Geometry _________________________________________________
+
+	WgSize	MinSize( int scale ) const override;
+	WgSize	PreferredSize( int scale ) const override;
+	
+	WgSize	SizeForContent( const WgSize contentSize, int scale ) const override;
+
+	//.____ Appearance _________________________________________________
 
 	void	SetSurface( WgSurface * pSurf );
 	bool	SetBlockGeo( WgSize size, WgBorders frame = WgBorders(0) );
 	void	SetStateBlock( WgStateEnum state, const WgCoord& ofs );
-
+	
+	void	SetAllBlocks( const WgCoord& ofs );
+	void	SetDisabledBlock( const WgCoord& ofs );
+	void	SetHoveredBlocks( const WgCoord& ofs );
+	void	SetPressedBlocks( const WgCoord& ofs );
+	void	SetSelectedBlocks( const WgCoord& ofs );
+	
+	void	SetTiled( bool bTiled );
 	void	SetTiledTopBorder( bool bTiled );
 	void	SetTiledBottomBorder( bool bTiled );
 	void	SetTiledLeftBorder( bool bTiled );
 	void	SetTiledRightBorder( bool bTiled );
 	void	SetTiledCenter( bool bTiled );
 
+
+	//.____ Misc ____________________________________________________	
+	
+	bool	MarkTest( const WgCoord& ofs, const WgSize& canvas, WgState state, int opacityTreshold, int scale ) const override;
+	
+	bool	IsOpaque() const override;
+	bool	IsOpaque( WgState state ) const override;
+	bool	IsOpaque( const WgRect& WgRect, const WgSize& canvasSize, WgState state, int scale ) const override;
+	
+//	bool	IsStateIdentical( WgState state, WgState comparedTo ) const;
+	
 	void	OptimizeRenderMethods();
 
-	void	Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip, int scale ) const;
-
-	WgSize	MinSize(int scale) const;
-	WgSize	PreferredSize(int scale) const;
-
-	WgSize	SizeForContent( const WgSize contentSize, int scale ) const;
-
-	bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const;
-
-	bool	IsOpaque() const;
-	bool	IsOpaque( WgState state ) const;
-	bool	IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state, int scale ) const;
-	
 private:
 	struct StateData
 	{
@@ -74,22 +105,24 @@ private:
 		int		opaqueSections;
 		int		invisibleSections;
 	};
-
+	
 	WgBlockSkin();
+	~WgBlockSkin() {};
+
 	void	_setBitFlag( int& bitmask, int bit, bool bSet );
 	void	_renderNoClip( WgGfxDevice * pDevice, const StateData * pState, const WgRect& _canvas ) const;
 	void	_scanStateBlockSectionArea( StateData * pState, WgOrigo section, const WgRect& sectionArea );
-	inline WgSize _scaledFrame(int scale) const { return WgSize((m_frame.Width()*scale) >> WG_SCALE_BINALS, (m_frame.Height()*scale) >> WG_SCALE_BINALS); }
-
+	
 	static const int ALL_SECTIONS = 0x1FF;
-
-	WgSurface *	m_pSurface;
-	WgSize		m_dimensions;
-	WgBorders	m_frame;
-	int			m_tiledSections;
-	bool		m_bIsOpaque;
-
-	StateData	m_state[WG_NB_STATES];
+	
+	WgSurface *		m_pSurface;
+	WgSize			m_dimensions;
+	WgBorders		m_frame;
+	int				m_tiledSections;
+	bool			m_bIsOpaque;
+	
+	StateData		m_state[WG_NB_STATES];
 };
+	
 
-#endif //WG_BLOCKSKIN_DOT_H
+#endif //WG_BLOCKSKIN2_DOT_H

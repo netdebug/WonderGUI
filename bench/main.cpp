@@ -26,6 +26,7 @@
 #include <wg_volumemeter.h>
 #include <wg_simplevolumemeter.h>
 #include <wg_chart.h>
+#include <wg_scrollchart.h>
 
 #include "testwidget.h"
 
@@ -63,6 +64,9 @@ WgOscilloscope * g_pOsc = 0;
 float	leftPeak = 1.f, rightPeak = 0.5f, leftHold = 0.5f, rightHold = 0.5f;
 
 bool	leftUp = true, rightUp = false;
+
+WgScrollChart * m_pScrollChart = nullptr;
+int				m_hWave1 = 0;
 
 
 //____ main() _________________________________________________________________
@@ -279,7 +283,7 @@ int main ( int argc, char** argv )
 			updateOscilloscope( g_pOsc, counter, freq, amp );
 
 		}	
-			
+		
 		// DRAWING STARTS HERE
 
 //		pRoot->AddDirtyPatch( pRoot->Geo().Size() );
@@ -341,8 +345,9 @@ int main ( int argc, char** argv )
 //		SDL_GL_SwapBuffers();
         // Pause for a while
 
-        SDL_Delay(50);
-			 
+
+		SDL_Delay(5);
+
 		counter++;
 
     } // end main loop
@@ -432,9 +437,115 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pHook->SetAnchored( WG_NORTHWEST, WG_SOUTHEAST );
 
 
+	// Scroll chart widget
+
+	m_pScrollChart = new WgScrollChart();
+
+	WgBoxSkinPtr pChartSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
+	pChartSkin->SetContentPadding(2);
+	m_pScrollChart->SetSkin(pChartSkin);
+
+//	m_pScrollChart->SetValueRange(10, -10);
+	m_pScrollChart->SetDynamicValueRange(false);
+
+	m_pScrollChart->SetSurfaceFactory(new WgSurfaceFactorySoft());
+
+	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 5.f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
+	m_pScrollChart->Start(20000);
+
+	WgScrollChart::GridLine valueGrid[3]{ { 0.25f,1.f,WgColor::red,"0.25" },{ 0.5f,1.f,WgColor::red,"0.5" },{ -0.5f,1.f,WgColor::red,"-0.5" } };
+	WgBoxSkinPtr pLabelSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
+	pLabelSkin->SetContentPadding(3);
+
+	m_pScrollChart->SetValueGridLines(3, valueGrid);
+	m_pScrollChart->SetValueLabelStyle(WG_SOUTHEAST, { 0,0 }, pLabelSkin, 0);
+
+
+	auto pWindow = new WgPackPanel();
+	pWindow->SetOrientation(WG_VERTICAL);
+	pWindow->SetSizeBroker(new WgUniformSizeBroker());
+
+	pWindow->AddChild(m_pScrollChart)->SetWeight(2);
+
+
+	auto pButtonBar = new WgPackPanel();
+	pButtonBar->SetSizeBroker(new WgUniformSizeBroker());
+
+	auto pFiller = new WgFiller();
+	pFiller->SetColors(WgColorset::Create(WgColor::grey));
+
+
+	auto pValueScaleButton = (WgButton*)pDB->CloneWidget("button");
+	pValueScaleButton->SetText(" ");
+	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pValueScaleButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
+	{
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+
+		WgChart * pChart = static_cast<WgChart*>(pWin);
+
+		float first = pChart->ValueRangeStart() - drag.x / 5.f;
+		float last = pChart->ValueRangeEnd() + drag.x / 5.f;
+
+		m_pScrollChart->SetValueRange(first, last);
+	}, m_pScrollChart);
+
+/*
+	auto pZoomButton = (WgButton*)pDB->CloneWidget("button");
+	pZoomButton->SetText(" ");
+	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pZoomButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
+	{
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+
+		WgChart * pChart = static_cast<WgChart*>(pWin);
+
+		float first = pChart->FirstSample();
+		float last = pChart->LastSample() + drag.x / 5.f;
+
+		pChart->SetFixedSampleRange(first, last);
+	}, pChart);
+
+
+	auto pScrollButton = (WgButton*)pDB->CloneWidget("button");
+	pScrollButton->SetText(" ");
+	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pScrollButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
+	{
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+
+		WgChart * pChart = static_cast<WgChart*>(pWin);
+
+		float first = pChart->FirstSample() + drag.x / 10.f;
+		float last = pChart->LastSample() + drag.x / 10.f;
+
+		pChart->SetFixedSampleRange(first, last);
+	}, pChart);
+*/
+
+	auto pResizeButton = (WgButton*)pDB->CloneWidget("button");
+	pResizeButton->SetText(" ");
+	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pResizeButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
+	{
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+		static_cast<WgFlexHook*>(pWin->Hook())->SetSize(WgSize(pWin->Size() + WgSize(drag.x, drag.y)) / 1);
+	}, pWindow);
+
+	pButtonBar->AddChild(pFiller)->SetWeight(2);
+	pButtonBar->AddChild(pValueScaleButton)->SetWeight(0);
+//	pButtonBar->AddChild(pZoomButton)->SetWeight(0);
+//	pButtonBar->AddChild(pScrollButton)->SetWeight(0);
+	pButtonBar->AddChild(pResizeButton)->SetWeight(0);
+	pWindow->AddChild(pButtonBar)->SetWeight(0);
+
+
+
+	pHook = pFlex->AddChild(pWindow, WgRect(10, 10, 500, 300));
+
+	pHook->SetScaleGeo(true);
+
+//	pFlex->SetScale(WG_SCALE_BASE * 2);
+
 
 	// Chart widget
-
+/*
 	WgChart * pChart = new WgChart();
 
 	float topSamples[10] = { 1.f,0.75f,0.5f,1.f,1.f,0.8f,0.8f,1.f,0.1f,0.1f };
@@ -571,7 +682,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pHook->SetScaleGeo(true);
 
 	pFlex->SetScale(WG_SCALE_BASE*2);
-
+*/
 
 	// LED Volume meter
 /*	
@@ -970,6 +1081,13 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 bool eventLoop( WgEventHandler * pHandler )
 {
+	if (m_pScrollChart)
+	{
+		int ticks = SDL_GetTicks();
+		
+
+		m_pScrollChart->FeedSample(m_hWave1, sin(ticks / 1000.0)*0.9 );
+	}
 	sdl_wglib::BeginEvents( pHandler );
 
    // message processing loop

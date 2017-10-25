@@ -151,6 +151,7 @@
     <ClInclude Include="framework\wg_rootpanel.h" />
     <ClInclude Include="framework\wg_rulerlabels.h" />
     <ClInclude Include="framework\wg_scaleimage.h" />
+    <ClInclude Include="framework\wg_scrollchart.h" />
     <ClInclude Include="framework\wg_scrollpanel.h" />
     <ClInclude Include="framework\wg_shadercapsule.h" />
     <ClInclude Include="framework\wg_simpleline.h" />
@@ -261,6 +262,7 @@
     <ClCompile Include="framework\wg_rootpanel.cpp" />
     <ClCompile Include="framework\wg_rulerlabels.cpp" />
     <ClCompile Include="framework\wg_scaleimage.cpp" />
+    <ClCompile Include="framework\wg_scrollchart.cpp" />
     <ClCompile Include="framework\wg_scrollpanel.cpp" />
     <ClCompile Include="framework\wg_shadercapsule.cpp" />
     <ClCompile Include="framework\wg_simpleline.cpp" />

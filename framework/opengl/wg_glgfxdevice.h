@@ -101,6 +101,9 @@ public:
     void    StretchBlitSubPixelWithInvert(const WgSurface * pSrc, float sx, float sy, float sw, float sh,
             float dx, float dy, float dw, float dh);
 
+	void	ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, const WgRect& src, int dx, int dy);	// Need to overload this to flip on Y.
+
+
 protected:
 
     void	_initTables();
