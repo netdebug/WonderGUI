@@ -191,7 +191,8 @@ bool WgChart::_setWaveSamples(int waveIndex, int firstSample, int nSamples, floa
 	w.nSamples = nSamples;
 	w.defaultSample = defaultSample;
 
-	float	max = -FLT_MAX, min = FLT_MAX;
+	float max = -std::numeric_limits<float>::max();
+    float min =  std::numeric_limits<float>::max();
 
 	if (pTopBorderSamples)
 	{
@@ -619,8 +620,9 @@ bool WgChart::_updateDynamics()
 
 	if (m_bDynamicValueRange)
 	{
-		float min = FLT_MAX, max = FLT_MIN;
-
+        float min = std::numeric_limits<float>::max();
+        float max = std::numeric_limits<float>::min();
+        
 		for (auto& it : m_waves)
 		{
 			if (min > it.minSample)
