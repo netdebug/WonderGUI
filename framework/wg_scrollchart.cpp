@@ -28,6 +28,7 @@ should contact Tord Jansson [tord.jansson@gmail.com] for details.
 #include <wg_base.h>
 #include <wg_texttool.h>
 #include <wg_util.h>
+#include <wg_eventhandler.h>
 
 
 #include <assert.h>
@@ -728,6 +729,9 @@ void WgScrollChart::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				m_windowBegin = 0;
 		}
 	}
+	else
+		pHandler->ForwardEvent(pEvent);
+
 }
 
 //____ _onCloneContent() ______________________________________________________
@@ -1045,7 +1049,27 @@ void WgScrollChart::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, cons
 
 	if (m_pSkin)
 	{
-//		m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, _clip, m_scale);
+		if (m_chartColor.a == 255)
+		{
+			WgRect coverage = m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale);
+
+			if ( !coverage.Contains( _clip) )
+			{
+				WgRect topSection(canvas.x, canvas.y, canvas.w, coverage.y - canvas.y);
+				WgRect leftSection(canvas.x, coverage.y, coverage.x - canvas.x, coverage.h);
+				WgRect rightSection(coverage.x + coverage.w, coverage.y, canvas.x + canvas.w - (coverage.x + coverage.w), coverage.h);
+				WgRect bottomSection(canvas.x, coverage.y + coverage.h, canvas.w, canvas.y + canvas.h - (coverage.y + coverage.h));
+
+				m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, WgRect(topSection, _clip), m_scale);
+				m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, WgRect(leftSection, _clip), m_scale);
+				m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, WgRect(rightSection, _clip), m_scale);
+				m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, WgRect(bottomSection, _clip), m_scale);
+			}
+
+		}
+		else
+			m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, _clip, m_scale);
+
 		canvas = m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale);
 	}
 	else

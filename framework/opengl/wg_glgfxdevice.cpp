@@ -334,13 +334,10 @@ WgGlGfxDevice::WgGlGfxDevice( WgSize canvas ) : WgGfxDevice(canvas)
     m_plotProgTintLoc = glGetUniformLocation( m_plotProg, "tint" );
     
     glGenVertexArrays(1, &m_vertexArrayId);
-    glBindVertexArray(m_vertexArrayId);
     glGenBuffers(1, &m_vertexBufferId);
     
     glGenVertexArrays(1, &m_texCoordArrayId);
-    glBindVertexArray(m_texCoordArrayId);
     glGenBuffers(1, &m_texCoordBufferId);
-    glBindVertexArray(0);
 
     glGenFramebuffers(1, &m_framebufferId);
 
@@ -366,7 +363,7 @@ WgGlGfxDevice::~WgGlGfxDevice()
     glDeleteVertexArrays(1, &m_texCoordArrayId);
     assert( glGetError() == 0 );
 }
-
+      
 //____ SetViewport() ________________________________________________________________
 
 void WgGlGfxDevice::SetViewportOffset( WgCoord ofs )
@@ -428,6 +425,9 @@ bool WgGlGfxDevice::_setFramebuffer()
     }
     else
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glScissor(0, 0, m_canvasSize.w, m_canvasSize.h);
+	glViewport(m_viewportOffset.x, m_viewportOffset.y, m_canvasSize.w, m_canvasSize.h);
 
     return true;
 }
@@ -524,17 +524,24 @@ bool WgGlGfxDevice::BeginRender()
     glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_glReadFrameBuffer);
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &m_glDrawFrameBuffer);  
 
-    // Set correct framebuffer
-
-    _setFramebuffer();
     
     //  Modify states
     
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
-    glScissor( 0, 0, m_canvasSize.w, m_canvasSize.h );
+
+
+
+/*
+	These are set in _setFramebuffer()
+	glScissor( 0, 0, m_canvasSize.w, m_canvasSize.h );
     glViewport(m_viewportOffset.x, m_viewportOffset.y, m_canvasSize.w, m_canvasSize.h);
-    
+*/
+	// Set correct framebuffer
+
+	_setFramebuffer();
+
+
     // Set correct blend mode
     
     _setBlendMode(m_blendMode);
