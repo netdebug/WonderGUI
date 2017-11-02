@@ -154,6 +154,7 @@ void WgPanel::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, const WgRe
 		m_pSkin->Render(pDevice, state, _canvas, _clip, m_scale);
 	}
 }
+
 //____ WgPanelHook::Parent() __________________________________________________
 
 WgPanel* WgPanelHook::Parent() const 

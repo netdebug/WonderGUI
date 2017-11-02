@@ -1216,7 +1216,8 @@ bool WgScrollChart::_updateDynamics()
 
 	if (m_bDynamicValueRange)
 	{
-		float min = FLT_MAX, max = FLT_MIN;
+        float min = std::numeric_limits<float>::max();
+        float max = std::numeric_limits<float>::min();
 
 		for (auto& it : m_waves)
 		{

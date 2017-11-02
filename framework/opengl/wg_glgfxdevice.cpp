@@ -363,7 +363,7 @@ WgGlGfxDevice::~WgGlGfxDevice()
     glDeleteVertexArrays(1, &m_texCoordArrayId);
     assert( glGetError() == 0 );
 }
-      
+
 //____ SetViewport() ________________________________________________________________
 
 void WgGlGfxDevice::SetViewportOffset( WgCoord ofs )

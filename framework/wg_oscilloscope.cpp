@@ -31,6 +31,7 @@ static const char	c_widgetType[] = {"Oscilloscope"};
 
 #include <stdlib.h>
 #include <math.h>
+#include <cmath>
 #define round(x) floorf((x)+0.5f)
 
 //____ Constructor ____________________________________________________________
@@ -531,7 +532,7 @@ void WgOscilloscope::_antiAlias(const int nPoints, const float *pYval, WgCoord o
             y1 = 0.0f;
         
         
-        bool steep = fabsf(y1 - y0) > abs(x1 - x0);
+        bool steep = fabsf(y1 - y0) > std::abs(x1 - x0);
         
         if(steep) {
             std::swap(x0,y0);
