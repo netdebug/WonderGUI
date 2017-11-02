@@ -1,15 +1,26 @@
 #include <cstdlib>
 
 #ifdef WIN32
-#include <SDL.h>
-#include <SDL_image.h>
+#	include <SDL.h>
+#	include <SDL_image.h>
+#	include <GL/glew.h>
 #else
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#	ifdef __APPLE__
+#		include <SDL2/SDL.h>
+#		include <SDL2_image/SDL_image.h>
+#	else
+#		include <SDL2/SDL.h>
+#		include <SDL2/SDL_image.h>
+#	endif
 #endif
 
-
 #include <wondergui.h>
+
+#include <wg_glsurface.h>
+#include <wg_glsurfacefactory.h>
+#include <wg_glgfxdevice.h>
+
+
 #include <wg_bitmapglyphs.h>
 #include <wg_vectorglyphs.h>
 #include <wg_knob.h>
@@ -29,6 +40,12 @@
 #include <wg_scrollchart.h>
 
 #include "testwidget.h"
+
+//#define USE_OPEN_GL
+
+
+WgSurfaceFactory *	g_pSurfaceFactory = nullptr;
+WgGfxDevice *		g_pGfxDevice = nullptr;
 
 
 extern std::ostream cout;
@@ -81,9 +98,30 @@ int main ( int argc, char** argv )
 	SDL_Init(SDL_INIT_VIDEO);
 
 	int posX = 100, posY = 100, width = 1920, height = 1080;
-	SDL_Window * pWin = SDL_CreateWindow("Hello WonderGUI", posX, posY, width, height, 0);
 
-	SDL_Surface * pScreen = SDL_GetWindowSurface(pWin);
+	int flags = 0;
+
+
+
+#ifdef USE_OPEN_GL
+	SDL_Window * pWin = SDL_CreateWindow("WonderGUI Testbench (OpenGL)", posX, posY, width, height, SDL_WINDOW_OPENGL);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 0);
+
+	SDL_GLContext context = SDL_GL_CreateContext(pWin);
+
+#ifdef WIN32  
+	glewExperimental = GL_TRUE;
+	GLenum err = glewInit();
+#endif
+
+#else
+	SDL_Window * pWin = SDL_CreateWindow("WonderGUI Testbench (Software)", posX, posY, width, height, 0);
+#endif
+
 
 	IMG_Init( IMG_INIT_PNG | IMG_INIT_JPG );
 
@@ -92,12 +130,16 @@ int main ( int argc, char** argv )
 	WgBase::Init();
 	sdl_wglib::MapKeys();
 
-	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", WgSurfaceFactorySoft() );
-
 
 //	WgBase::InitFreeType();
 
 	// Setup gfxdevice and gui
+
+#ifdef USE_OPEN_GL
+	g_pGfxDevice = new WgGlGfxDevice( WgSize(640,480) );
+	g_pSurfaceFactory = new WgGlSurfaceFactory();
+#else
+	SDL_Surface * pScreen = SDL_GetWindowSurface(pWin);
 
 	WgPixelType type = WG_PIXEL_UNKNOWN;
 
@@ -108,17 +150,18 @@ int main ( int argc, char** argv )
 
 
 	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(width,height), type, (unsigned char *) pScreen->pixels, pScreen->pitch );
-	WgGfxDeviceSoft * pGfxDevice = new WgGfxDeviceSoft( pCanvas );
-//	pGfxDevice->SetBilinearFiltering( true );
+	g_pGfxDevice = new WgGfxDeviceSoft( pCanvas );
 
+	g_pSurfaceFactory = new WgSurfaceFactorySoft();
+#endif
+	
+	//	pGfxDevice->SetBilinearFiltering( true );
 
-
-//	WgGfxDeviceGL * pGfxDevice = new WgGfxDeviceGL( WgSize(640,480) );
 
 
 	// Load TTF-font
 /*
-	WgVectorGlyphs::SetSurfaceFactory( new WgSurfaceFactorySDL() );
+	WgVectorGlyphs::SetSurfaceFactory( * pSurfaceFactory );
 
 	char	ttfname[] = { "a.ttf" };
 
@@ -131,11 +174,11 @@ int main ( int argc, char** argv )
 */
 	// Load bitmap font
 
-	WgFont * pFont = sdl_wglib::LoadBitmapFont( "../resources/anuvverbubbla_8x8.png", "../resources/anuvverbubbla_8x8.fnt", WgSurfaceFactorySoft() );
+	WgFont * pFont = sdl_wglib::LoadBitmapFont( "../resources/anuvverbubbla_8x8.png", "../resources/anuvverbubbla_8x8.fnt", * g_pSurfaceFactory );
 
 	// Load and setup cursor
 
-	WgSurface * pCursorImg = sdl_wglib::LoadSurface("../resources/cursors.png", WgSurfaceFactorySoft() );
+	WgSurface * pCursorImg = sdl_wglib::LoadSurface("../resources/cursors.png", * g_pSurfaceFactory );
 
 	WgGfxAnim * pCursorEOL = new WgGfxAnim();
 	pCursorEOL->SetSize( WgSize(8,8) );
@@ -168,9 +211,11 @@ int main ( int argc, char** argv )
 	WgBase::SetDefaultTextprop( prop.Register() );
 
 
-	WgRootPanel * pRoot = setupGUI( pGfxDevice );
+	WgRootPanel * pRoot = setupGUI( g_pGfxDevice );
 	
 	
+
+
 	// Setup debug overlays
 /*	
 	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
@@ -204,8 +249,15 @@ int main ( int argc, char** argv )
 
 	int counter = 0;
 
+
+	glDrawBuffer(GL_FRONT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glFlush();
+
     while (eventLoop( pRoot->EventHandler() ))
     {
+
 		if( m_pCounter )
 			m_pCounter->IncValue();
 		
@@ -288,7 +340,9 @@ int main ( int argc, char** argv )
 
 //		pRoot->AddDirtyPatch( pRoot->Geo().Size() );
 
+#ifndef USE_OPEN_GL
 		SDL_LockSurface( pScreen );
+#endif
 /*
 		pGfxDevice->BeginRender();
 
@@ -303,6 +357,8 @@ int main ( int argc, char** argv )
 */
 
 		pRoot->Render();
+
+#ifndef USE_OPEN_GL
 		SDL_UnlockSurface( pScreen );
 
         // DRAWING ENDS HERE
@@ -340,7 +396,7 @@ int main ( int argc, char** argv )
 		}
 
 		SDL_UpdateWindowSurfaceRects(pWin, updatedRects, nUpdatedRects);
-
+#endif
  
 //		SDL_GL_SwapBuffers();
         // Pause for a while
@@ -356,7 +412,7 @@ int main ( int argc, char** argv )
 	// Exit WonderGUI
 
 	delete pRoot;
-	delete pGfxDevice;
+	delete g_pGfxDevice;
 
 	WgBase::Exit();
 
@@ -385,7 +441,7 @@ void updateOscilloscope( WgOscilloscope * pOsc, int ofs, float freq, float ampli
 
 WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 {
-	WgResDB * pDB = sdl_wglib::LoadStdWidgets( "../resources/blocks.png", "../resources/blocks_x2.png", "../resources/blocks_x4.png", WgSurfaceFactorySoft() );
+	WgResDB * pDB = sdl_wglib::LoadStdWidgets( "../resources/blocks.png", "../resources/blocks_x2.png", "../resources/blocks_x4.png", * g_pSurfaceFactory );
 	if( !pDB )
 		return 0;
 
@@ -404,16 +460,16 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 	// Load images and specify blocks
 
-	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", WgSurfaceFactorySoft() );
+	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", * g_pSurfaceFactory );
 	WgBlocksetPtr pBackBlock = WgBlockset::CreateFromSurface(pBackImg, WG_TILE_ALL );
 
-	WgSurface * pFlagImg = sdl_wglib::LoadSurface("cb2.bmp", WgSurfaceFactorySoft() );
+	WgSurface * pFlagImg = sdl_wglib::LoadSurface("cb2.bmp", * g_pSurfaceFactory );
 	WgBlocksetPtr pFlagBlock = WgBlockset::CreateFromSurface( pFlagImg );
 
-	WgSurface * pSplashImg = sdl_wglib::LoadSurface("../resources/splash.png", WgSurfaceFactorySoft() );
+	WgSurface * pSplashImg = sdl_wglib::LoadSurface("../resources/splash.png", * g_pSurfaceFactory );
 	WgBlocksetPtr pSplashBlock = WgBlockset::CreateFromSurface( pSplashImg );
 
-	WgSurface * pBigImg = sdl_wglib::LoadSurface("../resources/frog.jpg", WgSurfaceFactorySoft() );
+	WgSurface * pBigImg = sdl_wglib::LoadSurface("../resources/frog.jpg", * g_pSurfaceFactory );
 	WgBlocksetPtr pBigBlock = WgBlockset::CreateFromSurface( pBigImg );
 
 
@@ -448,10 +504,10 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 //	m_pScrollChart->SetValueRange(10, -10);
 	m_pScrollChart->SetDynamicValueRange(false);
 
-	m_pScrollChart->SetSurfaceFactory(new WgSurfaceFactorySoft());
+	m_pScrollChart->SetSurfaceFactory(g_pSurfaceFactory);
 
 	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 5.f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
-	m_pScrollChart->Start(20000);
+	m_pScrollChart->Start(4000);
 
 	WgScrollChart::GridLine valueGrid[3]{ { 0.25f,1.f,WgColor::red,"0.25" },{ 0.5f,1.f,WgColor::red,"0.5" },{ -0.5f,1.f,WgColor::red,"-0.5" } };
 	WgBoxSkinPtr pLabelSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
@@ -537,7 +593,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 
 
-	pHook = pFlex->AddChild(pWindow, WgRect(10, 10, 500, 300));
+	pHook = pFlex->AddChild(pWindow, WgRect(0, 0, 500, 300));
 
 	pHook->SetScaleGeo(true);
 
@@ -915,7 +971,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	// Test oscilloscope
 /*
 	{
-		WgSurface * pImg = sdl_wglib::LoadSurface("../resources/blocks.png", WgSurfaceFactorySoft() );
+		WgSurface * pImg = sdl_wglib::LoadSurface("../resources/blocks.png", g_pSurfaceFactory );
 
 		WgBlocksetPtr pMarkerBlock = WgBlockset::CreateFromRect( pImg, WgRect(1,120,8,8) );
 
