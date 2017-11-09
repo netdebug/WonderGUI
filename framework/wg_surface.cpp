@@ -125,10 +125,10 @@ bool WgSurface::Fill( WgColor col, const WgRect& _rect )
 
 
 	Uint32 pixel = Col2Pixel( col );
-	int width = Width();
-	int height = Height();
+	int width = rect.w;
+	int height = rect.h;
 	int pitch = Pitch();
-	Uint8 * pDest = m_pPixels;
+	Uint8 * pDest = m_pPixels + rect.y * pitch + rect.x*m_pixelFormat.bits/8;
 
 	bool ret = true;
 	switch( m_pixelFormat.bits )
