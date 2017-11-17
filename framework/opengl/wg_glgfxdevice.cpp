@@ -37,7 +37,7 @@
 #	include <gl/glu.h>
 #endif
 
-using namespace std;
+§using namespace std;
 
 
 //____ Vertex and Fragment shaders ____________________________________________
@@ -341,9 +341,16 @@ WgGlGfxDevice::WgGlGfxDevice( WgSize canvas ) : WgGfxDevice(canvas)
 
     glGenFramebuffers(1, &m_framebufferId);
 
-	glGenTextures(1, &m_horrWaveBufferTexture);
-	glGenBuffers(1, &m_horrWaveBufferTextureData);
+    // For some unknown reason this causes issues with techture bliting in the second open instance
+    // For now only turn this on for products that needs it (i.e. Weiss plug-ins)
+    if(g_bSoftubeProductUseCodeInDevelopment)
+    {
+        glGenTextures(1, &m_horrWaveBufferTexture);
+        glGenBuffers(1, &m_horrWaveBufferTextureData);
+        glGenBuffers(1, &m_dummyBuffer);
 
+    }
+        
     SetCanvas( canvas );
     SetTintColor( WgColor::white );
     
@@ -357,6 +364,7 @@ WgGlGfxDevice::~WgGlGfxDevice()
     assert( glGetError() == 0 );
     glDeleteBuffers(1, &m_vertexBufferId);
     glDeleteBuffers(1, &m_texCoordBufferId);
+    glDeleteBuffers(1, &m_dummyBuffer);
     assert( glGetError() == 0 );
     glDeleteVertexArrays(1, &m_vertexArrayId);
     assert( glGetError() == 0 );

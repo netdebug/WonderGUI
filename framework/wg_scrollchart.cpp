@@ -711,11 +711,12 @@ void WgScrollChart::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 		
 		float samplesPerPixel = m_sampleTTL / (float) m_pCanvas->Size().w;
 
-		m_scrollAmount =  (int) ((m_scrollFraction-1) / samplesPerPixel);
+		int scrollAmount =  (int) ((m_scrollFraction-1) / samplesPerPixel);
 
-		m_scrollFraction -= m_scrollAmount * samplesPerPixel;
+        m_scrollAmount += scrollAmount;
+		m_scrollFraction -= scrollAmount * samplesPerPixel;
 
-		if (m_scrollAmount > 0)
+		if (scrollAmount > 0)
 		{
 			_requestRender();
 

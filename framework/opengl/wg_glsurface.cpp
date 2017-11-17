@@ -42,9 +42,16 @@ static const char	c_surfaceType[] = {"OpenGL"};
 
 WgSize WgGlSurface::MaxSize()
 {
-	GLint maxSize;
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxSize);
-	return WgSize(maxSize,maxSize);
+    GLenum err;
+    assert( 0 == ( err = glGetError()));
+    
+    GLint maxSize = 1000;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxSize);
+    
+    assert( maxSize > 1000 );
+    assert( 0 == ( err = glGetError()));
+    
+    return WgSize(maxSize,maxSize);
 }
 
 
