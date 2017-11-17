@@ -55,6 +55,13 @@ class WgEventFilter
 public:
 	WgEventFilter() : m_eventType(WG_EVENT_DUMMY), m_pFilterFunc(_filterDummy) {}	//Not meant to be public, but has to for compatibility with older compilers.
 	
+	static WgEventFilter	Type(int type);
+	static WgEventFilter	Source(WgWidget * pWidget);
+	static WgEventFilter	WidgetId(int id);
+	static WgEventFilter	TypeAndSource(int type, WgWidget * pWidget);
+	static WgEventFilter	TypeAndWidgetId(int type, int id);
+
+
 	static WgEventFilter	Tick();
 	static WgEventFilter	PointerChange();
 
@@ -239,7 +246,10 @@ private:
 
 	static bool _filterDummy( const WgEvent::Event * pEvent, const WgEventFilter& filter );
 	static bool _filterType( const WgEvent::Event * pEvent, const WgEventFilter& filter );
+	static bool _filterWidget(const WgEvent::Event * pEvent, const WgEventFilter& filter);
+	static bool _filterWidgetId(const WgEvent::Event * pEvent, const WgEventFilter& filter);
 	static bool _filterTypeWidget( const WgEvent::Event * pEvent, const WgEventFilter& filter );
+	static bool _filterTypeWidgetId(const WgEvent::Event * pEvent, const WgEventFilter& filter);
 
 	static bool _filterPointerEvents( const WgEvent::Event * pEvent, const WgEventFilter& filter );
 	static bool _filterMouseButtonEvents( const WgEvent::Event * pEvent, const WgEventFilter& filter );

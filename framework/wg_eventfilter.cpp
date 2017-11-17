@@ -35,6 +35,40 @@
 
 
 
+//____ Source() _________________________________________________________________
+
+WgEventFilter WgEventFilter::Source(WgWidget * pWidget)
+{
+	return WgEventFilter(WG_EVENT_DUMMY, pWidget, _filterWidget);
+}
+
+//____ Type() _________________________________________________________________
+
+WgEventFilter WgEventFilter::Type(int type)
+{
+	return WgEventFilter((WgEventType) type, 0, _filterType);
+}
+
+//____ WidgetId() _________________________________________________________________
+
+WgEventFilter WgEventFilter::WidgetId(int id)
+{
+	return WgEventFilter(WG_EVENT_DUMMY, 0, _filterWidgetId, id);
+}
+
+//____ TypeAndSource() _________________________________________________________________
+
+WgEventFilter WgEventFilter::TypeAndSource(int type, WgWidget * pWidget)
+{
+	return WgEventFilter((WgEventType)type, pWidget, _filterTypeWidget);
+}
+
+//____ TypeAndWidgetId() _________________________________________________________________
+
+WgEventFilter WgEventFilter::TypeAndWidgetId(int type, int id)
+{
+	return WgEventFilter((WgEventType)type, 0, _filterTypeWidgetId, id);
+}
 
 //____ Tick() _________________________________________________________________
 
@@ -735,6 +769,23 @@ bool WgEventFilter::_filterType( const WgEvent::Event * pEvent, const WgEventFil
 	return false;
 }
 
+bool WgEventFilter::_filterWidget(const WgEvent::Event * pEvent, const WgEventFilter& filter)
+{
+	if (pEvent->Widget() == filter.Widget())
+		return true;
+
+	return false;
+}
+
+bool WgEventFilter::_filterWidgetId(const WgEvent::Event * pEvent, const WgEventFilter& filter)
+{
+	if (pEvent->Widget() && pEvent->Widget()->Id() == filter.m_data1)
+		return true;
+
+	return false;
+}
+
+
 bool WgEventFilter::_filterTypeWidget( const WgEvent::Event * pEvent, const WgEventFilter& filter )
 {
 	if( pEvent->Type() == filter.EventType() && (!filter.Widget() || filter.Widget() == pEvent->Widget()) )
@@ -742,6 +793,15 @@ bool WgEventFilter::_filterTypeWidget( const WgEvent::Event * pEvent, const WgEv
 
 	return false;
 }
+
+bool WgEventFilter::_filterTypeWidgetId(const WgEvent::Event * pEvent, const WgEventFilter& filter)
+{
+	if (pEvent->Type() == filter.EventType() && (pEvent->Widget() && pEvent->Widget()->Id() == filter.m_data1))
+		return true;
+
+	return false;
+}
+
 
 bool WgEventFilter::_filterMouseButtonEvents( const WgEvent::Event * pEvent, const WgEventFilter& filter )
 {
