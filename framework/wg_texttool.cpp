@@ -200,7 +200,7 @@ Uint32 WgTextTool::readString( const char *& pSrc, Uint16 * pDst, Uint32 maxChar
 	}
 	Uint32 n = 0;
 
-	while( * pSrc != 0 && n < maxChars )
+	while(n < maxChars && * pSrc != 0 )
 		pDst[n++] = readChar(pSrc);
 
 	if( n != maxChars )
@@ -219,7 +219,7 @@ Uint32 WgTextTool::readString( const char *& pSrc, WgChar * pDst, Uint32 maxChar
 	}
 	Uint32 n = 0;
 
-	while( * pSrc != 0 && n < maxChars )
+	while(n < maxChars && * pSrc != 0 )
 	{
 		pDst[n++].SetGlyph(readChar(pSrc));
 	}
@@ -238,7 +238,7 @@ Uint32 WgTextTool::readString( const Uint16 *& pSrc, WgChar * pDst, Uint32 maxCh
 	}
 	Uint32 n = 0;
 
-	while( * pSrc != 0 && n < maxChars )
+	while( n < maxChars && * pSrc != 0 )
 		pDst[n++].SetGlyph( * pSrc++);
 
 	if( n != maxChars )
@@ -258,7 +258,7 @@ Uint32 WgTextTool::readString( const char *& pSrc, WgCodePage codepage, WgChar *
 	}
 
 	Uint32 n = 0;
-	for( unsigned char * p = (unsigned char *) pDst ; p[n] != 0 && n < maxChars ; n++ )
+	for( unsigned char * p = (unsigned char *) pDst ; n < maxChars && p[n] != 0 ; n++ )
 		pDst[n].SetGlyph( pCP[p[n]] );
 
 	if( n != maxChars )
@@ -277,7 +277,7 @@ Uint32 WgTextTool::readString( const char *& pSrc, WgCodePage codepage, Uint16 *
 	}
 
 	Uint32 n = 0;
-	for( unsigned char * p = (unsigned char *) pDst ; p[n] != 0 && n < maxChars ; n++ )
+	for( unsigned char * p = (unsigned char *) pDst ; n < maxChars && p[n] != 0 ; n++ )
 		pDst[n] = pCP[p[n]];
 
 	if( n != maxChars )
@@ -341,7 +341,7 @@ Uint32 WgTextTool::countNonFormattingChars( const char * pStr, Uint32 strlen )
 
 	const char * pEnd = pStr + strlen;
 	Uint32 n = 0;
-	while( * pStr != 0 && pStr != pEnd )
+	while(pStr != pEnd && * pStr != 0 )
 	{
 		Uint16 c = readChar(pStr);
 
@@ -387,7 +387,7 @@ Uint32 WgTextTool::countNonFormattingChars( const Uint16 * pStr, Uint32 strlen )
 
 	const Uint16 * pEnd = pStr + strlen;
 	Uint32 n = 0;
-	while( * pStr != 0 && pStr != pEnd )
+	while(pStr != pEnd && * pStr != 0 )
 	{
 		Uint16 c = * pStr++;
 
@@ -432,7 +432,7 @@ Uint32 WgTextTool::getTextSizeStripped( const char * pStr, Uint32 maxChars )
 {
 	Uint32 nChar = 0;
 
-	while( * pStr != 0 && nChar < maxChars )
+	while(nChar < maxChars && * pStr != 0 )
 	{
 		char c = * pStr++;
 
@@ -476,7 +476,7 @@ Uint32 WgTextTool::getTextSizeStripped( const Uint16 * pStr, Uint32 maxChars )
 {
 	Uint32 nChar = 0;
 
-	while( * pStr != 0 && nChar < maxChars )
+	while(nChar < maxChars && * pStr != 0 )
 	{
 		Uint16 c = * pStr++;
 
@@ -522,7 +522,7 @@ Uint32 WgTextTool::getTextSizeStrippedUTF8( const char * pStr, Uint32 maxChars )
 	Uint32 nChar = 0;
 	Uint32 nBytes = 0;
 
-	while( * pStr != 0 && nChar < maxChars )
+	while(nChar < maxChars && * pStr != 0 )
 	{
 		char c = * pStr++;
 
@@ -576,7 +576,7 @@ Uint32 WgTextTool::getTextSizeStrippedUTF8( const Uint16 * pStr, Uint32 maxChars
 	Uint32 nChar = 0;
 	Uint32 nBytes = 0;
 
-	while( * pStr != 0 && nChar < maxChars )
+	while(nChar < maxChars && * pStr != 0 )
 	{
 		Uint16 c = * pStr++;
 
@@ -1883,7 +1883,7 @@ inline Uint8 WgTextTool::AsciiToNibble( Uint8 ascii )
 //____ Uint16ToAscii() ____________________________________________________________
 bool WgTextTool::Uint16ToAscii( Uint16 value, Uint16 * pDest, Uint32 maxChars )
 {
-	if( 0 == pDest || maxChars < 4 )
+	if(maxChars < 4 || 0 == pDest )
 		return false;
 
 	Uint8ToAscii( value >> 8, (Uint16*)&pDest[0], 2 );
@@ -1906,7 +1906,7 @@ Uint16 WgTextTool::AsciiToUint16( const Uint16 * pAscii )
 //____ Uint16ToAscii() ____________________________________________________________
 bool WgTextTool::Uint16ToAscii( Uint16 value, char * pDest, Uint32 maxChars )
 {
-	if( 0 == pDest || maxChars < 4 )
+	if(maxChars < 4 || 0 == pDest )
 		return false;
 
 	Uint8ToAscii( value >> 8, (char*)&pDest[0], 2 );
@@ -1929,7 +1929,7 @@ Uint16 WgTextTool::AsciiToUint16( const char * pAscii )
 //____ Uint8ToAscii( Uint16* ) ____________________________________________________________
 bool WgTextTool::Uint8ToAscii( Uint8 value, Uint16 * pDest, Uint32 maxChars )
 {
-	if( 0 == pDest || maxChars < 2 )
+	if(maxChars < 2 || 0 == pDest )
 		return false;
 
 	Uint8 high = NibbleToAscii( value >> 4 );
@@ -1955,7 +1955,7 @@ Uint8 WgTextTool::AsciiToUint8( const Uint16 * pAscii )
 //____ Uint8ToAscii( char* ) ____________________________________________________________
 bool WgTextTool::Uint8ToAscii( Uint8 value, char * pDest, Uint32 maxChars )
 {
-	if( 0 == pDest || maxChars < 2 )
+	if(maxChars < 4 || 0 == pDest )
 		return false;
 
 	Uint8 high = NibbleToAscii( value >> 4 );
@@ -2332,7 +2332,7 @@ void WgTextTool::forwardCharacters( const char *& pChar, Uint32 nChars )
 void WgTextTool::forwardEscapedCharacters( const char *& pStr, Uint32 nChars )
 {
 	Uint32 n = 0;
-	while( * pStr != 0 && n < nChars )
+	while( n < nChars && * pStr != 0 )
 	{
 		Uint16 c = readChar(pStr);
 
@@ -2375,7 +2375,7 @@ void WgTextTool::forwardEscapedCharacters( const char *& pStr, Uint32 nChars )
 void WgTextTool::forwardEscapedCharacters( const Uint16 *& pStr, Uint32 nChars )
 {
 	Uint32 n = 0;
-	while( * pStr != 0 && n < nChars )
+	while(n < nChars && * pStr != 0 )
 	{
 		Uint16 c = * pStr++;
 
