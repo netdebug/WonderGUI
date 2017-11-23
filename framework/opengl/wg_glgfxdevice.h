@@ -160,6 +160,8 @@ protected:
 	GLint	m_horrWaveProgFrontFillLoc;
 	GLint	m_horrWaveProgBackFillLoc;
 
+    GLuint  m_dummyBuffer;
+    
     GLuint  m_vertexArrayId;
     GLuint  m_vertexBufferId;
     GLfloat m_vertexBufferData[8];         // Space to store a quad (through triangle strip)

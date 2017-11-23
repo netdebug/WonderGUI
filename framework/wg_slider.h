@@ -65,13 +65,12 @@ class	WgWidgetSlider : public WgWidget
 			HEADER_BWD	= 2,
 			FOOTER_FWD	= 4,
 			FOOTER_BWD	= 8,
-			WINDOWS		= HEADER_BWD | FOOTER_FWD,							// Like windows
 			NEXT_VERT	= FOOTER_FWD | FOOTER_BWD,							// Like NeXT's vertical dragbar.
 			NEXT_HORR	= HEADER_BWD | HEADER_FWD,							// Like NeXT's horizontal dragbar.
 			ALL			= HEADER_FWD | FOOTER_FWD | HEADER_BWD | FOOTER_BWD,
 
 
-			DEFAULT		= WINDOWS
+			DEFAULT		= HEADER_BWD | FOOTER_FWD
 		};
 
 		enum BgPressMode
