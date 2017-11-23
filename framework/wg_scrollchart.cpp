@@ -711,9 +711,11 @@ void WgScrollChart::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 		
 		float samplesPerPixel = m_sampleTTL / (float) m_pCanvas->Size().w;
 
-		m_scrollAmount =  (int) ((m_scrollFraction-1) / samplesPerPixel);
 
-		m_scrollFraction -= m_scrollAmount * samplesPerPixel;
+		int scrollAmount =  (int) ((m_scrollFraction-1) / samplesPerPixel);
+
+		m_scrollFraction -= scrollAmount * samplesPerPixel;
+		m_scrollAmount += scrollAmount;
 
 		if (m_scrollAmount > 0)
 		{
@@ -827,6 +829,7 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 
 				WgRect canvas2(0, 0, width2, m_pCanvas->Size().h);
 				pDevice->Fill(canvas2, m_chartColor);
+				_renderGridLines(pDevice, canvas2, canvas2, canvas2);
 				_renderWaveSegment(pDevice, canvas2, windowBegin, windowEnd, timestampInc);
 			}
 
