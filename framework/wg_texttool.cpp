@@ -1955,7 +1955,7 @@ Uint8 WgTextTool::AsciiToUint8( const Uint16 * pAscii )
 //____ Uint8ToAscii( char* ) ____________________________________________________________
 bool WgTextTool::Uint8ToAscii( Uint8 value, char * pDest, Uint32 maxChars )
 {
-	if(maxChars < 4 || 0 == pDest )
+	if( maxChars < 2 || 0 == pDest )
 		return false;
 
 	Uint8 high = NibbleToAscii( value >> 4 );
