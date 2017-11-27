@@ -37,7 +37,7 @@
 #	include <gl/glu.h>
 #endif
 
-§using namespace std;
+using namespace std;
 
 
 //____ Vertex and Fragment shaders ____________________________________________
@@ -343,7 +343,7 @@ WgGlGfxDevice::WgGlGfxDevice( WgSize canvas ) : WgGfxDevice(canvas)
 
     // For some unknown reason this causes issues with techture bliting in the second open instance
     // For now only turn this on for products that needs it (i.e. Weiss plug-ins)
-    if(g_bSoftubeProductUseCodeInDevelopment)
+ //   if(g_bSoftubeProductUseCodeInDevelopment)
     {
         glGenTextures(1, &m_horrWaveBufferTexture);
         glGenBuffers(1, &m_horrWaveBufferTextureData);

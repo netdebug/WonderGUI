@@ -46,7 +46,7 @@ public:
 	void	SetColors( const WgColorsetPtr& pColors );
 	const	WgColorsetPtr	GetColors() const		{ return m_pColors; }
 
-	void	SetPreferredSize( const WgSize& size );
+	void	SetPreferredPointSize( const WgSize& size );
 	WgSize	PreferredSize() const;
 
 protected:
@@ -57,6 +57,7 @@ protected:
 	bool	_onAlphaTest( const WgCoord& ofs );
 	void	_onEnable();
 	void	_onDisable();
+	void	_setScale(int scale) override;
 
 private:
 
