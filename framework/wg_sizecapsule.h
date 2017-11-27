@@ -29,11 +29,7 @@
 #	include <wg_capsule.h>
 #endif
 
-#ifndef WG_SIZESCALER_DOT_H
-#	include <wg_sizescaler.h>
-#endif
-
-class WgSizeCapsule : public WgCapsule, public WgScalable
+class WgSizeCapsule : public WgCapsule
 {
 public:
 	WgSizeCapsule();
@@ -43,11 +39,11 @@ public:
 	static const char * GetClass();
 	virtual WgWidget * NewOfMyType() const { return new WgSizeCapsule(); };
 
-	void	SetSizes( WgSize min, WgSize preferred, WgSize max );
+	void	SetSizes( WgSize min, WgSize preferred, WgSize max );   // Measured in points
 
-	void	SetPreferredSize( WgSize size );
-	void	SetMinSize( WgSize size );
-	void	SetMaxSize( WgSize size );
+	void	SetPreferredSize( WgSize size );        // Measured in points
+	void	SetMinSize( WgSize size );              // Measured in points
+	void	SetMaxSize( WgSize size );              // Measured in points
 
 	WgSize	PreferredSize() const;
 	WgSize	MinSize() const;
@@ -57,11 +53,15 @@ public:
 	int		WidthForHeight( int height ) const;
 
 private:
-	void	_onScaleChanged();
+	void	_setScale(int scale);
 
-	WgSize			m_min;
-	WgSize			m_max;
-	WgSize			m_preferred;
+    WgSize          m_pixelsMin;              // Measured in pixels
+    WgSize          m_pixelsMax;              // Measured in pixels
+    WgSize          m_pixelsPreferred;        // Measured in pixels
+    
+	WgSize			m_pointsMin;
+	WgSize			m_pointsMax;
+	WgSize			m_pointsPreferred;
 };
 
 #endif //WG_SIZECAPSULE_DOT_H

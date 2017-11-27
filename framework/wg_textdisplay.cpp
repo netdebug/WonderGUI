@@ -346,7 +346,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 		if( static_cast<const WgEvent::KeyEvent*>(pEvent)->IsMovementKey() == false &&
 			key != WG_KEY_DELETE && key != WG_KEY_BACKSPACE && key != WG_KEY_RETURN && (key != WG_KEY_TAB || !m_bTabLock) )
 				pHandler->ForwardEvent( pEvent );
-		
+
 		//TODO: Would be good if we didn't forward any character-creating keys either...
 	}
 	else if( type != WG_EVENT_CHARACTER )
@@ -417,6 +417,7 @@ void WgTextDisplay::_onLostInputFocus()
 	{
 		_stopReceiveTicks();
 		_requestRender();
+        _queueEvent(new WgEvent::TextSet(this, m_pText));
 	}
 }
 

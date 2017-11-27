@@ -622,31 +622,19 @@ void WgFlexHook::_refreshRealGeo()
 }
 
 //____ WgFlexHook::_sizeNeededForGeo() ________________________________________
-
+/*
 WgSize WgFlexHook::_sizeNeededForGeo()
 {
 	WgSize sz;
 
-	int scale = m_pParent->m_scale;
-	
-	WgBorders scaledPadding( (m_padding.left * scale) >> WG_SCALE_BINALS,
-							 (m_padding.top * scale) >> WG_SCALE_BINALS,
-							 (m_padding.right * scale) >> WG_SCALE_BINALS,
-							 (m_padding.bottom * scale) >> WG_SCALE_BINALS );
-
 	if( m_bFloating )
 	{
-		WgRect scaledGeo( (m_placementGeo.x * scale) >> WG_SCALE_BINALS,
-						  (m_placementGeo.y * scale) >> WG_SCALE_BINALS,
-						  (m_placementGeo.w * scale) >> WG_SCALE_BINALS,
-						  (m_placementGeo.h * scale) >> WG_SCALE_BINALS );
-
-        WgRect geo = scaledGeo + scaledPadding;
+        WgRect geo = m_placementGeo + m_padding;
         
 		const WgFlexAnchor * pa = m_pParent->Anchor(m_anchor);
 
 		WgCoord hotspot = WgUtil::OrigoToOfs(m_hotspot,geo.Size());
-		WgCoord offset = (pa->Offset()*scale)/WG_SCALE_BASE + geo.Pos() - hotspot;
+		WgCoord offset = pa->Offset() + geo.Pos() - hotspot;
 
 		int leftOfAnchor = 0 - offset.x;
 		int rightOfAnchor = offset.x + geo.w;
@@ -675,19 +663,87 @@ WgSize WgFlexHook::_sizeNeededForGeo()
 	}
 	else
 	{
-		sz = m_pWidget->PreferredSize() + scaledPadding;
+		sz = m_pWidget->PreferredSize() + m_padding;
 
 		const WgFlexAnchor * pa1 = m_pParent->Anchor(m_anchorTopLeft);
 		const WgFlexAnchor * pa2 = m_pParent->Anchor(m_anchorBottomRight);
 
-		sz += WgSize((pa1->OffsetX()*scale)>>WG_SCALE_BINALS,(pa1->OffsetY()*scale)>>WG_SCALE_BINALS);
-		sz -= WgSize((pa2->OffsetX()*scale)>>WG_SCALE_BINALS,(pa2->OffsetY()*scale)>>WG_SCALE_BINALS);
+		sz += WgSize(pa1->OffsetX(),pa1->OffsetY());
+		sz -= WgSize(pa2->OffsetX(),pa2->OffsetY());
 
 		sz.w = (int) (sz.w / (float) (pa2->RelativeX() - pa1->RelativeX()));
 		sz.h = (int) (sz.w / (float) (pa2->RelativeY() - pa1->RelativeY()));
 	}
 
 	return sz;
+}
+*/
+
+WgSize WgFlexHook::_sizeNeededForGeo()
+{
+    WgSize sz;
+    
+    int scale = m_pParent->m_scale;
+    
+    WgBorders scaledPadding( (m_padding.left * scale) >> WG_SCALE_BINALS,
+                            (m_padding.top * scale) >> WG_SCALE_BINALS,
+                            (m_padding.right * scale) >> WG_SCALE_BINALS,
+                            (m_padding.bottom * scale) >> WG_SCALE_BINALS );
+    
+    if( m_bFloating )
+    {
+        WgRect scaledGeo( (m_placementGeo.x * scale) >> WG_SCALE_BINALS,
+                         (m_placementGeo.y * scale) >> WG_SCALE_BINALS,
+                         (m_placementGeo.w * scale) >> WG_SCALE_BINALS,
+                         (m_placementGeo.h * scale) >> WG_SCALE_BINALS );
+        
+        WgRect geo = scaledGeo + scaledPadding;
+        
+        const WgFlexAnchor * pa = m_pParent->Anchor(m_anchor);
+        
+        WgCoord hotspot = WgUtil::OrigoToOfs(m_hotspot,geo.Size());
+        WgCoord offset = (pa->Offset()*scale)/WG_SCALE_BASE + geo.Pos() - hotspot;
+        
+        int leftOfAnchor = 0 - offset.x;
+        int rightOfAnchor = offset.x + geo.w;
+        int aboveAnchor = 0 - offset.y;
+        int belowAnchor = offset.y + geo.h;
+        
+        if( leftOfAnchor > 0 )
+            sz.w = (int) (leftOfAnchor / pa->RelativeX());
+        
+        if( rightOfAnchor > 0 )
+        {
+            int w = (int) (rightOfAnchor / (1.f - pa->RelativeX()) );
+            if( sz.w < w )
+                sz.w = w;
+        }
+        
+        if( aboveAnchor > 0 )
+            sz.h = (int) (aboveAnchor / pa->RelativeY());
+        
+        if( belowAnchor > 0 )
+        {
+            int h = (int) (belowAnchor / (1.f - pa->RelativeY()) );
+            if( sz.h < h )
+                sz.h = h;
+        }
+    }
+    else
+    {
+        sz = m_pWidget->PreferredSize() + scaledPadding;
+        
+        const WgFlexAnchor * pa1 = m_pParent->Anchor(m_anchorTopLeft);
+        const WgFlexAnchor * pa2 = m_pParent->Anchor(m_anchorBottomRight);
+        
+        sz += WgSize((pa1->OffsetX()*scale)>>WG_SCALE_BINALS,(pa1->OffsetY()*scale)>>WG_SCALE_BINALS);
+        sz -= WgSize((pa2->OffsetX()*scale)>>WG_SCALE_BINALS,(pa2->OffsetY()*scale)>>WG_SCALE_BINALS);
+        
+        sz.w = (int) (sz.w / (float) (pa2->RelativeX() - pa1->RelativeX()));
+        sz.h = (int) (sz.w / (float) (pa2->RelativeY() - pa1->RelativeY()));
+    }
+    
+    return sz;
 }
 
 
@@ -1123,20 +1179,39 @@ const WgFlexAnchor * WgFlexPanel::Anchor( int index )
 	return 0;
 }
 
+//____ SetPreferredSize() ________________________________________________________
+
+void WgFlexPanel::SetPreferredSize( WgSize size )
+{
+    if( size != m_preferredSize )
+    {
+        m_preferredSize = size;
+        _requestResize();
+    }
+}
+
+
 //____ PreferredSize() _____________________________________________________________
 
 WgSize WgFlexPanel::PreferredSize() const
 {
-	WgSize minSize;
+    if( m_preferredSize.w > 0 && m_preferredSize.h > 0 )
+    {
+        return WgSize( m_preferredSize.w * m_scale >> WG_SCALE_BINALS, m_preferredSize.h * m_scale >> WG_SCALE_BINALS );
+    }
+    else
+    {
+        WgSize minSize;
 
-	WgFlexHook * pHook = m_hooks.First();
-	while( pHook )
-	{
-		WgSize sz = pHook->_sizeNeededForGeo();
-		minSize = WgSize::Max(minSize,sz);
-		pHook = pHook->Next();
-	}
-	return minSize;
+        WgFlexHook * pHook = m_hooks.First();
+        while( pHook )
+        {
+            WgSize sz = pHook->_sizeNeededForGeo();
+            minSize = WgSize::Max(minSize,sz);
+            pHook = pHook->Next();
+        }
+        return minSize;
+    }
 }
 
 //____ _onRequestRender() ______________________________________________________
@@ -1201,17 +1276,20 @@ void WgFlexPanel::_setScale( int scale )
 	{
 		pHook->_refreshRealGeo();
 		pHook = pHook->Prev();
-	}	
+	}
+    
+    if( m_preferredSize.w > 0 && m_preferredSize.h > 0 )
+        _requestResize();
 }
 
 //____ _scaledPreferredSize() __________________________________________________
 
 WgSize WgFlexPanel::_scaledPreferredSize( WgWidget * pWidget )
 {
-    WgSize sz = pWidget->PreferredSize();
+    WgSize sz = pWidget->PreferredPointSize();
 
-    sz.w = (sz.w << WG_SCALE_BINALS) / m_scale;
-    sz.h = (sz.h << WG_SCALE_BINALS) / m_scale;
+//    sz.w = (sz.w << WG_SCALE_BINALS) / m_scale;
+//    sz.h = (sz.h << WG_SCALE_BINALS) / m_scale;
 
     return sz;
 }

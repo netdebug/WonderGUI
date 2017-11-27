@@ -113,6 +113,15 @@ public:
 
 	// Convenient calls to hook
 
+    WgCoord         PointPos() const { return (Pos() * WG_SCALE_BASE) / m_scale; }
+    WgSize          PointSize() const { return (Size() * WG_SCALE_BASE) / m_scale; }
+    WgRect          PointGeo() const { WgRect r = Geo(); return WgRect(r.x*WG_SCALE_BASE/m_scale, r.y*WG_SCALE_BASE/m_scale, r.w*WG_SCALE_BASE/m_scale, r.w*WG_SCALE_BASE/m_scale ); }
+
+    WgSize          PreferredPointSize() const { WgSize sz = PreferredSize(); return sz*WG_SCALE_BASE/m_scale; };
+    WgSize          MinPointSize() const { WgSize sz = MinSize(); return sz*WG_SCALE_BASE/m_scale; };
+    WgSize          MaxPointSize() const { WgSize sz = MaxSize(); return sz*WG_SCALE_BASE/m_scale; };
+
+    
 	WgCoord			Pos() const { if( m_pHook ) return m_pHook->Pos(); return WgCoord(0,0); }
 	WgSize			Size() const { if( m_pHook ) return m_pHook->Size(); return WgSize(256,256); }
 	WgRect			Geo() const { if( m_pHook ) return m_pHook->Geo(); return WgRect(0,0,256,256); }

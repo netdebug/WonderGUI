@@ -26,7 +26,7 @@ static const char	c_widgetType[] = {"SizeCapsule"};
 
 //____ Constructor ____________________________________________________________
 
-WgSizeCapsule::WgSizeCapsule() : m_max(INT_MAX,INT_MAX)
+WgSizeCapsule::WgSizeCapsule() : m_pointsMax(INT_MAX,INT_MAX), m_pixelsMax(INT_MAX,INT_MAX)
 {
 }
 
@@ -52,43 +52,54 @@ const char * WgSizeCapsule::GetClass()
 
 //____ SetPreferredSize() _____________________________________________________
 
-void WgSizeCapsule::SetPreferredSize( WgSize size )
+void WgSizeCapsule::SetPreferredSize( WgSize _size )
 {
-	if( size != m_preferred )
+    
+	if( _size != m_pixelsPreferred )
 	{
-		m_preferred = size;
+		m_pointsPreferred = _size;
+        m_pixelsPreferred = WgSize(_size.w*m_scale>>WG_SCALE_BINALS, _size.h*m_scale>>WG_SCALE_BINALS);
 		_requestResize();
 	}
 }
 
 //____ SetSizes() _____________________________________________________________
 
-void WgSizeCapsule::SetSizes( WgSize min, WgSize preferred, WgSize max )
+void WgSizeCapsule::SetSizes( WgSize _min, WgSize _preferred, WgSize _max )
 {
-	m_min = min;
-	m_preferred = preferred;
-	m_max = max;
-	_requestResize();
+
+	m_pointsMin = _min;
+	m_pointsPreferred = _preferred;
+	m_pointsMax = _max;
+
+    m_pixelsMin = WgSize(_min.w*m_scale>>WG_SCALE_BINALS, _min.h*m_scale>>WG_SCALE_BINALS);
+    m_pixelsPreferred = WgSize(_preferred.w*m_scale>>WG_SCALE_BINALS, _preferred.h*m_scale>>WG_SCALE_BINALS);
+    m_pixelsMax = WgSize(_max.w*m_scale>>WG_SCALE_BINALS, _max.h*m_scale>>WG_SCALE_BINALS);
+    _requestResize();
 }
 
 //____ SetMinSize() ___________________________________________________________
 
-void WgSizeCapsule::SetMinSize( WgSize size )
+void WgSizeCapsule::SetMinSize( WgSize _size )
 {
-	if( size != m_min )
+
+    if( _size != m_pixelsMin )
 	{
-		m_min = size;
+		m_pointsMin = _size;
+        m_pixelsMin = WgSize(_size.w*m_scale>>WG_SCALE_BINALS, _size.h*m_scale>>WG_SCALE_BINALS);
 		_requestResize();
 	}
 }
 
 //____ SetMaxSize() ___________________________________________________________
 
-void WgSizeCapsule::SetMaxSize( WgSize size )
+void WgSizeCapsule::SetMaxSize( WgSize _size )
 {
-	if( size != m_max )
+
+    if( _size != m_pixelsMax )
 	{
-		m_max = size;
+		m_pointsMax = _size;
+        m_pixelsMax =  WgSize(_size.w*m_scale>>WG_SCALE_BINALS, _size.h*m_scale>>WG_SCALE_BINALS);
 		_requestResize();
 	}
 }
@@ -102,17 +113,13 @@ WgSize WgSizeCapsule::PreferredSize() const
 	{
 		WgSize pref = m_hook.Widget()->PreferredSize();
 
-		if( m_preferred.w != 0 )
+		if( m_pixelsPreferred.w != 0 )
 		{
-			pref.w = m_preferred.w;
-			if( m_pScaler )
-				pref.w *= m_pScaler->ScaleX();
+			pref.w = m_pixelsPreferred.w;
 		}
-		if( m_preferred.h != 0 )
+		if( m_pixelsPreferred.h != 0 )
 		{
-			pref.h = m_preferred.h;
-			if( m_pScaler )
-				pref.h *= m_pScaler->ScaleY();
+			pref.h = m_pixelsPreferred.h;
 		}
 
 		// Constrain against min/max, taking WidthForHeight/HeightForWidth into account.
@@ -167,12 +174,7 @@ WgSize WgSizeCapsule::PreferredSize() const
 	}
 	else
 	{
-		WgSize pref = m_preferred;
-		if( m_pScaler )
-		{
-			pref.w *= m_pScaler->ScaleX();
-			pref.h *= m_pScaler->ScaleY();
-		}
+		WgSize pref = m_pixelsPreferred;
 		return pref;
 	}
 }
@@ -183,9 +185,9 @@ WgSize WgSizeCapsule::MinSize() const
 {
 
 	if( m_hook.Widget() )
-		return WgSize::Max(m_min,m_hook.Widget()->MinSize());
+		return WgSize::Max(m_pixelsMin,m_hook.Widget()->MinSize());
 	else
-		return m_min;
+		return m_pixelsMin;
 }
 
 //____ MaxSize() ______________________________________________________________
@@ -193,22 +195,19 @@ WgSize WgSizeCapsule::MinSize() const
 WgSize WgSizeCapsule::MaxSize() const 
 {
 	if( m_hook.Widget() )
-		return WgSize::Min(m_max,m_hook.Widget()->MaxSize());
+		return WgSize::Min(m_pixelsMax,m_hook.Widget()->MaxSize());
 	else
-		return m_max; 
+		return m_pixelsMax;
 }
 
 //____ HeightForWidth() _______________________________________________________
 
 int WgSizeCapsule::HeightForWidth( int width ) const
 {
-	if( m_preferred.h != 0 )
+	if( m_pixelsPreferred.h != 0 )
 	{
-		int h = m_preferred.h;
+		int h = m_pixelsPreferred.h;
 		
-		if( m_pScaler )
-			h *= m_pScaler->ScaleY();
-
 		if( m_hook.Widget() )
 		{
 			int max = m_hook.Widget()->MaxSize().h;
@@ -220,23 +219,20 @@ int WgSizeCapsule::HeightForWidth( int width ) const
 	else if( m_hook.Widget() )
 	{
 		int h = m_hook.Widget()->HeightForWidth(width);
-		WG_LIMIT( h, m_min.h, m_max.h );
+		WG_LIMIT( h, m_pixelsMin.h, m_pixelsMax.h );
 		return h;
 	}
 	else
-		return m_min.h;
+		return m_pixelsMin.h;
 }
 
 //____ WidthForHeight() _______________________________________________________
 
 int WgSizeCapsule::WidthForHeight( int height ) const
 {
-	if( m_preferred.w != 0 )
+	if( m_pixelsPreferred.w != 0 )
 	{
-		int w = m_preferred.w;		
-
-		if( m_pScaler )
-			w *= m_pScaler->ScaleX();
+		int w = m_pixelsPreferred.w;
 
 		if( m_hook.Widget() )
 		{
@@ -249,16 +245,31 @@ int WgSizeCapsule::WidthForHeight( int height ) const
 	else if( m_hook.Widget() )
 	{
 		int w = m_hook.Widget()->WidthForHeight(height);
-		WG_LIMIT( w, m_min.w, m_max.w );
+		WG_LIMIT( w, m_pixelsMin.w, m_pixelsMax.w );
 		return w;
 	}
 	else
-		return m_min.w;
+		return m_pixelsMin.w;
 }
 
-//____ _onScaleChanged() ______________________________________________________
+//____ _setScale() ______________________________________________________
 
-void WgSizeCapsule::_onScaleChanged()
+void WgSizeCapsule::_setScale( int scale )
 {
-	_requestResize();
+    WgCapsule::_setScale(scale);
+    
+    m_pixelsMin = WgSize(m_pointsMin.w*m_scale>>WG_SCALE_BINALS, m_pointsMin.h*m_scale>>WG_SCALE_BINALS);
+    m_pixelsPreferred = WgSize(m_pointsPreferred.w*m_scale>>WG_SCALE_BINALS, m_pointsPreferred.h*m_scale>>WG_SCALE_BINALS);
+
+    if( m_pointsMax.w == INT_MAX )
+        m_pixelsMax.w = INT_MAX;
+    else
+        m_pixelsMax.w = m_pointsMax.w*m_scale>>WG_SCALE_BINALS;
+    
+    if( m_pointsMax.h == INT_MAX )
+        m_pixelsMax.h = INT_MAX;
+    else
+        m_pixelsMax.h = m_pointsMax.h*m_scale>>WG_SCALE_BINALS;
+
+    _requestResize();
 }

@@ -245,7 +245,8 @@ public:
 	// Overloaded from WgWidget
 
 	WgSize			PreferredSize() const;
-
+    void            SetPreferredSize( WgSize size );
+    
 private:
 
 	void			_onCloneContent( const WgWidget * _pOrg );
@@ -270,6 +271,7 @@ private:
 	std::vector<WgFlexAnchor>	m_anchors;
 
 	bool			m_bConfineChildren;
+    WgRect          m_preferredSize;
 
 	static WgFlexAnchor	g_baseAnchors[9];
 };
