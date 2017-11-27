@@ -74,16 +74,6 @@ void WgPanel::SetSkin( const WgSkinPtr& pSkin )
 	_requestRender();
 }
 
-//____ _onAlphaTest() _________________________________________________________
-
-bool WgPanel::_onAlphaTest( const WgCoord& ofs )
-{
-	if( m_pSkin )
-		return m_pSkin->MarkTest( ofs, Size(), WG_STATE_NORMAL, m_markOpacity, m_scale);
-	else
-		return false;		// By default cointainers have nothing to display themselves.
-}
-
 //____ _onCloneContent() _______________________________________________________
 
 void WgPanel::_onCloneContent( const WgPanel * _pOrg )
@@ -138,20 +128,6 @@ void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRec
 		case WG_MASKOP_MASK:
 			patches.Sub( WgRect(geo,clip) );
 			break;
-	}
-}
-
-//____ _onRender() ___________________________________________________________________
-
-void WgPanel::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip)
-{
-	if (m_pSkin)
-	{
-		WgState	state;
-		state.setFocused(m_bFocused);
-		state.setSelected(m_bSelected);
-
-		m_pSkin->Render(pDevice, state, _canvas, _clip, m_scale);
 	}
 }
 

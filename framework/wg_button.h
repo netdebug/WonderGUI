@@ -63,8 +63,11 @@ public:
 	void			SetIcon( const WgBlocksetPtr& pIconGfx );
 	WgBlocksetPtr	GetIconSource() const { return m_pIconGfx; }
 
-	bool			SetSource( const WgBlocksetPtr& pGfx );
-	WgBlocksetPtr	GetSource() const { return m_pBgGfx; }
+	void			SetSkin(const WgSkinPtr& pSkin);
+
+
+	bool			SetSource( const WgBlocksetPtr& pGfx );		// Deprecated! Use SetSkin() instead.
+	WgBlocksetPtr	GetSource() const { return m_pBgGfx; }		// Deprecated!
 
 	Uint32			GetTextAreaWidth();
 

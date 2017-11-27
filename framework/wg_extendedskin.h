@@ -42,8 +42,10 @@ public:
 
 	virtual WgSize	MinSize( int scale ) const;
 	virtual WgSize	PreferredSize( int scale ) const;
-
 	virtual WgSize	SizeForContent( const WgSize contentSize, int scale ) const;
+
+	virtual WgSize	ContentPadding(int scale) const;
+	virtual WgCoord	ContentOfs(WgState state, int scale) const;
 	virtual WgRect	ContentRect( const WgRect& canvas, WgState state, int scale ) const;
 
 protected:

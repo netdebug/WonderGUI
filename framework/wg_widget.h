@@ -40,6 +40,11 @@
 #	include <wg_event.h>
 #endif
 
+#ifndef WG_SKIN_DOT_H
+#	include <wg_skin.h>
+#endif
+
+
 class WgGfxDevice;
 class Wg_Interface_TextHolder;
 class WgContainer;
@@ -86,6 +91,9 @@ public:
 
 	inline int			Id() const { return m_id; }
 	inline void			SetId( int id ) { m_id = id; }
+
+//	void				SetSkin(const WgSkinPtr& pSkin);		// Method added separately to those widgets that support skin so far.
+	WgSkinPtr			Skin() const { return m_pSkin; }
 
 	virtual WgString	GetTooltipString() const { return m_tooltip; }
 	WgString			GetRealTooltipString() const { return m_tooltip; }
@@ -217,6 +225,8 @@ protected:
 
 	Uint32			m_id;
 	WgHook *		m_pHook;
+
+	WgSkinPtr		m_pSkin;
 
 	int				m_scale;
 	WgPointerStyle	m_pointerStyle;

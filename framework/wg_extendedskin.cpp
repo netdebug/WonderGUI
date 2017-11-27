@@ -109,6 +109,30 @@ WgSize WgExtendedSkin::SizeForContent( const WgSize contentSize, int scale ) con
 	return contentSize + _scaledContentPadding(scale);
 }
 
+//____ ContentPadding() _______________________________________________________
+
+WgSize WgExtendedSkin::ContentPadding(int scale) const
+{
+	// Note: The borders need to be scaled individually before they are added together.
+
+	return WgSize((m_contentPadding.left * scale >> WG_SCALE_BINALS) +
+			(m_contentPadding.right * scale >> WG_SCALE_BINALS),
+			(m_contentPadding.top * scale >> WG_SCALE_BINALS) +
+			(m_contentPadding.bottom * scale >> WG_SCALE_BINALS) );
+}
+
+//____ ContentOfs() ___________________________________________________________
+
+WgCoord	WgExtendedSkin::ContentOfs(WgState state, int scale) const
+{
+	WgCoord shift = m_contentShift[_stateToIndex(state)];
+	shift.x = shift.x * scale >> WG_SCALE_BINALS;
+	shift.y = shift.y * scale >> WG_SCALE_BINALS;
+
+	return WgCoord((m_contentPadding.left * scale >> WG_SCALE_BINALS), (m_contentPadding.top * scale >> WG_SCALE_BINALS)) + shift;
+}
+
+
 //____ ContentRect() __________________________________________________________
 
 WgRect WgExtendedSkin::ContentRect( const WgRect& canvas, WgState state, int scale ) const

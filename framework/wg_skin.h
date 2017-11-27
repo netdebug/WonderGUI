@@ -49,8 +49,10 @@ public:
 
 	virtual WgSize	MinSize( int scale ) const = 0;
 	virtual WgSize	PreferredSize( int scale ) const = 0;
-
 	virtual WgSize	SizeForContent( const WgSize contentSize, int scale ) const = 0;
+
+	virtual WgSize	ContentPadding(int scale) const = 0;
+	virtual WgCoord	ContentOfs(WgState state, int scale) const = 0;	
 	virtual WgRect	ContentRect( const WgRect& canvas, WgState state, int scale ) const = 0;
 
 	virtual bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const = 0;

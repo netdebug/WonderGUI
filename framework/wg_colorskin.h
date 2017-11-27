@@ -49,8 +49,10 @@ public:
 
 	WgSize	MinSize(int scale) const;
 	WgSize	PreferredSize(int scale) const;
+	WgSize	SizeForContent(const WgSize contentSize, int scale) const;
 
-	WgSize	SizeForContent( const WgSize contentSize, int scale ) const;
+	WgSize	ContentPadding(int scale) const;
+	WgCoord	ContentOfs(WgState state, int scale) const;
 	WgRect	ContentRect( const WgRect& canvas, WgState state, int scale ) const;
 
 	bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const;

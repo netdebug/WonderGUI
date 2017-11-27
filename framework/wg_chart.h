@@ -62,7 +62,6 @@ public:
 	WgBorders	CanvasPadding() const;
 
 	void	SetSkin(const WgSkinPtr& pSkin);
-	WgSkinPtr	Skin() { return m_pSkin;  }
 
 	struct GridLine
 	{
@@ -164,7 +163,6 @@ private:
 
 	WgSize			m_defaultSize;
 	WgMode			m_mode;
-	WgSkinPtr		m_pSkin;
 
 	WgBorders		m_pointPadding;			// Padding for the canvas in points. To allow thick lines to fully stay inside widget. Grid is allowed outside.
 	WgBorders		m_pixelPadding;			// Same, but in pixels.

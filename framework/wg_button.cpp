@@ -68,6 +68,19 @@ const char * WgButton::GetClass()
 	return c_widgetType;
 }
 
+//____ SetSkin() ______________________________________________________________
+
+void WgButton::SetSkin(const WgSkinPtr& pSkin)
+{
+	if (pSkin != m_pSkin)
+	{
+		m_pSkin = pSkin;
+		_requestResize();
+		_requestRender();
+	}
+}
+
+
 //____ SetSource() ____________________________________________________________
 
 bool WgButton::SetSource( const WgBlocksetPtr& pGfx )
@@ -127,17 +140,21 @@ int WgButton::HeightForWidth( int width ) const
 {
 	int height = 0;
 
-	if( m_pBgGfx )
+	if( m_pSkin )
+		height = m_pSkin->PreferredSize(m_scale).h;
+	else if( m_pBgGfx )
 		height = m_pBgGfx->Height(m_scale);
 
 	if( m_text.nbChars() != 0 )
 	{
-		WgBorders padding;
+		WgSize padding;
 
-		if( m_pBgGfx )
-			padding = m_pBgGfx->Padding(m_scale);
+		if (m_pSkin)
+			padding = m_pSkin->ContentPadding(m_scale);
+		else if( m_pBgGfx )
+			padding = m_pBgGfx->Padding(m_scale).Size();
 
-		int heightForText = m_text.heightForWidth(width-padding.Width()) + padding.Height();
+		int heightForText = m_text.heightForWidth(width-padding.w) + padding.h;
 		if( heightForText > height )
 			height = heightForText;
 	}
@@ -154,14 +171,18 @@ WgSize WgButton::PreferredSize() const
 {
 	WgSize bestSize;
 
-	if( m_pBgGfx )
+	if (m_pSkin)
+		bestSize = m_pSkin->PreferredSize(m_scale);
+	else if( m_pBgGfx )
 		bestSize = m_pBgGfx->Size(m_scale);
 
 	if( m_text.nbChars() != 0 )
 	{
 		WgSize textSize = m_text.unwrappedSize();
 
-		if( m_pBgGfx )
+		if( m_pSkin )
+			textSize += m_pSkin->ContentPadding(m_scale);
+		else if( m_pBgGfx )
 			textSize += m_pBgGfx->Padding(m_scale);
 
 		if( textSize.w > bestSize.w )
@@ -199,7 +220,9 @@ void WgButton::_onNewSize( const WgSize& size )
 {
 	WgRect	contentRect(0,0,Size());
 
-	if( m_pBgGfx )
+	if (m_pSkin)
+		contentRect = m_pSkin->ContentRect(contentRect, WG_STATE_NORMAL, m_scale);
+	else if( m_pBgGfx )
 		contentRect.Shrink(m_pBgGfx->Padding(m_scale));
 
 	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx, m_scale ) );
@@ -221,22 +244,32 @@ void WgButton::_setScale( int scale )
 
 void WgButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
+	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
+
 	WgRect cli = _clip;
 	WgRect can = _canvas;
 	WgRect win = _window;
 
 	WgBlock	block;
 
-	if( m_pBgGfx )
+	WgRect contentRect = _canvas;
+
+	if (m_pSkin)
+	{
+		WgState	state;
+		state.setFocused(m_bFocused);
+		state.setSelected(m_bSelected);
+		state.setPressed(m_bPressed);
+		state.setEnabled(m_bEnabled);
+		contentRect = m_pSkin->ContentRect(_canvas, state, m_scale);
+	}
+	else if (m_pBgGfx)
+	{
 		block = m_pBgGfx->GetBlock(m_mode, m_scale);
 
-	// Render background
-
-	pDevice->ClipBlitBlock( _clip, block, _canvas );
-
-	// Get content rect with displacement.
-
-	WgRect contentRect = block.ContentRect(_canvas );
+		pDevice->ClipBlitBlock(_clip, block, _canvas);
+		WgRect contentRect = block.ContentRect(_canvas);
+	}
 
 	// Get icon and text rect from content rect
 
@@ -426,6 +459,9 @@ void WgButton::_onCloneContent( const WgWidget * _pOrg )
 
 bool WgButton::_onAlphaTest( const WgCoord& ofs )
 {
+	if (m_pSkin)
+		return WgWidget::_onAlphaTest(ofs);
+
 	if( !m_pBgGfx )
 		return false;
 

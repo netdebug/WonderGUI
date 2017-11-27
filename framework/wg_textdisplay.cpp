@@ -111,9 +111,11 @@ int WgTextDisplay::HeightForWidth( int width ) const
 
 WgSize WgTextDisplay::PreferredSize() const
 {
-	//TODO: Fix this so we don't return current size (after wraptext is adapted to width) but size for unwrapped lines.
 
-	return m_text.unwrappedSize();
+	WgSize sz = m_text.unwrappedSize();
+	if (m_pSkin)
+		sz = m_pSkin->SizeForContent(sz, m_scale);
+	return sz;
 }
 
 //____ GetPointerStyle() ________________________________________
@@ -146,6 +148,10 @@ WgString WgTextDisplay::GetTooltipString() const
 
 void WgTextDisplay::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
+	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
+
+	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
+
 	WgText * pText = &m_text;
 
 	if( m_bFocused && IsEditable() )
@@ -153,7 +159,7 @@ void WgTextDisplay::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 	else
 		m_text.hideCursor();
 
-	pDevice->PrintText( _clip, pText, _canvas );
+	pDevice->PrintText( _clip, pText, canvas );
 
 	if( pText != &m_text )
 		delete pText;
@@ -415,6 +421,7 @@ void WgTextDisplay::_onLostInputFocus()
 	m_bResetCursorOnFocus = false;
 	if( IsEditable() )
 	{
+		_queueEvent(new WgEvent::TextSet(this, m_pText));
 		_stopReceiveTicks();
 		_requestRender();
         _queueEvent(new WgEvent::TextSet(this, m_pText));
@@ -439,6 +446,19 @@ void WgTextDisplay::_textModified()
 	m_bResetCursorOnFocus = true;
     _requestResize();
 	_requestRender();
+}
+
+
+//____ SetSkin() ______________________________________________________________
+
+void WgTextDisplay::SetSkin(const WgSkinPtr& pSkin)
+{
+	if (pSkin != m_pSkin)
+	{
+		m_pSkin = pSkin;
+		_requestResize();
+		_requestRender();
+	}
 }
 
 //____ InsertTextAtCursor() ___________________________________________________

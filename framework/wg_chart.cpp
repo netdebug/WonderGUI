@@ -415,15 +415,9 @@ void WgChart::_onCloneContent( const WgWidget * _pOrg )
 
 void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	WgRect canvas;
+	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
 
-	if (m_pSkin)
-	{
-		m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, _clip, m_scale);
-		canvas = m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale);
-	}
-	else
-		canvas = _canvas;
+	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
 
 	// Preparations for both grid and wave drawing
 

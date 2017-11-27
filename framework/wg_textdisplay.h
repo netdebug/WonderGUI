@@ -40,6 +40,7 @@
 #	include <wg_cursorinstance.h>
 #endif
 
+
 class WgTextDisplay:public WgWidget, public WgInterfaceEditText
 {
 public:
@@ -52,6 +53,8 @@ public:
 
 
 	//____ Methods __________________________________________
+
+	void		SetSkin(const WgSkinPtr& pSkin);
 
 	inline void		SetMaxLines( int nLines ) { m_maxLines = nLines; }
 	inline int		MaxLines() { return m_maxLines; }
@@ -109,7 +112,6 @@ protected:
 private:
 	void	_textModified();
 	bool	_insertCharAtCursor( Uint16 c );
-
 
 	WgText				m_text;
 	bool				m_bHasFocus;

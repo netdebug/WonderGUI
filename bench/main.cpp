@@ -439,62 +439,134 @@ void updateOscilloscope( WgOscilloscope * pOsc, int ofs, float freq, float ampli
 
 //____ setupGUI() ______________________________________________________________
 
-WgRootPanel * setupGUI( WgGfxDevice * pDevice )
+WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 {
-	WgResDB * pDB = sdl_wglib::LoadStdWidgets( "../resources/blocks.png", "../resources/blocks_x2.png", "../resources/blocks_x4.png", * g_pSurfaceFactory );
-	if( !pDB )
+	WgResDB * pDB = sdl_wglib::LoadStdWidgets("../resources/blocks.png", "../resources/blocks_x2.png", "../resources/blocks_x4.png", *g_pSurfaceFactory);
+	if (!pDB)
 		return 0;
 
-	WgRootPanel * pRoot = new WgRootPanel( pDevice );
+	WgRootPanel * pRoot = new WgRootPanel(pDevice);
 
 	WgEventHandler * pEventHandler = pRoot->EventHandler();
 
-	WgEventLogger * pEventLogger = new WgEventLogger( std::cout );
-	pEventLogger->IgnoreEvent( WG_EVENT_MOUSE_POSITION );
-	pEventLogger->IgnoreEvent( WG_EVENT_MOUSEBUTTON_REPEAT );
-	pEventLogger->IgnoreEvent( WG_EVENT_BUTTON_PRESS );
-//	pEventLogger->IgnoreAllEvents();
-//	pEventLogger->LogMouseButtonEvents();
-	pEventHandler->AddCallback( pEventLogger );
+	WgEventLogger * pEventLogger = new WgEventLogger(std::cout);
+	pEventLogger->LogAllEvents();
+	pEventLogger->IgnoreEvent(WG_EVENT_TICK);
+	pEventLogger->IgnoreEvent(WG_EVENT_MOUSE_POSITION);
+	pEventLogger->IgnoreEvent(WG_EVENT_MOUSE_MOVE);
+	pEventLogger->IgnoreEvent(WG_EVENT_MOUSEBUTTON_REPEAT);
+
+	//	pEventLogger->IgnoreEvent( WG_EVENT_MOUSE_POSITION );
+	//	pEventLogger->IgnoreEvent( WG_EVENT_MOUSEBUTTON_REPEAT );
+	//	pEventLogger->IgnoreEvent( WG_EVENT_BUTTON_PRESS );
+	//	pEventLogger->IgnoreAllEvents();
+	//	pEventLogger->LogMouseButtonEvents();
+	pEventHandler->AddCallback(pEventLogger);
 
 
 	// Load images and specify blocks
 
-	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", * g_pSurfaceFactory );
-	WgBlocksetPtr pBackBlock = WgBlockset::CreateFromSurface(pBackImg, WG_TILE_ALL );
+	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/What-Goes-Up-3.bmp", *g_pSurfaceFactory);
+	WgBlocksetPtr pBackBlock = WgBlockset::CreateFromSurface(pBackImg, WG_TILE_ALL);
 
-	WgSurface * pFlagImg = sdl_wglib::LoadSurface("cb2.bmp", * g_pSurfaceFactory );
-	WgBlocksetPtr pFlagBlock = WgBlockset::CreateFromSurface( pFlagImg );
+	WgSurface * pFlagImg = sdl_wglib::LoadSurface("cb2.bmp", *g_pSurfaceFactory);
+	WgBlocksetPtr pFlagBlock = WgBlockset::CreateFromSurface(pFlagImg);
 
-	WgSurface * pSplashImg = sdl_wglib::LoadSurface("../resources/splash.png", * g_pSurfaceFactory );
-	WgBlocksetPtr pSplashBlock = WgBlockset::CreateFromSurface( pSplashImg );
+	WgSurface * pSplashImg = sdl_wglib::LoadSurface("../resources/splash.png", *g_pSurfaceFactory);
+	WgBlocksetPtr pSplashBlock = WgBlockset::CreateFromSurface(pSplashImg);
 
-	WgSurface * pBigImg = sdl_wglib::LoadSurface("../resources/frog.jpg", * g_pSurfaceFactory );
-	WgBlocksetPtr pBigBlock = WgBlockset::CreateFromSurface( pBigImg );
+	WgSurface * pBigImg = sdl_wglib::LoadSurface("../resources/frog.jpg", *g_pSurfaceFactory);
+	WgBlocksetPtr pBigBlock = WgBlockset::CreateFromSurface(pBigImg);
 
 
 	// Bottom Flex
 
 	WgFlexPanel * pBottom = new WgFlexPanel();
-	pRoot->SetChild( pBottom );
-	pBottom->SetSkin( WgColorSkin::Create( WgColor::black ) );
+	pRoot->SetChild(pBottom);
+	pBottom->SetSkin(WgColorSkin::Create(WgColor::black));
 
 	// Main Flex
 
 	WgFlexPanel * pFlex = new WgFlexPanel();
-	pBottom->AddChild( pFlex, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(10) );
+	pBottom->AddChild(pFlex, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(10));
 
 	// Background
 
 	WgImage * pBackground = new WgImage();
-	pBackground->SetSource( pBackBlock );
+	pBackground->SetSource(pBackBlock);
 
-	WgFlexHook * pHook = pFlex->AddChild( pBackground );
-	pHook->SetAnchored( WG_NORTHWEST, WG_SOUTHEAST );
+	WgFlexHook * pHook = pFlex->AddChild(pBackground);
+	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
+
+	// Button skin test
+
+	auto pSkin = WgBoxSkin::Create(WgColor::cornsilk, 2, WgColor::deeppink );
+	pSkin->SetContentPadding(3);
+	pSkin->SetContentShift(WG_STATE_PRESSED, { 2,2 });
+
+	auto pButton = new WgButton();
+	pButton->SetSkin(pSkin);
+	pButton->SetText("TEST");
+	pFlex->AddChild(pButton);
+
+	// TextDisplay skin test
+
+	auto pText = new WgTextDisplay();
+	pText->SetSkin(pSkin);
+	pText->SetText("THIS IS THE TEST TEXT");
+	pFlex->AddChild(pText, WgCoord(100,100));
+
+
+	// PackPanel Scale Test
+/*
+	auto pMyFlex = new WgFlexPanel();
+	pFlex->AddChild(pMyFlex, WG_NORTHWEST, WG_SOUTHEAST );
+	pMyFlex->SetScale(WG_SCALE_BASE * 2);
+
+	auto p1 = new WgPackPanel();
+
+	WgColor zebra[2] = { WgColor::red, WgColor::blue };
+
+
+
+	for (int i = 0; i < 4; i++)
+	{
+		auto pFiller = new WgFiller();
+		pFiller->SetColors(WgColorset::Create(zebra[i % 2]));
+		pFiller->SetPreferredPointSize({ 100,100 });
+		p1->AddChild(pFiller);
+
+		if( i == 0 )
+			pMyFlex->AddChild(p1, WgSize(800, 200));
+	}
+
+	p1->SetSkin(WgColorSkin::Create(WgColor::beige));
+*/
+
+
+
+
+	// Text InputFocus test
+/*
+	WgTextDisplay * pDisplay1 = new WgTextDisplay();
+	pDisplay1->SetText("DISPLAY 1");
+	pDisplay1->SetEditMode(WG_TEXT_EDITABLE);
+	pFlex->AddChild(pDisplay1, WgRect(0, 0, 200, 50));
+
+
+	WgScrollPanel * pScroll = new WgScrollPanel();
+	pFlex->AddChild(pScroll, WgRect(0, 50, 200, 50));
+
+	WgTextDisplay * pDisplay2 = new WgTextDisplay();
+	pDisplay2->SetText("DISPLAY 2");
+	pDisplay2->SetEditMode(WG_TEXT_EDITABLE);
+	pScroll->SetContent(pDisplay2);
+*/
 
 
 	// Scroll chart widget
 
+/*
 	m_pScrollChart = new WgScrollChart();
 
 	WgBoxSkinPtr pChartSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
@@ -544,7 +616,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 
 		m_pScrollChart->SetValueRange(first, last);
 	}, m_pScrollChart);
-
+*/
 /*
 	auto pZoomButton = (WgButton*)pDB->CloneWidget("button");
 	pZoomButton->SetText(" ");
@@ -575,7 +647,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 		pChart->SetFixedSampleRange(first, last);
 	}, pChart);
 */
-
+/*
 	auto pResizeButton = (WgButton*)pDB->CloneWidget("button");
 	pResizeButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pResizeButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
@@ -598,7 +670,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pHook->SetScaleGeo(true);
 
 //	pFlex->SetScale(WG_SCALE_BASE * 2);
-
+*/
 
 	// Chart widget
 /*

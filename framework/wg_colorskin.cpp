@@ -69,6 +69,17 @@ WgSize WgColorSkin::PreferredSize(int scale) const
 	return WgSize(0,0);
 }
 
+WgSize WgColorSkin::ContentPadding(int scale) const
+{
+	return WgSize(0, 0);
+}
+
+WgCoord	WgColorSkin::ContentOfs(WgState state, int scale) const
+{
+	return WgCoord(0, 0);
+}
+
+
 WgSize  WgColorSkin::SizeForContent( const WgSize contentSize, int scale ) const
 {
 	return contentSize;

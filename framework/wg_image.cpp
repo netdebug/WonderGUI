@@ -55,6 +55,19 @@ const char * WgImage::GetClass()
 	return c_widgetType;
 }
 
+//____ SetSkin() ______________________________________________________________
+
+void WgImage::SetSkin(const WgSkinPtr& pSkin)
+{
+	if (pSkin != m_pSkin)
+	{
+		m_pSkin = pSkin;
+		_requestResize();
+		_requestRender();
+	}
+}
+
+
 //____ SetSource() _____________________________________________________________
 
 void WgImage::SetSource( const WgBlocksetPtr& pBlockset )
@@ -97,6 +110,10 @@ void WgImage::_onCloneContent( const WgWidget * _pOrg )
 
 void WgImage::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
+	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
+
+	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
+
 	if( !m_pGfx )
 		return;
 
@@ -106,7 +123,7 @@ void WgImage::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 	else
 		block = m_pGfx->GetBlock(WG_MODE_DISABLED, m_scale);
 
-	pDevice->ClipBlitBlock( _clip, block, _canvas);
+	pDevice->ClipBlitBlock( _clip, block, canvas);
 }
 
 //____ _onAlphaTest() ___________________________________________________________

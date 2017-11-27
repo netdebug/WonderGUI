@@ -44,6 +44,7 @@ public:
 	static const char * GetClass();
 	virtual WgWidget * NewOfMyType() const { return new WgImage(); };
 	
+	void			SetSkin(const WgSkinPtr& pSkin);
 
 	void			SetSource( const WgBlocksetPtr& pBlockset );
 	WgBlocksetPtr	GetSource() const { return m_pGfx; }

@@ -341,6 +341,15 @@ void WgWidget::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRe
 
 void WgWidget::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
+	if (m_pSkin)
+	{
+		WgState	state;
+		state.setFocused(m_bFocused);
+		state.setSelected(m_bSelected);
+		state.setEnabled(m_bEnabled);
+
+		m_pSkin->Render(pDevice, state, _canvas, _clip, m_scale);
+	}
 }
 
 void WgWidget::_onNewSize( const WgSize& size )
@@ -365,7 +374,10 @@ void WgWidget::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandle
 
 bool WgWidget::_onAlphaTest( const WgCoord& ofs )
 {
-	return true;
+	if (m_pSkin)
+		return m_pSkin->MarkTest(ofs, Size(), WG_STATE_NORMAL, m_markOpacity, m_scale);
+	else
+		return false;
 }
 
 void WgWidget::_onEnable()

@@ -69,7 +69,6 @@ public:
 	WgBorders	CanvasPadding() const { return m_pointPadding; }
 
 	void		SetSkin(const WgSkinPtr& pSkin);
-	WgSkinPtr	Skin() { return m_pSkin;  }
 
 	void		SetChartColor(WgColor color);
 	WgColor		ChartColor() const { return m_chartColor;  }
@@ -231,7 +230,6 @@ private:
 
 	WgSize			m_defaultSize;
 	WgMode			m_mode;
-	WgSkinPtr		m_pSkin;
 	WgColor			m_chartColor;
 
 	WgBorders		m_pointPadding;			// Padding for the canvas in points. To allow thick lines to fully stay inside widget. Grid is allowed outside.
