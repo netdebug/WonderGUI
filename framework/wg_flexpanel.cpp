@@ -514,18 +514,18 @@ bool WgFlexHook::MoveY( int y )
 	return true;
 }
 
-//____ WgFlexHook::ScreenPos() ________________________________________________
+//____ WgFlexHook::ScreenPixelPos() ________________________________________________
 
-WgCoord WgFlexHook::ScreenPos() const
+WgCoord WgFlexHook::ScreenPixelPos() const
 {
-	return m_realGeo.Pos() + m_pParent->ScreenPos();
+	return m_realGeo.Pos() + m_pParent->ScreenPixelPos();
 }
 
-//____ WgFlexHook::ScreenGeo() ________________________________________________
+//____ WgFlexHook::ScreenPixelGeo() ________________________________________________
 
-WgRect WgFlexHook::ScreenGeo() const
+WgRect WgFlexHook::ScreenPixelGeo() const
 {
-	return m_realGeo + m_pParent->ScreenPos();
+	return m_realGeo + m_pParent->ScreenPixelPos();
 }
 
 //____ WgFlexHook::_prevHook() ________________________________________________
@@ -555,7 +555,7 @@ void WgFlexHook::_refreshRealGeo()
 {
 	
 	WgRect	newGeo;
-	WgSize	parentSize = m_pParent->Size();
+	WgSize	parentSize = m_pParent->PixelSize();
 
     int scale = m_bScaleGeo ? m_pParent->m_scale : WG_SCALE_BASE;
 	
@@ -1224,7 +1224,7 @@ void WgFlexPanel::_onRequestRender( const WgRect& rect, const WgFlexHook * pHook
 	// Clip our geometry and put it in a dirtyrect-list
 
 	WgPatches patches;
-	patches.Add( WgRect( rect, WgRect(0,0,Size())) );
+	patches.Add( WgRect( rect, WgRect(0,0,PixelSize())) );
 
 	// Remove portions of patches that are covered by opaque upper siblings
 

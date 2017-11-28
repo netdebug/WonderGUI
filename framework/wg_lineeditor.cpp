@@ -507,7 +507,7 @@ void WgLineEditor::_adjustViewOfs()
 		int maxOfs;			// Max allowed view offset in pixels.
 		int minOfs;			// Min allowed view offset in pixels.
 
-		int geoWidth = Size().w;
+		int geoWidth = PixelSize().w;
 		int	lineWidth = m_pText->getSoftLineWidth( 0 ) + cursBearing+cursWidth;
 
 		// Calculate cursOfs

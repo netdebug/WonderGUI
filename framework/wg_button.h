@@ -71,8 +71,8 @@ public:
 
 	Uint32			GetTextAreaWidth();
 
-	virtual int		HeightForWidth( int width ) const;
-//	virtual int		WidthForHeight( int height ) const;
+	virtual int		MatchingPixelHeight( int width ) const;
+//	virtual int		MatchingPixelWidth( int height ) const;
 
 	virtual WgSize	PreferredSize() const;
 

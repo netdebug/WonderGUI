@@ -61,8 +61,8 @@ protected:
 	WgSize		_paddedPreferredSize() const;
 	WgSize		_paddedMinSize() const;
 	WgSize		_paddedMaxSize() const;
-	int			_paddedWidthForHeight( int paddedHeight ) const;
-	int			_paddedHeightForWidth( int paddedWidth ) const;
+	int			_paddedMatchingPixelWidth( int paddedHeight ) const;
+	int			_paddedMatchingPixelHeight( int paddedWidth ) const;
 
 	WgSize		_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPolicy, WgSizePolicy heightPolicy ) const;
 

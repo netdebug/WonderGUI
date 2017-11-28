@@ -116,7 +116,7 @@ bool WgMenuHook::_updateGeo()
 {
 	// Get size of parent and correct launcherGeo
 
-	WgRect 	parentSize = m_pParent->Size();
+	WgRect 	parentSize = m_pParent->PixelSize();
 
 	//
 
@@ -417,8 +417,8 @@ WgWidget *  WgMenuLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 			{
 				WgWidget * pOpener = pHook->m_pOpener.GetRealPtr();
 
-				WgCoord absPos 		= ofs + ScreenPos();
-				WgRect	openerGeo 	= pOpener->ScreenGeo();
+				WgCoord absPos 		= ofs + ScreenPixelPos();
+				WgRect	openerGeo 	= pOpener->ScreenPixelGeo();
 
 				if( openerGeo.Contains(absPos) && pOpener->MarkTest( absPos - openerGeo.Pos() ) )
 					pResult = pOpener;
@@ -700,7 +700,7 @@ WgHook * WgMenuLayer::_prevHookWithGeo( WgRect& geo, WgHook * pHook ) const
 {
 	WgHook * p = pHook->Prev();
 	if( p )
-		geo = p->Geo();
+		geo = p->PixelGeo();
 
 	return p;
 }

@@ -278,7 +278,7 @@ void WgCheckBox::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHand
 
 Uint32 WgCheckBox::GetTextAreaWidth()
 {
-	WgSize widgetSize = Size();
+	WgSize widgetSize = PixelSize();
 
 	WgSize	iconSize;
 
@@ -446,7 +446,7 @@ bool WgCheckBox::_markTestTextArea( int _x, int _y )
 {
 	WgBlocksetPtr	pIconBlockset = m_bChecked?m_pIconChecked:m_pIconUnchecked;
 
-	WgRect	contentRect = _getTextRect( Size(), _getIconRect( Size(), pIconBlockset, m_scale ) );
+	WgRect	contentRect = _getTextRect( PixelSize(), _getIconRect( PixelSize(), pIconBlockset, m_scale ) );
 
 	if( m_text.CoordToOfs( WgCoord(_x,_y), contentRect ) != -1 )
 		return true;
@@ -488,7 +488,7 @@ bool WgCheckBox::_onAlphaTest( const WgCoord& ofs )
 	WgBlock bgBlock;
 	WgBlock iconBlock;
 
-	WgSize	bgSize		= Size();
+	WgSize	bgSize		= PixelSize();
 	WgRect	iconRect	= _getIconRect( bgSize, pIconBlockset, m_scale );
 
 	if( m_bChecked )

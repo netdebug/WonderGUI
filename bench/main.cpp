@@ -387,7 +387,7 @@ int main ( int argc, char** argv )
 		{
 			nUpdatedRects = 1;
 
-			const WgRect r = pRoot->Geo();
+			const WgRect r = pRoot->PixelGeo();
 
 			updatedRects[0].x = r.x;
 			updatedRects[0].y = r.y;
@@ -1303,7 +1303,7 @@ void cbResize( const WgEvent::Event* _pEvent, void * _pFlexHook )
 
 	WgCoord dragged = pEvent->DraggedNow();
 
-	pHook->SetSize( pHook->Size() + WgSize(dragged.x,dragged.y) );
+	pHook->SetSize( pHook->PixelSize() + WgSize(dragged.x,dragged.y) );
 }
 
 

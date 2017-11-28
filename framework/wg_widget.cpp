@@ -174,7 +174,7 @@ void WgWidget::_stopReceiveTicks()
 
 WgCoord WgWidget::Local2abs( const WgCoord& cord ) const
 {
-	WgCoord c = ScreenPos();
+	WgCoord c = ScreenPixelPos();
 	c.x += cord.x;
 	c.y += cord.y;
 	return c;
@@ -184,7 +184,7 @@ WgCoord WgWidget::Local2abs( const WgCoord& cord ) const
 
 WgCoord WgWidget::Abs2local( const WgCoord& cord ) const
 {
-	WgCoord c = ScreenPos();
+	WgCoord c = ScreenPixelPos();
 	return WgCoord( cord.x - c.x, cord.y - c.y );
 }
 
@@ -201,16 +201,16 @@ WgEventHandler * WgWidget::_eventHandler() const
 	return 0;
 }
 
-//____ HeightForWidth() _______________________________________________________
+//____ MatchingPixelHeight() _______________________________________________________
 
-int WgWidget::HeightForWidth( int width ) const
+int WgWidget::MatchingPixelHeight( int width ) const
 {
 	return PreferredSize().h;		// Default is to stick with best height no matter what width.
 }
 
-//____ WidthForHeight() _______________________________________________________
+//____ MatchingPixelWidth() _______________________________________________________
 
-int WgWidget::WidthForHeight( int height ) const
+int WgWidget::MatchingPixelWidth( int height ) const
 {
 	return PreferredSize().w;		// Default is to stick with best width no matter what height.
 }
@@ -375,7 +375,7 @@ void WgWidget::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandle
 bool WgWidget::_onAlphaTest( const WgCoord& ofs )
 {
 	if (m_pSkin)
-		return m_pSkin->MarkTest(ofs, Size(), WG_STATE_NORMAL, m_markOpacity, m_scale);
+		return m_pSkin->MarkTest(ofs, PixelSize(), WG_STATE_NORMAL, m_markOpacity, m_scale);
 	else
 		return false;
 }

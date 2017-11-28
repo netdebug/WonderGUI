@@ -729,13 +729,13 @@ void WgTablist::_resizeTabs()
 
 	// Shrink or grow tabs and advance as applicable
 
-	if( totalWidth < Size().w )
+	if( totalWidth < PixelSize().w )
 	{
 		switch( m_tabExpandMode )
 		{
 			case GROW_TABS:
 			{
-				int goal = Size().w;
+				int goal = PixelSize().w;
 				int diff = goal - totalWidth;
 
 				int combWidth = 0;							// Combined width of tabs, ignoring overlaps.
@@ -777,7 +777,7 @@ void WgTablist::_resizeTabs()
 			}
 			case SPREAD_TABS:
 			{
-				int diff = Size().w - totalWidth;
+				int diff = PixelSize().w - totalWidth;
 				int nSpaces = m_tabs.Size()-1;
 
 				float	incFactor = diff / (float) nSpaces;
@@ -828,7 +828,7 @@ void WgTablist::_resizeTabs()
 
 				// translate to growFactor
 
-				int goal = Size().w;
+				int goal = PixelSize().w;
 				int diff = goal - totalWidth;
 
 				if( diff > totalExpand )
@@ -885,7 +885,7 @@ void WgTablist::_resizeTabs()
 				break;
 		}
 	}
-	else if( totalWidth > Size().w )
+	else if( totalWidth > PixelSize().w )
 	{
 		switch( m_tabCompressMode )
 		{
@@ -895,7 +895,7 @@ void WgTablist::_resizeTabs()
 				// relative to their width beyond the minimum.
 
 				int minTotalWidth = m_tabs.Size()*m_minTabWidth - (m_tabs.Size()-1)*m_overlap;
-				int widthToShare = Size().w - minTotalWidth;
+				int widthToShare = PixelSize().w - minTotalWidth;
 
 				if( widthToShare <= 0 )
 				{
@@ -941,7 +941,7 @@ void WgTablist::_resizeTabs()
 				if( m_maxOverlap <= m_overlap )
 					break;
 
-				int diff = totalWidth - Size().w;
+				int diff = totalWidth - PixelSize().w;
 				int nSpaces = m_tabs.Size()-1;
 
 				float	decFactor = diff / (float) nSpaces;
@@ -1015,7 +1015,7 @@ WgTab * WgTablist::_pos2Tab( int x, int y ) const
 	bool bMovingUp = true;
 	WgTab * pHit = NULL;
 	WgTab * pTab = m_tabs.First();
-	WgSize	sz = Size();
+	WgSize	sz = PixelSize();
 
 	while( pTab )
 	{

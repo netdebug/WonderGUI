@@ -45,11 +45,11 @@ class WgVectorHook : public WgPanelHook, protected WgLink
 
 
 public:
-	WgCoord	Pos() const;
-	WgSize	Size() const;
-	WgRect	Geo() const;
-	WgCoord	ScreenPos() const;
-	WgRect	ScreenGeo() const;
+	WgCoord	PixelPos() const;
+	WgSize	PixelSize() const;
+	WgRect	PixelGeo() const;
+	WgCoord	ScreenPixelPos() const;
+	WgRect	ScreenPixelGeo() const;
 
 	WgVectorHook*	Prev() const { return _prev(); }
 	WgVectorHook*	Next() const { return _next(); }

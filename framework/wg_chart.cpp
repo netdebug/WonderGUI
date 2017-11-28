@@ -381,7 +381,7 @@ void WgChart::SetResizeResponder(std::function<void(WgChart * pWidget, WgSize ne
 {
 	m_resizeResponder = func;
 	if (func)
-		func(this, Size());
+		func(this, PixelSize());
 }
 
 //____ SetSampleRangeResponder() _____________________________________________________
@@ -649,7 +649,7 @@ void WgChart::_resampleAllWaves()
 
 void WgChart::_resampleWave(Wave * pWave)
 {
-	WgSize	canvas = Size();
+	WgSize	canvas = PixelSize();
 
 	if (m_pSkin)
 		canvas = m_pSkin->ContentRect(canvas, WG_STATE_NORMAL, m_scale);

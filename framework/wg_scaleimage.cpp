@@ -77,7 +77,7 @@ void WgScaleImage::SetSource( WgSurface * pSurf )
 	if( pSurf != m_pOrgSurface )
 	{
 		m_pOrgSurface = pSurf;
-		_recalcImageRect( Size() );
+		_recalcImageRect( PixelSize() );
 		_regenerateSurface();
 	}
 }
@@ -96,7 +96,7 @@ void WgScaleImage::SetImageMaxSize( WgSize max )
 
 	if( bRegenerate )
 	{
-		_recalcImageRect( Size() );
+		_recalcImageRect( PixelSize() );
 		_regenerateSurface();
 	}
 }
@@ -206,7 +206,7 @@ void WgScaleImage::SetImageScale( bool bScale )
 	if( bScale != m_bScale )
 	{
 		m_bScale = bScale;
-		_recalcImageRect( Size() );
+		_recalcImageRect( PixelSize() );
 		_regenerateSurface();
 	}
 }
@@ -220,7 +220,7 @@ void WgScaleImage::SetImageOrigo( WgOrigo origo )
 		m_imgOrigo = origo;
 		if( m_bScale )
 		{
-			_recalcImageRect( Size() );
+			_recalcImageRect( PixelSize() );
 			_requestRender();
 		}
 	}

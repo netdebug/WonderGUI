@@ -38,7 +38,7 @@ WgTextDisplay::WgTextDisplay()
 	m_maxLines		= 0;
     m_text.setHolder( this );
 
-	m_text.setLineWidth( Size().w );
+	m_text.setLineWidth( PixelSize().w );
 	m_text.SetAutoEllipsis(IsAutoEllipsisDefault());
 	m_text.SetEditMode( WG_TEXT_STATIC );
 	m_bResetCursorOnFocus = true;
@@ -100,9 +100,9 @@ void WgTextDisplay::SetEditMode(WgTextEditMode mode)
 	m_text.SetEditMode(mode);
 }
 
-//____ HeightForWidth() _______________________________________________________
+//____ MatchingPixelHeight() _______________________________________________________
 
-int WgTextDisplay::HeightForWidth( int width ) const
+int WgTextDisplay::MatchingPixelHeight( int width ) const
 {
 	return m_text.heightForWidth( width );
 }
@@ -136,7 +136,7 @@ WgString WgTextDisplay::GetTooltipString() const
 		return m_tooltip;
 	else
 	{
-		WgSize sz = Size();
+		WgSize sz = PixelSize();
 		if( sz.w < m_text.width() || sz.h < m_text.height() )
 			return m_text.getBuffer();
 	}
@@ -201,7 +201,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 			m_pText->setSelectionMode(true);
 		}
 
-		m_pText->CursorGotoCoord( pEvent->PointerPos(), Geo() );
+		m_pText->CursorGotoCoord( pEvent->PointerPos(), PixelGeo() );
 
 		if(IsSelectable() && type == WG_EVENT_MOUSEBUTTON_PRESS && !(modKeys & WG_MODKEY_SHIFT))
 		{
@@ -279,14 +279,14 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 				if( modKeys & WG_MODKEY_SHIFT )
 					m_pText->setSelectionMode(true);
 
-				m_pText->CursorGoUp( 1, ScreenGeo() );
+				m_pText->CursorGoUp( 1, ScreenPixelGeo() );
 				break;
 
 			case WG_KEY_DOWN:
 				if( modKeys & WG_MODKEY_SHIFT )
 					m_pText->setSelectionMode(true);
 
-				m_pText->CursorGoDown( 1, ScreenGeo() );
+				m_pText->CursorGoDown( 1, ScreenPixelGeo() );
 				break;
 
 			case WG_KEY_BACKSPACE:
@@ -334,7 +334,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 
 	// Let text object handle its actions.
 /*
-	bool bChanged = m_text.OnAction( action, button_key, ScreenGeo(), WgCoord(info.x, info.y) );
+	bool bChanged = m_text.OnAction( action, button_key, ScreenPixelGeo(), WgCoord(info.x, info.y) );
 	if( bChanged )
 		RequestRender();
 */

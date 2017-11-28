@@ -45,11 +45,11 @@ class WgHook
 	friend class WgVectorPanel;
 
 public:
-	virtual WgCoord	Pos() const = 0;
-	virtual WgSize	Size() const = 0;
-	virtual WgRect	Geo() const = 0;
-	virtual WgCoord	ScreenPos() const = 0;
-	virtual WgRect	ScreenGeo() const = 0;
+	virtual WgCoord	PixelPos() const = 0;
+	virtual WgSize	PixelSize() const = 0;
+	virtual WgRect	PixelGeo() const = 0;
+	virtual WgCoord	ScreenPixelPos() const = 0;
+	virtual WgRect	ScreenPixelGeo() const = 0;
 
 	WgHook *		Prev() const { return _prevHook(); }
 	WgHook *		Next() const { return _nextHook(); }

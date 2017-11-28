@@ -122,7 +122,7 @@ WgSize WgSizeCapsule::PreferredSize() const
 			pref.h = m_pixelsPreferred.h;
 		}
 
-		// Constrain against min/max, taking WidthForHeight/HeightForWidth into account.
+		// Constrain against min/max, taking MatchingPixelWidth/MatchingPixelHeight into account.
 		//TODO: Check so we don't have any corner cases that breaks the constraints and
 		// and that priorities between preferred height/width are reasonable.
 
@@ -132,13 +132,13 @@ WgSize WgSizeCapsule::PreferredSize() const
 		if( pref.w < min.w )
 		{
 			pref.w = min.w;
-			pref.h = HeightForWidth(pref.w);
+			pref.h = MatchingPixelHeight(pref.w);
 		}
 
 		if( pref.h < min.h )
 		{
 			pref.h = min.h;
-			pref.w = WidthForHeight(pref.h);
+			pref.w = MatchingPixelWidth(pref.h);
 			if( pref.w < min.w )
 				pref.w = min.w;
 		}
@@ -150,7 +150,7 @@ WgSize WgSizeCapsule::PreferredSize() const
 			else
 			{
 				pref.w = max.w;
-				pref.h = HeightForWidth(pref.w);
+				pref.h = MatchingPixelHeight(pref.w);
 				if( pref.h > max.h )
 					pref.h = max.h;
 			}
@@ -162,7 +162,7 @@ WgSize WgSizeCapsule::PreferredSize() const
 			else
 			{
 				pref.h = max.h;
-				pref.w = WidthForHeight(pref.h);
+				pref.w = MatchingPixelWidth(pref.h);
 				if( pref.w > max.w )
 					pref.w = max.w;
 			}
@@ -200,9 +200,9 @@ WgSize WgSizeCapsule::MaxSize() const
 		return m_pixelsMax;
 }
 
-//____ HeightForWidth() _______________________________________________________
+//____ MatchingPixelHeight() _______________________________________________________
 
-int WgSizeCapsule::HeightForWidth( int width ) const
+int WgSizeCapsule::MatchingPixelHeight( int width ) const
 {
 	if( m_pixelsPreferred.h != 0 )
 	{
@@ -218,7 +218,7 @@ int WgSizeCapsule::HeightForWidth( int width ) const
 	}
 	else if( m_hook.Widget() )
 	{
-		int h = m_hook.Widget()->HeightForWidth(width);
+		int h = m_hook.Widget()->MatchingPixelHeight(width);
 		WG_LIMIT( h, m_pixelsMin.h, m_pixelsMax.h );
 		return h;
 	}
@@ -226,9 +226,9 @@ int WgSizeCapsule::HeightForWidth( int width ) const
 		return m_pixelsMin.h;
 }
 
-//____ WidthForHeight() _______________________________________________________
+//____ MatchingPixelWidth() _______________________________________________________
 
-int WgSizeCapsule::WidthForHeight( int height ) const
+int WgSizeCapsule::MatchingPixelWidth( int height ) const
 {
 	if( m_pixelsPreferred.w != 0 )
 	{
@@ -244,7 +244,7 @@ int WgSizeCapsule::WidthForHeight( int height ) const
 	}
 	else if( m_hook.Widget() )
 	{
-		int w = m_hook.Widget()->WidthForHeight(height);
+		int w = m_hook.Widget()->MatchingPixelWidth(height);
 		WG_LIMIT( w, m_pixelsMin.w, m_pixelsMax.w );
 		return w;
 	}

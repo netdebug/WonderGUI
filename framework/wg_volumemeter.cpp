@@ -272,7 +272,7 @@ void WgVolumeMeter::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 			
 			if( firstRenderLED != -1 )
 			{
-				WgSize sz = Size();
+				WgSize sz = PixelSize();
 				WgRect rect;
 
 				int meterLen = (m_direction == WG_UP || m_direction == WG_DOWN) ? sz.h : sz.w; 

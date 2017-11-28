@@ -49,8 +49,8 @@ public:
 	WgSize	MinSize() const;
 	WgSize	MaxSize() const;
 
-	int		HeightForWidth( int width ) const;
-	int		WidthForHeight( int height ) const;
+	int		MatchingPixelHeight( int width ) const;
+	int		MatchingPixelWidth( int height ) const;
 
 private:
 	void	_setScale(int scale);

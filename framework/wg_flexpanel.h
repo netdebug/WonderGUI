@@ -111,13 +111,13 @@ public:
     WgSize  PointSize() const;
     WgRect  PointGeo() const;
     
-	WgCoord			Pos() const { return m_realGeo.Pos(); }
-	WgSize			Size() const { 	return m_realGeo.Size(); }
-	WgRect			Geo() const { return m_realGeo; }
+	WgCoord			PixelPos() const { return m_realGeo.Pos(); }
+	WgSize			PixelSize() const { 	return m_realGeo.Size(); }
+	WgRect			PixelGeo() const { return m_realGeo; }
 
 
-	WgCoord			ScreenPos() const;
-	WgRect			ScreenGeo() const;
+	WgCoord			ScreenPixelPos() const;
+	WgRect			ScreenPixelGeo() const;
 
 	WgFlexHook *	Prev() const { return _prev(); }
 	WgFlexHook *	Next() const { return _next(); }

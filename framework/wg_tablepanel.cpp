@@ -35,12 +35,12 @@ static const char	c_widgetType[] = {"TablePanel"};
 static const char	c_hookType[] = {"TableHook"};
 
 
-WgCoord WgTableHook::Pos() const
+WgCoord WgTableHook::PixelPos() const
 {
-	return Geo();
+	return PixelGeo();
 }
 
-WgSize WgTableHook::Size() const
+WgSize WgTableHook::PixelSize() const
 {
 	int w = 0;
 	int h = Row()->Height();
@@ -52,7 +52,7 @@ WgSize WgTableHook::Size() const
 	return WgSize(w,h);
 }
 
-WgRect WgTableHook::Geo() const
+WgRect WgTableHook::PixelGeo() const
 {
 	WgTablePanel * pTable = Row()->Table();
 
@@ -67,14 +67,14 @@ WgRect WgTableHook::Geo() const
 		return WgRect();
 }
 
-WgCoord WgTableHook::ScreenPos() const
+WgCoord WgTableHook::ScreenPixelPos() const
 {
-	return Pos() + Row()->Table()->ScreenPos();
+	return PixelPos() + Row()->Table()->ScreenPixelPos();
 }
 
-WgRect WgTableHook::ScreenGeo() const
+WgRect WgTableHook::ScreenPixelGeo() const
 {
-	return Geo() + Row()->Table()->ScreenPos();
+	return PixelGeo() + Row()->Table()->ScreenPixelPos();
 }
 
 
@@ -230,7 +230,7 @@ void WgTableHook::_requestRender()
 
 	WgTablePanel* pTable = Row()->Table();
 	if( pTable )
-		pTable->_requestRender( Geo() );
+		pTable->_requestRender( PixelGeo() );
 }
 
 void WgTableHook::_requestRender( const WgRect& rect )
@@ -240,7 +240,7 @@ void WgTableHook::_requestRender( const WgRect& rect )
 
 	WgTablePanel* pTable = Row()->Table();
 	if( pTable )
-		pTable->_requestRender( rect + Pos() );
+		pTable->_requestRender( rect + PixelPos() );
 }
 
 void WgTableHook::_requestResize()
@@ -471,7 +471,7 @@ void WgTableRow::SetWidget( WgWidget * pWidget, int cell )
 	m_pCells[cell]._attachWidget(pWidget);
 
 	int width = m_pTable->m_pColumns[cell].RealWidth();
-	int height = pWidget->HeightForWidth(width);
+	int height = pWidget->MatchingPixelHeight(width);
 
 	m_pCells[cell].m_height = height;
 	pWidget->_onNewSize( WgSize(width, height) );
@@ -920,7 +920,7 @@ void WgTablePanel::_updateColumnWidths()
 			if( m_pColumns[n].m_bWidthChanged && pHook->Widget() )
 			{
 				int w = m_pColumns[n].m_realWidth;
-				int h = pHook->Widget()->HeightForWidth(w);
+				int h = pHook->Widget()->MatchingPixelHeight(w);
 				pHook->Widget()->_onNewSize( WgSize( w, h ) );
 
 				if( h != pHook->m_height )
@@ -1676,18 +1676,18 @@ void WgTablePanel::_onNewSize( const WgSize& newSize )
 	_requestRender();
 }
 
-//____ HeightForWidth() _______________________________________________________
+//____ MatchingPixelHeight() _______________________________________________________
 
-int WgTablePanel::HeightForWidth( int width ) const
+int WgTablePanel::MatchingPixelHeight( int width ) const
 {
 	//TODO: Implement, should recurse through lines and their widgets checking height needed.
 
 	return PreferredSize().h;		// No recommendation, for the moment
 }
 
-//____ WidthForHeight() _______________________________________________________
+//____ MatchingPixelWidth() _______________________________________________________
 
-int WgTablePanel::WidthForHeight( int height ) const
+int WgTablePanel::MatchingPixelWidth( int height ) const
 {
 	return m_contentSize.w;		// Width remains the same independent of height.
 }

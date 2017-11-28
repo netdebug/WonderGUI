@@ -83,7 +83,7 @@ protected:
 
 	WgOrigo	m_origo;
 	WgRect			m_placementGeo;		// Widgets geo relative anchor and hotspot. Setting width and height to 0 uses Widgets PreferredSize() dynamically.
-										// Setting just one of them to 0 uses Widgets HeightForWidth() or WidthForHeight() dynamically.
+										// Setting just one of them to 0 uses Widgets MatchingPixelHeight() or MatchingPixelWidth() dynamically.
 
 	WgWidgetWeakPtr	m_pKeyFocus;		// Pointer at child that held focus when this modal was last on top.
 };
@@ -120,8 +120,8 @@ public:
 
 	// Overloaded from WgWidget
 
-	int				HeightForWidth( int width ) const;
-	int				WidthForHeight( int height ) const;
+	int				MatchingPixelHeight( int width ) const;
+	int				MatchingPixelWidth( int height ) const;
 
 	WgSize			PreferredSize() const;
 

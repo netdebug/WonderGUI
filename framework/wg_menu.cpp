@@ -436,9 +436,9 @@ WgSize WgMenu::PreferredSize() const
 	return m_defaultSize;
 }
 
-//____ WidthForHeight() ________________________________________________________
+//____ MatchingPixelWidth() ________________________________________________________
 
-int  WgMenu::WidthForHeight( int height ) const
+int  WgMenu::MatchingPixelWidth( int height ) const
 {
 	if( height >= m_defaultSize.h )
 		return m_defaultSize.w;
@@ -1140,7 +1140,7 @@ void WgMenu::_openSubMenu( WgMenuSubMenu * pItem )
 
 	// Calculate itemArea
 
-	WgRect	geo = ScreenGeo() - _getPadding();
+	WgRect	geo = ScreenPixelGeo() - _getPadding();
 	WgRect itemArea( geo.x, geo.y + yOfs, geo.w, m_entryHeight );
 
 	// 
@@ -1152,7 +1152,7 @@ void WgMenu::_openSubMenu( WgMenuSubMenu * pItem )
 
 	if( pLayer )
 	{
-		pLayer->OpenMenu( pMenu, this, itemArea - pLayer->ScreenPos(), WG_NORTHEAST );
+		pLayer->OpenMenu( pMenu, this, itemArea - pLayer->ScreenPixelPos(), WG_NORTHEAST );
 		m_pOpenSubMenu = pItem;
 	}
 }
@@ -1342,7 +1342,7 @@ WgHook * WgMenu::_firstHookWithGeo( WgRect& writeGeo ) const
 {
 	if( m_sliderHook.Widget() )
 	{
-		writeGeo = _sliderGeo( Size() );
+		writeGeo = _sliderGeo( PixelSize() );
 		return const_cast<SliderHook*>(&m_sliderHook);
 	}
 	else
@@ -1360,7 +1360,7 @@ WgMenuItem * WgMenu::_getItemAtPos( int x, int y )
 
 	y += m_contentOfs;
 
-	if( y > 0 && x > 0 && x < (int) ( Geo().w - contentBorders.Width() ) )
+	if( y > 0 && x > 0 && x < (int) ( PixelGeo().w - contentBorders.Width() ) )
 	{
 		WgMenuItem * pItem = m_items.First();
 		while( pItem )
@@ -1444,7 +1444,7 @@ void WgMenu::_adjustSize()
 		_requestResize();
 	}
 
-	if( h > Size().h )
+	if( h > PixelSize().h )
 	{
 		WgWidgetSlider * pSlider = m_sliderHook.Slider();
 		if( !pSlider )
@@ -1457,7 +1457,7 @@ void WgMenu::_adjustSize()
 		WgSize sliderSize = pSlider->PreferredSize();
 
 		m_sliderHook.m_size.w = sliderSize.w;
-		m_sliderHook.m_size.h = Size().h - contentBorders.Height();
+		m_sliderHook.m_size.h = PixelSize().h - contentBorders.Height();
 
 		m_sliderHook._attachWidget(pSlider);
 
@@ -1495,7 +1495,7 @@ float WgMenu::_stepBwd()
 
 float WgMenu::_jumpFwd()
 {
-	int viewHeight = Size().h - _getPadding().Height();
+	int viewHeight = PixelSize().h - _getPadding().Height();
 	_setViewOfs( m_contentOfs + (viewHeight - m_entryHeight) );
 	return _getSliderPosition();
 }
@@ -1504,7 +1504,7 @@ float WgMenu::_jumpFwd()
 
 float WgMenu::_jumpBwd()
 {
-	int viewHeight = Size().h - _getPadding().Height();
+	int viewHeight = PixelSize().h - _getPadding().Height();
 	_setViewOfs( m_contentOfs - (viewHeight - m_entryHeight) );
 	return _getSliderPosition();
 }
@@ -1513,7 +1513,7 @@ float WgMenu::_jumpBwd()
 
 float WgMenu::_wheelRolled( int distance )
 {
-	int viewHeight = Size().h - _getPadding().Height();
+	int viewHeight = PixelSize().h - _getPadding().Height();
 	_setViewOfs( m_contentOfs + m_entryHeight*distance );
 	return _getSliderPosition();
 }
@@ -1529,7 +1529,7 @@ float WgMenu::_setPosition( float fraction )
 	if( fraction > 1.f )
 		fraction = 1.f;
 
-	int viewHeight = Size().h - _getPadding().Height();
+	int viewHeight = PixelSize().h - _getPadding().Height();
 
 	int ofs = (int) (fraction * (m_contentHeight-viewHeight));
 
@@ -1550,7 +1550,7 @@ WgWidget* WgMenu::_getWidget()
 
 float WgMenu::_getSliderPosition()
 {
-	return ((float)m_contentOfs) / (m_contentHeight-(Size().h-_getPadding().Height()));
+	return ((float)m_contentOfs) / (m_contentHeight-(PixelSize().h-_getPadding().Height()));
 }
 
 //____ _getSliderSize() ________________________________________________________
@@ -1564,14 +1564,14 @@ float WgMenu::_getSliderSize()
 
 int WgMenu::_getViewSize()
 {
-	return Size().h-_getPadding().Height();
+	return PixelSize().h-_getPadding().Height();
 }
 
 //____ _setViewOfs() ______________________________________________________________
 
 void WgMenu::_setViewOfs(int pos)
 {
-	int viewHeight = Size().h - _getPadding().Height();
+	int viewHeight = PixelSize().h - _getPadding().Height();
 
 	if( pos + viewHeight > m_contentHeight )
 		pos = m_contentHeight - viewHeight;
@@ -1609,45 +1609,45 @@ const char * WgMenu::SliderHook::ClassType()
 	return c_hookType;
 }
 
-WgCoord WgMenu::SliderHook::Pos() const
+WgCoord WgMenu::SliderHook::PixelPos() const
 {
-	WgSize parentSize = m_pParent->Size();
+	WgSize parentSize = m_pParent->PixelSize();
 	WgBorders borders = m_pParent->_getPadding();
 	return WgCoord(parentSize.w-m_size.w-borders.right,borders.top);
 }
 
-WgSize WgMenu::SliderHook::Size() const
+WgSize WgMenu::SliderHook::PixelSize() const
 {
 	return m_size;
 }
 
-WgRect WgMenu::SliderHook::Geo() const
+WgRect WgMenu::SliderHook::PixelGeo() const
 {
-	WgSize parentSize = m_pParent->Size();
+	WgSize parentSize = m_pParent->PixelSize();
 	WgBorders borders = m_pParent->_getPadding();
 	return WgRect(parentSize.w-m_size.w-borders.right,borders.top,m_size);
 }
 
-WgCoord WgMenu::SliderHook::ScreenPos() const
+WgCoord WgMenu::SliderHook::ScreenPixelPos() const
 {
-	WgRect content = m_pParent->ScreenGeo() - m_pParent->_getPadding();
+	WgRect content = m_pParent->ScreenPixelGeo() - m_pParent->_getPadding();
 	return WgCoord( content.x + content.w - m_size.w, content.y);
 }
 
-WgRect WgMenu::SliderHook::ScreenGeo() const
+WgRect WgMenu::SliderHook::ScreenPixelGeo() const
 {
-	WgRect content = m_pParent->ScreenGeo() - m_pParent->_getPadding();
+	WgRect content = m_pParent->ScreenPixelGeo() - m_pParent->_getPadding();
 	return WgRect( content.x + content.w - m_size.w, content.y, m_size );
 }
 
 void WgMenu::SliderHook::_requestRender()
 {
-	m_pParent->_requestRender( Geo() );
+	m_pParent->_requestRender( PixelGeo() );
 }
 
 void WgMenu::SliderHook::_requestRender( const WgRect& rect )
 {
-	m_pParent->_requestRender( rect + Pos() );
+	m_pParent->_requestRender( rect + PixelPos() );
 }
 
 void WgMenu::SliderHook::_requestResize()

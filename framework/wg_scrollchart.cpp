@@ -381,7 +381,7 @@ void WgScrollChart::SetResizeResponder(std::function<void(WgScrollChart * pWidge
 {
 	m_resizeResponder = func;
 	if (func)
-		func(this, Size());
+		func(this, PixelSize());
 }
 
 //____ SetValueRangeResponder() _____________________________________________________
@@ -1276,7 +1276,7 @@ const WgScrollChart::Wave * WgScrollChart::_getWave(int waveId) const
 
 WgRect WgScrollChart::_getScrollWindow() const
 {
-	WgRect r = Size();
+	WgRect r = PixelSize();
 
 	if (m_pSkin)
 		r = m_pSkin->ContentRect(r, WG_STATE_NORMAL, m_scale).Size();

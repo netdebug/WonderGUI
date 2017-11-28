@@ -37,7 +37,7 @@ WgButton::WgButton()
 {
 	m_pText = &m_text;
 	m_text.setAlignment( WG_CENTER );
-	m_text.setLineWidth(Size().w);					// We start with no textborders...
+	m_text.setLineWidth(PixelSize().w);					// We start with no textborders...
 	m_text.SetAutoEllipsis(IsAutoEllipsisDefault());
 
  	m_mode				= WG_MODE_NORMAL;
@@ -124,7 +124,7 @@ bool WgButton::SetIcon( const WgBlocksetPtr& pIconGfx, WgOrigo origo, WgBorders 
 
 Uint32 WgButton::GetTextAreaWidth()
 {
-	WgRect	contentRect(0,0,Size());
+	WgRect	contentRect(0,0, PixelSize());
 
 	if( m_pBgGfx )
 		contentRect.Shrink(m_pBgGfx->Padding(m_scale));
@@ -134,9 +134,9 @@ Uint32 WgButton::GetTextAreaWidth()
 	return textRect.w;
 }
 
-//____ HeightForWidth() _______________________________________________________
+//____ MatchingPixelHeight() _______________________________________________________
 
-int WgButton::HeightForWidth( int width ) const
+int WgButton::MatchingPixelHeight( int width ) const
 {
 	int height = 0;
 
@@ -218,7 +218,7 @@ void WgButton::_onDisable()
 
 void WgButton::_onNewSize( const WgSize& size )
 {
-	WgRect	contentRect(0,0,Size());
+	WgRect	contentRect(0,0, PixelSize());
 
 	if (m_pSkin)
 		contentRect = m_pSkin->ContentRect(contentRect, WG_STATE_NORMAL, m_scale);
@@ -465,7 +465,7 @@ bool WgButton::_onAlphaTest( const WgCoord& ofs )
 	if( !m_pBgGfx )
 		return false;
 
-	WgSize	sz = Size();
+	WgSize	sz = PixelSize();
 
 	//TODO: Take icon into account.
 

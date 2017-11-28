@@ -205,13 +205,13 @@ void WgOscilloscope::SetLinePoints( int nPoints, float pPointValues[] )
 			delete [] m_pLinePoints;
 			m_pLinePoints = 0;
 			m_nLinePoints = 0;
-			_resampleLinePoints( Size() );
+			_resampleLinePoints( PixelSize() );
 			_requestRender();
 		}
         return;
     }
 
-	WgSize sz = Size();
+	WgSize sz = PixelSize();
 
 	// Resize array if needed
 

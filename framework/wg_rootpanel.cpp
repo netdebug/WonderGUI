@@ -78,9 +78,9 @@ bool WgRootPanel::SetGfxDevice( WgGfxDevice * pDevice )
 	return true;
 }
 
-//_____ SetGeo() _____________________________________________________________
+//_____ SetPixelGeo() _____________________________________________________________
 
-bool WgRootPanel::SetGeo( const WgRect& geo )
+bool WgRootPanel::SetPixelGeo( const WgRect& geo )
 {
 	if( geo.x == 0 && geo.y == 0 && geo.w == 0 && geo.h == 0 )
 		m_bHasGeo = false;
@@ -91,9 +91,9 @@ bool WgRootPanel::SetGeo( const WgRect& geo )
 	return true;
 }
 
-//____ Geo() __________________________________________________________________
+//____ PixelGeo() __________________________________________________________________
 
-WgRect WgRootPanel::Geo() const
+WgRect WgRootPanel::PixelGeo() const
 {
 	if( m_bHasGeo )
 		return m_geo;
@@ -119,7 +119,7 @@ bool WgRootPanel::SetChild( WgWidget * pWidget )
 	m_hook._attachWidget(pWidget);
 	m_hook.Widget()->_onNewSize(m_geo.Size());
 
-	m_hook.Widget()->_onCollectPatches( m_dirtyPatches, Geo(), Geo() );
+	m_hook.Widget()->_onCollectPatches( m_dirtyPatches, PixelGeo(), PixelGeo() );
 
 	return true;
 }
@@ -172,7 +172,7 @@ bool WgRootPanel::SetVisible( bool bVisible )
 	if( bVisible != m_bVisible )
 	{
 		m_bVisible = bVisible;
-		AddDirtyPatch( Geo() );
+		AddDirtyPatch( PixelGeo() );
 	}
 	return true;
 }
@@ -191,7 +191,7 @@ void WgRootPanel::SetUpdatedRectOverlay( const WgSkinPtr& pUpdatedRectOverlay, i
 
 bool WgRootPanel::Render()
 {
-	return Render( Geo() );
+	return Render( PixelGeo() );
 }
 
 bool WgRootPanel::Render( const WgRect& clip )
@@ -263,7 +263,7 @@ bool WgRootPanel::RenderSection( const WgRect& _clip )
 
 	// Make sure we have a vaild clip rectangle (doesn't go outside our geometry and has an area)
 
-	WgRect canvas = Geo();
+	WgRect canvas = PixelGeo();
 	WgRect clip( _clip, canvas );
 	if( clip.w == 0 || clip.h == 0 )
 		return false;						// Invalid rect area.
@@ -340,7 +340,7 @@ bool WgRootPanel::EndRender( void )
 
 WgWidget * WgRootPanel::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 {
-	if( !Geo().Contains(ofs) || !m_hook.Widget() )
+	if( !PixelGeo().Contains(ofs) || !m_hook.Widget() )
 		return 0;
 
 	if( m_hook.Widget() && m_hook.Widget()->IsContainer() )
@@ -398,29 +398,29 @@ const char * WgRootPanel::Hook::ClassType()
 	return c_hookType;
 }
 
-WgCoord WgRootPanel::Hook::Pos() const
+WgCoord WgRootPanel::Hook::PixelPos() const
 {
-	return m_pRoot->Geo();
+	return m_pRoot->PixelGeo();
 }
 
-WgSize WgRootPanel::Hook::Size() const
+WgSize WgRootPanel::Hook::PixelSize() const
 {
-	return m_pRoot->Geo();
+	return m_pRoot->PixelGeo();
 }
 
-WgRect WgRootPanel::Hook::Geo() const
+WgRect WgRootPanel::Hook::PixelGeo() const
 {
-	return m_pRoot->Geo();
+	return m_pRoot->PixelGeo();
 }
 
-WgCoord WgRootPanel::Hook::ScreenPos() const
+WgCoord WgRootPanel::Hook::ScreenPixelPos() const
 {
-	return m_pRoot->Geo();
+	return m_pRoot->PixelGeo();
 }
 
-WgRect WgRootPanel::Hook::ScreenGeo() const
+WgRect WgRootPanel::Hook::ScreenPixelGeo() const
 {
-	return m_pRoot->Geo();
+	return m_pRoot->PixelGeo();
 }
 
 WgRootPanel* WgRootPanel::Hook::Root() const
@@ -431,13 +431,13 @@ WgRootPanel* WgRootPanel::Hook::Root() const
 void WgRootPanel::Hook::_requestRender()
 {
 	if( m_pRoot->m_bVisible )
-		m_pRoot->AddDirtyPatch( Geo() );
+		m_pRoot->AddDirtyPatch( PixelGeo() );
 }
 
 void WgRootPanel::Hook::_requestRender( const WgRect& rect )
 {
 	if( m_pRoot->m_bVisible )
-		m_pRoot->AddDirtyPatch( WgRect( Pos() + rect.Pos(), rect.Size() ) );
+		m_pRoot->AddDirtyPatch( WgRect( PixelPos() + rect.Pos(), rect.Size() ) );
 }
 
 void WgRootPanel::Hook::_requestResize()

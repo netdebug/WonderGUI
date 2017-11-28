@@ -75,9 +75,9 @@ const char * WgListPanel::GetClass()
 	return c_widgetType;
 }
 
-//____ HeightForWidth() _______________________________________________________
+//____ MatchingPixelHeight() _______________________________________________________
 
-int WgListPanel::HeightForWidth( int width ) const
+int WgListPanel::MatchingPixelHeight( int width ) const
 {
 	if( width == m_size.w )
 		return m_size.h;
@@ -87,16 +87,16 @@ int WgListPanel::HeightForWidth( int width ) const
 
 	while( pHook )
 	{
-		height += pHook->Widget()->HeightForWidth(width);
+		height += pHook->Widget()->MatchingPixelHeight(width);
 		pHook = pHook->Next();
 	}
 
 	return height;
 }
 
-//____ WidthForHeight() _______________________________________________________
+//____ MatchingPixelWidth() _______________________________________________________
 
-int WgListPanel::WidthForHeight( int height ) const
+int WgListPanel::MatchingPixelWidth( int height ) const
 {
 	return PreferredSize().w;
 }
@@ -268,7 +268,7 @@ void WgListPanel::_onResizeRequested( WgVectorHook * _pHook )
 
 	// We accept any change to height for current width ourselves
 
-	int newHeight = pHook->Widget()->HeightForWidth(m_size.w);
+	int newHeight = pHook->Widget()->MatchingPixelHeight(m_size.w);
 
 	bool bRequestRender = false;
 	if( newHeight != m_size.h )
@@ -277,7 +277,7 @@ void WgListPanel::_onResizeRequested( WgVectorHook * _pHook )
 	m_size.h += newHeight - pHook->m_height;
 	pHook->m_height = newHeight;
 
-	// Now we have up-to-date data for HeightForWidth() and PreferredSize() requests,
+	// Now we have up-to-date data for MatchingPixelHeight() and PreferredSize() requests,
 	// we notify our parent that we might need a resize.
 
 	_requestResize();
@@ -336,7 +336,7 @@ void  WgListPanel::_onWidgetAppeared( WgVectorHook * pInserted )
 	// We set Widget to same width as ours to start with, our parent will
 	// expand us in RequestResize() if it wants to.
 
-	int	height = pHook->Widget()->HeightForWidth(m_size.w);
+	int	height = pHook->Widget()->MatchingPixelHeight(m_size.w);
 
 	pHook->m_height = height;
 	m_size.h += height;
@@ -404,7 +404,7 @@ void WgListPanel::_adaptChildrenToWidth( int width )
 	{
 		if( pHook->m_bVisible )
 		{
-			int height = pHook->Widget()->HeightForWidth( width );
+			int height = pHook->Widget()->MatchingPixelHeight( width );
 			if( height == -1 )
 				height = pHook->m_preferredSize.h;
 

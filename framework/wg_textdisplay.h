@@ -76,7 +76,7 @@ public:
 	virtual bool TempIsInputField() const { return IsEditable(); }
 	virtual Wg_Interface_TextHolder* TempGetText() { return this; }
 
-	int		HeightForWidth( int width ) const;
+	int		MatchingPixelHeight( int width ) const;
 	WgSize	PreferredSize() const;
 	bool	IsAutoEllipsisDefault() const { return true; };
 

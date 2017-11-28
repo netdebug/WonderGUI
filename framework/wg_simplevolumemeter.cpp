@@ -77,7 +77,7 @@ void WgSimpleVolumeMeter::SetSections( float bottomFraction, float topFraction )
 		m_fSectionHeight[0] = bottomFraction;
 		m_fSectionHeight[1] = middleFraction;
 		m_fSectionHeight[2] = topFraction;
-		_updateIValues( Size() );
+		_updateIValues( PixelSize() );
 		_requestRender();
 	}
 }
@@ -91,7 +91,7 @@ void WgSimpleVolumeMeter::SetHoldHeight( float fraction )
 	if( m_fHoldHeight != fraction )
 	{
 		m_fHoldHeight = fraction;
-        _updateIValues( Size() );
+        _updateIValues( PixelSize() );
 		_requestRender();
 	}
 }
@@ -106,7 +106,7 @@ void WgSimpleVolumeMeter::SetValue( float peak, float hold )
  	m_fPeak[0] = peak;
 	m_fHold[0] = hold;
 
-	WgSize sz = Size();
+	WgSize sz = PixelSize();
 
 	int	iPeak = peak * sz.h;
 	int iHold = _calcIHold(hold, sz.h);
@@ -137,7 +137,7 @@ void WgSimpleVolumeMeter::SetValue( float leftPeak, float leftHold, float rightP
 	m_fHold[0] = leftHold;
 	m_fHold[1] = rightHold;
 
-	WgSize sz = Size();
+	WgSize sz = PixelSize();
 
 	int	iPeakL = leftPeak * sz.h;
 	int	iPeakR = rightPeak * sz.h;
@@ -380,7 +380,7 @@ void WgSimpleVolumeMeter::_onCloneContent( const WgWidget * _pOrg )
 	m_fHold[0] = pOrg->m_fHold[0];
 	m_fHold[1] = pOrg->m_fHold[1];
 	
-	_updateIValues( Size() );
+	_updateIValues( PixelSize() );
 }
 
 //____ _onAlphaTest() ____________________________________________________________________

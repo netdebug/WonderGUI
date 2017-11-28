@@ -31,12 +31,12 @@ class WgLayerHook : public WgHook
 {
 	friend class WgLayer;
 public:
-	WgCoord			Pos() const { return m_geo.Pos(); }
-	WgSize			Size() const { 	return m_geo.Size(); }
-	WgRect			Geo() const { return m_geo; }
+	WgCoord			PixelPos() const { return m_geo.Pos(); }
+	WgSize			PixelSize() const { 	return m_geo.Size(); }
+	WgRect			PixelGeo() const { return m_geo; }
 
-	WgCoord			ScreenPos() const;
-	WgRect			ScreenGeo() const;
+	WgCoord			ScreenPixelPos() const;
+	WgRect			ScreenPixelGeo() const;
 
 	WgLayerHook *	Prev() const { return static_cast<WgLayerHook*>(_prevHook()); }
 	WgLayerHook *	Next() const { return static_cast<WgLayerHook*>(_nextHook()); }
@@ -72,8 +72,8 @@ public:
 
 	// Overloaded from WgWidget
 
-	int				HeightForWidth( int width ) const;
-	int				WidthForHeight( int height ) const;
+	int				MatchingPixelHeight( int width ) const;
+	int				MatchingPixelWidth( int height ) const;
 
 	WgSize			PreferredSize() const;
 
@@ -91,12 +91,12 @@ protected:
 
 		// Standard Hook methods
 
-		WgCoord		Pos() const { return m_pParent->Pos(); }
-		WgSize		Size() const { 	return m_pParent->Size(); }
-		WgRect		Geo() const { return m_pParent->Geo(); }
+		WgCoord		PixelPos() const { return m_pParent->PixelPos(); }
+		WgSize		PixelSize() const { 	return m_pParent->PixelSize(); }
+		WgRect		PixelGeo() const { return m_pParent->PixelGeo(); }
 
-		WgCoord		ScreenPos() const { return m_pParent->ScreenPos(); }
-		WgRect		ScreenGeo() const { return m_pParent->ScreenGeo(); }
+		WgCoord		ScreenPixelPos() const { return m_pParent->ScreenPixelPos(); }
+		WgRect		ScreenPixelGeo() const { return m_pParent->ScreenPixelGeo(); }
 
 		WgLayer *		Parent() const { return m_pParent; }
 

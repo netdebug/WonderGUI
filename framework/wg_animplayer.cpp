@@ -76,7 +76,7 @@ bool WgAnimPlayer::SetAnimation( WgGfxAnim * pAnim )
 	m_pAnim			= pAnim;
 	m_playPos		= 0.0;
 
-	WgSize	currSize = Size();
+	WgSize	currSize = PixelSize();
 	WgSize	wantedSize;
 
 	_requestResize();
@@ -352,7 +352,7 @@ void WgAnimPlayer::_onCloneContent( const WgWidget * _pOrg )
 
 bool WgAnimPlayer::_onAlphaTest( const WgCoord& ofs )
 {
-	WgSize sz = Size();
+	WgSize sz = PixelSize();
 
 	if( m_pAnim && m_bEnabled )
 		return WgUtil::MarkTestBlock( ofs, m_animFrame, WgRect(0,0,sz), m_markOpacity );

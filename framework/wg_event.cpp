@@ -96,7 +96,7 @@ namespace WgEvent
 		m_bIsForWidget		= pOrg->m_bIsForWidget;
 		m_pWidget			= pOrg->m_pWidget;
 		m_pointerLocalPos	= pOrg->m_pointerLocalPos;
-		m_pointerScreenPos	= pOrg->m_pointerScreenPos;
+		m_pointerScreenPixelPos	= pOrg->m_pointerScreenPixelPos;
 	}
 
 	//____ MouseButtonEvent ____________________________________________________
@@ -160,7 +160,7 @@ namespace WgEvent
 		m_type = WG_EVENT_MOUSE_ENTER;
 
 		m_pointerLocalPos = pos;
-		m_pointerScreenPos = pos;
+		m_pointerScreenPixelPos = pos;
 	}
 
 	MouseEnter::MouseEnter( WgWidget * pWidget )
@@ -191,7 +191,7 @@ namespace WgEvent
 		m_type = WG_EVENT_MOUSE_MOVE;
 
 		m_pointerLocalPos = pos;
-		m_pointerScreenPos = pos;
+		m_pointerScreenPixelPos = pos;
 	}
 
 	MouseMove::MouseMove( WgWidget * pWidget )

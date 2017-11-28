@@ -408,14 +408,14 @@ void WgValueEditor::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 		if( pEvent->ModKeys() & WG_MODKEY_SHIFT )
 		{
 			m_text.setSelectionMode(true);
-			m_text.CursorGotoCoord( ofs, WgRect(0,0,Size()) );
+			m_text.CursorGotoCoord( ofs, WgRect(0,0,PixelSize()) );
 			_limitCursor();
 		}
 		else
 		{
 			m_text.setSelectionMode(false);
 			m_text.clearSelection();
-			m_text.CursorGotoCoord( ofs, WgRect(0,0,Size()) );
+			m_text.CursorGotoCoord( ofs, WgRect(0,0,PixelSize()) );
 			_limitCursor();
 			m_text.setSelectionMode(true);
 		}
@@ -427,7 +427,7 @@ void WgValueEditor::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 	{
 		if( m_bFocused && ofs.x != m_buttonDownOfs )
 		{
-			m_text.CursorGotoCoord( ofs, WgRect(0,0,Size()) );
+			m_text.CursorGotoCoord( ofs, WgRect(0,0,PixelSize()) );
 			_limitCursor();
 			m_buttonDownOfs = ofs.x;
 			m_bSelectAllOnRelease = false;

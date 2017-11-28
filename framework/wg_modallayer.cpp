@@ -168,16 +168,16 @@ bool WgModalHook::_refreshRealGeo()	// Return false if we couldn't get exactly t
 	if( sz.w == 0 && sz.h == 0 )
 		sz = m_pWidget->PreferredSize();
 	else if( sz.w == 0 )
-		sz.w = m_pWidget->WidthForHeight(sz.h);
+		sz.w = m_pWidget->MatchingPixelWidth(sz.h);
 	else if( sz.h == 0 )
-		sz.h = m_pWidget->HeightForWidth(sz.w);
+		sz.h = m_pWidget->MatchingPixelHeight(sz.w);
 
 	if( sz.w <= 0 )
 		sz.w = 1;
 	if( sz.h <= 0 )
 		sz.h = 1;
 
-	WgCoord ofs = WgUtil::OrigoToOfs( m_origo, m_pParent->Size() ) - WgUtil::OrigoToOfs( m_origo, sz );
+	WgCoord ofs = WgUtil::OrigoToOfs( m_origo, m_pParent->PixelSize() ) - WgUtil::OrigoToOfs( m_origo, sz );
 	ofs += m_placementGeo.Pos();
 
 	WgRect newGeo( ofs, sz );
@@ -375,24 +375,24 @@ WgModalHook * WgModalLayer::LastModal()
 	return m_modalHooks.Last();
 }
 
-//____ HeightForWidth() _______________________________________________________
+//____ MatchingPixelHeight() _______________________________________________________
 
-int WgModalLayer::HeightForWidth( int width ) const
+int WgModalLayer::MatchingPixelHeight( int width ) const
 {
 	if( m_baseHook.Widget() )
-		return m_baseHook.Widget()->HeightForWidth( width );
+		return m_baseHook.Widget()->MatchingPixelHeight( width );
 	else
-		return WgWidget::HeightForWidth(width);
+		return WgWidget::MatchingPixelHeight(width);
 }
 
-//____ WidthForHeight() _______________________________________________________
+//____ MatchingPixelWidth() _______________________________________________________
 
-int WgModalLayer::WidthForHeight( int height ) const
+int WgModalLayer::MatchingPixelWidth( int height ) const
 {
 	if( m_baseHook.Widget() )
-		return m_baseHook.Widget()->WidthForHeight( height );
+		return m_baseHook.Widget()->MatchingPixelWidth( height );
 	else
-		return WgWidget::WidthForHeight(height);
+		return WgWidget::MatchingPixelWidth(height);
 }
 
 //____ PreferredSize() _____________________________________________________________
@@ -420,13 +420,13 @@ WgWidget *  WgModalLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 		{
 			if( pHook->Widget()->IsContainer() )
 			{
-				WgWidget * pResult = pHook->Widget()->CastToContainer()->FindWidget( ofs - pHook->Pos(), mode );
+				WgWidget * pResult = pHook->Widget()->CastToContainer()->FindWidget( ofs - pHook->PixelPos(), mode );
 				if( pResult )
 					return pResult;
 			}
 			else
 			{
-				if( pHook->Widget()->MarkTest(ofs - pHook->Pos()) )
+				if( pHook->Widget()->MarkTest(ofs - pHook->PixelPos()) )
 					return pHook->Widget();
 				else
 					return this;
@@ -436,7 +436,7 @@ WgWidget *  WgModalLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 		{
 			if( m_baseHook.Widget()->IsContainer() )
 			{
-				WgWidget * pResult = m_baseHook.Widget()->CastToContainer()->FindWidget( ofs - m_baseHook.Pos(), mode );
+				WgWidget * pResult = m_baseHook.Widget()->CastToContainer()->FindWidget( ofs - m_baseHook.PixelPos(), mode );
 				if( pResult )
 					return pResult;
 			}
@@ -668,7 +668,7 @@ WgHook * WgModalLayer::_prevHookWithGeo( WgRect& geo, WgHook * pHook ) const
 {
 	WgHook * p = pHook->Prev();
 	if( p )
-		geo = p->Geo();
+		geo = p->PixelGeo();
 
 	return p;
 }

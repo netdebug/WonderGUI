@@ -155,16 +155,16 @@ const char * WgStackPanel::GetClass()
 	return c_widgetType;
 }
 
-//____ HeightForWidth() _______________________________________________________
+//____ MatchingPixelHeight() _______________________________________________________
 
-int WgStackPanel::HeightForWidth( int width ) const
+int WgStackPanel::MatchingPixelHeight( int width ) const
 {
 	int height = 0;
 
 	WgStackHook * pHook = FirstHook();
 	while( pHook )
 	{
-		int h = pHook->Widget()->HeightForWidth(width);
+		int h = pHook->Widget()->MatchingPixelHeight(width);
 		if( h > height )
 			height = h;
 		pHook = pHook->Next();
@@ -173,16 +173,16 @@ int WgStackPanel::HeightForWidth( int width ) const
 	return height;
 }
 
-//____ WidthForHeight() _______________________________________________________
+//____ MatchingPixelWidth() _______________________________________________________
 
-int WgStackPanel::WidthForHeight( int height ) const
+int WgStackPanel::MatchingPixelWidth( int height ) const
 {
 	int width = 0;
 
 	WgStackHook * pHook = FirstHook();
 	while( pHook )
 	{
-		int w = pHook->Widget()->WidthForHeight(height);
+		int w = pHook->Widget()->MatchingPixelWidth(height);
 		if( w > width )
 			width = w;
 		pHook = pHook->Next();
@@ -272,7 +272,7 @@ void WgStackPanel::_onWidgetAppeared( WgVectorHook * pInserted )
 
 	// Check if we need to resize to fit Widget in current width
 
-	int height = pInserted->Widget()->HeightForWidth(m_size.w);
+	int height = pInserted->Widget()->MatchingPixelHeight(m_size.w);
 	if( height > m_size.h )
 		bRequestResize = true;
 
@@ -337,7 +337,7 @@ void WgStackPanel::_onWidgetDisappeared( WgVectorHook * pToBeRemoved )
 
 	// Check if removal might affect height for current width
 
-	int height = pToBeRemoved->Widget()->HeightForWidth(m_size.w);
+	int height = pToBeRemoved->Widget()->MatchingPixelHeight(m_size.w);
 	if( height >= m_size.h )
 		bRequestResize = true;
 

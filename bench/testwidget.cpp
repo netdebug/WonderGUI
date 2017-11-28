@@ -118,7 +118,7 @@ void TestWidget::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHand
 		{
 			const WgEvent::Tick * pTick = static_cast<const WgEvent::Tick*>(pEvent);
 			
-			WgRect area( 0,0, Size() );
+			WgRect area( 0,0, PixelSize() );
 			
 			
 			if( !m_bPointsInitialized )

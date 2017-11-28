@@ -78,7 +78,7 @@ namespace WgEvent
 			WgWidget *		ForwardedFrom() const;
 			WgModifierKeys	ModKeys() const { return m_modKeys; }
 			WgCoord			PointerPos() const { return m_pointerLocalPos; }
-			WgCoord			PointerScreenPos() const { return m_pointerScreenPos; }
+			WgCoord			PointerScreenPixelPos() const { return m_pointerScreenPixelPos; }
 			
 			bool			IsMouseEvent() const;
 			bool			IsMouseButtonEvent() const;
@@ -96,8 +96,8 @@ namespace WgEvent
 			bool			m_bIsForWidget;		// Set if this event is for a specific Widget (m_pWidget set at creation, even if weak pointer now is null).
 			WgWidgetWeakPtr	m_pWidget;			// Widget to receive this event.
 			WgWidgetWeakPtr	m_pForwardedFrom;	// Widget this event was forwarded from.
-			WgCoord			m_pointerLocalPos;	// Widget-relative position of pointer. Same as m_pointerScreenPos if Widget not set.
-			WgCoord			m_pointerScreenPos;	// Screen position of pointer.
+			WgCoord			m_pointerLocalPos;	// Widget-relative position of pointer. Same as m_pointerScreenPixelPos if Widget not set.
+			WgCoord			m_pointerScreenPixelPos;	// Screen position of pointer.
 	};
 
 	class MouseButtonEvent : public Event

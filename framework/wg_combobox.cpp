@@ -246,7 +246,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 		break;
 
 		case WG_EVENT_MENU_CLOSED:
-			if( Geo().Contains( _pEvent->PointerPos() ) )
+			if( PixelGeo().Contains( _pEvent->PointerPos() ) )
 				newMode = WG_MODE_MARKED;
 			else
 				newMode = WG_MODE_NORMAL;
@@ -273,7 +273,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 		case WG_EVENT_MOUSE_POSITION:
 		{
 			WgCoord pos = static_cast<const WgEvent::MousePosition*>(_pEvent)->PointerPos();
-			WgRect inputRect = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( Size() ): WgRect( 0,0, Size() );
+			WgRect inputRect = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( PixelSize() ): WgRect( 0,0, PixelSize() );
 
 			if( _isSelectable() && inputRect.Contains( pos ) )
 			{
@@ -295,7 +295,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 
 			if( pEvent->Button() == 1 )
 			{
-				WgRect inputRect = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( Size() ): WgRect( 0,0, Size() );
+				WgRect inputRect = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( PixelSize() ): WgRect( 0,0, PixelSize() );
 
 				if( m_mode == WG_MODE_SELECTED && m_pMenu )
 				{
@@ -345,7 +345,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 						WgMenuLayer * pLayer = Parent()->_getMenuLayer();
 						if( pLayer )
 						{
-							pLayer->OpenMenu( m_pMenu, this, m_pHook->ScreenGeo() - pLayer->ScreenPos(), WG_SOUTHWEST );
+							pLayer->OpenMenu( m_pMenu, this, m_pHook->ScreenPixelGeo() - pLayer->ScreenPixelPos(), WG_SOUTHWEST );
 							pHandler->AddCallback( WgEventFilter::MenuitemSelect( m_pMenu ), cbEntrySelected, this );
 						}
 					}
@@ -371,7 +371,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 					}
 
 					int x = pEvent->PointerPos().x + m_viewOfs;
-					int leftBorder = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( Size() ).x : 0;
+					int leftBorder = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( PixelSize() ).x : 0;
 
 					m_pText->CursorGotoCoord( WgCoord(x, 0), WgRect(leftBorder,0,1000000,1000000) );
 					_adjustViewOfs();
@@ -1029,7 +1029,7 @@ void WgCombobox::_adjustViewOfs()
 		int maxOfs;			// Max allowed view offset in pixels.
 		int minOfs;			// Min allowed view offset in pixels.
 
-		int geoWidth = Size().w;
+		int geoWidth = PixelSize().w;
 		if( m_pTextBoxBg )
 			geoWidth -= m_pTextBoxBg->Padding(m_scale).Width();
 
@@ -1080,7 +1080,7 @@ bool WgCombobox::_onAlphaTest( const WgCoord& ofs )
 	if( !m_pTextBoxBg )
 		return false;
 
-	WgSize sz = Size();
+	WgSize sz = PixelSize();
 
 	return WgUtil::MarkTestBlock( ofs, m_pTextBoxBg->GetBlock(m_mode,m_scale), WgRect( WgCoord(0,0), sz ), m_markOpacity );
 }

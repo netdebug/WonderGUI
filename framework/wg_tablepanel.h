@@ -64,11 +64,11 @@ public:
 	const char *Type( void ) const;
 	static const char * ClassType();
 
-	WgCoord			Pos() const;
-	WgSize			Size() const;
-	WgRect			Geo() const;
-	WgCoord			ScreenPos() const;
-	WgRect			ScreenGeo() const;
+	WgCoord			PixelPos() const;
+	WgSize			PixelSize() const;
+	WgRect			PixelGeo() const;
+	WgCoord			ScreenPixelPos() const;
+	WgRect			ScreenPixelGeo() const;
 
 	WgTableHook*	PrevInTable() const;
 	WgTableHook*	NextInTable() const;
@@ -351,8 +351,8 @@ public:
 
 	// Overloaded from WgWidget
 
-	int				HeightForWidth( int width ) const;
-	int				WidthForHeight( int height ) const;
+	int				MatchingPixelHeight( int width ) const;
+	int				MatchingPixelWidth( int height ) const;
 
 	WgSize			PreferredSize() const;
 

@@ -472,7 +472,7 @@ bool WgScrollPanel::SetContent( WgWidget * pContent )
 {
 	m_elements[WINDOW]._attachWidget(pContent);
 
-	_updateElementGeo( Size() );
+	_updateElementGeo( PixelSize() );
 	_requestRender( m_elements[WINDOW].m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
 	return true;
 
@@ -494,7 +494,7 @@ bool WgScrollPanel::SetHSlider( WgHSlider* pSlider )
 	if( pSlider )
 		pSlider->SetSliderTarget( &m_sliderTargets[1] );
 
-	_updateElementGeo( Size() );
+	_updateElementGeo( PixelSize() );
     if( pSlider )
         pSlider->SetSlider( ViewOfsX(), ViewLenX() );
 	_requestRender( m_elements[XDRAG].m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
@@ -519,7 +519,7 @@ bool WgScrollPanel::SetVSlider( WgVSlider* pSlider )
 	if( pSlider )
 		pSlider->SetSliderTarget( &m_sliderTargets[0] );
 
-	_updateElementGeo( Size() );
+	_updateElementGeo( PixelSize() );
     if(pSlider)
         pSlider->SetSlider( ViewOfsY(), ViewLenY() );
 	_requestRender( m_elements[YDRAG].m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
@@ -531,7 +531,7 @@ bool WgScrollPanel::SetVSlider( WgVSlider* pSlider )
 WgWidget* WgScrollPanel::ReleaseContent()
 {
 	WgWidget * p = m_elements[WINDOW]._releaseWidget();
-	_updateElementGeo( Size() );
+	_updateElementGeo( PixelSize() );
 	return p;
 }
 
@@ -540,7 +540,7 @@ WgWidget* WgScrollPanel::ReleaseContent()
 WgHSlider* WgScrollPanel::ReleaseHSlider()
 {
 	WgHSlider * p = (WgHSlider*) m_elements[XDRAG]._releaseWidget();
-	_updateElementGeo( Size() );
+	_updateElementGeo( PixelSize() );
 	return p;
 }
 
@@ -549,7 +549,7 @@ WgHSlider* WgScrollPanel::ReleaseHSlider()
 WgVSlider* WgScrollPanel::ReleaseVSlider()
 {
 	WgVSlider * p = (WgVSlider*) m_elements[YDRAG]._releaseWidget();
-	_updateElementGeo( Size() );
+	_updateElementGeo( PixelSize() );
 	return p;
 }
 
@@ -619,7 +619,7 @@ void WgScrollPanel::SetSliderAutoHide( bool bHideHSlider, bool bHideVSlider )
 	// Force a refresh of our subclass if its geometry has been affected.
 
 	if( IsHSliderVisible() != bWasVisibleX || IsVSliderVisible() != bWasVisibleY )
-		_updateElementGeo( Size() );
+		_updateElementGeo( PixelSize() );
 }
 
 //____ SetSliderPositions() ________________________________________________
@@ -632,7 +632,7 @@ void WgScrollPanel::SetSliderPositions( bool bBottom, bool bRight )
 	m_bSliderBottom	= bBottom;
 	m_bSliderRight	= bRight;
 
-	_updateElementGeo( Size() );
+	_updateElementGeo( PixelSize() );
 }
 
 //____ SetFillerBlocks() ______________________________________________________
@@ -741,7 +741,7 @@ void  WgScrollPanel::SetContentSizePolicy( WgSizePolicy widthPolicy, WgSizePolic
 		m_widthPolicy = widthPolicy;
 		m_heightPolicy = heightPolicy;
 
-		_updateElementGeo( Size() );
+		_updateElementGeo( PixelSize() );
 	}
 }
 
@@ -1419,39 +1419,39 @@ const char * WgScrollHook::ClassType()
 }
 
 
-//____ WgScrollHook::Pos() ________________________________________________________
+//____ WgScrollHook::PixelPos() ________________________________________________________
 
-WgCoord WgScrollHook::Pos() const
+WgCoord WgScrollHook::PixelPos() const
 {
 	return m_canvasGeo.Pos();
 }
 
-//____ WgScrollHook::Size() _______________________________________________________
+//____ WgScrollHook::PixelSize() _______________________________________________________
 
-WgSize WgScrollHook::Size() const
+WgSize WgScrollHook::PixelSize() const
 {
 	return m_canvasGeo.Size();
 }
 
-//____ WgScrollHook::Geo() ________________________________________________________
+//____ WgScrollHook::PixelGeo() ________________________________________________________
 
-WgRect WgScrollHook::Geo() const
+WgRect WgScrollHook::PixelGeo() const
 {
 	return m_canvasGeo;
 }
 
-//____ WgScrollHook::ScreenPos() __________________________________________________
+//____ WgScrollHook::ScreenPixelPos() __________________________________________________
 
-WgCoord WgScrollHook::ScreenPos() const
+WgCoord WgScrollHook::ScreenPixelPos() const
 {
-	return m_pView->ScreenPos() + m_canvasGeo.Pos();
+	return m_pView->ScreenPixelPos() + m_canvasGeo.Pos();
 }
 
-//____ WgScrollHook::ScreenGeo() __________________________________________________
+//____ WgScrollHook::ScreenPixelGeo() __________________________________________________
 
-WgRect WgScrollHook::ScreenGeo() const
+WgRect WgScrollHook::ScreenPixelGeo() const
 {
-	return m_canvasGeo + m_pView->ScreenPos();
+	return m_canvasGeo + m_pView->ScreenPixelPos();
 }
 
 
@@ -1478,7 +1478,7 @@ void WgScrollHook::_requestRender( const WgRect& rect )
 
 void WgScrollHook::_requestResize()
 {
-	m_pView->_updateElementGeo( m_pView->Size() );
+	m_pView->_updateElementGeo( m_pView->PixelSize() );
 	m_pView->_requestRender( m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
 }
 

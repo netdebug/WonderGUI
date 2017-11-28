@@ -55,8 +55,8 @@ public:
 
 	inline WgEventHandler *	EventHandler() const { return m_pEventHandler; }
 
-	bool					SetGeo( const WgRect& geo );
-	WgRect					Geo() const;
+	bool					SetPixelGeo( const WgRect& geo );
+	WgRect					PixelGeo() const;
 
 	bool					SetVisible( bool bVisible );
 	bool					IsVisible() const { return m_bVisible; }
@@ -114,11 +114,11 @@ protected:
 		const char *Type( void ) const;
 		static const char * ClassType();
 
-		WgCoord			Pos() const;
-		WgSize			Size() const;
-		WgRect			Geo() const;
-		WgCoord			ScreenPos() const;
-		WgRect			ScreenGeo() const;
+		WgCoord			PixelPos() const;
+		WgSize			PixelSize() const;
+		WgRect			PixelGeo() const;
+		WgCoord			ScreenPixelPos() const;
+		WgRect			ScreenPixelGeo() const;
 
 		WgRootPanel*	Root() const;
 

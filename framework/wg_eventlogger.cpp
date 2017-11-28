@@ -557,7 +557,7 @@ string WgEventLogger::_formatModkeys( const WgEvent::Event * _pEvent )
 string WgEventLogger::_formatPointerPos( const WgEvent::Event * _pEvent )
 {
 	WgCoord localPos = _pEvent->PointerPos();
-	WgCoord globalPos = _pEvent->PointerScreenPos();
+	WgCoord globalPos = _pEvent->PointerScreenPixelPos();
 
 
 	char	temp[64];

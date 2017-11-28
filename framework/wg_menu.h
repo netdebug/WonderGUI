@@ -143,7 +143,7 @@ public:
 	bool		DeleteAllChildren() { return false; }
 	bool		ReleaseAllChildren() { return false; }
 
-	int			WidthForHeight( int height ) const;
+	int			MatchingPixelWidth( int height ) const;
 
 	WgSize		PreferredSize() const;
 
@@ -162,12 +162,12 @@ private:
 
 		// Standard Hook methods
 
-		WgCoord		Pos() const;
-		WgSize		Size() const;
-		WgRect		Geo() const;
+		WgCoord		PixelPos() const;
+		WgSize		PixelSize() const;
+		WgRect		PixelGeo() const;
 
-		WgCoord		ScreenPos() const;
-		WgRect		ScreenGeo() const;
+		WgCoord		ScreenPixelPos() const;
+		WgRect		ScreenPixelGeo() const;
 
 		bool		SetVisible( bool bVisible ) { return false; }
 		WgMenu* Parent() const { return m_pParent; }

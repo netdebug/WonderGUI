@@ -121,20 +121,20 @@ public:
 
 	// Convenient calls to hook
 
-    WgCoord         PointPos() const { return (Pos() * WG_SCALE_BASE) / m_scale; }
-    WgSize          PointSize() const { return (Size() * WG_SCALE_BASE) / m_scale; }
-    WgRect          PointGeo() const { WgRect r = Geo(); return WgRect(r.x*WG_SCALE_BASE/m_scale, r.y*WG_SCALE_BASE/m_scale, r.w*WG_SCALE_BASE/m_scale, r.w*WG_SCALE_BASE/m_scale ); }
+    WgCoord         PointPos() const { return (PixelPos() * WG_SCALE_BASE) / m_scale; }
+    WgSize          PointSize() const { return (PixelSize() * WG_SCALE_BASE) / m_scale; }
+    WgRect          PointGeo() const { WgRect r = PixelGeo(); return WgRect(r.x*WG_SCALE_BASE/m_scale, r.y*WG_SCALE_BASE/m_scale, r.w*WG_SCALE_BASE/m_scale, r.w*WG_SCALE_BASE/m_scale ); }
 
     WgSize          PreferredPointSize() const { WgSize sz = PreferredSize(); return sz*WG_SCALE_BASE/m_scale; };
     WgSize          MinPointSize() const { WgSize sz = MinSize(); return sz*WG_SCALE_BASE/m_scale; };
     WgSize          MaxPointSize() const { WgSize sz = MaxSize(); return sz*WG_SCALE_BASE/m_scale; };
 
     
-	WgCoord			Pos() const { if( m_pHook ) return m_pHook->Pos(); return WgCoord(0,0); }
-	WgSize			Size() const { if( m_pHook ) return m_pHook->Size(); return WgSize(256,256); }
-	WgRect			Geo() const { if( m_pHook ) return m_pHook->Geo(); return WgRect(0,0,256,256); }
-	WgCoord			ScreenPos() const { if( m_pHook ) return m_pHook->ScreenPos(); return WgCoord(0,0); }
-	WgRect			ScreenGeo() const { if( m_pHook ) return m_pHook->ScreenGeo(); return WgRect(0,0,256,256); }
+	WgCoord			PixelPos() const { if( m_pHook ) return m_pHook->PixelPos(); return WgCoord(0,0); }
+	WgSize			PixelSize() const { if( m_pHook ) return m_pHook->PixelSize(); return WgSize(256,256); }
+	WgRect			PixelGeo() const { if( m_pHook ) return m_pHook->PixelGeo(); return WgRect(0,0,256,256); }
+	WgCoord			ScreenPixelPos() const { if( m_pHook ) return m_pHook->ScreenPixelPos(); return WgCoord(0,0); }
+	WgRect			ScreenPixelGeo() const { if( m_pHook ) return m_pHook->ScreenPixelGeo(); return WgRect(0,0,256,256); }
 	bool			GrabFocus() { if( m_pHook ) return m_pHook->_requestFocus(); return false; }
 	bool			ReleaseFocus() { if( m_pHook ) return m_pHook->_releaseFocus(); return false; }
 	bool			IsFocused() { return m_bFocused; }
@@ -151,8 +151,8 @@ public:
     
 	// To be overloaded by Widget
 
-	virtual int		HeightForWidth( int width ) const;
-	virtual int		WidthForHeight( int height ) const;
+	virtual int		MatchingPixelHeight( int pixelWidth ) const;
+	virtual int		MatchingPixelWidth( int pixelHeight ) const;
 
 	virtual WgSize	PreferredSize() const = 0;
 	virtual WgSize	MinSize() const;

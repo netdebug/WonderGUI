@@ -73,7 +73,7 @@ WgHook * WgCapsule::SetChild( WgWidget * pWidget )
           return NULL;
 
 	m_hook._attachWidget(pWidget);
-	pWidget->_onNewSize(Size());
+	pWidget->_onNewSize(PixelSize());
 
 	_requestRender();
 	_requestResize();
@@ -145,24 +145,24 @@ bool WgCapsule::ReleaseAllChildren()
 	return true;
 }
 
-//____ HeightForWidth() ________________________________________________________
+//____ MatchingPixelHeight() ________________________________________________________
 
-int WgCapsule::HeightForWidth( int width ) const
+int WgCapsule::MatchingPixelHeight( int width ) const
 {
 	if( m_hook.Widget() )
-		return m_hook.Widget()->HeightForWidth( width );
+		return m_hook.Widget()->MatchingPixelHeight( width );
 	else
-		return WgWidget::HeightForWidth(width);
+		return WgWidget::MatchingPixelHeight(width);
 }
 
-//____ WidthForHeight() ________________________________________________________
+//____ MatchingPixelWidth() ________________________________________________________
 
-int WgCapsule::WidthForHeight( int height ) const
+int WgCapsule::MatchingPixelWidth( int height ) const
 {
 	if( m_hook.Widget() )
-		return m_hook.Widget()->WidthForHeight( height );
+		return m_hook.Widget()->MatchingPixelWidth( height );
 	else
-		return WgWidget::WidthForHeight(height);
+		return WgWidget::MatchingPixelWidth(height);
 }
 
 //____ PreferredSize() ___________________________________________________________
@@ -231,7 +231,7 @@ WgHook * WgCapsule::_firstHookWithGeo( WgRect& geo ) const
 {
 	if( m_hook.Widget() )
 	{
-		geo = WgRect(0,0,Size());
+		geo = WgRect(0,0,PixelSize());
 		return const_cast<CapsuleHook*>(&m_hook);
 	}
 
@@ -251,7 +251,7 @@ WgHook * WgCapsule::_lastHookWithGeo( WgRect& geo ) const
 {
 	if( m_hook.Widget() )
 	{
-		geo = WgRect(0,0,Size());
+		geo = WgRect(0,0, PixelSize());
 		return const_cast<CapsuleHook*>(&m_hook);
 	}
 

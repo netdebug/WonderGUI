@@ -92,8 +92,8 @@ public:
 
 	// Overloaded from WgWidget
 
-	int		HeightForWidth( int width ) const;
-	int		WidthForHeight( int height ) const;
+	int		MatchingPixelHeight( int width ) const;
+	int		MatchingPixelWidth( int height ) const;
 
 	WgSize	PreferredSize() const;
 

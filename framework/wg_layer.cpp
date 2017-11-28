@@ -97,24 +97,24 @@ WgWidget * WgLayer::ReleaseBase()
 	return pWidget;
 }
 
-//____ HeightForWidth() _______________________________________________________
+//____ MatchingPixelHeight() _______________________________________________________
 
-int WgLayer::HeightForWidth( int width ) const
+int WgLayer::MatchingPixelHeight( int width ) const
 {
 	if( m_baseHook.Widget() )
-		return m_baseHook.Widget()->HeightForWidth( width );
+		return m_baseHook.Widget()->MatchingPixelHeight( width );
 	else
-		return WgWidget::HeightForWidth(width);
+		return WgWidget::MatchingPixelHeight(width);
 }
 
-//____ WidthForHeight() _______________________________________________________
+//____ MatchingPixelWidth() _______________________________________________________
 
-int WgLayer::WidthForHeight( int height ) const
+int WgLayer::MatchingPixelWidth( int height ) const
 {
 	if( m_baseHook.Widget() )
-		return m_baseHook.Widget()->WidthForHeight( height );
+		return m_baseHook.Widget()->MatchingPixelWidth( height );
 	else
-		return WgWidget::WidthForHeight(height);
+		return WgWidget::MatchingPixelWidth(height);
 }
 
 //____ PreferredSize() _____________________________________________________________
@@ -190,15 +190,15 @@ void WgLayer::BaseHook::_requestResize()
 
 
 //_____________________________________________________________________________
-WgCoord WgLayerHook::ScreenPos() const
+WgCoord WgLayerHook::ScreenPixelPos() const
 {
-	return Parent()->ScreenPos() + m_geo.Pos();
+	return Parent()->ScreenPixelPos() + m_geo.Pos();
 }
 
 //_____________________________________________________________________________
-WgRect WgLayerHook::ScreenGeo() const
+WgRect WgLayerHook::ScreenPixelGeo() const
 {
-	return m_geo + Parent()->ScreenPos();
+	return m_geo + Parent()->ScreenPixelPos();
 }
 
 //_____________________________________________________________________________

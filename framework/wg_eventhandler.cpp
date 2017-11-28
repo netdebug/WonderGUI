@@ -797,11 +797,11 @@ void WgEventHandler::_finalizeEvent( WgEvent::Event * pEvent )
 
 	if( pEvent->IsForWidget() || (pEvent->Type() != WG_EVENT_MOUSE_MOVE && pEvent->Type() != WG_EVENT_MOUSE_ENTER) )
 	{
-		pEvent->m_pointerScreenPos = m_pointerPos;
+		pEvent->m_pointerScreenPixelPos = m_pointerPos;
 		pEvent->m_pointerLocalPos = m_pointerPos;
 
 		if( pEvent->Widget() )
-			pEvent->m_pointerLocalPos -= pEvent->Widget()->ScreenPos();
+			pEvent->m_pointerLocalPos -= pEvent->Widget()->ScreenPixelPos();
 	}
 
 	// Event specific finalizations
@@ -1427,7 +1427,7 @@ void WgEventHandler::_processMouseButtonRelease( WgEvent::MouseButtonRelease * p
 	WgWidget * pWidget = m_latestPressWidgets[button].GetRealPtr();
 	if( pWidget )
 	{
-		bool bIsInside = pWidget->ScreenGeo().Contains(pEvent->PointerPos());
+		bool bIsInside = pWidget->ScreenPixelGeo().Contains(pEvent->PointerPos());
 		QueueEvent( new WgEvent::MouseButtonRelease( button, pWidget, true, bIsInside ) );
 	}
 
@@ -1438,7 +1438,7 @@ void WgEventHandler::_processMouseButtonRelease( WgEvent::MouseButtonRelease * p
 	{
 		if( pWidget != m_latestPressWidgets[button].GetRealPtr() )
 		{
-			bool bIsInside = pWidget->ScreenGeo().Contains(pEvent->PointerPos());
+			bool bIsInside = pWidget->ScreenPixelGeo().Contains(pEvent->PointerPos());
 			QueueEvent( new WgEvent::MouseButtonRelease( button, pWidget, false, bIsInside ) );
 		}
 	}
@@ -1468,7 +1468,7 @@ void WgEventHandler::_processMouseButtonDrag( WgEvent::MouseButtonDrag * pEvent 
 
 	if( pWidget )
 	{
-		WgCoord	ofs = pWidget->ScreenPos();
+		WgCoord	ofs = pWidget->ScreenPixelPos();
 		QueueEvent( new WgEvent::MouseButtonDrag( button, pWidget, pEvent->StartPos() - ofs, pEvent->PrevPos() - ofs, pEvent->CurrPos() - ofs ) );
 	}
 

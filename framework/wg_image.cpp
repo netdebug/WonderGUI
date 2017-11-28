@@ -137,7 +137,7 @@ bool WgImage::_onAlphaTest( const WgCoord& ofs )
 	if( !m_bEnabled )
 		mode = WG_MODE_DISABLED;
 
-	WgSize sz = Size();
+	WgSize sz = PixelSize();
 
 	return WgUtil::MarkTestBlock( ofs, m_pGfx->GetBlock(mode,m_scale), WgRect(0,0,sz.w,sz.h), m_markOpacity );
 }

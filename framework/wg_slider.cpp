@@ -126,11 +126,11 @@ bool WgWidgetSlider::SetSliderPosPxlOfs( int x )
 	int		length;
 	if( m_bHorizontal )
 	{
-		length = Size().w;
+		length = PixelSize().w;
 	}
 	else
 	{
-		length = Size().h;
+		length = PixelSize().h;
 	}
 
 	length -= m_headerLen + m_footerLen;
@@ -301,9 +301,9 @@ void	WgWidgetSlider::_viewToPosLen( int * _wpPos, int * _wpLen )
 
 	int maxLen;
 	if( m_bHorizontal )
-		maxLen = Size().w;
+		maxLen = PixelSize().w;
 	else
-		maxLen = Size().h;
+		maxLen = PixelSize().h;
 
 	maxLen -= m_headerLen + m_footerLen;
 
@@ -489,9 +489,9 @@ void WgWidgetSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 	// Render background (if any).
 
 	if( m_bHorizontal )
-		dest.w = Size().w - m_headerLen - m_footerLen;
+		dest.w = PixelSize().w - m_headerLen - m_footerLen;
 	else
-		dest.h = Size().h - m_headerLen - m_footerLen;
+		dest.h = PixelSize().h - m_headerLen - m_footerLen;
 
 	if( m_pBgGfx )
 		pDevice->ClipBlitBlock( _clip, m_pBgGfx->GetBlock(m_mode[C_BG],m_scale), dest );
@@ -562,7 +562,7 @@ WgWidgetSlider::Component WgWidgetSlider::_findMarkedComponent( WgCoord ofs )
 {
 	// First of all, do a mark test against the header buttons...
 
-	WgSize	sz = Size();
+	WgSize	sz = PixelSize();
 
 	WgRect dest(0,0,sz.w,sz.h);
 
@@ -649,12 +649,12 @@ void WgWidgetSlider::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * p
 	if( m_bHorizontal )
 	{
 		pointerOfs = x;
-		length = Size().w;
+		length = PixelSize().w;
 	}
 	else
 	{
 		pointerOfs = y;
-		length = Size().h;
+		length = PixelSize().h;
 	}
 
 	length -= m_headerLen + m_footerLen;
@@ -886,7 +886,7 @@ bool WgWidgetSlider::_markTestSlider( WgCoord ofs )
 	int   barPos, barLen;
 	_viewToPosLen( &barPos, &barLen );
 
-	WgSize	sz = Size();
+	WgSize	sz = PixelSize();
 
 	WgRect area(0,0,sz.w,sz.h);
 

@@ -23,30 +23,30 @@
 #include <wg_vectorpanel.h>
 
 
-WgCoord WgVectorHook::Pos() const
+WgCoord WgVectorHook::PixelPos() const
 {
 	return Parent()->_hookGeo(this).Pos();
 }
 
-WgSize WgVectorHook::Size() const
+WgSize WgVectorHook::PixelSize() const
 {
 	return Parent()->_hookGeo(this).Size();
 }
 
-WgRect WgVectorHook::Geo() const
+WgRect WgVectorHook::PixelGeo() const
 {
 	return Parent()->_hookGeo(this);
 }
 
-WgCoord WgVectorHook::ScreenPos() const
+WgCoord WgVectorHook::ScreenPixelPos() const
 {
-	return Parent()->_hookGeo(this).Pos() + Parent()->ScreenPos();
+	return Parent()->_hookGeo(this).Pos() + Parent()->ScreenPixelPos();
 
 }
 
-WgRect WgVectorHook::ScreenGeo() const
+WgRect WgVectorHook::ScreenPixelGeo() const
 {
-	return Parent()->_hookGeo(this) + Parent()->ScreenPos();
+	return Parent()->_hookGeo(this) + Parent()->ScreenPixelPos();
 }
 
 bool WgVectorHook::MoveForward()

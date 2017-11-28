@@ -489,7 +489,7 @@ bool WgMenubar::OpenMenu( Uint32 nb )
 		pI = pI->Next();
 	}
 
-	WgRect	r(pos, pI->m_width+bordersWidth, Size().h );
+	WgRect	r(pos, pI->m_width+bordersWidth, PixelSize().h );
 
 
 	WgMenuLayer * pLayer = 0;
@@ -498,7 +498,7 @@ bool WgMenubar::OpenMenu( Uint32 nb )
 	if( !pLayer )
 		return false;
 
-	pLayer->OpenMenu( pItem->m_pMenu, this, r - pLayer->ScreenPos(), WG_SOUTHWEST );
+	pLayer->OpenMenu( pItem->m_pMenu, this, r - pLayer->ScreenPixelPos(), WG_SOUTHWEST );
 	return true;
 }
 
@@ -541,7 +541,7 @@ Uint32 WgMenubar::GetItemAtAbsPos( int x, int y )
 		pos.y -= m_pBgGfx->Padding(m_scale).top;
 	}
 
-	if( y > 0 && x > 0 && y < (int) Size().h )
+	if( y > 0 && x > 0 && y < (int) PixelSize().h )
 	{
 		int bordersWidth = GetEntryBorders().Width();
 
