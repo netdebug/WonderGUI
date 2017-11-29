@@ -62,7 +62,7 @@ public:
 	//.____ Geometry _________________________________________________
 
 	WgSize	MinSize( int scale ) const override;
-	WgSize	PreferredPixelSize( int scale ) const override;
+	WgSize	PreferredSize( int scale ) const override;
 	
 	WgSize	SizeForContent( const WgSize contentSize, int scale ) const override;
 

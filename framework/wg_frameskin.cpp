@@ -74,7 +74,7 @@ WgSize WgFrameSkin::MinSize(int scale) const
 	return WgSize(0,0);
 }
 
-WgSize WgFrameSkin::PreferredPixelSize(int scale) const
+WgSize WgFrameSkin::PreferredSize(int scale) const
 {
 	return WgSize(0,0);
 }

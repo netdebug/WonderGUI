@@ -48,7 +48,7 @@ public:
 	bool	IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state, int scale ) const;
 
 	WgSize	MinSize(int scale) const;
-	WgSize	PreferredPixelSize(int scale) const;
+	WgSize	PreferredSize(int scale) const;
 	WgSize	SizeForContent(const WgSize contentSize, int scale) const;
 
 	WgSize	ContentPadding(int scale) const;

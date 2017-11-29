@@ -48,7 +48,7 @@ public:
 	virtual void Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip, int scale ) const = 0;
 
 	virtual WgSize	MinSize( int scale ) const = 0;
-	virtual WgSize	PreferredPixelSize( int scale ) const = 0;
+	virtual WgSize	PreferredSize( int scale ) const = 0;
 	virtual WgSize	SizeForContent( const WgSize contentSize, int scale ) const = 0;
 
 	virtual WgSize	ContentPadding(int scale) const = 0;

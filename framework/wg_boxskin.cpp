@@ -190,7 +190,7 @@ WgSize WgBoxSkin::MinSize(int scale) const
 
 //____ PreferredPixelSize() ________________________________________________________
 
-WgSize WgBoxSkin::PreferredPixelSize(int scale) const
+WgSize WgBoxSkin::PreferredSize(int scale) const
 {
 	WgSize content = WgExtendedSkin::PreferredPixelSize(scale);
 	WgSize frame = _scaledFrame(scale);
