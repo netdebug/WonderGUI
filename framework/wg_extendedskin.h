@@ -41,7 +41,7 @@ public:
 	virtual void	SetFocusedContentShift( WgCoord shift );
 
 	virtual WgSize	MinSize( int scale ) const;
-	virtual WgSize	PreferredPixelSize( int scale ) const;
+	virtual WgSize	PreferredSize( int scale ) const;
 	virtual WgSize	SizeForContent( const WgSize contentSize, int scale ) const;
 
 	virtual WgSize	ContentPadding(int scale) const;

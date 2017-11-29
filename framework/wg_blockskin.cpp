@@ -717,7 +717,7 @@ WgSize WgBlockSkin::MinSize(int scale) const
 	
 WgSize WgBlockSkin::PreferredSize(int scale) const
 {
-	WgSize sz = WgExtendedSkin::PreferredPixelSize(scale);
+	WgSize sz = WgExtendedSkin::PreferredSize(scale);
 	return WgSize( WgMax(m_dimensions.w,sz.w), WgMax(m_dimensions.h,sz.h) );
 }
 	
