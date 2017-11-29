@@ -1210,7 +1210,7 @@ void WgTablist::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHand
 		{
 			const WgEvent::MouseButtonEvent * pEvent = static_cast<const WgEvent::MouseButtonEvent*>(_pEvent);
 
-			WgCoord pos = pEvent->PointerPos();
+			WgCoord pos = pEvent->PointerPixelPos();
 
 			WgTab * pTab = _pos2Tab( pos.x, pos.y );
 			if( pTab && pTab != m_pTabSelected )
@@ -1226,7 +1226,7 @@ void WgTablist::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHand
 		case WG_EVENT_MOUSE_ENTER:
 		case WG_EVENT_MOUSE_MOVE:
 		{
-			WgCoord pos = _pEvent->PointerPos();
+			WgCoord pos = _pEvent->PointerPixelPos();
 
 			WgTab * pTab = _pos2Tab( pos.x, pos.y );
 			if( pTab != m_pTabMarked )

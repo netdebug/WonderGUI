@@ -77,7 +77,7 @@ namespace WgEvent
 			WgWidgetWeakPtr	WidgetWeakPtr() const { return m_pWidget; }
 			WgWidget *		ForwardedFrom() const;
 			WgModifierKeys	ModKeys() const { return m_modKeys; }
-			WgCoord			PointerPos() const { return m_pointerLocalPos; }
+			WgCoord			PointerPixelPos() const { return m_pointerLocalPos; }
 			WgCoord			PointerScreenPixelPos() const { return m_pointerScreenPixelPos; }
 			
 			bool			IsMouseEvent() const;
@@ -682,11 +682,11 @@ namespace WgEvent
 		MouseButtonDrag( int button, WgWidget * pWidget, const WgCoord& orgPos, const WgCoord& prevPos, const WgCoord& currPos );
 		virtual void 	_cloneContentFrom( const Event * pOrg );
 	public:
-		WgCoord			DraggedTotal() const;
-		WgCoord			DraggedNow() const;
-		WgCoord			StartPos() const;
-		WgCoord			PrevPos() const;
-		WgCoord			CurrPos() const;
+		WgCoord			DraggedTotalPixels() const;
+		WgCoord			DraggedNowPixels() const;
+		WgCoord			StartPixelPos() const;
+		WgCoord			PrevPixelPos() const;
+		WgCoord			CurrPixelPos() const;
 	protected:
 		WgCoord			m_startPos;
 		WgCoord			m_prevPos;

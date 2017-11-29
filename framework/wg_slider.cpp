@@ -640,7 +640,7 @@ void WgWidgetSlider::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * p
 	int		barPos, barLen;
 	_viewToPosLen( &barPos, &barLen );
 
-	WgCoord pos = pEvent->PointerPos();
+	WgCoord pos = pEvent->PointerPixelPos();
 	int		x = pos.x;
 	int		y = pos.y;
 

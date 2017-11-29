@@ -565,7 +565,7 @@ void WgModalLayer::_onCloneContent( const WgWidget * _pOrg )
 void WgModalLayer::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHandler )
 {
 
-	if( !m_modalHooks.IsEmpty() && FindWidget( _pEvent->PointerPos(), WG_SEARCH_ACTION_TARGET ) == this )
+	if( !m_modalHooks.IsEmpty() && FindWidget( _pEvent->PointerPixelPos(), WG_SEARCH_ACTION_TARGET ) == this )
 	{
 		switch( _pEvent->Type() )
 		{

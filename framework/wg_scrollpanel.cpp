@@ -1075,7 +1075,7 @@ void WgScrollPanel::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * p
 		{			
 			const WgEvent::MouseWheelRoll * pEvent = static_cast<const WgEvent::MouseWheelRoll*>(_pEvent);
 
-			if( m_elements[WINDOW].m_windowGeo.Contains(pEvent->PointerPos()) )
+			if( m_elements[WINDOW].m_windowGeo.Contains(pEvent->PointerPixelPos()) )
 			{
 				int wheel = pEvent->Wheel();
 

@@ -2446,7 +2446,7 @@ bool WgText::OnEvent( const WgEvent::Event * pEvent, WgEventHandler * pEventHand
 		case WG_EVENT_MOUSE_ENTER:
 		case WG_EVENT_MOUSE_MOVE:
 		{
-			WgCoord pointerOfs = pEvent->PointerPos();
+			WgCoord pointerOfs = pEvent->PointerPixelPos();
 			
 			WgTextLinkPtr pLink = CoordToLink( pointerOfs, container );
 			if( m_pMarkedLink && pLink != m_pMarkedLink )

@@ -1281,7 +1281,7 @@ void cbDragWidget( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 
 	const WgEvent::MouseButtonDrag* pEvent = static_cast<const WgEvent::MouseButtonDrag*>(_pEvent);
 
-	WgCoord	dragDistance = pEvent->DraggedTotal();
+	WgCoord	dragDistance = pEvent->DraggedTotalPixels();
 
 	WgCoord	ofs = dragStartPos + dragDistance;
 
@@ -1313,7 +1313,7 @@ void cbResize( const WgEvent::Event* _pEvent, void * _pFlexHook )
 	WgFlexHook * pHook = static_cast<WgFlexHook*>(_pFlexHook);
 	const WgEvent::MouseButtonDrag* pEvent = static_cast<const WgEvent::MouseButtonDrag*>(_pEvent);
 
-	WgCoord dragged = pEvent->DraggedNow();
+	WgCoord dragged = pEvent->DraggedNowPixels();
 
 	pHook->SetPointSize( pHook->PixelSize() + WgSize(dragged.x,dragged.y) );
 }

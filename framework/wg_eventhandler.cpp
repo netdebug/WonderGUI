@@ -1021,7 +1021,7 @@ void WgEventHandler::_processMouseEnter( WgEvent::MouseEnter * pEvent )
 	for( int i = 0 ; i <= WG_MAX_BUTTONS ; i++ )
 	{
 		if( m_bButtonPressed[i] )
-			QueueEvent( new WgEvent::MouseButtonDrag( i, m_pLatestPressEvents[i]->PointerPos(), m_pointerPos, pEvent->PointerPos() ) );
+			QueueEvent( new WgEvent::MouseButtonDrag( i, m_pLatestPressEvents[i]->PointerPixelPos(), m_pointerPos, pEvent->PointerPixelPos() ) );
 	}
 
 	// Post event for finalizing position once button drag is taken care of.
@@ -1030,7 +1030,7 @@ void WgEventHandler::_processMouseEnter( WgEvent::MouseEnter * pEvent )
 
 	// Update pointer position
 
-	m_pointerPos = pEvent->PointerPos();
+	m_pointerPos = pEvent->PointerPixelPos();
 }
 
 //____ _processMouseLeave() ___________________________________________________
@@ -1057,7 +1057,7 @@ void WgEventHandler::_processMouseMove( WgEvent::MouseMove * pEvent )
 	for( int i = 0 ; i <= WG_MAX_BUTTONS ; i++ )
 	{
 		if( m_bButtonPressed[i] )
-			QueueEvent( new WgEvent::MouseButtonDrag( i, m_pLatestPressEvents[i]->PointerPos(), m_pointerPos, pEvent->PointerPos() ) );
+			QueueEvent( new WgEvent::MouseButtonDrag( i, m_pLatestPressEvents[i]->PointerPixelPos(), m_pointerPos, pEvent->PointerPixelPos() ) );
 	}
 
 	// Post event for finalizing move once button drag is taken care of.
@@ -1066,7 +1066,7 @@ void WgEventHandler::_processMouseMove( WgEvent::MouseMove * pEvent )
 
 	// Update pointer position
 
-	m_pointerPos = pEvent->PointerPos();
+	m_pointerPos = pEvent->PointerPixelPos();
 }
 
 //____ _processMousePosition() _________________________________________________
@@ -1379,7 +1379,7 @@ void WgEventHandler::_processMouseButtonPress( WgEvent::MouseButtonPress * pEven
 
 	if( m_pLatestPressEvents[button] && m_pLatestPressEvents[button]->Timestamp() + doubleClickTimeTreshold > pEvent->Timestamp() )
 	{
-		WgCoord distance = pEvent->PointerPos() - m_pLatestPressEvents[button]->PointerPos();
+		WgCoord distance = pEvent->PointerPixelPos() - m_pLatestPressEvents[button]->PointerPixelPos();
 
 		if( distance.x <= doubleClickDistanceTreshold &&
 			distance.x >= -doubleClickDistanceTreshold &&
@@ -1427,7 +1427,7 @@ void WgEventHandler::_processMouseButtonRelease( WgEvent::MouseButtonRelease * p
 	WgWidget * pWidget = m_latestPressWidgets[button].GetRealPtr();
 	if( pWidget )
 	{
-		bool bIsInside = pWidget->ScreenPixelGeo().Contains(pEvent->PointerPos());
+		bool bIsInside = pWidget->ScreenPixelGeo().Contains(pEvent->PointerPixelPos());
 		QueueEvent( new WgEvent::MouseButtonRelease( button, pWidget, true, bIsInside ) );
 	}
 
@@ -1438,7 +1438,7 @@ void WgEventHandler::_processMouseButtonRelease( WgEvent::MouseButtonRelease * p
 	{
 		if( pWidget != m_latestPressWidgets[button].GetRealPtr() )
 		{
-			bool bIsInside = pWidget->ScreenPixelGeo().Contains(pEvent->PointerPos());
+			bool bIsInside = pWidget->ScreenPixelGeo().Contains(pEvent->PointerPixelPos());
 			QueueEvent( new WgEvent::MouseButtonRelease( button, pWidget, false, bIsInside ) );
 		}
 	}
@@ -1469,7 +1469,7 @@ void WgEventHandler::_processMouseButtonDrag( WgEvent::MouseButtonDrag * pEvent 
 	if( pWidget )
 	{
 		WgCoord	ofs = pWidget->ScreenPixelPos();
-		QueueEvent( new WgEvent::MouseButtonDrag( button, pWidget, pEvent->StartPos() - ofs, pEvent->PrevPos() - ofs, pEvent->CurrPos() - ofs ) );
+		QueueEvent( new WgEvent::MouseButtonDrag( button, pWidget, pEvent->StartPixelPos() - ofs, pEvent->PrevPixelPos() - ofs, pEvent->CurrPixelPos() - ofs ) );
 	}
 
 }

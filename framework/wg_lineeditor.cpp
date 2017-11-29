@@ -257,7 +257,7 @@ void WgLineEditor::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHa
 				m_pText->setSelectionMode(true);
 			}
 
-			WgCoord ofs = pEvent->PointerPos();
+			WgCoord ofs = pEvent->PointerPixelPos();
 			int x = ofs.x + m_viewOfs;
 			int y = 0;
 

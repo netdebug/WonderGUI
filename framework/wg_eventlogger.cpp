@@ -232,12 +232,12 @@ void WgEventLogger::OnEvent( const WgEvent::Event * _pEvent )
 
 			const WgEvent::MouseButtonDrag * pEvent = static_cast<const WgEvent::MouseButtonDrag*>(_pEvent);
 
-			WgCoord	now		= pEvent->CurrPos();
-			WgCoord 	prev	= pEvent->PrevPos();
-			WgCoord	start	= pEvent->StartPos();
+			WgCoord	now		= pEvent->CurrPixelPos();
+			WgCoord 	prev	= pEvent->PrevPixelPos();
+			WgCoord	start	= pEvent->StartPixelPos();
 
-			WgCoord	dragNow	= pEvent->DraggedNow();
-			WgCoord	dragTotal=pEvent->DraggedTotal();
+			WgCoord	dragNow	= pEvent->DraggedNowPixels();
+			WgCoord	dragTotal=pEvent->DraggedTotalPixels();
 
 			sprintf( params, " button=%d position(start=%d,%d prev=%d,%d now=%d,%d) dragged(now=%d,%d total=%d,%d)",
 					pEvent->Button(), start.x, start.y, prev.x, prev.y, now.x, now.y, dragNow.x, dragNow.y, dragTotal.x, dragTotal.y );
@@ -556,7 +556,7 @@ string WgEventLogger::_formatModkeys( const WgEvent::Event * _pEvent )
 
 string WgEventLogger::_formatPointerPos( const WgEvent::Event * _pEvent )
 {
-	WgCoord localPos = _pEvent->PointerPos();
+	WgCoord localPos = _pEvent->PointerPixelPos();
 	WgCoord globalPos = _pEvent->PointerScreenPixelPos();
 
 

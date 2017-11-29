@@ -543,7 +543,7 @@ void WgMenuLayer::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHa
 		{
 			const WgEvent::MouseButtonEvent * pEvent = static_cast<const WgEvent::MouseButtonEvent*>(_pEvent);
 
-			WgCoord ofs = pEvent->PointerPos();
+			WgCoord ofs = pEvent->PointerPixelPos();
 			WgWidget * p = FindWidget( ofs, WG_SEARCH_ACTION_TARGET );
 			if( p == this )
 			{

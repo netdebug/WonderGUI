@@ -1022,27 +1022,27 @@ namespace WgEvent
 	}
 
 
-	WgCoord MouseButtonDrag::DraggedTotal() const
+	WgCoord MouseButtonDrag::DraggedTotalPixels() const
 	{
 		return m_currPos - m_startPos;
 	}
 
-	WgCoord MouseButtonDrag::DraggedNow() const
+	WgCoord MouseButtonDrag::DraggedNowPixels() const
 	{
 		return m_currPos - m_prevPos;
 	}
 
-	WgCoord MouseButtonDrag::CurrPos() const
+	WgCoord MouseButtonDrag::CurrPixelPos() const
 	{
 		return m_currPos;
 	}
 
-	WgCoord MouseButtonDrag::StartPos() const
+	WgCoord MouseButtonDrag::StartPixelPos() const
 	{
 		return m_startPos;
 	}
 
-	WgCoord MouseButtonDrag::PrevPos() const
+	WgCoord MouseButtonDrag::PrevPixelPos() const
 	{
 		return m_prevPos;
 	}

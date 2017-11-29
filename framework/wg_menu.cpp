@@ -770,7 +770,7 @@ void WgMenu::_onRender( WgGfxDevice * pDevice, const WgRect& canvas, const WgRec
 
 void WgMenu::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler )
 {
-	WgCoord mousePos = pEvent->PointerPos();
+	WgCoord mousePos = pEvent->PointerPixelPos();
 
 	switch( pEvent->Type() )
 	{

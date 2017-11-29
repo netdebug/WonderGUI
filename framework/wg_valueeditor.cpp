@@ -393,7 +393,7 @@ void WgValueEditor::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 	if( pEvent->IsMouseButtonEvent() )
 		mousebutton = static_cast<const WgEvent::MouseButtonEvent*>(pEvent)->Button();
 
-	WgCoord ofs = pEvent->PointerPos();
+	WgCoord ofs = pEvent->PointerPixelPos();
 
 	if( event == WG_EVENT_MOUSEBUTTON_PRESS && mousebutton == 1 )
 	{

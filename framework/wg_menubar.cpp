@@ -321,7 +321,7 @@ void WgMenubar::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandl
 		case WG_EVENT_MOUSE_MOVE:
 		case WG_EVENT_MOUSEBUTTON_PRESS:
 		{
-			WgCoord pos = pEvent->PointerPos();
+			WgCoord pos = pEvent->PointerPixelPos();
 
 			Uint32 item = GetItemAtAbsPos( pos.x, pos.y );
 

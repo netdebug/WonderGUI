@@ -201,7 +201,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 			m_pText->setSelectionMode(true);
 		}
 
-		m_pText->CursorGotoCoord( pEvent->PointerPos(), PixelGeo() );
+		m_pText->CursorGotoCoord( pEvent->PointerPixelPos(), PixelGeo() );
 
 		if(IsSelectable() && type == WG_EVENT_MOUSEBUTTON_PRESS && !(modKeys & WG_MODKEY_SHIFT))
 		{

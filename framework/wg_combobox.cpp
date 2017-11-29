@@ -246,7 +246,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 		break;
 
 		case WG_EVENT_MENU_CLOSED:
-			if( PixelGeo().Contains( _pEvent->PointerPos() ) )
+			if( PixelGeo().Contains( _pEvent->PointerPixelPos() ) )
 				newMode = WG_MODE_MARKED;
 			else
 				newMode = WG_MODE_NORMAL;
@@ -272,7 +272,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 
 		case WG_EVENT_MOUSE_POSITION:
 		{
-			WgCoord pos = static_cast<const WgEvent::MousePosition*>(_pEvent)->PointerPos();
+			WgCoord pos = static_cast<const WgEvent::MousePosition*>(_pEvent)->PointerPixelPos();
 			WgRect inputRect = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( PixelSize() ): WgRect( 0,0, PixelSize() );
 
 			if( _isSelectable() && inputRect.Contains( pos ) )
@@ -291,7 +291,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 		case WG_EVENT_MOUSEBUTTON_PRESS:
 		{
 			const WgEvent::MouseButtonPress * pEvent = static_cast<const WgEvent::MouseButtonPress*>(_pEvent);
-			WgCoord pos = pEvent->PointerPos();
+			WgCoord pos = pEvent->PointerPixelPos();
 
 			if( pEvent->Button() == 1 )
 			{
@@ -370,7 +370,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 						m_pText->setSelectionMode(true);
 					}
 
-					int x = pEvent->PointerPos().x + m_viewOfs;
+					int x = pEvent->PointerPixelPos().x + m_viewOfs;
 					int leftBorder = m_pTextBoxBg ? m_pTextBoxBg->GetBlock(m_mode,m_scale).ContentRect( PixelSize() ).x : 0;
 
 					m_pText->CursorGotoCoord( WgCoord(x, 0), WgRect(leftBorder,0,1000000,1000000) );
