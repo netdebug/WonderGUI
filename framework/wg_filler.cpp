@@ -56,7 +56,7 @@ const char * WgFiller::GetClass()
 	return c_widgetType;
 }
 
-//____ SetPreferredSize() _______________________________________________________
+//____ SetPreferredPixelSize() _______________________________________________________
 
 void WgFiller::SetPreferredPointSize( const WgSize& size )
 {
@@ -83,9 +83,9 @@ void WgFiller::SetColors( const WgColorsetPtr& pColors )
 	}
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize WgFiller::PreferredSize() const
+WgSize WgFiller::PreferredPixelSize() const
 {
 	return m_defaultSize*m_scale/WG_SCALE_BASE;
 }

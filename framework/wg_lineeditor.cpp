@@ -157,9 +157,9 @@ bool WgLineEditor::SetTextWrap(bool bWrap)
 	return !bWrap;
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize WgLineEditor::PreferredSize() const
+WgSize WgLineEditor::PreferredPixelSize() const
 {
 	//TODO: Implement!
 

@@ -478,6 +478,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	WgSurface * pBigImg = sdl_wglib::LoadSurface("../resources/frog.jpg", *g_pSurfaceFactory);
 	WgBlocksetPtr pBigBlock = WgBlockset::CreateFromSurface(pBigImg);
 
+	WgSurface * pPlateImg = sdl_wglib::LoadSurface("../resources/grey_pressable_plate.bmp", *g_pSurfaceFactory);
+
 
 	// Bottom Flex
 
@@ -499,7 +501,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
 
 	// Button skin test
-
+/*
 	auto pSkin = WgBoxSkin::Create(WgColor::cornsilk, 2, WgColor::deeppink );
 	pSkin->SetContentPadding(3);
 	pSkin->SetContentShift(WG_STATE_PRESSED, { 2,2 });
@@ -515,7 +517,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pText->SetSkin(pSkin);
 	pText->SetText("THIS IS THE TEST TEXT");
 	pFlex->AddChild(pText, WgCoord(100,100));
-
+*/
 
 	// PackPanel Scale Test
 /*
@@ -545,12 +547,21 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 
-
 	// Text InputFocus test
-/*
+
+
+	WgBlockSkinPtr pSkin = WgBlockSkin::CreateStatic(pPlateImg, { 0,0,10,10 }, 3);
+	pSkin->SetStateBlock(WG_STATE_FOCUSED, { 10,0 });
+
+//	WgBoxSkinPtr pSkin = WgBoxSkin::Create(WgColor::antiquewhite, 1, WgColor::black );
+//	pSkin->SetStateColor(WG_STATE_FOCUSED, WgColor::seagreen, WgColor::red);
+
+
 	WgTextDisplay * pDisplay1 = new WgTextDisplay();
 	pDisplay1->SetText("DISPLAY 1");
 	pDisplay1->SetEditMode(WG_TEXT_EDITABLE);
+	pDisplay1->SetSkin(pSkin);
+
 	pFlex->AddChild(pDisplay1, WgRect(0, 0, 200, 50));
 
 
@@ -560,8 +571,9 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	WgTextDisplay * pDisplay2 = new WgTextDisplay();
 	pDisplay2->SetText("DISPLAY 2");
 	pDisplay2->SetEditMode(WG_TEXT_EDITABLE);
+	pDisplay2->SetSkin(pSkin);
 	pScroll->SetContent(pDisplay2);
-*/
+
 
 
 	// Scroll chart widget
@@ -1256,7 +1268,7 @@ void cbInitDrag( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 	WgFlexHook * pHook = static_cast<WgFlexHook*>(pWidget->Hook());
 
 
-	dragStartPos = pHook->FloatOfs();
+	dragStartPos = pHook->FloatPointOfs();
 	printf( "DRAG START!\n" );
 }
 
@@ -1277,7 +1289,7 @@ void cbDragWidget( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 	printf( "ofs: %d, %d   start: %d %d   distance: %d, %d\n", ofs.x, ofs.y, dragStartPos.x, dragStartPos.y, dragDistance.x, dragDistance.y );
 
 	WgFlexHook * pHook = static_cast<WgFlexHook*>(pWidget->Hook());
-	pHook->SetOfs(dragStartPos+dragDistance);
+	pHook->SetPointOfs(dragStartPos+dragDistance);
 }
 
 //____ cbOpenModal() __________________________________________________________
@@ -1303,7 +1315,7 @@ void cbResize( const WgEvent::Event* _pEvent, void * _pFlexHook )
 
 	WgCoord dragged = pEvent->DraggedNow();
 
-	pHook->SetSize( pHook->PixelSize() + WgSize(dragged.x,dragged.y) );
+	pHook->SetPointSize( pHook->PixelSize() + WgSize(dragged.x,dragged.y) );
 }
 
 

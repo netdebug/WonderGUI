@@ -39,7 +39,7 @@ public:
 
     void drawLine(const WgRect& _clip, bool erase=false);
     
-    WgSize	PreferredSize() const;
+    WgSize	PreferredPixelSize() const;
 
     
 protected:

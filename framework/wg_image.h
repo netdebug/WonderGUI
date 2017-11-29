@@ -49,7 +49,7 @@ public:
 	void			SetSource( const WgBlocksetPtr& pBlockset );
 	WgBlocksetPtr	GetSource() const { return m_pGfx; }
 
-	WgSize			PreferredSize() const;
+	WgSize			PreferredPixelSize() const;
 
 protected:
 

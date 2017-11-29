@@ -60,7 +60,7 @@ public:
 	virtual WgWidget * NewOfMyType() const { return new WgScrollChart(); };
 
 	void	SetPreferredChartSize(const WgSize& size);			// Preferred size of the wave area (widget minus all padding) set in POINTS, not pixels!
-	WgSize	PreferredSize() const;
+	WgSize	PreferredPixelSize() const;
 
 	void		SetSurfaceFactory(WgSurfaceFactory * pFactory);
 	WgSurfaceFactory * SurfaceFactory() const {return m_pFactory;}

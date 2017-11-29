@@ -114,7 +114,7 @@ void WgPackPanel::SetOrientation( WgOrientation orientation )
 	if( m_bHorizontal != bHorizontal )
 	{
 		m_bHorizontal = bHorizontal;
-		_updatePreferredSize();
+		_updatePreferredPixelSize();
 		_refreshChildGeo();
 	}
 }
@@ -127,14 +127,14 @@ void WgPackPanel::SetSizeBroker( WgSizeBroker * pBroker )
 	if( m_pSizeBroker != pBroker )
 	{
 		m_pSizeBroker = pBroker;
-		_updatePreferredSize();
+		_updatePreferredPixelSize();
 		_refreshChildGeo();
 	}
 }
 
-//____ PreferredSize() _______________________________________________________
+//____ PreferredPixelSize() _______________________________________________________
 
-WgSize WgPackPanel::PreferredSize() const
+WgSize WgPackPanel::PreferredPixelSize() const
 {
 	return m_preferredSize;
 }
@@ -387,7 +387,7 @@ void WgPackPanel::_onResizeRequested( WgVectorHook * pHook )
 	// Update cached preferred size of child
 	
 	WgPackHook * p = static_cast<WgPackHook*>(pHook);
-	p->m_preferredSize = p->_paddedPreferredSize();
+	p->m_preferredSize = p->_paddedPreferredPixelSize();
 
 	//
 	
@@ -401,7 +401,7 @@ void WgPackPanel::_onWidgetAppeared( WgVectorHook * pInserted )
 	// Update cached preferred size of child
 	
 	WgPackHook * p = static_cast<WgPackHook*>(pInserted);
-	p->m_preferredSize = p->_paddedPreferredSize();
+	p->m_preferredSize = p->_paddedPreferredPixelSize();
 	
 	//
 	
@@ -426,7 +426,7 @@ void WgPackPanel::_onWidgetsReordered()
 
 void WgPackPanel::_refreshAllWidgets()
 {
-	_updatePreferredSize();
+	_updatePreferredPixelSize();
 	_refreshChildGeo();
 }
 
@@ -446,9 +446,9 @@ void WgPackPanel::_onNewSize( const WgSize& size )
 }
 
 
-//____ _updatePreferredSize() ______________________________________________________
+//____ _updatePreferredPixelSize() ______________________________________________________
 
-void WgPackPanel::_updatePreferredSize()
+void WgPackPanel::_updatePreferredPixelSize()
 {
 	int length = 0;
 	int breadth = 0;

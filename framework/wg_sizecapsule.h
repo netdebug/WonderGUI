@@ -45,12 +45,12 @@ public:
 	void	SetMinSize( WgSize size );              // Measured in points
 	void	SetMaxSize( WgSize size );              // Measured in points
 
-	WgSize	PreferredSize() const;
-	WgSize	MinSize() const;
-	WgSize	MaxSize() const;
+	WgSize	PreferredPixelSize() const override;
+	WgSize	MinPixelSize() const override;
+	WgSize	MaxPixelSize() const override;
 
-	int		MatchingPixelHeight( int width ) const;
-	int		MatchingPixelWidth( int height ) const;
+	int		MatchingPixelHeight( int width ) const override;
+	int		MatchingPixelWidth( int height ) const override;
 
 private:
 	void	_setScale(int scale);

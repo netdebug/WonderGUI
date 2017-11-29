@@ -696,9 +696,9 @@ WgWidget * WgScrollPanel::FindWidget( const WgCoord& pos, WgSearchMode mode )
 	return 0;
 }
 
-//____ PreferredSize() ___________________________________________________________
+//____ PreferredPixelSize() ___________________________________________________________
 
-WgSize WgScrollPanel::PreferredSize() const
+WgSize WgScrollPanel::PreferredPixelSize() const
 {
 	//TODO: Implement!!!
 
@@ -757,10 +757,10 @@ WgSize WgScrollPanel::_calcContentSize( WgSize mySize )
 	//
 
 	if( !m_bAutoHideSliderX && m_elements[XDRAG].Widget() )
-		mySize.h -= m_elements[XDRAG].Widget()->PreferredSize().h;
+		mySize.h -= m_elements[XDRAG].Widget()->PreferredPixelSize().h;
 
 	if( !m_bAutoHideSliderY && m_elements[YDRAG].Widget() )
-		mySize.w -= m_elements[YDRAG].Widget()->PreferredSize().w;
+		mySize.w -= m_elements[YDRAG].Widget()->PreferredPixelSize().w;
 
 	//
 
@@ -768,23 +768,23 @@ WgSize WgScrollPanel::_calcContentSize( WgSize mySize )
 
 	if( contentSize.h > mySize.h && m_bAutoHideSliderY && m_elements[YDRAG].Widget() )
 	{
-		mySize.w -= m_elements[YDRAG].Widget()->PreferredSize().w;
+		mySize.w -= m_elements[YDRAG].Widget()->PreferredPixelSize().w;
 		contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy );
 
 		if( contentSize.w > mySize.w && m_bAutoHideSliderX && m_elements[XDRAG].Widget() )
 		{
-			mySize.h -= m_elements[XDRAG].Widget()->PreferredSize().h;
+			mySize.h -= m_elements[XDRAG].Widget()->PreferredPixelSize().h;
 			contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy );
 		}
 	}
 	else if( contentSize.w > mySize.w && m_bAutoHideSliderX && m_elements[XDRAG].Widget() )
 	{
-		mySize.h -= m_elements[XDRAG].Widget()->PreferredSize().h;
+		mySize.h -= m_elements[XDRAG].Widget()->PreferredPixelSize().h;
 		contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy );
 
 		if( contentSize.h > mySize.h && m_bAutoHideSliderY && m_elements[YDRAG].Widget() )
 		{
-			mySize.w -= m_elements[YDRAG].Widget()->PreferredSize().w;
+			mySize.w -= m_elements[YDRAG].Widget()->PreferredPixelSize().w;
 			contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy );
 		}
 	}
@@ -808,7 +808,7 @@ void WgScrollPanel::_updateElementGeo( WgSize mySize )
 
 	if( m_elements[XDRAG].Widget() )
 	{
-		newDragX.h = m_elements[XDRAG].Widget()->PreferredSize().h;
+		newDragX.h = m_elements[XDRAG].Widget()->PreferredPixelSize().h;
 		newDragX.w = newWindow.w;
 		newDragX.x = 0;
 
@@ -820,7 +820,7 @@ void WgScrollPanel::_updateElementGeo( WgSize mySize )
 
 	if( m_elements[YDRAG].Widget() )
 	{
-		newDragY.w = m_elements[YDRAG].Widget()->PreferredSize().w;
+		newDragY.w = m_elements[YDRAG].Widget()->PreferredPixelSize().w;
 		newDragY.h = newWindow.h;
 		newDragY.y = 0;
 

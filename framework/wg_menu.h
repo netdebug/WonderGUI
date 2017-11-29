@@ -145,7 +145,7 @@ public:
 
 	int			MatchingPixelWidth( int height ) const;
 
-	WgSize		PreferredSize() const;
+	WgSize		PreferredPixelSize() const;
 
 	//
 

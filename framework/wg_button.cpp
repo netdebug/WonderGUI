@@ -141,7 +141,7 @@ int WgButton::MatchingPixelHeight( int width ) const
 	int height = 0;
 
 	if( m_pSkin )
-		height = m_pSkin->PreferredSize(m_scale).h;
+		height = m_pSkin->PreferredPixelSize(m_scale).h;
 	else if( m_pBgGfx )
 		height = m_pBgGfx->Height(m_scale);
 
@@ -165,14 +165,14 @@ int WgButton::MatchingPixelHeight( int width ) const
 }
 
 
-//____ PreferredSize() _____________________________________________________________
+//____ PreferredPixelSize() _____________________________________________________________
 
-WgSize WgButton::PreferredSize() const
+WgSize WgButton::PreferredPixelSize() const
 {
 	WgSize bestSize;
 
 	if (m_pSkin)
-		bestSize = m_pSkin->PreferredSize(m_scale);
+		bestSize = m_pSkin->PreferredPixelSize(m_scale);
 	else if( m_pBgGfx )
 		bestSize = m_pBgGfx->Size(m_scale);
 

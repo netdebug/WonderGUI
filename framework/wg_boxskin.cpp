@@ -188,11 +188,11 @@ WgSize WgBoxSkin::MinSize(int scale) const
 	return WgSize( WgMax(content.w,frame.w), WgMax(content.h,frame.h) );
 }
 
-//____ PreferredSize() ________________________________________________________
+//____ PreferredPixelSize() ________________________________________________________
 
-WgSize WgBoxSkin::PreferredSize(int scale) const
+WgSize WgBoxSkin::PreferredPixelSize(int scale) const
 {
-	WgSize content = WgExtendedSkin::PreferredSize(scale);
+	WgSize content = WgExtendedSkin::PreferredPixelSize(scale);
 	WgSize frame = _scaledFrame(scale);
 
 	return WgSize( WgMax(content.w,frame.w), WgMax(content.h,frame.h) );

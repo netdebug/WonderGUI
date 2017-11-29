@@ -98,12 +98,12 @@ int WgListPanel::MatchingPixelHeight( int width ) const
 
 int WgListPanel::MatchingPixelWidth( int height ) const
 {
-	return PreferredSize().w;
+	return PreferredPixelSize().w;
 }
 
-//____ PreferredSize() _____________________________________________________________
+//____ PreferredPixelSize() _____________________________________________________________
 
-WgSize WgListPanel::PreferredSize() const
+WgSize WgListPanel::PreferredPixelSize() const
 {
 	return m_preferredSize;
 }
@@ -247,7 +247,7 @@ void WgListPanel::_onResizeRequested( WgVectorHook * _pHook )
 	// Update PreferredSize
 
 	WgSize oldPreferredSize = pHook->m_preferredSize;
-	pHook->m_preferredSize = pHook->Widget()->PreferredSize();
+	pHook->m_preferredSize = pHook->Widget()->PreferredPixelSize();
 
 	m_preferredSize.h += pHook->m_preferredSize.h - oldPreferredSize.h;
 
@@ -277,7 +277,7 @@ void WgListPanel::_onResizeRequested( WgVectorHook * _pHook )
 	m_size.h += newHeight - pHook->m_height;
 	pHook->m_height = newHeight;
 
-	// Now we have up-to-date data for MatchingPixelHeight() and PreferredSize() requests,
+	// Now we have up-to-date data for MatchingPixelHeight() and PreferredPixelSize() requests,
 	// we notify our parent that we might need a resize.
 
 	_requestResize();
@@ -319,7 +319,7 @@ void  WgListPanel::_onWidgetAppeared( WgVectorHook * pInserted )
 
 	// Update stored PreferredSize
 
-	pHook->m_preferredSize = pHook->Widget()->PreferredSize();
+	pHook->m_preferredSize = pHook->Widget()->PreferredPixelSize();
 
 	if( m_preferredSize.w == pHook->m_preferredSize.w )
 	{
@@ -442,11 +442,11 @@ void WgListPanel::_refreshDefaultWidth()
 	}
 }
 
-//____ _refreshPreferredSize() ______________________________________________________
+//____ _refreshPreferredPixelSize() ______________________________________________________
 // Refreshes m_preferredSize for all visible hooks, m_preferredSize and m_nPreferredWidth with fresh
 // info straight from the children.
 
-void WgListPanel::_refreshPreferredSize()
+void WgListPanel::_refreshPreferredPixelSize()
 {
 	m_preferredSize.Clear();
 	m_nPreferredWidth = 0;
@@ -456,7 +456,7 @@ void WgListPanel::_refreshPreferredSize()
 	{
 		if( pHook->m_bVisible )
 		{
-			pHook->m_preferredSize = pHook->Widget()->PreferredSize();
+			pHook->m_preferredSize = pHook->Widget()->PreferredPixelSize();
 
 			if( pHook->m_preferredSize.w > m_preferredSize.w )
 			{
@@ -476,7 +476,7 @@ void WgListPanel::_refreshPreferredSize()
 
 void  WgListPanel::_refreshAllWidgets()
 {
-	_refreshPreferredSize();
+	_refreshPreferredPixelSize();
 	_adaptChildrenToWidth( m_size.w );
 	_requestResize();
 	_requestRender();

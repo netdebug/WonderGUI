@@ -354,7 +354,7 @@ public:
 	int				MatchingPixelHeight( int width ) const;
 	int				MatchingPixelWidth( int height ) const;
 
-	WgSize			PreferredSize() const;
+	WgSize			PreferredPixelSize() const;
 
 	// Overloaded from WgPanel
 

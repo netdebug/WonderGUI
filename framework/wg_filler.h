@@ -47,7 +47,7 @@ public:
 	const	WgColorsetPtr	GetColors() const		{ return m_pColors; }
 
 	void	SetPreferredPointSize( const WgSize& size );
-	WgSize	PreferredSize() const;
+	WgSize	PreferredPixelSize() const;
 
 protected:
 

@@ -154,9 +154,9 @@ void WgCheckBox::SetFlipOnRelease( bool bFlipOnRelease )
 }
 
 
-//____ PreferredSize() __________________________________________________
+//____ PreferredPixelSize() __________________________________________________
 
-WgSize WgCheckBox::PreferredSize() const
+WgSize WgCheckBox::PreferredPixelSize() const
 {
 	WgSize iconPreferredSize;
 	WgSize bgPreferredSize;

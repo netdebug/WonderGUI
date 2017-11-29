@@ -109,9 +109,9 @@ void WgScrollChart::SetPreferredChartSize(const WgSize& size)
 	}
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize WgScrollChart::PreferredSize() const
+WgSize WgScrollChart::PreferredPixelSize() const
 {
 	WgSize sz = (m_defaultSize * m_scale) / WG_SCALE_BASE;
 

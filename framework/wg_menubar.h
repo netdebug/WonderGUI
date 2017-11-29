@@ -131,7 +131,7 @@ public:
 	bool			ShowMenu(WgMenu * pMenu);
 	bool			HideMenu(WgMenu * pMenu);
 
-	WgSize			PreferredSize() const;
+	WgSize			PreferredPixelSize() const;
 
 
 protected:

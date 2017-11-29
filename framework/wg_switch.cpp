@@ -103,14 +103,14 @@ void WgSwitch::SetOffColor(WgColor color )
     m_offColor = color;
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-void WgSwitch::SetPreferredSize(WgSize size)
+void WgSwitch::SetPreferredPixelSize(WgSize size)
 {
     m_preferredSize = size;
 }
 
-WgSize WgSwitch::PreferredSize() const
+WgSize WgSwitch::PreferredPixelSize() const
 {
 	return m_preferredSize;
 }

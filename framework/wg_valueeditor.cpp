@@ -179,9 +179,9 @@ bool WgValueEditor::SetMaxInputChars( int max )
 }
 
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize WgValueEditor::PreferredSize() const
+WgSize WgValueEditor::PreferredPixelSize() const
 {
 	WgSize	sz;
 

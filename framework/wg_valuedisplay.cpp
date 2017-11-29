@@ -76,9 +76,9 @@ void WgValueDisplay::SetFormat( const WgValueFormat& format )
 	_requestRender();
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize WgValueDisplay::PreferredSize() const
+WgSize WgValueDisplay::PreferredPixelSize() const
 {
 	return WgSize(m_text.width(),m_text.height());
 }

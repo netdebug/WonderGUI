@@ -88,6 +88,50 @@ bool WgHook::_releaseFocus()
 	return Parent()->_focusReleased(this, m_pWidget);
 }
 
+
+WgCoord WgHook::PointPos() const
+{
+	return (PixelPos() * Parent()->Scale()) / WG_SCALE_BASE;
+}
+
+WgSize WgHook::PointSize() const
+{
+	return (PixelSize() * Parent()->Scale()) / WG_SCALE_BASE;
+}
+
+WgRect WgHook::PointGeo() const
+{
+	WgRect geo = PixelGeo();
+	int scale = Parent()->Scale();
+
+	geo.x = (geo.x * scale) >> WG_SCALE_BINALS;
+	geo.y = (geo.y * scale) >> WG_SCALE_BINALS;
+	geo.w = (geo.w * scale) >> WG_SCALE_BINALS;
+	geo.h = (geo.h * scale) >> WG_SCALE_BINALS;
+
+	return geo;
+}
+
+WgCoord WgHook::ScreenPointPos() const
+{
+	return (ScreenPixelPos() * Parent()->Scale()) / WG_SCALE_BASE;
+
+}
+
+WgRect WgHook::ScreenPointGeo() const
+{
+	WgRect geo = ScreenPixelGeo();
+	int scale = Parent()->Scale();
+
+	geo.x = (geo.x * scale) >> WG_SCALE_BINALS;
+	geo.y = (geo.y * scale) >> WG_SCALE_BINALS;
+	geo.w = (geo.w * scale) >> WG_SCALE_BINALS;
+	geo.h = (geo.h * scale) >> WG_SCALE_BINALS;
+
+	return geo;
+}
+
+
 //____ Root() _________________________________________________________________
 
 WgRootPanel * WgHook::Root() const

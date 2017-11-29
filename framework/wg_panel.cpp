@@ -176,7 +176,7 @@ bool WgPanelHook::SetPadding( WgBorders padding, WgUnit unit )
 
 WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPolicy, WgSizePolicy heightPolicy ) const
 {
-	WgSize	defaultSize = _paddedPreferredSize();
+	WgSize	defaultSize = _paddedPreferredPixelSize();
 
 	WgSize	sz;
 
@@ -225,15 +225,15 @@ WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPol
 	return sz;
 }
 
-WgSize WgPanelHook::_paddedPreferredSize() const
+WgSize WgPanelHook::_paddedPreferredPixelSize() const
 {
     switch( m_paddingUnit )
     {
         case WG_PIXELS:
-            return m_pWidget->PreferredSize() + m_padding;
+            return m_pWidget->PreferredPixelSize() + m_padding;
         case WG_FRACTION:
         {
-            WgSize sz = m_pWidget->PreferredSize();
+            WgSize sz = m_pWidget->PreferredPixelSize();
             sz.w += ((sz.w * m_padding.left) >> 8) + ((sz.w * m_padding.right) >> 8);
             sz.h += ((sz.h * m_padding.top) >> 8) + ((sz.h * m_padding.bottom) >> 8);
             return sz;
@@ -249,10 +249,10 @@ WgSize WgPanelHook::_paddedMinSize() const
     switch( m_paddingUnit )
     {
         case WG_PIXELS:
-            return m_pWidget->MinSize() + m_padding;
+            return m_pWidget->MinPixelSize() + m_padding;
         case WG_FRACTION:
         {
-            WgSize sz = m_pWidget->MinSize();
+            WgSize sz = m_pWidget->MinPixelSize();
             sz.w += ((sz.w * m_padding.left) >> 8) + ((sz.w * m_padding.right) >> 8);
             sz.h += ((sz.h * m_padding.top) >> 8) + ((sz.h * m_padding.bottom) >> 8);
             return sz;
@@ -268,10 +268,10 @@ WgSize WgPanelHook::_paddedMaxSize() const
     switch( m_paddingUnit )
     {
         case WG_PIXELS:
-            return m_pWidget->MaxSize() + m_padding;
+            return m_pWidget->MaxPixelSize() + m_padding;
         case WG_FRACTION:
         {
-            WgSize sz = m_pWidget->MaxSize();
+            WgSize sz = m_pWidget->MaxPixelSize();
             sz.w += ((sz.w * m_padding.left) >> 8) + ((sz.w * m_padding.right) >> 8);
             sz.h += ((sz.h * m_padding.top) >> 8) + ((sz.h * m_padding.bottom) >> 8);
             return sz;

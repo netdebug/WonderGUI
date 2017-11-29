@@ -83,7 +83,7 @@ WgRect WgStackHook::_getGeo( const WgRect& parentGeo ) const
 		default:
 		case DEFAULT:
 		{
-			WgSize	size = m_pWidget->PreferredSize();
+			WgSize	size = m_pWidget->PreferredPixelSize();
 			WgRect geo = WgUtil::OrigoToRect( m_origo, base, size );
 
 			if( geo.w > base.w )
@@ -105,7 +105,7 @@ WgRect WgStackHook::_getGeo( const WgRect& parentGeo ) const
 		}
 		case SCALE:
 		{
-			WgSize	orgSize = m_pWidget->PreferredSize();
+			WgSize	orgSize = m_pWidget->PreferredPixelSize();
 			WgSize	size;
 
 			float	fracX = orgSize.w / (float) base.w;
@@ -192,9 +192,9 @@ int WgStackPanel::MatchingPixelWidth( int height ) const
 }
 
 
-//____ PreferredSize() _____________________________________________________________
+//____ PreferredPixelSize() _____________________________________________________________
 
-WgSize WgStackPanel::PreferredSize() const
+WgSize WgStackPanel::PreferredPixelSize() const
 {
 	return m_preferredSize;
 }
@@ -219,7 +219,7 @@ WgRect WgStackPanel::_hookGeo( const WgVectorHook * pHook )
 
 void WgStackPanel::_onResizeRequested( WgVectorHook * _pHook )
 {
-	_refreshPreferredSize();
+	_refreshPreferredPixelSize();
 }
 
 //____ _onRenderRequested() ____________________________________________________
@@ -278,7 +278,7 @@ void WgStackPanel::_onWidgetAppeared( WgVectorHook * pInserted )
 
 	// Update bestSize
 
-	WgSize preferred = pInserted->Widget()->PreferredSize();
+	WgSize preferred = pInserted->Widget()->PreferredPixelSize();
 
 	if( preferred.w > m_preferredSize.w )
 	{
@@ -321,7 +321,7 @@ void WgStackPanel::_onWidgetDisappeared( WgVectorHook * pToBeRemoved )
 	{
 		if( pHook != pToBeRemoved )
 		{
-			WgSize sz = pHook->Widget()->PreferredSize();
+			WgSize sz = pHook->Widget()->PreferredPixelSize();
 			if( sz.w > preferredSize.w )
 				preferredSize.w = sz.w;
 			if( sz.h > preferredSize.h )
@@ -358,7 +358,7 @@ void WgStackPanel::_onWidgetsReordered()
 
 void WgStackPanel::_refreshAllWidgets()
 {
-	_refreshPreferredSize();
+	_refreshPreferredPixelSize();
 	_adaptChildrenToSize();
 	_requestRender();
 }
@@ -370,16 +370,16 @@ WgVectorHook * WgStackPanel::_newHook()
 	return new WgStackHook(this);
 }
 
-//____ _refreshPreferredSize() _____________________________________________________
+//____ _refreshPreferredPixelSize() _____________________________________________________
 
-void WgStackPanel::_refreshPreferredSize()
+void WgStackPanel::_refreshPreferredPixelSize()
 {
 	WgSize	preferredSize;
 
 	WgStackHook * pHook = FirstHook();
 	while( pHook )
 	{
-		WgSize sz = pHook->_paddedPreferredSize();
+		WgSize sz = pHook->_paddedPreferredPixelSize();
 		if( sz.w > preferredSize.w )
 			preferredSize.w = sz.w;
 		if( sz.h > preferredSize.h )

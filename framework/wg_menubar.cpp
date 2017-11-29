@@ -202,9 +202,9 @@ bool WgMenubar::HideMenu(WgMenu * pMenu)
 	return false;
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize WgMenubar::PreferredSize() const
+WgSize WgMenubar::PreferredPixelSize() const
 {
 	//TODO: Implement!
 

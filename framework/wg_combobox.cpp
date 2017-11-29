@@ -86,9 +86,9 @@ void WgCombobox::SetSource( const WgBlocksetPtr& pTextBox )
 	_requestRender();
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize WgCombobox::PreferredSize() const
+WgSize WgCombobox::PreferredPixelSize() const
 {
 	//TODO: Implement!!!
 

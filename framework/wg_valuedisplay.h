@@ -64,7 +64,7 @@ public:
 	WgValueFormat	Format() { return m_format; }
 	virtual const WgValueFormat&	GetFormat() const { return m_format; }
 
-	WgSize	PreferredSize() const;
+	WgSize	PreferredPixelSize() const;
 
 
 protected:

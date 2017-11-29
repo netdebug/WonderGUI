@@ -38,7 +38,7 @@ public:
     void            SetSidePadding( float padding ) { m_fSidePadding = padding; }
     void            SetZeroInMiddle(bool mb) { m_bZeroInMiddle = mb; }
     void            EnableFades(bool b) { m_bUseFades = b; }
-	WgSize			PreferredSize() const;
+	WgSize			PreferredPixelSize() const;
 	
 protected:
 	

@@ -42,7 +42,7 @@ public:
 	virtual const char *Type( void ) const;
 	static const char * GetClass();
 	virtual WgWidget * NewOfMyType() const { return new TestWidget(); };
-	WgSize	PreferredSize() const;
+	WgSize	PreferredPixelSize() const;
 
 	void	Start();
 	void	Stop();

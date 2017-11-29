@@ -38,7 +38,7 @@ public:
 	
 	
 	
-	WgSize			PreferredSize() const;
+	WgSize			PreferredPixelSize() const;
 	
 protected:
 	

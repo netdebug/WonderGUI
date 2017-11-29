@@ -120,7 +120,7 @@ bool WgMenuHook::_updateGeo()
 
 	//
 
-	WgRect geo(0,0,WgSize::Min(Widget()->PreferredSize(),WgSize::Min(m_maxSize,parentSize)));
+	WgRect geo(0,0,WgSize::Min(Widget()->PreferredPixelSize(),WgSize::Min(m_maxSize,parentSize)));
 
 	switch( m_attachPoint )
 	{

@@ -205,26 +205,26 @@ WgEventHandler * WgWidget::_eventHandler() const
 
 int WgWidget::MatchingPixelHeight( int width ) const
 {
-	return PreferredSize().h;		// Default is to stick with best height no matter what width.
+	return PreferredPixelSize().h;		// Default is to stick with best height no matter what width.
 }
 
 //____ MatchingPixelWidth() _______________________________________________________
 
 int WgWidget::MatchingPixelWidth( int height ) const
 {
-	return PreferredSize().w;		// Default is to stick with best width no matter what height.
+	return PreferredPixelSize().w;		// Default is to stick with best width no matter what height.
 }
 
-//____ MinSize() ______________________________________________________________
+//____ MinPixelSize() ______________________________________________________________
 
-WgSize WgWidget::MinSize() const
+WgSize WgWidget::MinPixelSize() const
 {
 	return WgSize(0,0);
 }
 
-//____ MaxSize() ______________________________________________________________
+//____ MaxPixelSize() ______________________________________________________________
 
-WgSize WgWidget::MaxSize() const
+WgSize WgWidget::MaxPixelSize() const
 {
 	return WgSize(2<<24,2<<24);
 }
@@ -273,6 +273,41 @@ WgMode WgWidget::Mode() const
 	else
 		return WG_MODE_DISABLED;
 }
+
+//____ PreferredPointSize() ___________________________________________________
+
+WgSize WgWidget::PreferredPointSize() const 
+{ 
+	WgSize sz = PreferredPixelSize()*WG_SCALE_BASE; 
+
+	sz.w += m_scale - 1;		// Preferred size should be rounded up.
+	sz.h += m_scale - 1;
+
+	return sz / m_scale; 
+};
+
+//____ MinPointSize() ___________________________________________________
+
+WgSize WgWidget::MinPointSize() const
+{ 
+	WgSize sz = MinPixelSize()*WG_SCALE_BASE;
+
+	sz.w += m_scale - 1;		// Min size should be rounded up.
+	sz.h += m_scale - 1;
+
+	return sz / m_scale; 
+};
+
+
+//____ MaxPointSize() ___________________________________________________
+
+WgSize WgWidget::MaxPointSize() const 
+{ 
+	WgSize sz = MaxPixelSize(); 
+	return sz*WG_SCALE_BASE / m_scale; 
+};
+
+
 
 //____ _getBlendMode() _________________________________________________________
 

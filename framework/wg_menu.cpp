@@ -429,9 +429,9 @@ WgMenuItem* WgMenu::FindItem(int id)
 	return 0;
 }
 
-//____ PreferredSize() ___________________________________________________________
+//____ PreferredPixelSize() ___________________________________________________________
 
-WgSize WgMenu::PreferredSize() const
+WgSize WgMenu::PreferredPixelSize() const
 {
 	return m_defaultSize;
 }
@@ -1454,7 +1454,7 @@ void WgMenu::_adjustSize()
 			pSlider->SetButtonLayout( m_sliderBtnLayout );
 			pSlider->SetSliderTarget(this);
 		}
-		WgSize sliderSize = pSlider->PreferredSize();
+		WgSize sliderSize = pSlider->PreferredPixelSize();
 
 		m_sliderHook.m_size.w = sliderSize.w;
 		m_sliderHook.m_size.h = PixelSize().h - contentBorders.Height();

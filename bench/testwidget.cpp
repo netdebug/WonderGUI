@@ -58,9 +58,9 @@ const char * TestWidget::GetClass()
 	return c_widgetType;
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize TestWidget::PreferredSize() const
+WgSize TestWidget::PreferredPixelSize() const
 {
 	return WgSize(200,200);
 }

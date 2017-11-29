@@ -65,7 +65,7 @@ public:
 	void	AddMarker( int xOfs, float yOfs );
 	void	SetMarkerGfx( const WgBlocksetPtr& pBlockset );
 
-	WgSize	PreferredSize() const;
+	WgSize	PreferredPixelSize() const;
 	
 	void	SetRenderSegments( int nSegments );
 

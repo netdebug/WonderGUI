@@ -582,9 +582,9 @@ WgMode	WgTablist::_getTabMode(const WgTab& tab) const
 		return WG_MODE_NORMAL;
 }
 
-//____ PreferredSize() ______________________________________________________________
+//____ PreferredPixelSize() ______________________________________________________________
 
-WgSize WgTablist::PreferredSize() const
+WgSize WgTablist::PreferredPixelSize() const
 {
 	if( m_tabs.Size() == 0 )
 		return WgSize(0,0);

@@ -81,9 +81,9 @@ void WgRulerLabels::SetTextManager( WgTextManager * pTextManager )
 }
 
 
-//____ PreferredSize() ________________________________________________________________
+//____ PreferredPixelSize() ________________________________________________________________
 
-WgSize WgRulerLabels::PreferredSize() const
+WgSize WgRulerLabels::PreferredPixelSize() const
 {
     //TODO: calculation of length is not good.
     

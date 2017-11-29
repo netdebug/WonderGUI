@@ -238,9 +238,9 @@ int WgSimpleVolumeMeter::_calcIHold( float holdValue, int canvasHeight )
 	return ofs;
 }
 
-//____ PreferredSize() ________________________________________________________________
+//____ PreferredPixelSize() ________________________________________________________________
 
-WgSize WgSimpleVolumeMeter::PreferredSize() const
+WgSize WgSimpleVolumeMeter::PreferredPixelSize() const
 {
 	return WgSize(9,20);
 }

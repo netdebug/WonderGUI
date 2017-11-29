@@ -80,9 +80,9 @@ const char * WgSimpleLine::GetClass()
     return c_widgetType;
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize WgSimpleLine::PreferredSize() const
+WgSize WgSimpleLine::PreferredPixelSize() const
 {
     return m_src.Size();
 }

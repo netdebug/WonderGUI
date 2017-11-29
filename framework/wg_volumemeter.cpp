@@ -165,9 +165,9 @@ void WgVolumeMeter::SetValue( float fPeak, float fHold )
 }
 
 
-//____ PreferredSize() ________________________________________________________________
+//____ PreferredPixelSize() ________________________________________________________________
 
-WgSize WgVolumeMeter::PreferredSize() const
+WgSize WgVolumeMeter::PreferredPixelSize() const
 {
 	if( m_direction == WG_UP || m_direction == WG_DOWN )
 		return WgSize((10*m_scale)>>WG_SCALE_BINALS,(5*m_nLEDs*m_scale)>>WG_SCALE_BINALS);

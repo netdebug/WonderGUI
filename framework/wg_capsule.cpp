@@ -165,12 +165,12 @@ int WgCapsule::MatchingPixelWidth( int height ) const
 		return WgWidget::MatchingPixelWidth(height);
 }
 
-//____ PreferredSize() ___________________________________________________________
+//____ PreferredPixelSize() ___________________________________________________________
 
-WgSize WgCapsule::PreferredSize() const
+WgSize WgCapsule::PreferredPixelSize() const
 {
 	if( m_hook.Widget() )
-		return m_hook.Widget()->PreferredSize();
+		return m_hook.Widget()->PreferredPixelSize();
 	else
 		return WgSize(1,1);
 }

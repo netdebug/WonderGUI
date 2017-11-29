@@ -97,7 +97,7 @@ WgSize WgExtendedSkin::MinSize(int scale) const
 
 //____ MinSize() ______________________________________________________________
 
-WgSize WgExtendedSkin::PreferredSize(int scale) const
+WgSize WgExtendedSkin::PreferredPixelSize(int scale) const
 {
 	return _scaledContentPadding(scale);
 }

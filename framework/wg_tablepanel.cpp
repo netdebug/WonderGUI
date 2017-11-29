@@ -1682,7 +1682,7 @@ int WgTablePanel::MatchingPixelHeight( int width ) const
 {
 	//TODO: Implement, should recurse through lines and their widgets checking height needed.
 
-	return PreferredSize().h;		// No recommendation, for the moment
+	return PreferredPixelSize().h;		// No recommendation, for the moment
 }
 
 //____ MatchingPixelWidth() _______________________________________________________
@@ -1692,9 +1692,9 @@ int WgTablePanel::MatchingPixelWidth( int height ) const
 	return m_contentSize.w;		// Width remains the same independent of height.
 }
 
-//____ PreferredSize() _____________________________________________________________
+//____ PreferredPixelSize() _____________________________________________________________
 
-WgSize WgTablePanel::PreferredSize() const
+WgSize WgTablePanel::PreferredPixelSize() const
 {
 	return m_contentSize;
 }

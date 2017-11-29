@@ -51,10 +51,10 @@ public:
 	bool	SetAnchored( int anchorTopLeft, int anchorBottomRight, WgBorders padding = 0 );
 
 	bool	SetFloating();
-	bool	SetFloating( const WgCoord& pos, WgOrigo origo = WG_NORTHWEST );
-	bool	SetFloating( const WgCoord& pos, int anchor, WgOrigo hotspot );
-	bool	SetFloating( const WgRect& geometry, WgOrigo origo = WG_NORTHWEST );
-	bool	SetFloating( const WgRect& geometry, int anchor, WgOrigo hotspot );
+	bool	SetFloating( const WgCoord& pointPos, WgOrigo origo = WG_NORTHWEST );
+	bool	SetFloating( const WgCoord& pointPos, int anchor, WgOrigo hotspot );
+	bool	SetFloating( const WgRect& pointGeometry, WgOrigo origo = WG_NORTHWEST );
+	bool	SetFloating( const WgRect& pointGeometry, int anchor, WgOrigo hotspot );
 
 
 	void	Top();								// Put us ontop all our silbings.
@@ -69,36 +69,33 @@ public:
 	bool	IsAnchored() const { return !m_bFloating; }
 
 	// Methods for floating hooks
-
-    void    SetScaleGeo( bool bScale );
-    bool    ScaleGeo() const { return m_bScaleGeo; }
     
 	bool	SetAnchor( int anchor );
 	bool	SetHotspot( WgOrigo hotspot );
 
 	bool	SetSizePolicy( WgSizePolicy width, WgSizePolicy height );
 
-	bool	SetGeo( const WgRect& geometry );
+	bool	SetPointGeo( const WgRect& geometry );
 
-	bool	SetOfs( const WgCoord& ofs );
-	bool	SetOfsX( int x );
-	bool	SetOfsY( int y );
+	bool	SetPointOfs( const WgCoord& ofs );
+	bool	SetPointOfsX( int x );
+	bool	SetPointOfsY( int y );
 
-	bool	SetSize( const WgSize& size );
-	bool	SetWidth( int width );
-	bool	SetHeight( int height );
+	bool	SetPointSize( const WgSize& size );
+	bool	SetPointWidth( int width );
+	bool	SetPointHeight( int height );
 
-	bool	Move( const WgCoord& ofs );
-	bool	MoveX( int x );
-	bool	MoveY( int y );
+	bool	MovePoints( const WgCoord& ofs );
+	bool	MovePointsX( int x );
+	bool	MovePointsY( int y );
 
 	WgSizePolicy	WidthPolicy() const { return m_widthPolicy; }
 	WgSizePolicy	HeightPolicy() const { return m_heightPolicy; }
 	int				Origo() const { return m_anchor; }
 	WgOrigo	Hotspot() const { return m_hotspot; }
-	WgRect			FloatGeo() const { return m_placementGeo; }
-	WgCoord			FloatOfs() const { return m_placementGeo.Pos(); }
-	WgRect			FloatSize() const { return m_placementGeo.Size(); }
+	WgRect			FloatPointGeo() const { return m_placementGeo; }
+	WgCoord			FloatPointOfs() const { return m_placementGeo.Pos(); }
+	WgRect			FloatPointSize() const { return m_placementGeo.Size(); }
 
 	// Methods for anchored hooks
 
@@ -106,10 +103,6 @@ public:
 	int				AnchorBottomRight() const { return m_anchorBottomRight; }
 
 	// Standard Hook methods
-    
-    WgCoord PointPos() const;
-    WgSize  PointSize() const;
-    WgRect  PointGeo() const;
     
 	WgCoord			PixelPos() const { return m_realGeo.Pos(); }
 	WgSize			PixelSize() const { 	return m_realGeo.Size(); }
@@ -155,7 +148,6 @@ protected:
 	int				m_anchor;
 	WgOrigo         m_hotspot;
 	WgRect			m_placementGeo;	// Widgets geo relative anchor and hotspot.
-    bool            m_bScaleGeo;   // true = scale is applied to placement geo.
 
 	//Only used for anchored hooks.
 
@@ -244,8 +236,8 @@ public:
 
 	// Overloaded from WgWidget
 
-	WgSize			PreferredSize() const;
-    void            SetPreferredSize( WgSize size );
+	WgSize			PreferredPixelSize() const;
+    void            SetPreferredPixelSize( WgSize size );
     
 private:
 
@@ -253,7 +245,7 @@ private:
 	void			_onNewSize( const WgSize& size );
 	void			_setScale( int scale );
 
-    WgSize          _scaledPreferredSize( WgWidget * pWidget );
+    WgSize          _scaledPreferredPixelSize( WgWidget * pWidget );
 
 
 	void			_onRequestRender( const WgRect& rect, const WgFlexHook * pHook );	// rect is in our coordinate system.

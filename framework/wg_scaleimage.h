@@ -67,7 +67,7 @@ public:
 
 
 
-	WgSize			PreferredSize() const;
+	WgSize			PreferredPixelSize() const;
 
     void resample(WgSurface* src, WgSurface* dest)
     {

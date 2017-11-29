@@ -44,8 +44,8 @@ public:
     void    SetColor( WgColor color );
     void    SetOffColor(WgColor color );
     
-	WgSize	PreferredSize() const;
-    void    SetPreferredSize(WgSize size);
+	WgSize	PreferredPixelSize() const;
+    void    SetPreferredPixelSize(WgSize size);
 
 protected:
 	void	_onCloneContent( const WgWidget * _pOrg );

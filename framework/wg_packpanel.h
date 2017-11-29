@@ -92,7 +92,7 @@ public:
 	int				MatchingPixelHeight( int width ) const;
 	int				MatchingPixelWidth( int height ) const;
 
-	WgSize			PreferredSize() const;
+	WgSize			PreferredPixelSize() const;
 	
 protected:
 
@@ -125,7 +125,7 @@ protected:
 	//
 	
 	void			_refreshChildGeo();
-	void			_updatePreferredSize();
+	void			_updatePreferredPixelSize();
 	int				_populateSizeBrokerArray( WgSizeBrokerItem * pArray ) const;
 	int				_populateSizeBrokerArray( WgSizeBrokerItem * pArray, int forcedBreadth ) const;
 

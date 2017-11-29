@@ -198,8 +198,6 @@ namespace sdl_wglib
 			surfaces[2] = pSurfaceX4;
 		}
 		
-
-
 		WgBlocksetPtr pHSliderBtnBwdBlocks	= WgBlockset::CreateFromRow(pSurface, WgRect(1,HSLIDER_BTN_OFS,74,17), 4, 2, WG_OPAQUE);
 		pHSliderBtnBwdBlocks->SetFrame(WgBorders(3));
 		pHSliderBtnBwdBlocks->SetPadding(WgBorders(4));
@@ -294,6 +292,7 @@ namespace sdl_wglib
 
 
 		WgResDB * pDB = new WgResDB();
+
 
 
 		// Create standard button

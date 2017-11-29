@@ -86,9 +86,9 @@ void WgChart::SetPreferredChartSize( const WgSize& size )
 	}
 }
 
-//____ PreferredSize() __________________________________________________________
+//____ PreferredPixelSize() __________________________________________________________
 
-WgSize WgChart::PreferredSize() const
+WgSize WgChart::PreferredPixelSize() const
 {
 	WgSize sz = (m_defaultSize * m_scale) / WG_SCALE_BASE;
 

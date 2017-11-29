@@ -118,9 +118,9 @@ public:
 	float		JumpSizeX( ) const { return m_jumpSizeX; }
 	float		JumpSizeY( ) const { return m_jumpSizeY; }
 
-	int			ContentWidth() { return m_contentSize.w; };
-	int			ContentHeight() { return m_contentSize.h; };
-	WgSize		ContentSize() { return m_contentSize; };
+	int			ContentPixelWidth() { return m_contentSize.w; };
+	int			ContentPixelHeight() { return m_contentSize.h; };
+	WgSize		ContentPixelSize() { return m_contentSize; };
 
 	void		SetBgColor( WgColor color );
 	WgColor		BgColor() const { return m_bgColor; }
@@ -219,7 +219,7 @@ public:
 
 	// Overloaded from Widget
 
-	WgSize				PreferredSize() const;				// = preferred size of dragbars in the geometry, fixed value if dragbars are missing.
+	WgSize				PreferredPixelSize() const;				// = preferred size of dragbars in the geometry, fixed value if dragbars are missing.
 
 
 

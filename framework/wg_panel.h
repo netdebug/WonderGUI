@@ -58,7 +58,7 @@ protected:
 
 	 WgWidgetHolder* _holder() const { return _parent(); }
 
-	WgSize		_paddedPreferredSize() const;
+	WgSize		_paddedPreferredPixelSize() const;
 	WgSize		_paddedMinSize() const;
 	WgSize		_paddedMaxSize() const;
 	int			_paddedMatchingPixelWidth( int paddedHeight ) const;

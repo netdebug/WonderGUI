@@ -104,14 +104,14 @@ void WgSizeCapsule::SetMaxSize( WgSize _size )
 	}
 }
 
-//____ PreferredSize() ________________________________________________________
+//____ PreferredPixelSize() ________________________________________________________
 
-WgSize WgSizeCapsule::PreferredSize() const 
+WgSize WgSizeCapsule::PreferredPixelSize() const 
 {
 
 	if( m_hook.Widget() )
 	{
-		WgSize pref = m_hook.Widget()->PreferredSize();
+		WgSize pref = m_hook.Widget()->PreferredPixelSize();
 
 		if( m_pixelsPreferred.w != 0 )
 		{
@@ -126,8 +126,8 @@ WgSize WgSizeCapsule::PreferredSize() const
 		//TODO: Check so we don't have any corner cases that breaks the constraints and
 		// and that priorities between preferred height/width are reasonable.
 
-		WgSize min = MinSize();
-		WgSize max = MaxSize();
+		WgSize min = MinPixelSize();
+		WgSize max = MaxPixelSize();
 
 		if( pref.w < min.w )
 		{
@@ -179,23 +179,23 @@ WgSize WgSizeCapsule::PreferredSize() const
 	}
 }
 
-//____ MinSize() ______________________________________________________________
+//____ MinPixelSize() ______________________________________________________________
 
-WgSize WgSizeCapsule::MinSize() const 
+WgSize WgSizeCapsule::MinPixelSize() const 
 {
 
 	if( m_hook.Widget() )
-		return WgSize::Max(m_pixelsMin,m_hook.Widget()->MinSize());
+		return WgSize::Max(m_pixelsMin,m_hook.Widget()->MinPixelSize());
 	else
 		return m_pixelsMin;
 }
 
-//____ MaxSize() ______________________________________________________________
+//____ MaxPixelSize() ______________________________________________________________
 
-WgSize WgSizeCapsule::MaxSize() const 
+WgSize WgSizeCapsule::MaxPixelSize() const
 {
 	if( m_hook.Widget() )
-		return WgSize::Min(m_pixelsMax,m_hook.Widget()->MaxSize());
+		return WgSize::Min(m_pixelsMax,m_hook.Widget()->MaxPixelSize());
 	else
 		return m_pixelsMax;
 }
@@ -210,8 +210,8 @@ int WgSizeCapsule::MatchingPixelHeight( int width ) const
 		
 		if( m_hook.Widget() )
 		{
-			int max = m_hook.Widget()->MaxSize().h;
-			int min = m_hook.Widget()->MinSize().h;
+			int max = m_hook.Widget()->MaxPixelSize().h;
+			int min = m_hook.Widget()->MinPixelSize().h;
 			WG_LIMIT( h, min, max );
 		}
 		return h;
@@ -236,8 +236,8 @@ int WgSizeCapsule::MatchingPixelWidth( int height ) const
 
 		if( m_hook.Widget() )
 		{
-			int max = m_hook.Widget()->MaxSize().w;
-			int min = m_hook.Widget()->MinSize().w;
+			int max = m_hook.Widget()->MaxPixelSize().w;
+			int min = m_hook.Widget()->MinPixelSize().w;
 			WG_LIMIT( w, min, max );
 		}
 		return w;

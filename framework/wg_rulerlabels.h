@@ -33,7 +33,7 @@ public:
 	
 	void			AddLabel( const WgCharSeq& text, const WgTextpropPtr& pProp, float offset, WgOrigo origo );
     void            SetTextManager( WgTextManager * pTextManager );
-	WgSize			PreferredSize() const;
+	WgSize			PreferredPixelSize() const;
 	void			SetDirection( WgDirection direction );
 	
 protected:

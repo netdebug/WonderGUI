@@ -102,7 +102,7 @@ class	WgWidgetSlider : public WgWidget
 
 		bool	SetSliderTarget( WgSliderTarget * pTarget );
 
-		WgSize	PreferredSize() const;
+		WgSize	PreferredPixelSize() const;
 
 	protected:
 		void	_onCloneContent( const WgWidget * _pOrg );

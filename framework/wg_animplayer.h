@@ -67,7 +67,7 @@ public:
 	bool			Stop();
 	bool			IsPlaying() { return m_bPlaying; };
 
-	WgSize			PreferredSize() const;
+	WgSize			PreferredPixelSize() const;
 
     void SetTint(WgColor kColor);
     const WgColor& GetTint() { return m_kTintColor; }

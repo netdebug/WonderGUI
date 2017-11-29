@@ -73,7 +73,7 @@ class WgValueEditor : public WgWidget, public Wg_Interface_ValueHolder
 
 		bool	SelectAllText();
 
-		WgSize	PreferredSize() const;
+		WgSize	PreferredPixelSize() const;
 
 
 		virtual bool		IsInputField() const	{ return true; }

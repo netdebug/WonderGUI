@@ -166,7 +166,7 @@ bool WgModalHook::_refreshRealGeo()	// Return false if we couldn't get exactly t
 	WgSize sz = m_placementGeo.Size();
 
 	if( sz.w == 0 && sz.h == 0 )
-		sz = m_pWidget->PreferredSize();
+		sz = m_pWidget->PreferredPixelSize();
 	else if( sz.w == 0 )
 		sz.w = m_pWidget->MatchingPixelWidth(sz.h);
 	else if( sz.h == 0 )
@@ -395,12 +395,12 @@ int WgModalLayer::MatchingPixelWidth( int height ) const
 		return WgWidget::MatchingPixelWidth(height);
 }
 
-//____ PreferredSize() _____________________________________________________________
+//____ PreferredPixelSize() _____________________________________________________________
 
-WgSize WgModalLayer::PreferredSize() const
+WgSize WgModalLayer::PreferredPixelSize() const
 {
 	if( m_baseHook.Widget() )
-		return m_baseHook.Widget()->PreferredSize();
+		return m_baseHook.Widget()->PreferredPixelSize();
 	else
 		return WgSize(1,1);
 }

@@ -99,7 +99,7 @@ public:
 	int		MatchingPixelHeight( int width ) const;
 	int		MatchingPixelWidth( int height ) const;
 
-	WgSize	PreferredSize() const;
+	WgSize	PreferredPixelSize() const;
 
 protected:
 
@@ -131,7 +131,7 @@ protected:
 	// Internal to WgListPanel
 
 	void	_adaptChildrenToWidth( int width );
-	void 	_refreshPreferredSize();
+	void 	_refreshPreferredPixelSize();
 	void	_refreshDefaultWidth();
 	void	_renderFromChildOnward( WgVectorHook * pHook );
 

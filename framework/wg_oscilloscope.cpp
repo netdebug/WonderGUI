@@ -84,9 +84,9 @@ const char * WgOscilloscope::GetClass()
 	return c_widgetType;
 }
 
-//____ PreferredSize() ________________________________________________________
+//____ PreferredPixelSize() ________________________________________________________
 
-WgSize WgOscilloscope::PreferredSize() const
+WgSize WgOscilloscope::PreferredPixelSize() const
 {
 	return WgSize(80,64);
 }

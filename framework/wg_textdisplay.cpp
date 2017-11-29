@@ -107,9 +107,9 @@ int WgTextDisplay::MatchingPixelHeight( int width ) const
 	return m_text.heightForWidth( width );
 }
 
-//____ PreferredSize() _____________________________________________________________
+//____ PreferredPixelSize() _____________________________________________________________
 
-WgSize WgTextDisplay::PreferredSize() const
+WgSize WgTextDisplay::PreferredPixelSize() const
 {
 
 	WgSize sz = m_text.unwrappedSize();

@@ -75,13 +75,13 @@ void WgKnob::SetValue( float fValue )
   	_requestRender();
 }
 
-//____ PreferredSize() __________________________________________________________
-void WgKnob::SetPreferredSize(WgSize size)
+//____ PreferredPixelSize() __________________________________________________________
+void WgKnob::SetPreferredPixelSize(WgSize size)
 {
     m_preferredSize = size;
 }
 
-WgSize WgKnob::PreferredSize() const
+WgSize WgKnob::PreferredPixelSize() const
 {
 	return m_preferredSize;
 }

@@ -52,7 +52,7 @@ public:
 	void Render( WgGfxDevice * pDevice, WgState mode, const WgRect& _canvas, const WgRect& _clip, int scale ) const;
 	
 	WgSize	MinSize(int scale) const;
-	WgSize	PreferredSize(int scale) const;
+	WgSize	PreferredPixelSize(int scale) const;
 
 	WgSize	SizeForContent( const WgSize contentSize, int scale ) const;
 	bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const;
