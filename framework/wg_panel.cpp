@@ -102,33 +102,34 @@ void WgPanel::_onCollectPatches( WgPatches& container, const WgRect& geo, const 
 
 void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode )
 {
-	if( m_pSkin && m_pSkin->IsOpaque() )
-	{
-		patches.Sub( WgRect(geo,clip) );
-		return;
-	}	
-	
-	switch( m_maskOp )
-	{
-		case WG_MASKOP_RECURSE:
-		{
-			WgRect childGeo;
-			WgPanelHook * p = static_cast<WgPanelHook*>(_firstHookWithGeo( childGeo ));
+    if( m_pSkin && m_pSkin->IsOpaque() )
+    {
+        patches.Sub( WgRect(geo,clip) );
+        return;
+    }
 
-			while(p)
-			{
-				if( p->IsVisible() )
-					p->Widget()->_onMaskPatches( patches, childGeo + geo.Pos(), clip, blendMode );
-				p = static_cast<WgPanelHook*>(_nextHookWithGeo( childGeo, p ));
-			}
-			break;
-		}
-		case WG_MASKOP_SKIP:
-			break;
-		case WG_MASKOP_MASK:
-			patches.Sub( WgRect(geo,clip) );
-			break;
-	}
+    switch( m_maskOp )
+    {
+        case WG_MASKOP_RECURSE:
+        {
+            WgRect childGeo;
+            WgPanelHook * p = static_cast<WgPanelHook*>(_firstHookWithGeo( childGeo ));
+            WgRect myClip(geo, clip);
+
+            while(p)
+            {
+                if( p->IsVisible() )
+                    p->Widget()->_onMaskPatches( patches, childGeo + geo.Pos(), myClip, blendMode );
+                p = static_cast<WgPanelHook*>(_nextHookWithGeo( childGeo, p ));
+            }
+            break;
+        }
+        case WG_MASKOP_SKIP:
+            break;
+        case WG_MASKOP_MASK:
+            patches.Sub( WgRect(geo,clip) );
+            break;
+    }
 }
 
 //____ WgPanelHook::Parent() __________________________________________________
