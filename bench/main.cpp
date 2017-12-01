@@ -500,6 +500,19 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	WgFlexHook * pHook = pFlex->AddChild(pBackground);
 	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
 
+	// Volume meter direction test
+
+	for (int i = 0; i < 4; i++)
+	{
+		auto p = new WgSimpleVolumeMeter();
+
+		p->SetValue(0.8f, 1.0f, 0.7f, 0.8f);
+
+		p->SetDirection((WgDirection) (WgDirection::WG_UP + i));
+
+		pFlex->AddChild(p, { 10 + i * 110, 10, 100, 100 });
+	}
+
 	// Button skin test
 /*
 	auto pSkin = WgBoxSkin::Create(WgColor::cornsilk, 2, WgColor::deeppink );
@@ -548,7 +561,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	// Text InputFocus test
-
+/*
 
 	WgBlockSkinPtr pSkin = WgBlockSkin::CreateStatic(pPlateImg, { 0,0,10,10 }, 3);
 	pSkin->SetStateBlock(WG_STATE_FOCUSED, { 10,0 });
@@ -573,7 +586,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pDisplay2->SetEditMode(WG_TEXT_EDITABLE);
 	pDisplay2->SetSkin(pSkin);
 	pScroll->SetContent(pDisplay2);
-
+*/
 
 
 	// Scroll chart widget

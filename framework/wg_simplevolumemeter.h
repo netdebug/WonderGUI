@@ -36,7 +36,8 @@ public:
 	void			SetValue( float leftPeak, float leftHold, float rightPeak, float rightHold );
     void            SetGaps(float fSides, float fGap) {m_fSidePadding = fSides; m_fGap = fGap; }
 	
-	
+	void			SetDirection(WgDirection direction);
+
 	
 	WgSize			PreferredPixelSize() const;
 	
@@ -50,10 +51,11 @@ protected:
 	void			_renderBar( WgGfxDevice * pDevice, int nb, const WgRect& _rect, const WgRect& _clip );
 	void 			_requestRenderPartial( WgSize sz, int newLeftPeak, int newLeftHold, int newRightPeak, int newRightHold );
 	void			_updateIValues( WgSize sz );
-	int 			_calcIHold( float holdValue, int canvasHeight );
+	int 			_calcIHold( float holdValue, WgSize canvas );
 
 	
 	
+	WgDirection		m_direction;
 	WgColor			m_sectionColors[3];
 	float			m_fSectionHeight[3];
 	float			m_fHoldHeight;
