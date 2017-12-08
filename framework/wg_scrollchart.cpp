@@ -1038,7 +1038,7 @@ void WgScrollChart::_renderGridLines(WgGfxDevice * pDevice, const WgRect& _canva
 		for (auto& line : m_valueGridLines)
 		{
 			int yOfs = startOfs + (int)((line.pos - top) * mul + 0.5f);
-			pDevice->ClipDrawHorrLine(_clip, { _canvas.x, yOfs }, _canvas.w, line.color);
+			pDevice->ClipDrawLine(_clip, { _canvas.x, yOfs }, WG_RIGHT, _canvas.w, line.color, line.thickness * m_scale / WG_SCALE_BASE);
 		}
 	}
 }

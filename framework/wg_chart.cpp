@@ -53,6 +53,8 @@ WgChart::WgChart()
 
 	m_valueLabelStyle.alignment = WG_WEST;
 	m_valueLabelStyle.offset = { 0,0 };
+
+	m_waveIdCounter = 1;
 }
 
 //____ Destructor _____________________________________________________________
@@ -142,27 +144,101 @@ void WgChart::ClearWaves()
 
 int WgChart::AddWave()
 {
-	m_waves.push_back(Wave());
-	return m_waves.size() - 1;
+	m_waves.emplace_back();
+	Wave&	w = m_waves.back();
+	w.id = m_waveIdCounter++;
+	return w.id;
 }
+
+//____ IsWaveDisplayed() ______________________________________________________
+
+bool WgChart::IsWaveDisplayed(int waveId) const
+{
+	const Wave * p = _getWave(waveId);
+	if (!p)
+		return false;
+
+	return !p->bHidden;
+}
+
+//____ HideWave() _____________________________________________________________
+
+bool WgChart::HideWave(int waveId)
+{
+	Wave * p = _getWave(waveId);
+	if (!p)
+		return false;
+
+	if (p->bHidden == false)
+	{
+		p->bHidden = true;
+		_requestRender();
+	}
+	return true;
+}
+
+//____ UnhideWave() ___________________________________________________________
+
+bool WgChart::UnhideWave(int waveId)
+{
+	Wave * p = _getWave(waveId);
+	if (!p)
+		return false;
+
+	if (p->bHidden == true)
+	{
+		p->bHidden = false;
+		_requestRender();
+	}
+	return true;
+}
+
+//____ HideAllWaves() _________________________________________________________
+
+void WgChart::HideAllWaves()
+{
+	for (auto& wave : m_waves)
+	{
+		if (!wave.bHidden)
+		{
+			wave.bHidden = true;
+			_requestRender();
+		}
+	}
+}
+
+//____ UnhideAllWaves() _______________________________________________________
+
+void WgChart::UnhideAllWaves()
+{
+	for (auto& wave : m_waves)
+	{
+		if (wave.bHidden)
+		{
+			wave.bHidden = false;
+			_requestRender();
+		}
+	}
+}
+
+
 
 //____ SetWaveStyle() _________________________________________________________
 
-bool WgChart::SetWaveStyle(int waveIndex, WgColor frontFill, WgColor backFill, float topLineThickness, WgColor topLineColor, float bottomLineThickness, WgColor bottomLineColor)
+bool WgChart::SetWaveStyle(int waveId, WgColor frontFill, WgColor backFill, float topLineThickness, WgColor topLineColor, float bottomLineThickness, WgColor bottomLineColor)
 {
-	if (waveIndex < 0 || waveIndex >= (int) m_waves.size())
+	Wave * p = _getWave(waveId);
+	if (!p)
 		return false;
-
-	Wave& w = m_waves.at(waveIndex);
 	  
-	w.frontFill = frontFill;
-	w.backFill = backFill;
+	p->frontFill = frontFill;
+	p->backFill = backFill;
 
-	w.topLineThickness = topLineThickness;
-	w.topLineColor = topLineColor;
+	p->topLineThickness = topLineThickness;
+	p->topLineColor = topLineColor;
 
-	w.bottomLineThickness = bottomLineThickness;
-	w.bottomLineColor = bottomLineColor;
+	p->bottomLineThickness = bottomLineThickness;
+	p->bottomLineColor = bottomLineColor;
 
 	_requestRender();
 	return true;
@@ -181,26 +257,26 @@ bool WgChart::SetWaveSamples(int waveId, int firstSample, int nSamples, float * 
 }
 
 
-bool WgChart::_setWaveSamples(int waveIndex, int firstSample, int nSamples, float * pTopBorderSamples, float * pBottomBorderSamples, float defaultSample )
+bool WgChart::_setWaveSamples(int waveId, int firstSample, int nSamples, float * pTopBorderSamples, float * pBottomBorderSamples, float defaultSample )
 {
-	if (waveIndex < 0 || waveIndex >= (int) m_waves.size())
+	Wave * pWave = _getWave(waveId);
+	if (!pWave)
 		return false;
 
-	Wave& w = m_waves.at(waveIndex);
-	w.firstSample = firstSample;
-	w.nSamples = nSamples;
-	w.defaultSample = defaultSample;
+	pWave->firstSample = firstSample;
+	pWave->nSamples = nSamples;
+	pWave->defaultSample = defaultSample;
 
 	float max = -std::numeric_limits<float>::max();
     float min =  std::numeric_limits<float>::max();
 
 	if (pTopBorderSamples)
 	{
-		w.orgTopSamples.resize(nSamples);
+		pWave->orgTopSamples.resize(nSamples);
 		for (int i = 0; i < nSamples; i++)
 		{
 			float sample = pTopBorderSamples[i];
-			w.orgTopSamples[i] = sample;
+			pWave->orgTopSamples[i] = sample;
 
 			if (max < sample) max = sample;
 			if (min > sample) min = sample;
@@ -208,17 +284,17 @@ bool WgChart::_setWaveSamples(int waveIndex, int firstSample, int nSamples, floa
 	}
 	else
 	{
-		w.orgTopSamples.clear();
+		pWave->orgTopSamples.clear();
 		max = defaultSample;
 		min = defaultSample;
 	}
 	if (pBottomBorderSamples)
 	{
-		w.orgBottomSamples.resize(nSamples);
+		pWave->orgBottomSamples.resize(nSamples);
 		for (int i = 0; i < nSamples; i++)
 		{
 			float sample = pBottomBorderSamples[i];
-			w.orgBottomSamples[i] = sample;
+			pWave->orgBottomSamples[i] = sample;
 
 			if (max < sample) max = sample;
 			if (min > sample) min = sample;
@@ -226,19 +302,19 @@ bool WgChart::_setWaveSamples(int waveIndex, int firstSample, int nSamples, floa
 	}
 	else
 	{
-		w.orgBottomSamples.clear();
+		pWave->orgBottomSamples.clear();
 		if (max < defaultSample) max = defaultSample;
 		if (min > defaultSample) min = defaultSample;
 	}
 
-	w.maxSample = max;
-	w.minSample = min;
+	pWave->maxSample = max;
+	pWave->minSample = min;
 
 	bool bResampleAll = _updateDynamics();
 	if ( bResampleAll )
 		_resampleAllWaves();
 	else
-		_resampleWave(&w);
+		_resampleWave(pWave);
 
 	_requestRender();			//TODO: Optimize, only render rectangle with modifications.
 	return true;
@@ -431,7 +507,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 		for (auto& line : m_sampleGridLines)
 		{
 			int xOfs = waveCanvas.x + (line.pos - m_firstSample) * sampleScale;
-			pDevice->ClipDrawVertLine(_clip, { xOfs, canvas.y }, canvas.h, line.color);
+			pDevice->ClipDrawLine(_clip, { xOfs, canvas.y }, WG_DOWN, canvas.h, line.color, line.thickness * m_scale / WG_SCALE_BASE);
 
 			if (!line.label.IsEmpty())
 			{
@@ -479,7 +555,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 		for (auto& line : m_valueGridLines)
 		{
 			int yOfs = startOfs + (int)((line.pos - top) * mul + 0.5f);
-			pDevice->ClipDrawHorrLine(_clip, { canvas.x, yOfs }, canvas.w, line.color);
+			pDevice->ClipDrawLine(_clip, { canvas.x, yOfs }, WG_RIGHT, canvas.w, line.color, line.thickness * m_scale / WG_SCALE_BASE );
 
 			if (!line.label.IsEmpty())
 			{
@@ -521,6 +597,9 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 
 	for (auto& wave : m_waves)
 	{
+		if (wave.bHidden)
+			continue;
+
 		int xOfs = (int) ((wave.firstSample - m_firstSample) * sampleScale);
 
 		WgWaveLine top, bottom;
@@ -550,6 +629,25 @@ WgCoord	WgChart::_placeLabel(WgCoord startPoint, WgOrigo alignment, WgCoord labe
 {
 	return startPoint + labelOffset -WgCoord(labelSize.w,labelSize.h) + WgUtil::OrigoToOfs(alignment, labelSize);
 }
+
+//____ _getWave() _____________________________________________________________
+
+WgChart::Wave * WgChart::_getWave(int waveId)
+{
+	for (auto& wave : m_waves)
+		if (wave.id == waveId)
+			return &wave;
+	return nullptr;
+}
+
+const WgChart::Wave * WgChart::_getWave(int waveId) const
+{
+	for (auto& wave : m_waves)
+		if (wave.id == waveId)
+			return &wave;
+	return nullptr;
+}
+
 
 
 //____ _onAlphaTest() ___________________________________________________________

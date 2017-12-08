@@ -79,6 +79,13 @@ public:
 	bool	SetWaveSamples(int waveId, int firstSample, int nSamples, float * pTopBorderSamples, float * pBottomBorderSamples);
 	bool	SetWaveSamples(int waveId, int firstSample, int nSamples, float * pSamples, float floor = 0.f);
 
+	bool	IsWaveDisplayed(int waveId) const;
+	bool	HideWave(int waveId);
+	bool	UnhideWave(int waveId);
+	void	HideAllWaves();
+	void	UnhideAllWaves();
+
+
 	bool	SetFixedValueRange(float topValue, float bottomValue );
 	void	SetDynamicValueRange();
 	bool	IsValueRangeDynamic() const { return m_bDynamicValueRange;  }
@@ -113,6 +120,8 @@ protected:
 	{
 		Wave() {}
 
+		int		id;
+
 		WgColor	frontFill = WgColor::darkgrey;
 		WgColor	backFill = WgColor::darkgrey;
 		float	topLineThickness = 1.f;
@@ -126,6 +135,8 @@ protected:
 
 		float	minSample = 0.f;
 		float	maxSample = 0.f;
+
+		bool		bHidden = false;
 
 		std::vector<float>	orgTopSamples;
 		std::vector<float>	orgBottomSamples;
@@ -156,6 +167,9 @@ protected:
 	bool	_updateDynamics();
 	WgCoord	_placeLabel(WgCoord startPoint, WgOrigo alignment, WgCoord labelOffset, WgSize labelSize ) const;
 
+	Wave *	_getWave(int waveId);
+	const Wave *	_getWave(int waveId) const;
+
 //	void	_onEnable();
 //	void	_onDisable();
 
@@ -166,6 +180,8 @@ private:
 
 	WgBorders		m_pointPadding;			// Padding for the canvas in points. To allow thick lines to fully stay inside widget. Grid is allowed outside.
 	WgBorders		m_pixelPadding;			// Same, but in pixels.
+
+	int				m_waveIdCounter;
 
 	std::vector<Wave>		m_waves;
 	std::vector<GridLine>	m_sampleGridLines;

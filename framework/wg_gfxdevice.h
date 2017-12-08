@@ -121,8 +121,10 @@ public:
 
 	virtual void	Fill( const WgRect& rect, const WgColor& col ) = 0;
 
-	virtual void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) = 0;
-	virtual void	ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) = 0;
+	virtual void	ClipDrawLine(const WgRect& clip, const WgCoord& begin, WgDirection dir, int length, WgColor col, float thickness = 1.f);
+
+//	virtual void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) = 0;
+//	virtual void	ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) = 0;
 	virtual void	ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness ) = 0;
 	virtual void    ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor * colors) = 0;
 
@@ -213,6 +215,11 @@ public:
 	
 protected:
 	WgGfxDevice( WgSize canvasSize );
+
+	virtual void	_drawHorrLine(const WgCoord& begin, int length, const WgColor& col) = 0;
+	virtual void	_drawVertLine(const WgCoord& begin, int length, const WgColor& col) = 0;
+
+
 
 	void	_printTextSpan( WgPen& pen, const WgText * pText, int ofs, int len, bool bLineEnding );
 	void	_printEllipsisTextSpan( WgPen& pen, const WgText * pText, int ofs, int len, int endX );
