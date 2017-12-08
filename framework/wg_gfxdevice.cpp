@@ -112,6 +112,139 @@ bool WgGfxDevice::EndRender()
 	return true;	// Assumed to be ok if device doesn't have its own method.
 }
 
+//____ ClipDrawLine() _________________________________________________________
+
+// Coordinates for start are considered to be + 0.5 in the width dimension, so they start in the middle of a line/column.
+// A one pixel thick line will only be drawn one pixel think, while a two pixels thick line will cover three pixels in thickness,
+// where the outer pixels are faded.
+
+void WgGfxDevice::ClipDrawLine(const WgRect& clip, const WgCoord& _begin, WgDirection dir, int length, WgColor _col, float thickness)
+{
+	if (thickness <= 0.f)
+		return;
+
+	WgCoord begin = _begin;
+
+	switch (dir)
+	{
+	case WG_LEFT:
+		begin.x -= length;
+	case WG_RIGHT:
+	{
+		if (begin.x > clip.x + clip.w)
+			return;
+
+		if (begin.x < clip.x)
+		{
+			length -= clip.x - begin.x;
+			if (length <= 0)
+				return;
+			begin.x = clip.x;
+		}
+
+		if (begin.x + length > clip.x + clip.w)
+		{
+			length = clip.x + clip.w - begin.x;
+			if (length <= 0)
+				return;
+		}
+
+		if (thickness <= 1.f)
+		{
+			if (begin.y < clip.y || begin.y >= clip.y + clip.h)
+				return;
+
+			WgColor col = _col;
+			col.a = (uint8_t) (thickness * col.a);
+
+			_drawHorrLine(begin, length, col);
+		}
+		else
+		{
+			int expanse = (int) 1 + (thickness - 1) / 2;
+			WgColor edgeColor( _col.r, _col.g, _col.b, _col.a * ((thickness - 1) / 2 - (expanse - 1)));
+
+			if (begin.y + expanse <= clip.y || begin.y - expanse >= clip.y + clip.h)
+				return;
+
+			int beginY = begin.y - expanse;
+			int endY = begin.y + expanse+1;
+
+			if (beginY < clip.y)
+				beginY = clip.y - 1;
+			else
+				_drawHorrLine({ begin.x, beginY }, length, edgeColor);
+
+			if (endY > clip.y + clip.h)
+				endY = clip.y + clip.h + 1;
+			else
+				_drawHorrLine({ begin.x, endY-1 }, length, edgeColor);
+
+			Fill({ begin.x, beginY + 1, length, endY - beginY - 2 }, _col );
+		}
+
+		break;
+	}
+	case WG_UP:
+		begin.y -= length;
+	case WG_DOWN:
+		if (begin.y > clip.y + clip.h )
+			return;
+
+		if (begin.y < clip.y)
+		{
+			length -= clip.y - begin.y;
+			if (length <= 0)
+				return;
+			begin.y = clip.y;
+		}
+
+		if (begin.y + length > clip.y + clip.h)
+		{
+			length = clip.y + clip.h - begin.y;
+			if (length <= 0)
+				return;
+		}
+
+		if (thickness <= 1.f)
+		{
+			if (begin.x < clip.x || begin.x >= clip.x + clip.w)
+				return;
+
+			WgColor col = _col;
+			col.a = (uint8_t)(thickness * col.a);
+
+			_drawHorrLine(begin, length, col);
+		}
+		else
+		{
+			int expanse = (int)1 + (thickness - 1) / 2;
+			WgColor edgeColor(_col.r, _col.g, _col.b, _col.a * ((thickness - 1) / 2 - (expanse - 1)));
+
+			if (begin.x + expanse <= clip.x || begin.x - expanse >= clip.x + clip.w)
+				return;
+
+			int beginX = begin.x - expanse;
+			int endX = begin.x + expanse+1;
+
+			if (beginX < clip.x)
+				beginX = clip.x - 1;
+			else
+				_drawVertLine({ beginX, begin.y }, length, edgeColor);
+
+			if (endX > clip.x + clip.w)
+				endX = clip.x + clip.w + 1;
+			else
+				_drawVertLine({ endX-1, begin.y }, length, edgeColor);
+
+			Fill({ beginX + 1, begin.y, endX - beginX - 2, length }, _col);
+		}
+
+		break;
+	}
+}
+
+
 //_____ ClipBlitFromCanvas() ______________________________________________________
 
 void WgGfxDevice::ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, const WgRect& src, int dx, int dy)

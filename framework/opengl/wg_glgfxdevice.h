@@ -64,8 +64,6 @@ public:
 	
     void	Fill( const WgRect& rect, const WgColor& col );
 
-    void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col );
-    void	ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col );
     void	ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness );
 
     
@@ -109,10 +107,13 @@ protected:
     void	_initTables();
     void	_setBlendMode( WgBlendMode blendMode );
 
+	void	_drawHorrLine(const WgCoord& start, int length, const WgColor& col);
+	void	_drawVertLine(const WgCoord& start, int length, const WgColor& col);
+
     GLuint  _createGLProgram( const char * pVertexShader, const char * pFragmentShader );
     void    _updateProgramDimensions();
     bool    _setFramebuffer();   
-    
+
     bool	m_bRendering;
 
     float	m_lineThicknessTable[17];

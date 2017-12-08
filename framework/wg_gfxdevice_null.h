@@ -68,6 +68,10 @@ public:
 
 protected:
 
+	void	_drawHorrLine(const WgCoord& start, int length, const WgColor& col);
+	void	_drawVertLine(const WgCoord& start, int length, const WgColor& col);
+
+
 };
 
 #endif //WG_GFXDEVICE_NULL_DOT_H

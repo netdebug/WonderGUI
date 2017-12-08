@@ -952,46 +952,18 @@ void WgGfxDeviceSoft::_clipDrawWaveColumn(int clipBeg, int clipLen, uint8_t * pC
 
 
 
-//____ ClipDrawHorrLine() _____________________________________________________
+//____ _drawHorrLine() _____________________________________________________
 
-void WgGfxDeviceSoft::ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col )
+void WgGfxDeviceSoft::_drawHorrLine( const WgCoord& start, int length, const WgColor& col )
 {
-	if( start.y < clip.y || start.y >= clip.y + clip.h || start.x >= clip.x + clip.w || start.x + length <= clip.x )
-		return;
-
-	int x = start.x;
-
-	if( x < clip.x )
-	{
-		length = start.x + length - clip.x;
-		x = clip.x;
-	}
-
-	if( x + length > clip.x + clip.w )
-		length = clip.x + clip.w - x;
-
-	_drawHorrVertLine( x, start.y, length, col, WG_HORIZONTAL );
+	_drawHorrVertLine( start.x, start.y, length, col, WG_HORIZONTAL );
 }
 
-//____ ClipDrawVertLine() _____________________________________________________
+//____ _drawVertLine() _____________________________________________________
 
-void WgGfxDeviceSoft::ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col )
+void WgGfxDeviceSoft::_drawVertLine( const WgCoord& start, int length, const WgColor& col )
 {
-	if( start.x < clip.x || start.x >= clip.x + clip.w || start.y >= clip.y + clip.h || start.y + length <= clip.y )
-		return;
-
-	int y = start.y;
-
-	if( y < clip.y )
-	{
-		length = start.y + length - clip.y;
-		y = clip.y;
-	}
-
-	if( y + length > clip.y + clip.h )
-		length = clip.y + clip.h - y;
-
-	_drawHorrVertLine( start.x, y, length, col, WG_VERTICAL );
+	_drawHorrVertLine( start.x, start.y, length, col, WG_VERTICAL );
 }
 
 //____ ClipPlotSoftPixels() _______________________________________________________

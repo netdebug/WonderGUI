@@ -335,7 +335,28 @@ int main ( int argc, char** argv )
 			updateOscilloscope( g_pOsc, counter, freq, amp );
 
 		}	
-		
+
+		{
+			WgRect clip = { 100,100,200,200 };
+
+			g_pGfxDevice->Fill(clip, WgColor::black);
+
+			int lineLength = 250;
+			WgCoord pos;
+
+			pos.x = clip.x + clip.w / 2 - lineLength / 2 +sin(counter / 250.0)*clip.w * 3 / 3;
+			pos.y = clip.y + clip.h / 2 + sin(counter / 150.0)*clip.h * 2 / 3;
+
+
+			g_pGfxDevice->ClipDrawLine(clip, pos, WgDirection::WG_RIGHT, lineLength, WgColor::white, 5.75 );
+
+
+//			for (int i = 0; i < 20; i++)
+//				g_pGfxDevice->ClipDrawLine(clip, { clip.x + 1, clip.y + i * 15 }, WgDirection::WG_RIGHT, 50, WgColor::white, i*0.25 );
+
+		}
+
+
 		// DRAWING STARTS HERE
 
 //		pRoot->AddDirtyPatch( pRoot->Geo().Size() );
@@ -501,7 +522,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
 
 	// Volume meter direction test
-
+/*
 	for (int i = 0; i < 4; i++)
 	{
 		auto p = new WgSimpleVolumeMeter();
@@ -512,7 +533,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 		pFlex->AddChild(p, { 10 + i * 110, 10, 100, 100 });
 	}
-
+*/
 	// Button skin test
 /*
 	auto pSkin = WgBoxSkin::Create(WgColor::cornsilk, 2, WgColor::deeppink );
