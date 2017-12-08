@@ -237,7 +237,7 @@ public:
 	// Overloaded from WgWidget
 
 	WgSize			PreferredPixelSize() const;
-    void            SetPreferredPixelSize( WgSize size );
+    void            SetPreferredPointSize( WgSize size );
     
 private:
 

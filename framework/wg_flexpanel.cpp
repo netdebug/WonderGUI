@@ -1151,9 +1151,9 @@ const WgFlexAnchor * WgFlexPanel::Anchor( int index )
 	return 0;
 }
 
-//____ SetPreferredPixelSize() ________________________________________________________
+//____ SetPreferredPointSize() ________________________________________________________
 
-void WgFlexPanel::SetPreferredPixelSize( WgSize size )
+void WgFlexPanel::SetPreferredPointSize( WgSize size )
 {
     if( size != m_preferredSize )
     {

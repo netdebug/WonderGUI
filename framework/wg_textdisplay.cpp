@@ -104,7 +104,9 @@ void WgTextDisplay::SetEditMode(WgTextEditMode mode)
 
 int WgTextDisplay::MatchingPixelHeight( int width ) const
 {
-	return m_text.heightForWidth( width );
+    WgSize padding = m_pSkin ? m_pSkin->ContentPadding(m_scale) : WgSize(0,0);
+    int height = m_text.heightForWidth( width - padding.w );
+    return height + padding.h;
 }
 
 //____ PreferredPixelSize() _____________________________________________________________
@@ -201,7 +203,11 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 			m_pText->setSelectionMode(true);
 		}
 
-		m_pText->CursorGotoCoord( pEvent->PointerPixelPos(), PixelGeo() );
+        WgRect textCanvas = PixelGeo();
+        if( m_pSkin )
+            textCanvas = m_pSkin->ContentRect( textCanvas, WG_STATE_NORMAL, m_scale );
+        
+		m_pText->CursorGotoCoord( pEvent->PointerPixelPos(), textCanvas );
 
 		if(IsSelectable() && type == WG_EVENT_MOUSEBUTTON_PRESS && !(modKeys & WG_MODKEY_SHIFT))
 		{

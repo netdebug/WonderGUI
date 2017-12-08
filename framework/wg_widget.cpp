@@ -170,9 +170,9 @@ void WgWidget::_stopReceiveTicks()
 	m_bReceiveTick = false;
 }
 
-//____ Local2abs() ____________________________________________________________
+//____ Local2absPixel() ____________________________________________________________
 
-WgCoord WgWidget::Local2abs( const WgCoord& cord ) const
+WgCoord WgWidget::Local2absPixel( const WgCoord& cord ) const
 {
 	WgCoord c = ScreenPixelPos();
 	c.x += cord.x;
@@ -180,13 +180,28 @@ WgCoord WgWidget::Local2abs( const WgCoord& cord ) const
 	return c;
 }
 
-//____ Abs2local() ____________________________________________________________
+//____ Abs2localPixel() ____________________________________________________________
 
-WgCoord WgWidget::Abs2local( const WgCoord& cord ) const
+WgCoord WgWidget::Abs2localPixel( const WgCoord& cord ) const
 {
 	WgCoord c = ScreenPixelPos();
 	return WgCoord( cord.x - c.x, cord.y - c.y );
 }
+
+//____ Local2absPoint() ____________________________________________________________
+
+WgCoord WgWidget::Local2absPoint( const WgCoord& cord ) const
+{
+    return (Local2absPixel(cord)*WG_SCALE_BASE) / m_scale;
+}
+
+//____ Abs2localPoint() ____________________________________________________________
+
+WgCoord WgWidget::Abs2localPoint( const WgCoord& cord ) const
+{
+    return (Abs2localPixel(cord)*WG_SCALE_BASE) / m_scale;
+}
+
 
 //____ _eventHandler() __________________________________________________________
 

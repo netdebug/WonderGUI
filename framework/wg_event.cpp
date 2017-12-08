@@ -95,8 +95,9 @@ namespace WgEvent
 		m_timestamp			= pOrg->m_timestamp;
 		m_bIsForWidget		= pOrg->m_bIsForWidget;
 		m_pWidget			= pOrg->m_pWidget;
-		m_pointerLocalPos	= pOrg->m_pointerLocalPos;
+		m_pointerLocalPixelPos	= pOrg->m_pointerLocalPixelPos;
 		m_pointerScreenPixelPos	= pOrg->m_pointerScreenPixelPos;
+        m_pointScale        = pOrg->m_pointScale;
 	}
 
 	//____ MouseButtonEvent ____________________________________________________
@@ -159,7 +160,7 @@ namespace WgEvent
 	{
 		m_type = WG_EVENT_MOUSE_ENTER;
 
-		m_pointerLocalPos = pos;
+		m_pointerLocalPixelPos = pos;
 		m_pointerScreenPixelPos = pos;
 	}
 
@@ -190,7 +191,7 @@ namespace WgEvent
 	{
 		m_type = WG_EVENT_MOUSE_MOVE;
 
-		m_pointerLocalPos = pos;
+		m_pointerLocalPixelPos = pos;
 		m_pointerScreenPixelPos = pos;
 	}
 
@@ -1047,4 +1048,31 @@ namespace WgEvent
 		return m_prevPos;
 	}
 
+    
+    WgCoord MouseButtonDrag::DraggedTotalPoints() const
+    {
+        return CurrPointPos() - StartPointPos();
+    }
+    
+    WgCoord MouseButtonDrag::DraggedNowPoints() const
+    {
+        return CurrPointPos() - PrevPointPos();
+    }
+    
+    WgCoord MouseButtonDrag::CurrPointPos() const
+    {
+        return (m_currPos*WG_SCALE_BASE)/m_pointScale;
+    }
+    
+    WgCoord MouseButtonDrag::StartPointPos() const
+    {
+        return (m_startPos*WG_SCALE_BASE)/m_pointScale;
+    }
+    
+    WgCoord MouseButtonDrag::PrevPointPos() const
+    {
+        return (m_prevPos*WG_SCALE_BASE)/m_pointScale;
+    }
+    
+    
 };

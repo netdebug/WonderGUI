@@ -467,7 +467,7 @@ bool WgMenubar::OpenMenu( Uint32 nb )
 	if( pItem == 0 || pItem->m_pMenu == 0 )
 		return false;
 
-	WgCoord pos = Abs2local( WgCoord(0, 0) );
+	WgCoord pos = Abs2localPixel( WgCoord(0, 0) );
 
 	Sint32	x = pos.x;
 	Sint32	y = pos.y;
@@ -531,7 +531,7 @@ bool WgMenubar::CloseMenu( Uint32 nb )
 
 Uint32 WgMenubar::GetItemAtAbsPos( int x, int y )
 {
-	WgCoord pos = Abs2local( WgCoord(x, y) );
+	WgCoord pos = Abs2localPixel( WgCoord(x, y) );
 	x = pos.x;
 	y = pos.y;
 
