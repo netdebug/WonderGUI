@@ -76,6 +76,8 @@ bool WgGfxDeviceSoft::SetCanvas( WgSurface * pCanvas )
 		m_canvasSize = pCanvas->Size();
 	else
 		m_canvasSize = WgSize();
+
+    return true;
 }
 
 //____ Fill() ____________________________________________________________________

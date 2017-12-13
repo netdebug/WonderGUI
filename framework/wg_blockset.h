@@ -83,21 +83,23 @@ enum WgBlockFlags
 class WgBlock
 {
 public:
-	WgBlock( const WgSurface * pSurf, const WgRect& rect, const WgBorders& frame, const WgBorders& padding, WgCoord contentShift, Uint32 flags );
+	WgBlock( const WgSurface * pSurf, const WgRect& rect, const WgBorders& sourceFrame, const WgBorders& canvasFrame, const WgBorders& padding, WgCoord contentShift, int scale, Uint32 flags );
 	WgBlock() : m_pSurf(0), m_flags(0) { }
 
 	inline const WgRect&		Rect() const { return m_rect; }
 	inline const WgSurface *	Surface() const { return m_pSurf; }
-	inline const WgBorders&		Frame() const { return m_frame; }
+	inline const WgBorders&		SourceFrame() const { return m_sourceFrame; }
+	inline const WgBorders&		CanvasFrame() const { return m_canvasFrame; }
 	inline const WgRect			ContentRect( const WgRect& blockGeo ) const { return (blockGeo + m_contentShift) - m_padding; }
 	inline Uint32				Flags() const { return m_flags; }
 	inline int					Width() const { return m_rect.w; }
 	inline int					Height() const { return m_rect.h; }
 	inline WgSize				Size() const { return WgSize(m_rect.w, m_rect.h); }
+	inline int 					Scale() const { return m_scale; }
 
-	inline int					MinWidth() const { return m_frame.Width(); }
-	inline int					MinHeight() const { return m_frame.Height(); }
-	inline WgSize				MinSize() const { return m_frame.Size(); }
+	inline int					MinWidth() const { return m_canvasFrame.Width(); }
+	inline int					MinHeight() const { return m_canvasFrame.Height(); }
+	inline WgSize				MinSize() const { return m_canvasFrame.Size(); }
 
 	inline bool					IsOpaque() const { return ((m_flags & WG_OPAQUE) != 0); }
 	inline bool					HasOpaqueCenter() const { return ((m_flags & WG_OPAQUE_CENTER) != 0); }
@@ -125,10 +127,12 @@ private:
 
 	const WgSurface *	m_pSurf;
 	WgRect				m_rect;
-	WgBorders			m_frame;
+	WgBorders 			m_sourceFrame;
+	WgBorders			m_canvasFrame;
 	WgBorders			m_padding;
 	WgCoord				m_contentShift;
 	Uint32				m_flags;
+	int                 m_scale = WG_SCALE_BASE;
 };
 
 //____ WgBlockset _____________________________________________________________
@@ -244,7 +248,7 @@ private:
 	const Alt_Data*	_getAlt( int n ) const;
 	const Alt_Data*	_getAltForScale( int scale ) const;
 
-	inline WgBlock	_getBlock( WgMode mode, const Alt_Data * pAlt, int scale ) const;
+	WgBlock	_getBlock( WgMode mode, const Alt_Data * pAlt, int scale ) const;
 
 	WgColorsetPtr				m_pTextColors;		// Default colors for text placed on this block.
 	Uint32						m_flags;
@@ -257,17 +261,6 @@ private:
 };
 
 
-inline WgBlock WgBlockset::_getBlock(WgMode m, const Alt_Data * p, int scale) const
-{
-	if( !p )
-		return WgBlock();
-
-	const Uint32 SKIP_MASK = WG_SKIP_NORMAL | WG_SKIP_MARKED | WG_SKIP_SELECTED | WG_SKIP_DISABLED | WG_SKIP_SPECIAL;
-	Uint32 flags = m_flags & ~SKIP_MASK;
-	flags |= IsModeSkipable(m) ? WG_SKIP_NORMAL : 0;	// reuse bit
-
-	return WgBlock( p->pSurf, WgRect(p->x[m], p->y[m], p->w, p->h), p->frame, p->padding, p->contentShift[m], flags );
-}
 
 
 inline bool WgBlockset::IsModeSkipable(WgMode m) const

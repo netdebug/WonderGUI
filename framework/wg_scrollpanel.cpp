@@ -98,7 +98,7 @@ const char * WgScrollPanel::GetClass( void )
 
 bool WgScrollPanel::StepUp()
 {
-	int ofs = m_viewPixOfs.y - m_stepSizeY;
+	int ofs = m_viewPixOfs.y - ((m_stepSizeY*m_scale) >> WG_SCALE_BINALS);
 
 	if( ofs < 0 )
 		ofs = 0;
@@ -109,13 +109,13 @@ bool WgScrollPanel::StepUp()
 //____ StepDown() _____________________________________________________________
 bool WgScrollPanel::StepDown()
 {
-	return SetViewPixelOfsY( m_viewPixOfs.y + m_stepSizeY );
+	return SetViewPixelOfsY( m_viewPixOfs.y + ((m_stepSizeY*m_scale) >> WG_SCALE_BINALS));
 }
 
 //____ StepLeft() _____________________________________________________________
 bool WgScrollPanel::StepLeft()
 {
-	int ofs = m_viewPixOfs.x - m_stepSizeX;
+	int ofs = m_viewPixOfs.x - ((m_stepSizeX*m_scale) >> WG_SCALE_BINALS);
 
 	if( ofs < 0 )
 		ofs = 0;
@@ -127,7 +127,7 @@ bool WgScrollPanel::StepLeft()
 
 bool WgScrollPanel::StepRight()
 {
-	return SetViewPixelOfsX( m_viewPixOfs.x + m_stepSizeX );
+	return SetViewPixelOfsX( m_viewPixOfs.x + ((m_stepSizeX*m_scale) >> WG_SCALE_BINALS) );
 }
 
 
@@ -171,7 +171,7 @@ bool WgScrollPanel::JumpRight()
 
 bool WgScrollPanel::_wheelRollX(int distance)
 {
-	int ofs = m_viewPixOfs.x - (m_stepSizeX * distance * 3);
+	int ofs = m_viewPixOfs.x - (((m_stepSizeX*m_scale) >> WG_SCALE_BINALS) * distance * 3);
 
 	if( ofs < 0 )
 		ofs = 0;
@@ -183,7 +183,7 @@ bool WgScrollPanel::_wheelRollX(int distance)
 
 bool WgScrollPanel::_wheelRollY(int distance)
 {
-	int ofs = m_viewPixOfs.y - (m_stepSizeY * distance * 3);
+	int ofs = m_viewPixOfs.y - (((m_stepSizeY*m_scale) >> WG_SCALE_BINALS) * distance * 3);
 
 	if( ofs < 0 )
 		ofs = 0;
@@ -243,6 +243,21 @@ Uint32 WgScrollPanel::ViewPixelLenY()
 {
 	return m_elements[WINDOW].m_windowGeo.h;
 }
+
+//____ ViewPointLenX() ________________________________________________________
+
+Uint32 WgScrollPanel::ViewPointLenX()
+{
+    return (m_elements[WINDOW].m_windowGeo.w << WG_SCALE_BINALS) / m_scale;
+}
+
+//____ ViewPointLenY() ________________________________________________________
+
+Uint32 WgScrollPanel::ViewPointLenY()
+{
+    return (m_elements[WINDOW].m_windowGeo.h << WG_SCALE_BINALS) / m_scale;
+}
+
 
 //____ ViewOfsX() _____________________________________________________________
 
@@ -381,29 +396,26 @@ bool WgScrollPanel::SetViewPixelOfsY( int y )
 }
 
 
-//____ SetScaledViewPixelOfs() _____________________________________________________
+//____ SetViewPointOfs() _____________________________________________________
 
-bool WgScrollPanel::SetScaledViewPixelOfs( int x, int y )
+bool WgScrollPanel::SetViewPointOfs( int x, int y )
 {
     return SetViewPixelOfs((x*m_scale)>>WG_SCALE_BINALS, (y*m_scale)>>WG_SCALE_BINALS);
-//    return SetViewPixelOfs(x, y );
 }
 
 
-//____ SetScaledViewPixelOfsX() _____________________________________________________
+//____ SetViewPointOfsX() _____________________________________________________
 
-bool WgScrollPanel::SetScaledViewPixelOfsX( int x )
+bool WgScrollPanel::SetViewPointOfsX( int x )
 {
     return SetViewPixelOfs((x*m_scale)>>WG_SCALE_BINALS, m_viewPixOfs.y);
-//    return SetViewPixelOfs(x, m_viewPixOfs.y);
 }
 
-//____ SetScaledViewPixelOfsY() _____________________________________________________
+//____ SetViewPointOfsY() _____________________________________________________
 
-bool WgScrollPanel::SetScaledViewPixelOfsY( int y )
+bool WgScrollPanel::SetViewPointOfsY( int y )
 {
     return SetViewPixelOfs(m_viewPixOfs.x,(y*m_scale)>>WG_SCALE_BINALS);
-//    return SetViewPixelOfs(m_viewPixOfs.x,y );
 }
 
 

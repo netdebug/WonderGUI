@@ -122,6 +122,10 @@ public:
 	int			ContentPixelHeight() { return m_contentSize.h; };
 	WgSize		ContentPixelSize() { return m_contentSize; };
 
+    int			ContentPointWidth() { return (m_contentSize.w << WG_SCALE_BINALS) / m_scale; };
+    int			ContentPointHeight() { return (m_contentSize.h << WG_SCALE_BINALS) / m_scale; };
+    WgSize		ContentPointSize() { return (m_contentSize*WG_SCALE_BASE)/ m_scale; };
+    
 	void		SetBgColor( WgColor color );
 	WgColor		BgColor() const { return m_bgColor; }
 
@@ -137,9 +141,16 @@ public:
 	Uint32		ViewPixelOfsY() { return m_viewPixOfs.y; };
 	WgCoord		ViewPixelOfs() { return m_viewPixOfs; };
 
+    Uint32		ViewPointOfsX() { return (m_viewPixOfs.x << WG_SCALE_BINALS) / m_scale; };
+    Uint32		ViewPointOfsY() { return (m_viewPixOfs.y << WG_SCALE_BINALS) / m_scale; };
+    WgCoord		ViewPointOfs() { return (m_viewPixOfs * WG_SCALE_BASE) / m_scale; };
+    
 	Uint32		ViewPixelLenX();
 	Uint32		ViewPixelLenY();
 
+    Uint32		ViewPointLenX();
+    Uint32		ViewPointLenY();
+    
 	float		ViewOfsX();
 	float		ViewOfsY();
 	float		ViewLenX();
@@ -149,9 +160,9 @@ public:
 	bool		SetViewPixelOfsX( int x );
 	bool		SetViewPixelOfsY( int y );
 
-    bool		SetScaledViewPixelOfs( int x, int y );
-    bool		SetScaledViewPixelOfsX( int x );
-    bool		SetScaledViewPixelOfsY( int y );
+    bool		SetViewPointOfs( int x, int y );
+    bool		SetViewPointOfsX( int x );
+    bool		SetViewPointOfsY( int y );
 
     
 	bool		SetViewOfs( float x, float y );

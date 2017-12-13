@@ -32,16 +32,18 @@
 WgMemPool * WgBlockset::g_pMemPool = 0;
 
 
-WgBlock::WgBlock(	const WgSurface * pSurf, const WgRect& rect, const WgBorders& frame, const WgBorders& padding, WgCoord contentShift, Uint32 flags )
+WgBlock::WgBlock(	const WgSurface * pSurf, const WgRect& rect, const WgBorders& sourceFrame, const WgBorders& canvasFrame, const WgBorders& padding, WgCoord contentShift, int scale, Uint32 flags )
 {
 	m_pSurf			= pSurf;
 	m_rect			= rect;
-	m_frame			= frame;
+	m_sourceFrame	= sourceFrame;
+	m_canvasFrame	= canvasFrame;
 	m_flags			= flags;
 	m_padding		= padding;
 	m_contentShift	= contentShift;
+	m_scale 		= scale;
 
-	if( m_frame.left || m_frame.right || m_frame.top || m_frame.bottom )
+	if( m_sourceFrame.left || m_sourceFrame.right || m_sourceFrame.top || m_sourceFrame.bottom )
 		m_flags |= WG_HAS_BORDERS;
 
 	if(m_rect.x + m_rect.w > (int)m_pSurf->Width())
@@ -63,7 +65,8 @@ bool WgBlock::operator==( const WgBlock& b) const
 
 bool WgBlock::operator!=( const WgBlock& b) const
 {
-	if( m_pSurf == b.m_pSurf && m_rect == b.m_rect && m_frame == b.m_frame && 
+	if( m_pSurf == b.m_pSurf && m_rect == b.m_rect && m_sourceFrame == b.m_sourceFrame &&
+		m_canvasFrame == b.m_canvasFrame && 
 	    m_flags == b.m_flags && m_padding == b.m_padding &&
 		m_contentShift == b.m_contentShift )
 		return false;
@@ -631,3 +634,21 @@ bool WgBlockset::SameBlock( WgMode one, WgMode two, int alt )
 
 	return false;
 }
+
+//____ _getBlock() ____________________________________________________________
+
+WgBlock WgBlockset::_getBlock(WgMode m, const Alt_Data * p, int scale) const
+{
+	if( !p )
+		return WgBlock();
+
+	const Uint32 SKIP_MASK = WG_SKIP_NORMAL | WG_SKIP_MARKED | WG_SKIP_SELECTED | WG_SKIP_DISABLED | WG_SKIP_SPECIAL;
+	Uint32 flags = m_flags & ~SKIP_MASK;
+	flags |= IsModeSkipable(m) ? WG_SKIP_NORMAL : 0;	// reuse bit
+
+	WgRect source(p->x[m], p->y[m], p->w, p->h);
+	WgCoord shift( (p->contentShift[m].x * scale) >> WG_SCALE_BINALS, (p->contentShift[m].y * scale) >> WG_SCALE_BINALS );
+
+	return WgBlock( p->pSurf, source, p->frame, p->frame.Scale(scale), p->padding.Scale(scale), shift, scale, flags );
+}
+

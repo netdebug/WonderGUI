@@ -248,7 +248,7 @@ WgBlock WgGfxAnim::GetBlock( int64_t ticks, int scale, WgGfxFrame * pProximity )
 			alt = i;
 	}
 		
-	return WgBlock( pFrame->pSurf[alt], WgRect( pFrame->ofs[alt], m_size[alt]), m_borders[alt], WgBorders(), WgCoord(), m_blockFlags );
+	return WgBlock( pFrame->pSurf[alt], WgRect( pFrame->ofs[alt], m_size[alt]), m_borders[alt], WgBorders(), WgBorders(), WgCoord(), WG_SCALE_BASE, m_blockFlags );
 }
 
 

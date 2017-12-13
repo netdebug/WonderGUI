@@ -1108,6 +1108,7 @@ GLuint WgGlGfxDevice::_createGLProgram( const char * pVertexShader, const char *
 
 	glGetShaderInfoLog(fragmentShaderID, 1023, &logLen, log);
 
+    assert( logLen == 0 );
 	assert( (err = glGetError()) == 0 );
     
     glShaderSource(fragmentShaderID, 1, &pFragmentShader, NULL);
@@ -1189,7 +1190,7 @@ void WgGlGfxDevice::_drawVertLine( const WgCoord& start, int length, const WgCol
 {
     GLenum err;
     assert( 0 == (err = glGetError()) );
-    
+
     WgColor fillColor = col * m_tintColor;
     
     float	dx = start.x + 0.5f;

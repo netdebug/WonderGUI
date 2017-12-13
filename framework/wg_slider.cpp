@@ -367,7 +367,7 @@ void WgWidgetSlider::_onDisable( void )
 void WgWidgetSlider::_setScale( int scale )
 {
 	WgWidget::_setScale(scale);
-
+	_updateMinSize();
 }
 
 //____ _onRefresh() _______________________________________________________

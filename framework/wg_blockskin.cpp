@@ -484,224 +484,62 @@ void WgBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _c
 	const StateData * pState = &m_state[_stateToIndex(state)];
 	if( pState->invisibleSections == ALL_SECTIONS )
 		return;
-	
-	//
-	
+
+    const WgRect&	src		= WgRect(pState->ofs, m_dimensions);
+    
 	// Shortcuts & optimizations for common special cases.
-	
-	WgSize borderSize = m_frame.Size();
-	
-	if( _clip.Contains( _canvas ) && borderSize.w <= _canvas.Size().w && borderSize.h <= _canvas.Size().h )
-	{
-		_renderNoClip( pDevice, pState, _canvas );
-		return;
-	}
-	
-	const WgRect&	src		= WgRect(pState->ofs, m_dimensions);
-	
-	if( src.w == _canvas.w && src.h == _canvas.h )
+
+	if( src.w == _canvas.w && src.h == _canvas.h && scale == WG_SCALE_BASE )
 	{
 		pDevice->ClipBlit( _clip, m_pSurface, src, _canvas.Pos().x, _canvas.Pos().y);
 		return;
 	}
-	
-	if( borderSize.w == 0 && borderSize.h == 0 )
+    
+    if( m_frame.left + m_frame.top + m_frame.right + m_frame.bottom == 0 )
 	{
-		if( m_tiledSections & (1 << (int) WG_CENTER) )
-			pDevice->ClipTileBlit( _clip, m_pSurface, src, _canvas );
-		else
-			pDevice->ClipStretchBlit( _clip, m_pSurface, src, _canvas );
+        pDevice->ClipStretchBlit( _clip, m_pSurface, src, _canvas );
 		return;
 	}
-	
-	if( src.w == _canvas.w )
+
+    const WgBorders&    sourceBorders = m_frame;
+    const WgBorders     canvasBorders = m_frame.Scale(scale);
+
+    if( src.w == _canvas.w )
 	{
-		pDevice->ClipBlitVertBar( _clip, m_pSurface, src, m_frame,
-							(m_tiledSections & (1<<(int)WG_CENTER)) != 0, _canvas.Pos().x, _canvas.Pos().y, _canvas.h );
+        pDevice->ClipBlitVertStretchBar( _clip, m_pSurface, src, sourceBorders, _canvas, canvasBorders );
 		return;
 	}
-	
-	if( src.h == _canvas.h )
-	{
-		pDevice->ClipBlitHorrBar( _clip, m_pSurface, src, m_frame,
-							(m_tiledSections & (1<<(int)WG_CENTER)) != 0, _canvas.Pos().x, _canvas.Pos().y, _canvas.w );
-		return;
-	}
-	
-	const WgBorders& borders = m_frame;
-	
+
 	// Render upper row (top-left corner, top stretch area and top-right corner)
 	
-	if( borders.top > 0 )
+	if( canvasBorders.top > 0 )
 	{
-		WgRect rect( src.x, src.y, src.w, borders.top );
-	
-		pDevice->ClipBlitHorrBar( _clip, m_pSurface, rect, borders, (m_tiledSections & (1<<(int)WG_NORTH)) != 0,
-								_canvas.Pos().x, _canvas.Pos().y, _canvas.w );
+		WgRect sourceRect( src.x, src.y, src.w, sourceBorders.top );
+        WgRect destRect( _canvas.x, _canvas.y, _canvas.w, canvasBorders.top );
+
+        pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
 	}
-	
+
+    // Render mid row (left and right stretch area and middle section)
+    
+    if( _canvas.h - canvasBorders.Height() > 0 )
+    {
+        WgRect sourceRect( src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.Height() );
+        WgRect destRect( _canvas.x, _canvas.y + canvasBorders.top, _canvas.w, _canvas.h - canvasBorders.Height() );
+        
+        pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
+    }
+    
 	// Render lowest row (bottom-left corner, bottom stretch area and bottom-right corner)
 	
-	if( borders.bottom > 0 )
+	if( canvasBorders.bottom > 0 )
 	{
-		WgRect rect( src.x, src.y + src.h - borders.bottom, src.w, borders.bottom );
+		WgRect sourceRect( src.x, src.y + src.h - sourceBorders.bottom, src.w, sourceBorders.bottom );
+        WgRect destRect( _canvas.x, _canvas.y + _canvas.h - canvasBorders.bottom, _canvas.w, canvasBorders.bottom );
 	
-		pDevice->ClipBlitHorrBar( _clip, m_pSurface, rect, borders, (m_tiledSections & (1<<(int)WG_SOUTH)) != 0,
-								  _canvas.x, _canvas.y + _canvas.h - borders.bottom, _canvas.w );
-	}
-	
-	// Render left and right stretch areas
-	
-	if( _canvas.h > (int) borders.Height() )
-	{
-		if( borders.left > 0 )
-		{
-			WgRect sr( src.x, src.y + borders.top, borders.left, src.h - borders.Height() );
-			WgRect dr( _canvas.x, _canvas.y + borders.top, borders.left, _canvas.h - borders.Height() );
-	
-			if( m_tiledSections & (1<<(int)WG_WEST) )
-				pDevice->ClipTileBlit( _clip, m_pSurface, sr, dr );
-			else
-				pDevice->ClipStretchBlit( _clip, m_pSurface, sr, dr );
-		}
-	
-		if( borders.right > 0 )
-		{
-			WgRect sr(	src.x + src.w - borders.right, src.y + borders.top,
-						borders.right, src.h - borders.Height() );
-			WgRect dr(	_canvas.x + _canvas.w - borders.right, _canvas.y + borders.top,
-						borders.right, _canvas.h - borders.Height() );
-	
-			if( m_tiledSections & (1<<(int)WG_EAST) )
-				pDevice->ClipTileBlit( _clip, m_pSurface, sr, dr );
-			else
-				pDevice->ClipStretchBlit( _clip, m_pSurface, sr, dr );
-		}
-	}
-	
-	
-	// Render middle stretch area
-	
-	if( (_canvas.h > borders.top + borders.bottom) && (_canvas.w > borders.left + borders.right ) )
-	{
-		WgRect sr(	src.x + borders.left, src.y + borders.top,
-					src.w - borders.Width(), src.h - borders.Height() );
-	
-		WgRect dr(	_canvas.x + borders.left, _canvas.y + borders.top,
-					_canvas.w - borders.Width(), _canvas.h - borders.Height() );
-	
-		if( m_tiledSections & (1<<(int)WG_CENTER) )
-			pDevice->ClipTileBlit( _clip, m_pSurface, sr, dr );
-		else
-			pDevice->ClipStretchBlit( _clip, m_pSurface, sr, dr );
+        pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
 	}
 }
-	
-//____ _renderNoClip() ________________________________________________________
-	
-void WgBlockSkin::_renderNoClip( WgGfxDevice * pDevice, const StateData * pState, const WgRect& _canvas ) const
-{
-	WgSize borderSize = m_frame.Size();
-	const WgRect&	src		= WgRect(pState->ofs, m_dimensions);
-	
-	if( src.w == _canvas.w && src.h == _canvas.h )
-	{
-		pDevice->Blit( m_pSurface, src, _canvas.Pos().x, _canvas.Pos().y );
-		return;
-	}
-	
-	if( borderSize.w == 0 && borderSize.h == 0 )
-	{
-		if( m_tiledSections & (1 << (int)WG_CENTER) )
-			pDevice->TileBlit( m_pSurface, src, _canvas );
-		else
-			pDevice->StretchBlit( m_pSurface, src, _canvas );
-		return;
-	}
-	
-	if( src.w == _canvas.w )
-	{
-		pDevice->BlitVertBar( m_pSurface, src, m_frame,
-							(m_tiledSections & (1<<(int)WG_CENTER)) != 0, _canvas.Pos().x, _canvas.Pos().y, _canvas.h );
-		return;
-	}
-	
-	if( src.h == _canvas.h )
-	{
-		pDevice->BlitHorrBar( m_pSurface, src, m_frame,
-							(m_tiledSections & (1<<(int)WG_CENTER)) != 0, _canvas.Pos().x, _canvas.Pos().y, _canvas.w );
-		return;
-	}
-	
-	const WgBorders& borders = m_frame;
-	
-	// Render upper row (top-left corner, top stretch area and top-right corner)
-	
-	if( borders.top > 0 )
-	{
-		WgRect rect( src.x, src.y, src.w, borders.top );
-	
-		pDevice->BlitHorrBar( m_pSurface, rect, borders, (m_tiledSections & (1<<(int)WG_NORTH)) != 0,
-								_canvas.Pos().x, _canvas.Pos().y, _canvas.w );
-	}
-	
-	// Render lowest row (bottom-left corner, bottom stretch area and bottom-right corner)
-	
-	if( borders.bottom > 0 )
-	{
-		WgRect rect( src.x, src.y + src.h - borders.bottom, src.w, borders.bottom );
-	
-		pDevice->BlitHorrBar( m_pSurface, rect, borders, (m_tiledSections & (1<<(int)WG_SOUTH)) != 0,
-								_canvas.x, _canvas.y + _canvas.h - borders.bottom, _canvas.w );
-	}
-	
-	// Render left and right stretch areas
-	
-	if( _canvas.h > (int) borders.Height() )
-	{
-		if( borders.left > 0 )
-		{
-			WgRect sr( src.x, src.y + borders.top, borders.left, src.h - borders.Height() );
-			WgRect dr( _canvas.x, _canvas.y + borders.top, borders.left, _canvas.h - borders.Height() );
-	
-			if( m_tiledSections & (1<<(int)WG_WEST) )
-				pDevice->TileBlit( m_pSurface, sr, dr );
-			else
-				pDevice->StretchBlit( m_pSurface, sr, dr );
-		}
-	
-		if( borders.right > 0 )
-		{
-			WgRect sr(	src.x + src.w - borders.right, src.y + borders.top,
-						borders.right, src.h - borders.Height() );
-			WgRect dr(	_canvas.x + _canvas.w - borders.right, _canvas.y + borders.top,
-						borders.right, _canvas.h - borders.Height() );
-	
-			if( m_tiledSections & (1<<(int)WG_EAST) )
-				pDevice->TileBlit( m_pSurface, sr, dr );
-			else
-				pDevice->StretchBlit( m_pSurface, sr, dr );
-		}
-	}
-	
-	
-	// Render middle stretch area
-	
-	if( (_canvas.h > borders.top + borders.bottom) && (_canvas.w > borders.left + borders.right ) )
-	{
-		WgRect sr(	src.x + borders.left, src.y + borders.top,
-					src.w - borders.Width(), src.h - borders.Height() );
-	
-		WgRect dr(	_canvas.x + borders.left, _canvas.y + borders.top,
-					_canvas.w - borders.Width(), _canvas.h - borders.Height() );
-	
-		if( m_tiledSections & (1<<(int)WG_CENTER) )
-			pDevice->TileBlit( m_pSurface, sr, dr );
-		else
-			pDevice->StretchBlit( m_pSurface, sr, dr );
-	}
-}
-	
 	
 	
 //____ minSize() ______________________________________________________________
@@ -709,7 +547,7 @@ void WgBlockSkin::_renderNoClip( WgGfxDevice * pDevice, const StateData * pState
 WgSize WgBlockSkin::MinSize(int scale) const
 {
 	WgSize content = WgExtendedSkin::MinSize(scale);
-	WgSize frame = m_frame.Size();
+	WgSize frame = (m_frame.Size() * scale) / WG_SCALE_BASE;
 	return WgSize( WgMax(content.w, frame.w), WgMax(content.h, frame.h) );
 }
 	
@@ -718,7 +556,7 @@ WgSize WgBlockSkin::MinSize(int scale) const
 WgSize WgBlockSkin::PreferredSize(int scale) const
 {
 	WgSize sz = WgExtendedSkin::PreferredSize(scale);
-	return WgSize( WgMax(m_dimensions.w,sz.w), WgMax(m_dimensions.h,sz.h) );
+	return WgSize( WgMax((m_dimensions.w*scale) >> WG_SCALE_BINALS,sz.w), WgMax((m_dimensions.h*scale) >> WG_SCALE_BINALS,sz.h) );
 }
 	
 //____ sizeForContent() _______________________________________________________
@@ -726,7 +564,7 @@ WgSize WgBlockSkin::PreferredSize(int scale) const
 WgSize WgBlockSkin::SizeForContent( const WgSize contentSize, int scale ) const
 {
 	WgSize sz = WgExtendedSkin::SizeForContent(contentSize, scale);
-	WgSize min = m_frame.Size();
+	WgSize min = (m_frame.Size() * scale) / WG_SCALE_BASE;
 	
 	return WgSize( WgMax(sz.w,min.w), WgMax(sz.h,min.h) );
 }
@@ -744,27 +582,35 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
 	else
 	{
 		WgCoord ofs = _ofs;
+        
+        WgBorders canvasFrame = m_frame.Scale(scale);
 	
 		// Determine in which section the cordinate is (0-2 for x and y).
 	
 		int	xSection = 0;
 		int ySection = 0;
 	
-		if( ofs.x >= canvas.w - m_frame.right )
+		if( ofs.x >= canvas.w - canvasFrame.right )
 			xSection = 2;
-		else if( ofs.x > m_frame.left )
+		else if( ofs.x > canvasFrame.left )
 			xSection = 1;
 	
-		if( ofs.y >= canvas.h - m_frame.bottom )
+		if( ofs.y >= canvas.h - canvasFrame.bottom )
 			ySection = 2;
-		else if( ofs.y > m_frame.top )
+		else if( ofs.y > canvasFrame.top )
 			ySection = 1;
 	
 		// Convert ofs.x to X-offset in bitmap, taking stretch/tile section into account.
 	
-		if( xSection == 2 )
+        if( xSection == 0 )
+        {
+            ofs.x = (ofs.x * WG_SCALE_BASE) / scale;
+        }
+		else if( xSection == 2 )
 		{
-			ofs.x = m_dimensions.w - (canvas.w - ofs.x);
+            ofs.x = ofs.x - (canvas.w - canvasFrame.right);           // Offset in right border of canvas
+            ofs.x = (ofs.x * WG_SCALE_BASE) / scale;            // Scale from canvas to source coordinates
+            ofs.x += m_dimensions.w - m_frame.right;          // Add offset for right border
 		}
 		else if( xSection == 1 )
 		{
@@ -780,20 +626,33 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
 				bTile = (m_tiledSections & (1 << (int)WG_SOUTH)) != 0;
 	
 			if( bTile )
-				ofs.x = ((ofs.x - m_frame.left) % tileAreaWidth) + m_frame.left;
+            {
+                ofs.x = ofs.x - canvasFrame.left;               // Offset in middle section of canvas
+                ofs.x = (ofs.x * WG_SCALE_BASE) / scale;        // Scale from canvas to source offset
+                ofs.x = (ofs.x % tileAreaWidth) + m_frame.left; // Get offset in source
+            }
 			else
 			{
-				double screenWidth = canvas.w - m_frame.Width();	// Width of stretch-area on screen.
-				ofs.x = (int) ((ofs.x-m_frame.left)/screenWidth * tileAreaWidth + m_frame.left);
+                int canvasStretchWidth = canvas.w - canvasFrame.Width();	// Width of stretch-area on screen.
+                
+                ofs.x = ofs.x - canvasFrame.left;               // Offset in middle section of canvas
+                ofs.x = (ofs.x * WG_SCALE_BASE) / scale;        // Scale from canvas to source offset
+                ofs.x = (int)((ofs.x / (float)canvasStretchWidth)*tileAreaWidth) + m_frame.left;
 			}
 		}
 	
 	
 		// Convert ofs.y to Y-offset in bitmap, taking stretch/tile section into account.
 	
+        if( ySection == 0 )
+        {
+            ofs.y = (ofs.y * WG_SCALE_BASE) / scale;
+        }
 		if( ySection == 2 )
 		{
-			ofs.y = m_dimensions.h - (canvas.h - ofs.y);
+            ofs.y = ofs.y - (canvas.w - canvasFrame.bottom);           // Offset in bottom border of canvas
+            ofs.y = (ofs.y * WG_SCALE_BASE) / scale;            // Scale from canvas to source coordinates
+            ofs.y += m_dimensions.h - m_frame.bottom;          // Add offset for bottom border
 		}
 		else if( ySection == 1 )
 		{
@@ -809,11 +668,18 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
 				bTile = (m_tiledSections & (1 << (int)WG_EAST)) != 0;
 	
 			if( bTile )
-				ofs.y = ((ofs.y - m_frame.top) % tileAreaHeight) + m_frame.top;
+            {
+                ofs.y = ofs.y - canvasFrame.top;               // Offset in middle section of canvas
+                ofs.y = (ofs.y * WG_SCALE_BASE) / scale;        // Scale from canvas to source offset
+                ofs.y = (ofs.y % tileAreaHeight) + m_frame.top; // Get offset in source
+            }
 			else
 			{
-				double screenHeight = canvas.h - m_frame.Height();	// Height of stretch-area on screen.
-				ofs.y = (int) ((ofs.y-m_frame.top)/screenHeight * tileAreaHeight + m_frame.top);
+                int canvasStretchHeight = canvas.h - canvasFrame.Height();	// Height of stretch-area on screen.
+                
+                ofs.y = ofs.y - canvasFrame.top;               // Offset in middle section of canvas
+                ofs.y = (ofs.y * WG_SCALE_BASE) / scale;        // Scale from canvas to source offset
+                ofs.y = (int)((ofs.y / (float)canvasStretchHeight)*tileAreaHeight) + m_frame.top;
 			}
 		}
 	
@@ -854,14 +720,9 @@ bool WgBlockSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgStat
 	if( rect.w == canvasSize.w && rect.h == canvasSize.h )
 		return (m_state[index].opaqueSections == ALL_SECTIONS);
 	
-	WgRect center = WgRect(canvasSize) - m_frame;
+	WgRect center = WgRect(canvasSize) - m_frame.Scale(scale);
 	if( center.Contains(rect) )
-	{
-		if( m_state[index].opaqueSections & (1<<(int)WG_CENTER) )
-			return true;
-		else
-			return false;
-	}
+        return ( m_state[index].opaqueSections & (1<<(int)WG_CENTER) ) == true;
 	
 	//
 /*

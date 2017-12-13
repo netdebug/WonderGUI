@@ -424,6 +424,7 @@ protected:
 	WgChar *		_parseValue( double value, const WgValueFormat& form, WgChar[s_parseBufLen] );
 	WgChar *		_parseScaledValue( Sint64 value, Uint32 scale, const WgValueFormat& form, WgChar[s_parseBufLen] );
 
+    void            _textModified();
 
 	void			_regenHardLines();		// regenerate the softlines-array (if necessary).
 	void			_regenSoftLines();		// regenerate the softlines-array (if necessary).

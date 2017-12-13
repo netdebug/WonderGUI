@@ -752,9 +752,9 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 	if (m_pCanvas)
 	{
 		WgSize sz = m_pCanvas->Size();
-		double	timestampInc = m_sampleTTL / (double)m_pCanvas->Size().w;
+		double	timestampInc = m_sampleTTL / (double)sz.w;
 
-		if (m_bRefreshCanvas)
+		if (m_bRefreshCanvas || m_scrollAmount >= sz.w)
 		{
 			WgSurface * pOldCanvas = pDevice->Canvas();
 			pDevice->SetCanvas(m_pCanvas);
@@ -772,7 +772,7 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 			}
 */
 
-			_renderWaveSegment(pDevice, m_pCanvas->Size(), m_windowBegin, m_windowEnd, timestampInc);
+			_renderWaveSegment(pDevice, sz, m_windowBegin, m_windowEnd, timestampInc);
 			pDevice->SetCanvas(pOldCanvas);
 
 			if (m_windowEnd - m_windowBegin < m_sampleTTL)
@@ -792,7 +792,7 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 
 			int margin = ((int)(_thickestLine() / 2)) + 1;
 
-			m_canvasOfs = (m_canvasOfs + m_pCanvas->Size().w - margin) % m_pCanvas->Size().w;
+			m_canvasOfs = (m_canvasOfs + sz.w - margin) % sz.w;
 			m_scrollAmount += margin;
 
 			//
@@ -818,7 +818,7 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 				double windowBegin = m_windowEnd - m_scrollAmount*timestampInc;
 				double windowEnd = m_windowEnd - width2*timestampInc;
 
-				WgRect canvas(m_canvasOfs, 0, width1, m_pCanvas->Size().h);
+				WgRect canvas(m_canvasOfs, 0, width1, sz.h);
 				pDevice->Fill(canvas, m_chartColor);
 				_renderGridLines(pDevice, canvas, canvas, canvas);
 				_renderWaveSegment(pDevice, canvas, windowBegin, windowEnd, timestampInc);
@@ -826,7 +826,7 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 				windowBegin = m_windowEnd - width2*timestampInc;
 				windowEnd = m_windowEnd;
 
-				WgRect canvas2(0, 0, width2, m_pCanvas->Size().h);
+				WgRect canvas2(0, 0, width2, sz.h);
 				pDevice->Fill(canvas2, m_chartColor);
 				_renderGridLines(pDevice, canvas2, canvas2, canvas2);
 				_renderWaveSegment(pDevice, canvas2, windowBegin, windowEnd, timestampInc);
@@ -835,7 +835,7 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 
 			pDevice->SetCanvas(pOldCanvas);
 
-			m_canvasOfs = (m_canvasOfs + m_scrollAmount) % m_pCanvas->Size().w;
+			m_canvasOfs = (m_canvasOfs + m_scrollAmount) % sz.w;
 			m_scrollAmount = 0;
 		}
 	}

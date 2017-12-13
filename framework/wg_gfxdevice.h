@@ -183,6 +183,15 @@ public:
 
 	// Mid-level draw methods
 
+    virtual void ClipBlitHorrStretchBar(const WgRect& _clip, const WgSurface * _pSurf,
+                                        const WgRect& _src, const WgBorders& _srcBorders,
+                                        const WgRect& _dest, const WgBorders& _destBorders );
+
+    virtual void ClipBlitVertStretchBar(const WgRect& _clip, const WgSurface * _pSurf,
+                                        const WgRect& _src, const WgBorders& _srcBorders,
+                                        const WgRect& _dest, const WgBorders& _destBorders );
+    
+    
 	virtual void	ClipBlitHorrBar(	const WgRect& _clip, const WgSurface * _pSurf, const WgRect& _src,
 										const WgBorders& _borders, bool _bTile,
 										int _dx, int _dy, int _len );

@@ -214,7 +214,7 @@ void WgGfxDevice::ClipDrawLine(const WgRect& clip, const WgCoord& _begin, WgDire
 			WgColor col = _col;
 			col.a = (uint8_t)(thickness * col.a);
 
-			_drawHorrLine(begin, length, col);
+			_drawVertLine(begin, length, col);
 		}
 		else
 		{
@@ -557,124 +557,15 @@ void WgGfxDevice::ClipTileBlit( const WgRect& _clip, const WgSurface* _pSrc, con
 
 void WgGfxDevice::BlitBlock( const WgBlock& _block, const WgRect& _dest2, bool bTriLinear, float mipmapbias )
 {
-	if( !_block.Surface() )
-		return;
+	// Isn't worth the time to reimplement, just call the slightly slower version.
 
-	if( _block.IsSkipable() )
-		return;
-
-	WgRect _dest = _dest2;
-	WgUtil::AdjustScaledArea(_block, _dest);
-
-	// Shortcuts & optimizations for common special cases.
-
-	const WgRect& src = _block.Rect();
-	const WgSurface * pSurf = _block.Surface();
-
-	if( src.w == _dest.w && src.h == _dest.h )
-	{
-		Blit( pSurf, src, _dest.x, _dest.y );
-		return;
-	}
-
-	if( !_block.HasBorders() )
-	{
-		if( _block.HasTiledCenter() )
-			TileBlit( pSurf, src, _dest );
-		else
-			StretchBlit( pSurf, src, _dest, bTriLinear, mipmapbias );
-		return;
-	}
-
-	if( src.w == _dest.w )
-	{
-		BlitVertBar( pSurf, src, _block.Frame(),
-					 _block.HasTiledCenter(), _dest.x, _dest.y, _dest.h );
-		return;
-	}
-
-	if( src.h == _dest.h )
-	{
-		BlitHorrBar( pSurf, src, _block.Frame(),
-					 _block.HasTiledCenter(), _dest.x, _dest.y, _dest.w );
-		return;
-	}
-
-	const WgBorders& borders = _block.Frame();
-
-	// Render upper row (top-left corner, top stretch area and top-right corner)
-
-	if( borders.top > 0 )
-	{
-		WgRect rect( src.x, src.y, src.w, borders.top );
-
-		BlitHorrBar( pSurf, rect, borders, _block.HasTiledTopBorder(),
-					_dest.x, _dest.y, _dest.w );
-	}
-
-	// Render lowest row (bottom-left corner, bottom stretch area and bottom-right corner)
-
-	if( borders.bottom > 0 )
-	{
-		WgRect rect( src.x, src.y + src.h - borders.bottom, src.w, borders.bottom );
-
-		BlitHorrBar( pSurf, rect, borders, _block.HasTiledBottomBorder(),
-					_dest.x, _dest.y + _dest.h - borders.bottom, _dest.w );
-	}
-
-	// Render left and right stretch areas
-
-	if( _dest.h > (int) borders.Height() )
-	{
-		if( borders.left > 0 )
-		{
-			WgRect sr( src.x, src.y + borders.top, borders.left, src.h - borders.Height() );
-			WgRect dr( _dest.x, _dest.y + borders.top, borders.left, _dest.h - borders.Height() );
-
-			if( _block.HasTiledLeftBorder() )
-				TileBlit( pSurf, sr, dr );
-			else
-				StretchBlit( pSurf, sr, dr );
-		}
-
-		if( borders.right > 0 )
-		{
-			WgRect sr(	src.x + src.w - borders.right, src.y + borders.top,
-						borders.right, src.h - borders.Height() );
-			WgRect dr(	_dest.x + _dest.w - borders.right, _dest.y + borders.top,
-						borders.right, _dest.h - borders.Height() );
-
-			if( _block.HasTiledRightBorder() )
-				TileBlit( pSurf, sr, dr );
-			else
-				StretchBlit( pSurf, sr, dr );
-		}
-	}
-
-
-	// Render middle stretch area
-
-	if( (_dest.h > borders.top + borders.bottom) && (_dest.w > borders.left + borders.right ) )
-	{
-		WgRect sr(	src.x + borders.left, src.y + borders.top,
-					src.w - borders.Width(), src.h - borders.Height() );
-
-		WgRect dr(	_dest.x + borders.left, _dest.y + borders.top,
-					_dest.w - borders.Width(), _dest.h - borders.Height() );
-
-		if( _block.HasTiledCenter() )
-			TileBlit( pSurf, sr, dr );
-		else
-			StretchBlit( pSurf, sr, dr, bTriLinear, mipmapbias );
-	}
-
-
+	ClipBlitBlock( _dest2, _block, _dest2, bTriLinear, mipmapbias );
 }
 
 
 //____ ClipBlitBlock() ________________________________________________________
 
-void WgGfxDevice::ClipBlitBlock( const WgRect& _clip, const WgBlock& _block, const WgRect& _dest2, bool bTriLinear, float mipmapbias )
+void WgGfxDevice::ClipBlitBlock( const WgRect& _clip, const WgBlock& _block, const WgRect& _canvas, bool bTriLinear, float mipmapbias)
 {
 	if( !_block.Surface() )
 		return;
@@ -682,120 +573,132 @@ void WgGfxDevice::ClipBlitBlock( const WgRect& _clip, const WgBlock& _block, con
 	if( _block.IsSkipable() )
 		return;
 
+    const WgBorders&    sourceBorders = _block.SourceFrame();
+    const WgBorders     canvasBorders = _block.CanvasFrame();
+
 	// Shortcuts & optimizations for common special cases.
 
-	WgSize borderSize = _block.Frame().Size();
-
-	if( _clip.Contains( _dest2 ) && borderSize.w <= _dest2.Size().w && borderSize.h <= _dest2.Size().h )
-	{
-		BlitBlock( _block, _dest2, bTriLinear, mipmapbias );
-		return;
-	}
-
-	WgRect _dest = _dest2;
-	WgUtil::AdjustScaledArea(_block, _dest);
+	WgRect canvas = _canvas;
+	WgUtil::AdjustScaledArea(_block, canvas);
 
 	const WgRect& src = _block.Rect();
 	const WgSurface * pSurf = _block.Surface();
 
-	if( src.w == _dest.w && src.h == _dest.h )
+	if( sourceBorders == canvasBorders )
 	{
-		ClipBlit( _clip, pSurf, src, _dest.x, _dest.y );
-		return;
-	}
+		if( src.w == canvas.w && src.h == canvas.h )
+		{
+			ClipBlit( _clip, pSurf, src, canvas.x, canvas.y );
+			return;
+		}
 
-	if( !_block.HasBorders() )
-	{
-		if( _block.HasTiledCenter() )
-			ClipTileBlit( _clip, pSurf, src, _dest );
-		else
-			ClipStretchBlit( _clip, pSurf, src, _dest, bTriLinear, mipmapbias );
-		return;
+		if( !_block.HasBorders() )
+		{
+	        ClipStretchBlit( _clip, pSurf, src, canvas );
+			return;
+		}
+	    
+		if( src.w == canvas.w )
+		{
+			ClipBlitVertStretchBar( _clip, pSurf, src, sourceBorders, canvas, canvasBorders );
+			return;
+		}
 	}
-
-	if( src.w == _dest.w )
-	{
-		ClipBlitVertBar( _clip, pSurf, src, _block.Frame(),
-						 _block.HasTiledCenter(), _dest.x, _dest.y, _dest.h );
-		return;
-	}
-
-	if( src.h == _dest.h )
-	{
-		ClipBlitHorrBar( _clip, pSurf, src, _block.Frame(),
-						 _block.HasTiledCenter(), _dest.x, _dest.y, _dest.w );
-		return;
-	}
-
-	const WgBorders& borders = _block.Frame();
 
 	// Render upper row (top-left corner, top stretch area and top-right corner)
-
-	if( borders.top > 0 )
+	
+	if( canvasBorders.top > 0 )
 	{
-		WgRect rect( src.x, src.y, src.w, borders.top );
+		WgRect sourceRect( src.x, src.y, src.w, sourceBorders.top );
+        WgRect destRect( canvas.x, canvas.y, canvas.w, canvasBorders.top );
 
-		ClipBlitHorrBar( _clip, pSurf, rect, borders, _block.HasTiledTopBorder(),
-								_dest.x, _dest.y, _dest.w );
+        ClipBlitHorrStretchBar( _clip, pSurf, sourceRect, sourceBorders, destRect, canvasBorders );
 	}
 
+    // Render mid row (left and right stretch area and middle section)
+    
+    if( canvas.h - canvasBorders.Height() > 0 )
+    {
+        WgRect sourceRect( src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.Height() );
+        WgRect destRect( canvas.x, canvas.y + canvasBorders.top, canvas.w, canvas.h - canvasBorders.Height() );
+        
+        ClipBlitHorrStretchBar( _clip, pSurf, sourceRect, sourceBorders, destRect, canvasBorders );
+    }
+    
 	// Render lowest row (bottom-left corner, bottom stretch area and bottom-right corner)
-
-	if( borders.bottom > 0 )
+	
+	if( canvasBorders.bottom > 0 )
 	{
-		WgRect rect( src.x, src.y + src.h - borders.bottom, src.w, borders.bottom );
-
-		ClipBlitHorrBar( _clip, pSurf, rect, borders, _block.HasTiledBottomBorder(),
-								_dest.x, _dest.y + _dest.h - borders.bottom, _dest.w );
+		WgRect sourceRect( src.x, src.y + src.h - sourceBorders.bottom, src.w, sourceBorders.bottom );
+        WgRect destRect( canvas.x, canvas.y + canvas.h - canvasBorders.bottom, canvas.w, canvasBorders.bottom );
+	
+        ClipBlitHorrStretchBar( _clip, pSurf, sourceRect, sourceBorders, destRect, canvasBorders );
 	}
 
-	// Render left and right stretch areas
+}
 
-	if( _dest.h > (int) borders.Height() )
-	{
-		if( borders.left > 0 )
-		{
-			WgRect sr( src.x, src.y + borders.top, borders.left, src.h - borders.Height() );
-			WgRect dr( _dest.x, _dest.y + borders.top, borders.left, _dest.h - borders.Height() );
+//____ ClipBlitHorrStretchBar() ______________________________________________________
 
-			if( _block.HasTiledLeftBorder() )
-				ClipTileBlit( _clip, pSurf, sr, dr );
-			else
-				ClipStretchBlit( _clip, pSurf, sr, dr );
-		}
+void WgGfxDevice::ClipBlitHorrStretchBar(	const WgRect& _clip, const WgSurface * _pSurf,
+                                            const WgRect& _src, const WgBorders& _srcBorders,
+                                            const WgRect& _dest, const WgBorders& _destBorders )
+{
+    /*
+     This can be optimized by handling clipping directly instead of calling clipBlit().
+     */
+    
+    // Blit left edge
+    
+    WgRect	src( _src.x, _src.y, _srcBorders.left, _src.h );
+    WgRect  dest( _dest.x, _dest.y, _destBorders.left, _dest.h );
 
-		if( borders.right > 0 )
-		{
-			WgRect sr(	src.x + src.w - borders.right, src.y + borders.top,
-						borders.right, src.h - borders.Height() );
-			WgRect dr(	_dest.x + _dest.w - borders.right, _dest.y + borders.top,
-						borders.right, _dest.h - borders.Height() );
+    ClipStretchBlit( _clip, _pSurf, src, dest );
 
-			if( _block.HasTiledRightBorder() )
-				ClipTileBlit( _clip, pSurf, sr, dr );
-			else
-				ClipStretchBlit( _clip, pSurf, sr, dr );
-		}
-	}
+    src.x += src.w;
+    src.w = _src.w - _srcBorders.Width();
+    dest.x += dest.w;
+    dest.w = _dest.w - _destBorders.Width();
+    
+    ClipStretchBlit( _clip, _pSurf, src, dest );
+    
+    src.x += src.w;
+    src.w = _srcBorders.right;
+    dest.x += dest.w;
+    dest.w = _destBorders.right;
 
+    ClipStretchBlit( _clip, _pSurf, src, dest );
+}
 
-	// Render middle stretch area
+//____ ClipBlitVertStretchBar() ______________________________________________________
 
-	if( (_dest.h > borders.top + borders.bottom) && (_dest.w > borders.left + borders.right ) )
-	{
-		WgRect sr(	src.x + borders.left, src.y + borders.top,
-					src.w - borders.Width(), src.h - borders.Height() );
-
-		WgRect dr(	_dest.x + borders.left, _dest.y + borders.top,
-					_dest.w - borders.Width(), _dest.h - borders.Height() );
-
-		if( _block.HasTiledCenter() )
-			ClipTileBlit( _clip, pSurf, sr, dr );
-		else
-			ClipStretchBlit( _clip, pSurf, sr, dr, bTriLinear, mipmapbias );
-	}
-
-
+void WgGfxDevice::ClipBlitVertStretchBar(	const WgRect& _clip, const WgSurface * _pSurf,
+                                         const WgRect& _src, const WgBorders& _srcBorders,
+                                         const WgRect& _dest, const WgBorders& _destBorders )
+{
+    /*
+     This can be optimized by handling clipping directly instead of calling clipBlit().
+     */
+    
+    // Blit left edge
+    
+    WgRect	src( _src.x, _src.y, _src.w, _srcBorders.top );
+    WgRect  dest( _dest.x, _dest.y, _dest.w, _destBorders.top );
+    
+    ClipStretchBlit( _clip, _pSurf, src, dest );
+    
+    src.y += _src.h;
+    src.h = _src.h - _srcBorders.Height();
+    dest.y += _dest.h;
+    dest.h = _dest.h - _destBorders.Height();
+    
+    ClipStretchBlit( _clip, _pSurf, src, dest );
+    
+    src.y += _src.h;
+    src.h = _srcBorders.bottom;
+    dest.y += _dest.h;
+    dest.h = _destBorders.bottom;
+    
+    ClipStretchBlit( _clip, _pSurf, src, dest );
 }
 
 

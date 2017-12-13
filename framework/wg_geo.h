@@ -159,7 +159,8 @@ public:
 	inline int		Width() const { return ((int)left)+right; }
 	inline int		Height() const { return ((int)top)+bottom; }
 	inline void		Clear()			{ left = 0; right = 0; top = 0; bottom = 0; }
-
+    WgBorders       Scale(int scale) const;
+    
 	bool			operator==(const WgBorders& borders) const { return left == borders.left &&
 																		right == borders.right &&
 																		top == borders.top &&

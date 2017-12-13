@@ -24,6 +24,18 @@
 #include <wg_geo.h>
 //#include <wg_blockset.h>
 
+
+//____ WgBorders::Scale() ____________________________________________________
+
+WgBorders WgBorders::Scale(int scale) const
+{
+    return {    (uint8_t)((left*scale)>>WG_SCALE_BINALS),
+                (uint8_t)((top*scale)>>WG_SCALE_BINALS),
+                (uint8_t)((right*scale)>>WG_SCALE_BINALS),
+                (uint8_t)((bottom*scale)>>WG_SCALE_BINALS) };
+}
+
+
 //____ WgRect() _______________________________________________________________
 
 

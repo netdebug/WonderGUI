@@ -215,6 +215,9 @@ void WgText::clear()
 
 	if( m_pCursor )
 		m_pCursor->gotoHardPos(m_pCursor->line(), m_pCursor->column());
+
+    if( m_pHolder )
+        m_pHolder->_textModified( this );
 }
 
 
@@ -226,9 +229,8 @@ void WgText::setText( const WgCharSeq& seq )
 		m_buffer.PushBack( seq );
 	else
 		m_buffer.PushBack( WgCharSeq(seq, 0, m_maxChars) );
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
+
 	clearSelection();
 
 	assert( m_buffer.FindFirst( WG_ESCAPE_CODE ) == -1 );		// Forgotten to wrap text in WgCharSeqEscaped?
@@ -239,9 +241,8 @@ void WgText::setText( const WgCharBuffer * buffer )
 	m_buffer = * buffer;
 	if( (int) m_buffer.Length() > m_maxChars )
 		m_buffer.Delete( m_maxChars, INT_MAX );
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
+
 	clearSelection();
 
 	assert( m_buffer.FindFirst( WG_ESCAPE_CODE ) == -1 );		// Forgotten to wrap text in WgCharSeqEscaped?
@@ -255,9 +256,7 @@ void WgText::setText( const WgString& str )
 	else
 		m_buffer = WgCharSeq(str,0,m_maxChars);
 
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
 	clearSelection();
 
 	assert( m_buffer.FindFirst( WG_ESCAPE_CODE ) == -1 );		// Forgotten to wrap text in WgCharSeqEscaped?
@@ -272,9 +271,7 @@ void WgText::setText( const WgText * pText )
 	if( (int) m_buffer.Length() > m_maxChars )
 		m_buffer.Delete( m_maxChars, INT_MAX );
 
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
 	clearSelection();
 }
 
@@ -1187,16 +1184,24 @@ int WgText::nbChars() const
 
 void WgText::refresh()
 {
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
-
+    _textModified();
+    
 	if( m_pCursor )
 		m_pCursor->gotoHardPos(m_pCursor->line(), m_pCursor->column());
-
-	if( m_pHolder )
-		m_pHolder->_textModified( this );
 }
+
+//____ _textModified() ___________________________________________________________
+
+void WgText::_textModified()
+{
+    _regenHardLines();
+    _regenSoftLines();
+    _refreshAllLines();
+    
+    if( m_pHolder )
+        m_pHolder->_textModified( this );
+}
+
 
 //____ addChar() ______________________________________________________________
 
@@ -1206,9 +1211,7 @@ int WgText::addChar( const WgChar& character )
 		return 0;
 
 	int nAdded = m_buffer.PushBack( character );
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
 
 	return nAdded;
 }
@@ -1224,9 +1227,7 @@ int WgText::addText( const WgCharSeq& seq )
 	else
 		nAdded = m_buffer.PushBack( seq );
 
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
 
 	assert( m_buffer.FindFirst( WG_ESCAPE_CODE ) == -1 );		// Forgotten to wrap text in WgCharSeqEscaped?
 
@@ -1243,9 +1244,7 @@ int WgText::insertText( int ofs, const WgCharSeq& seq )
 	else
 		nInserted = m_buffer.Insert( ofs, seq );
 
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
 
 	assert( m_buffer.FindFirst( WG_ESCAPE_CODE ) == -1 );		// Forgotten to wrap text in WgCharSeqEscaped?
 
@@ -1262,9 +1261,7 @@ int WgText::replaceText( int ofs, int nDelete, const WgCharSeq& seq )
 	else
 		nInserted = m_buffer.Replace( ofs, nDelete, seq );
 
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
 
 	assert( m_buffer.FindFirst( WG_ESCAPE_CODE ) == -1 );		// Forgotten to wrap text in WgCharSeqEscaped?
 
@@ -1276,9 +1273,8 @@ int WgText::replaceText( int ofs, int nDelete, const WgCharSeq& seq )
 int WgText::deleteText( int ofs, int nChars )
 {
 	int nDeleted = m_buffer.Delete( ofs, nChars );
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
+
 	return nDeleted;
 }
 
@@ -1288,9 +1284,8 @@ int WgText::deleteText( int ofs, int nChars )
 int WgText::replaceChar( int ofs, const WgChar& character )
 {
 	int nReplaced = m_buffer.Replace( ofs, character );
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
+
 	return nReplaced;
 }
 
@@ -1303,9 +1298,7 @@ int WgText::insertChar( int ofs, const WgChar& character )
 		return 0;
 
 	int nInserted = m_buffer.Insert( ofs, character );
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
 
 	return nInserted;
 }
@@ -1315,9 +1308,8 @@ int WgText::insertChar( int ofs, const WgChar& character )
 int WgText::deleteChar( int ofs )
 {
 	int nDeleted = m_buffer.Delete( ofs, 1 );
-	_regenHardLines();
-	_regenSoftLines();
-	_refreshAllLines();
+    _textModified();
+
 	return nDeleted;
 }
 

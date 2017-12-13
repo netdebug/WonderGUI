@@ -206,7 +206,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
         WgRect textCanvas = PixelGeo();
         if( m_pSkin )
             textCanvas = m_pSkin->ContentRect( textCanvas, WG_STATE_NORMAL, m_scale );
-        
+
 		m_pText->CursorGotoCoord( pEvent->PointerPixelPos(), textCanvas );
 
 		if(IsSelectable() && type == WG_EVENT_MOUSEBUTTON_PRESS && !(modKeys & WG_MODKEY_SHIFT))
@@ -452,6 +452,7 @@ void WgTextDisplay::_textModified()
 	m_bResetCursorOnFocus = true;
     _requestResize();
 	_requestRender();
+    _queueEvent(new WgEvent::TextModify(this, m_pText));
 }
 
 
