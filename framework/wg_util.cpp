@@ -35,7 +35,7 @@ bool WgUtil::AdjustScaledArea(const WgBlock& block, WgRect& area)
 	if(!block.IsScaled())
 		return false;
 
-	const WgBorders& borders = block.Frame();
+	const WgBorders& borders = block.CanvasFrame();
 
 	int areaW = area.w - borders.Width();
 	int areaH = area.h - borders.Height();
@@ -70,104 +70,98 @@ bool WgUtil::AdjustScaledArea(const WgBlock& block, WgRect& area)
 
 //____ MarkTestBlock() ________________________________________________________
 
-bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect area, int opacityTreshold )
+bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, int opacityTreshold )
 {
-	AdjustScaledArea(block, area);
+	AdjustScaledArea(block, canvas);
 
 	// Sanity check & shortcuts.
-	if( !area.Contains(ofs.x,ofs.y) )
+	if( !canvas.Contains(ofs.x,ofs.y) )
 		return false;
 
+	int alpha;
 	if( block.IsOpaque() )
-		return true;
+		return ( 255 >= opacityTreshold);
 
-	// Make cordinates relative area.
+	// Make cordinates relative canvas.
 
-	ofs.x -= area.x;
-	ofs.y -= area.y;
+	ofs.x -= canvas.x;
+	ofs.y -= canvas.y;
 
 
-	const WgBorders& borders = block.Frame();
+	const WgBorders& canvasFrame = block.CanvasFrame();
+	const WgBorders& sourceFrame = block.SourceFrame();
+
+	int scale = block.Scale();
+	WgSize dimensions = block.Size();	
 
 	// Determine in which section the cordinate is (0-2 for x and y).
 
 	int	xSection = 0;
 	int ySection = 0;
 
-	if( ofs.x >= area.w - borders.right )
+	if( ofs.x >= canvas.w - canvasFrame.right )
 		xSection = 2;
-	else if( ofs.x > borders.left )
+	else if( ofs.x > canvasFrame.left )
 		xSection = 1;
 
-	if( ofs.y >= area.h - borders.bottom )
+	if( ofs.y >= canvas.h - canvasFrame.bottom )
 		ySection = 2;
-	else if( ofs.y > borders.top )
+	else if( ofs.y > canvasFrame.top )
 		ySection = 1;
 
 
 	// Convert ofs.x to X-offset in bitmap, taking stretch/tile section into account.
 
-	if( xSection == 2 )
+    if( xSection == 0 )
+    {
+        ofs.x = (ofs.x * WG_SCALE_BASE) / scale;
+    }
+	else if( xSection == 2 )
 	{
-		ofs.x = block.Width() - (area.w - ofs.x);
+        ofs.x = ofs.x - (canvas.w - canvasFrame.right);           // Offset in right border of canvas
+        ofs.x = (ofs.x * WG_SCALE_BASE) / scale;            // Scale from canvas to source coordinates
+        ofs.x += dimensions.w - sourceFrame.right;          // Add offset for right border
+        
+//			ofs.x = dimensions.w - (canvas.w - ofs.x);
 	}
 	else if( xSection == 1 )
 	{
-		int tileAreaWidth = block.Width() - borders.Width();
+		int tileAreaWidth = dimensions.w - sourceFrame.Width();
 
-		bool bTile;
-
-		if( ySection == 0 )
-			bTile = block.HasTiledTopBorder();
-		else if( ySection == 1 )
-			bTile = block.HasTiledCenter();
-		else
-			bTile = block.HasTiledBottomBorder();
-
-		if( bTile )
-			ofs.x = ((ofs.x - borders.left) % tileAreaWidth) + borders.left;
-		else
-		{
-			double screenWidth = area.w - borders.Width();	// Width of stretch-area on screen.
-			ofs.x = (int) ((ofs.x-borders.left)/screenWidth * tileAreaWidth + borders.left);
-		}
-	}
-
+        int canvasStretchWidth = canvas.w - canvasFrame.Width();	// Width of stretch-area on screen.
+        
+        ofs.x = ofs.x - canvasFrame.left;               // Offset in middle section of canvas
+        ofs.x = (ofs.x * WG_SCALE_BASE) / scale;        // Scale from canvas to source offset
+        ofs.x = (int)((ofs.x / (float)canvasStretchWidth)*tileAreaWidth) + sourceFrame.left;
+	}	
 
 	// Convert ofs.y to Y-offset in bitmap, taking stretch/tile section into account.
 
+    if( ySection == 0 )
+    {
+        ofs.y = (ofs.y * WG_SCALE_BASE) / scale;
+    }
 	if( ySection == 2 )
 	{
-		ofs.y = block.Height() - (area.h - ofs.y);
+        ofs.y = ofs.y - (canvas.w - canvasFrame.bottom);           // Offset in bottom border of canvas
+        ofs.y = (ofs.y * WG_SCALE_BASE) / scale;            // Scale from canvas to source coordinates
+        ofs.y += dimensions.h - sourceFrame.bottom;          // Add offset for bottom border
 	}
 	else if( ySection == 1 )
 	{
-		int tileAreaHeight = block.Height() - borders.Height();
-
-		bool bTile;
-
-		if( xSection == 0 )
-			bTile = block.HasTiledLeftBorder();
-		else if( xSection == 1 )
-			bTile = block.HasTiledCenter();
-		else
-			bTile = block.HasTiledRightBorder();
-
-		if( bTile )
-			ofs.y = ((ofs.y - borders.top) % tileAreaHeight) + borders.top;
-		else
-		{
-			double screenHeight = area.h - borders.Height();	// Height of stretch-area on screen.
-			ofs.y = (int) ((ofs.y-borders.top)/screenHeight * tileAreaHeight + borders.top);
-		}
+		int tileAreaHeight = dimensions.h - sourceFrame.Height();	
+        int canvasStretchHeight = canvas.h - canvasFrame.Height();	// Height of stretch-area on screen.
+        
+        ofs.y = ofs.y - canvasFrame.top;               // Offset in middle section of canvas
+        ofs.y = (ofs.y * WG_SCALE_BASE) / scale;        // Scale from canvas to source offset
+        ofs.y = (int)((ofs.y / (float)canvasStretchHeight)*tileAreaHeight) + sourceFrame.top;
 	}
 
-	int alpha = block.Surface()->GetOpacity(block.Rect().x+ofs.x, block.Rect().y+ofs.y);
+	WgCoord srcOfs = block.Rect().Pos();
 
-	if( alpha >= opacityTreshold )
-		return true;
-	else
-		return false;
+	alpha = block.Surface()->GetOpacity(srcOfs.x+ofs.x, srcOfs.y+ofs.y);
+	
+	return ( alpha >= opacityTreshold);
 }
 
 //____ PixelTypeToFormat() _____________________________________________________

@@ -296,7 +296,7 @@ Uint32 WgTextTool::countWhitespaces( const char * pStr, Uint32 len )
 	Uint32 n = 0;
 	for( unsigned int i = 0 ; i < len && pStr[i] != 0 ; i++ )
 	{
-		if( pStr[i] == ' ' || pStr[i] == WG_NO_BREAK_SPACE )
+		if( pStr[i] == ' ' || pStr[i] == (char) WG_NO_BREAK_SPACE )
 			n++;
 	}
 	return n;
@@ -436,7 +436,7 @@ Uint32 WgTextTool::getTextSizeStripped( const char * pStr, Uint32 maxChars )
 	{
 		char c = * pStr++;
 
-		if( c == WG_ESCAPE_CODE )
+		if( c == (char) WG_ESCAPE_CODE )
 		{
 			switch( * pStr )
 			{
@@ -526,7 +526,7 @@ Uint32 WgTextTool::getTextSizeStrippedUTF8( const char * pStr, Uint32 maxChars )
 	{
 		char c = * pStr++;
 
-		if( c == WG_ESCAPE_CODE )
+		if( c == (char)WG_ESCAPE_CODE )
 		{
 			switch( * pStr )
 			{
