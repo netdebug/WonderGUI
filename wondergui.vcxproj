@@ -111,6 +111,7 @@
     <ClInclude Include="framework\wg_extendedskin.h" />
     <ClInclude Include="framework\wg_filler.h" />
     <ClInclude Include="framework\wg_flexpanel.h" />
+    <ClInclude Include="framework\wg_flowpanel.h" />
     <ClInclude Include="framework\wg_font.h" />
     <ClInclude Include="framework\wg_fpsdisplay.h" />
     <ClInclude Include="framework\wg_frameskin.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="framework\wg_extendedskin.cpp" />
     <ClCompile Include="framework\wg_filler.cpp" />
     <ClCompile Include="framework\wg_flexpanel.cpp" />
+    <ClCompile Include="framework\wg_flowpanel.cpp" />
     <ClCompile Include="framework\wg_font.cpp" />
     <ClCompile Include="framework\wg_fpsdisplay.cpp" />
     <ClCompile Include="framework\wg_frameskin.cpp" />

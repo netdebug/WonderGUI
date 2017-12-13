@@ -67,6 +67,10 @@
 #	include <wg_eventlogger.h>
 #endif
 
+#ifndef WG_FLOWPANEL_DOT_H
+#	include <wg_flowpanel.h>
+#endif
+
 #ifndef WG_FONT_DOT_H
 #	include <wg_font.h>
 #endif

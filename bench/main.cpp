@@ -335,7 +335,7 @@ int main ( int argc, char** argv )
 			updateOscilloscope( g_pOsc, counter, freq, amp );
 
 		}	
-
+/*
 		{
 			WgRect clip = { 100,100,200,200 };
 
@@ -344,18 +344,18 @@ int main ( int argc, char** argv )
 			int lineLength = 250;
 			WgCoord pos;
 
-			pos.x = clip.x + clip.w / 2 - lineLength / 2 +sin(counter / 250.0)*clip.w * 3 / 3;
-			pos.y = clip.y + clip.h / 2 + sin(counter / 150.0)*clip.h * 2 / 3;
+			pos.x = clip.x + clip.w / 2 + sin(counter / 250.0)*clip.w * 3 / 3;
+			pos.y = clip.y + clip.h / 2 - lineLength / 2 + sin(counter / 150.0)*clip.h * 2 / 3;
 
 
-			g_pGfxDevice->ClipDrawLine(clip, pos, WgDirection::WG_RIGHT, lineLength, WgColor::white, 5.75 );
+			g_pGfxDevice->ClipDrawLine(clip, pos, WgDirection::WG_DOWN, lineLength, WgColor::white, 1.f );
 
 
 //			for (int i = 0; i < 20; i++)
 //				g_pGfxDevice->ClipDrawLine(clip, { clip.x + 1, clip.y + i * 15 }, WgDirection::WG_RIGHT, 50, WgColor::white, i*0.25 );
 
 		}
-
+*/
 
 		// DRAWING STARTS HERE
 
@@ -520,6 +520,34 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	WgFlexHook * pHook = pFlex->AddChild(pBackground);
 	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
+
+	// Flow Panel Test
+
+	{
+		WgFlowPanel * pFlow = new WgFlowPanel();
+
+		pFlow->SetSkin(WgColorSkin::Create(WgColor::white));
+
+		WgFlexHook * pHook = pFlex->AddChild(pFlow, { 10,10,400,300 });
+
+
+		WgSize fillers[10]{ {10,10}, {20,20}, {30,15}, {40,20}, {80,20}, {160,20}, {320,20}, {160,20}, {80,20}, {40,20} };
+
+		WgColorsetPtr colors[2];
+
+		colors[0] = WgColorset::Create(WgColor::blue);
+		colors[1] = WgColorset::Create(WgColor::red);
+
+		for (int i = 0; i < 10; i++)
+		{
+			auto p = new WgFiller();
+
+			p->SetPreferredPointSize(fillers[i]);
+			p->SetColors(colors[i % 2]);
+			WgFlowHook * pH = pFlow->AddChild(p);
+			pH->SetPadding(2);
+		}
+	}
 
 	// Volume meter direction test
 /*
