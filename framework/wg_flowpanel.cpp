@@ -389,7 +389,7 @@ void WgFlowPanel::_refreshChildGeo()
 	WgFlowHook * pH = FirstHook();
 
 	WgRect	row;
-
+	WgRect  newGeo;
 	while (pH)
 	{
 		if (pH->IsVisible())
@@ -405,7 +405,7 @@ void WgFlowPanel::_refreshChildGeo()
 
 				int paddedHeight = pH->_paddedMatchingPixelHeight(canvas.w);
 
-				pH->m_geo = {	pH->m_padding.left,
+				newGeo = {	pH->m_padding.left,
 								row.y+pH->m_padding.top,
 								canvas.w-pH->m_padding.Width(),
 								paddedHeight-pH->m_padding.Height() };
@@ -422,7 +422,7 @@ void WgFlowPanel::_refreshChildGeo()
 					row.h = 0;
 				}
 
-				pH->m_geo = {	row.w + pH->m_padding.left,
+				newGeo = {	row.w + pH->m_padding.left,
 								row.y + pH->m_padding.top,
 								sz - pH->m_padding.Size() };
 
@@ -430,6 +430,13 @@ void WgFlowPanel::_refreshChildGeo()
 
 				if (sz.h > row.h)
 					row.h = sz.h;
+			}
+
+			if (newGeo != pH->m_geo)
+			{
+				_requestRender(newGeo);
+				_requestRender(pH->m_geo);
+				pH->m_geo = newGeo;
 			}
 
 		}
@@ -443,6 +450,7 @@ void WgFlowPanel::_refreshChildGeo()
 			pH->m_geo.w = 0;
 			pH->m_geo.h = 0;
 		}
+
 		pH = pH->Next();
 	}
 }

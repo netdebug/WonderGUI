@@ -66,6 +66,19 @@ const char * WgLineEditor::GetClass()
 	return c_widgetType;
 }
 
+//____ SetSkin() ______________________________________________________________
+
+void WgLineEditor::SetSkin(const WgSkinPtr& pSkin)
+{
+	if (pSkin != m_pSkin)
+	{
+		m_pSkin = pSkin;
+		_requestResize();
+		_requestRender();
+	}
+}
+
+
 //____ SetEditMode() __________________________________________________________
 
 void WgLineEditor::SetEditMode(WgTextEditMode mode)
@@ -120,13 +133,7 @@ Uint32 WgLineEditor::InsertTextAtCursor( const WgCharSeq& str )
 		if( !GrabFocus() )
 			return 0;				// Couldn't get input focus...
 
-	Uint32 retVal = m_pText->putText( str );
-
-	_queueEvent( new WgEvent::TextModify(this,m_pText) );
-
-	_adjustViewOfs();
-
-	return retVal;
+	return m_pText->putText( str );
 }
 
 //____ InsertCharAtCursor() ___________________________________________________
@@ -143,9 +150,6 @@ bool WgLineEditor::InsertCharAtCursor( Uint16 c )
 	if( !m_pText->putChar( c ) )
 		return false;
 
-	_queueEvent( new WgEvent::TextModify(this,m_pText) );
-
-	_adjustViewOfs();
 	return true;
 }
 
@@ -320,13 +324,7 @@ void WgLineEditor::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHa
 				m_pText->delSelection();
 			m_pText->setSelectionMode(false);
 
-			if( m_pText->putChar( ch ) )
-			{
-				if( pHandler )
-					pHandler->QueueEvent( new WgEvent::TextModify(this,m_pText) );
-
-				_adjustViewOfs();
-			}
+			m_pText->putChar(ch);
 		}
 	}
 
@@ -388,9 +386,6 @@ void WgLineEditor::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHa
 					m_pText->delPrevWord();
 				else
 					m_pText->delPrevChar();
-
-				if( pHandler )
-					pHandler->QueueEvent( new WgEvent::TextModify(this,m_pText) );
 				break;
 			}
 
@@ -402,9 +397,6 @@ void WgLineEditor::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHa
 					m_pText->delNextWord();
 				else
 					m_pText->delNextChar();
-
-				if( pHandler )
-					pHandler->QueueEvent( new WgEvent::TextModify(this,m_pText) );
 				break;
 			}
 
@@ -644,7 +636,9 @@ void WgLineEditor::_setScale( int scale )
 void WgLineEditor::_textModified()
 {
 	m_bResetCursorOnFocus = true;			// Any change to text while we don't have focus resets the position.
+	_requestResize();
 	_requestRender();
 	_adjustViewOfs();
+	_queueEvent(new WgEvent::TextModify(this, m_pText));
 }
 

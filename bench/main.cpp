@@ -547,7 +547,13 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 			WgFlowHook * pH = pFlow->AddChild(p);
 			pH->SetPadding(2);
 		}
+
+		WgLineEditor * pLE = new WgLineEditor();
+		pLE->SetText("ABC");
+		pLE->SetSkin(WgColorSkin::Create(WgColor::yellow));
+		pFlow->AddChild(pLE);
 	}
+
 
 	// Volume meter direction test
 /*

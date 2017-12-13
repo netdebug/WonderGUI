@@ -79,6 +79,8 @@ public:
 	bool		IsAutoEllipsisDefault() const { return false; };
 
 
+	void		SetSkin(const WgSkinPtr& pSkin);
+
 protected:
 
 	bool	_isEditable() const { return m_text.IsEditable(); }

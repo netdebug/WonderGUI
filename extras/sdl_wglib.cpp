@@ -104,6 +104,10 @@ namespace sdl_wglib
 				if( event.button.button != 4 && event.button.button != 5 )
 					g_pHandler->QueueEvent( new WgEvent::MouseButtonRelease( event.button.button ) );	
 				break;
+			case SDL_TEXTINPUT:
+				g_pHandler->QueueEvent(new WgEvent::Character((short)event.text.text));
+				break;
+
 		}
 	}
 
