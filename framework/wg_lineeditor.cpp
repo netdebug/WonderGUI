@@ -161,11 +161,11 @@ bool WgLineEditor::SetTextWrap(bool bWrap)
 
 WgSize WgLineEditor::PreferredPixelSize() const
 {
-	//TODO: Implement!
-
-	return WgSize(1,1);
+	WgSize sz = m_text.unwrappedSize();
+	if (m_pSkin)
+		sz = m_pSkin->SizeForContent(sz, m_scale);
+	return sz;
 }
-
 
 
 //____ _onCloneContent() _______________________________________________________
@@ -183,6 +183,9 @@ void WgLineEditor::_onCloneContent( const WgWidget * _pOrg )
 
 void WgLineEditor::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
+	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
+
+	WgRect textCanvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
 
 	WgText * pText = &m_text;
 	if( m_bPasswordMode )
@@ -214,7 +217,7 @@ void WgLineEditor::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 
 	}
 
-	WgRect r = _canvas;
+	WgRect r = textCanvas;
 	r.x -= m_viewOfs;
 	r.w += m_viewOfs;
 
@@ -223,7 +226,7 @@ void WgLineEditor::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 	else
 		pText->hideCursor();
 
-	pDevice->PrintText( _clip, pText, r );
+	pDevice->PrintText( WgRect(_clip,textCanvas), pText, r );
 
 	if( pText != &m_text )
 		delete pText;
@@ -260,6 +263,9 @@ void WgLineEditor::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHa
 			WgCoord ofs = pEvent->PointerPixelPos();
 			int x = ofs.x + m_viewOfs;
 			int y = 0;
+
+			if (m_pSkin)
+				x -= m_pSkin->ContentOfs(WG_STATE_NORMAL, m_scale).x;
 
 			if( m_bPasswordMode )
 			{
