@@ -311,7 +311,7 @@ void WgSimpleLine::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 void WgSimpleLine::plot(int x, int y, double alpha, const WgRect& _clip)
 {
     WgColor col;
-    WgCoord abs = Local2abs( WgCoord(x,y) );
+    WgCoord abs = Local2absPixel( WgCoord(x,y) );
     
     alpha *= 1;
     

@@ -146,9 +146,13 @@ public:
 	WgWidget *		NextSibling() const { if( m_pHook ) {WgHook * p = m_pHook->Next(); if( p ) return p->Widget(); } return 0; }
 	WgWidget *		PrevSibling() const { if( m_pHook ) {WgHook * p = m_pHook->Prev(); if( p ) return p->Widget(); } return 0; }
 
-	WgCoord			Local2abs( const WgCoord& cord ) const;		// Cordinate from local cordsys to global (in pixels)
-	WgCoord			Abs2local( const WgCoord& cord ) const; 		// Cordinate from global to local cordsys (in pixels)
+	WgCoord			Local2absPixel( const WgCoord& cord ) const;		// Cordinate from local cordsys to global (in pixels)
+	WgCoord			Abs2localPixel( const WgCoord& cord ) const; 		// Cordinate from global to local cordsys (in pixels)
 
+    WgCoord			Local2absPoint( const WgCoord& cord ) const;		// Cordinate from local cordsys to global (in pixels)
+    WgCoord			Abs2localPoint( const WgCoord& cord ) const; 		// Cordinate from global to local cordsys (in pixels)
+    
+    
     int Scale() const { return m_scale; }
     
 	// To be overloaded by Widget

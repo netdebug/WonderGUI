@@ -184,7 +184,7 @@ void WgContainer::SetScale( int scale )
 void WgContainer::_onNewRoot( WgRootPanel * pRoot )
 {
 	for( WgHook * p = FirstHook() ; p != 0 ; p = p->Next() )
-		p->Widget()->_onNewRoot( pRoot );	
+		p->Widget()->_onNewRoot( pRoot );
 
 	WgWidget::_onNewRoot(pRoot);
 }
@@ -269,7 +269,7 @@ void WgContainer::_setScale( int scale )
 	{
 		p->_setScale( scale );
 		p = p->NextSibling();
-	}	
+	}
 }
 
 
@@ -301,15 +301,15 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 
 
 	// Render container itself
-	
+
 	for( const WgRect * pRect = patches.Begin() ; pRect != patches.End() ; pRect++ )
 		_onRender(pDevice, _canvas, _window, *pRect );
-		
-	
+
+
 	// Render children
 
 	WgRect	dirtBounds = patches.Union();
-	
+
 	if( m_bSiblingsOverlap )
 	{
 
@@ -369,14 +369,6 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 		}
 
 	}
-}
-
-
-//____ _onAlphaTest() _________________________________________________________
-
-bool WgContainer::_onAlphaTest( const WgCoord& ofs )
-{
-	return false;		// By default cointainers have nothing to display themselves.
 }
 
 //____ _onCloneContent() _______________________________________________________

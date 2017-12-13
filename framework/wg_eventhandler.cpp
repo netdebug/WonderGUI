@@ -791,6 +791,7 @@ void WgEventHandler::_finalizeEvent( WgEvent::Event * pEvent )
 
 	pEvent->m_timestamp	= m_time;
 	pEvent->m_modKeys	= m_modKeys;
+    pEvent->m_pointScale = m_pRoot->Scale();
 
 	// Only global POINTER_ENTER & POINTER_MOVE events have these members
 	// set, the rest needs to have them filled in.
@@ -798,10 +799,10 @@ void WgEventHandler::_finalizeEvent( WgEvent::Event * pEvent )
 	if( pEvent->IsForWidget() || (pEvent->Type() != WG_EVENT_MOUSE_MOVE && pEvent->Type() != WG_EVENT_MOUSE_ENTER) )
 	{
 		pEvent->m_pointerScreenPixelPos = m_pointerPos;
-		pEvent->m_pointerLocalPos = m_pointerPos;
+		pEvent->m_pointerLocalPixelPos = m_pointerPos;
 
 		if( pEvent->Widget() )
-			pEvent->m_pointerLocalPos -= pEvent->Widget()->ScreenPixelPos();
+			pEvent->m_pointerLocalPixelPos -= pEvent->Widget()->ScreenPixelPos();
 	}
 
 	// Event specific finalizations
