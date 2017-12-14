@@ -20,8 +20,6 @@
 
 =========================================================================*/
 
-
-
 #include <wg_chart.h>
 #include <wg_gfxdevice.h>
 #include <wg_pen.h>
@@ -881,9 +879,4 @@ void WgChart::_resampleWave(Wave * pWave)
 		}
 
 	}
-
-
-
 }
-
-

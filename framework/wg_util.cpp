@@ -143,7 +143,7 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
     }
 	if( ySection == 2 )
 	{
-        ofs.y = ofs.y - (canvas.w - canvasFrame.bottom);           // Offset in bottom border of canvas
+        ofs.y = ofs.y - (canvas.h - canvasFrame.bottom);           // Offset in bottom border of canvas
         ofs.y = (ofs.y * WG_SCALE_BASE) / scale;            // Scale from canvas to source coordinates
         ofs.y += dimensions.h - sourceFrame.bottom;          // Add offset for bottom border
 	}

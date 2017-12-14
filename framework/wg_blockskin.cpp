@@ -650,7 +650,7 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
         }
 		if( ySection == 2 )
 		{
-            ofs.y = ofs.y - (canvas.w - canvasFrame.bottom);           // Offset in bottom border of canvas
+            ofs.y = ofs.y - (canvas.h - canvasFrame.bottom);           // Offset in bottom border of canvas
             ofs.y = (ofs.y * WG_SCALE_BASE) / scale;            // Scale from canvas to source coordinates
             ofs.y += m_dimensions.h - m_frame.bottom;          // Add offset for bottom border
 		}
