@@ -232,7 +232,7 @@ void WgScaleImage::SetImageOrigo( WgOrigo origo )
 WgSize WgScaleImage::PreferredPixelSize() const
 {
 	if( m_pOrgSurface )
-		return m_pOrgSurface->Size();
+		return m_pOrgSurface->PixelSize();
 
 	return WgSize(1,1);
 }

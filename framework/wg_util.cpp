@@ -91,7 +91,9 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
 	const WgBorders& canvasFrame = block.CanvasFrame();
 	const WgBorders& sourceFrame = block.SourceFrame();
 
-	int scale = block.Scale();
+	int outputScale = block.Scale();
+	int surfaceScale = block.Surface()->ScaleFactor();
+
 	WgSize dimensions = block.Size();	
 
 	// Determine in which section the cordinate is (0-2 for x and y).
@@ -114,12 +116,12 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
 
     if( xSection == 0 )
     {
-        ofs.x = (ofs.x * WG_SCALE_BASE) / scale;
+        ofs.x = (ofs.x * surfaceScale) / outputScale;
     }
 	else if( xSection == 2 )
 	{
         ofs.x = ofs.x - (canvas.w - canvasFrame.right);           // Offset in right border of canvas
-        ofs.x = (ofs.x * WG_SCALE_BASE) / scale;            // Scale from canvas to source coordinates
+        ofs.x = (ofs.x * surfaceScale) / outputScale;            // Scale from canvas to source coordinates
         ofs.x += dimensions.w - sourceFrame.right;          // Add offset for right border
         
 //			ofs.x = dimensions.w - (canvas.w - ofs.x);
@@ -131,7 +133,7 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
         int canvasStretchWidth = canvas.w - canvasFrame.Width();	// Width of stretch-area on screen.
         
         ofs.x = ofs.x - canvasFrame.left;               // Offset in middle section of canvas
-        ofs.x = (ofs.x * WG_SCALE_BASE) / scale;        // Scale from canvas to source offset
+//        ofs.x = (ofs.x * surfaceScale) / outputScale;        // Scale from canvas to source offset
         ofs.x = (int)((ofs.x / (float)canvasStretchWidth)*tileAreaWidth) + sourceFrame.left;
 	}	
 
@@ -139,12 +141,12 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
 
     if( ySection == 0 )
     {
-        ofs.y = (ofs.y * WG_SCALE_BASE) / scale;
+        ofs.y = (ofs.y * surfaceScale) / outputScale;
     }
 	if( ySection == 2 )
 	{
         ofs.y = ofs.y - (canvas.h - canvasFrame.bottom);           // Offset in bottom border of canvas
-        ofs.y = (ofs.y * WG_SCALE_BASE) / scale;            // Scale from canvas to source coordinates
+        ofs.y = (ofs.y * surfaceScale) / outputScale;            // Scale from canvas to source coordinates
         ofs.y += dimensions.h - sourceFrame.bottom;          // Add offset for bottom border
 	}
 	else if( ySection == 1 )
@@ -153,7 +155,7 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
         int canvasStretchHeight = canvas.h - canvasFrame.Height();	// Height of stretch-area on screen.
         
         ofs.y = ofs.y - canvasFrame.top;               // Offset in middle section of canvas
-        ofs.y = (ofs.y * WG_SCALE_BASE) / scale;        // Scale from canvas to source offset
+  //      ofs.y = (ofs.y * surfaceScale) / outputScale;        // Scale from canvas to source offset
         ofs.y = (int)((ofs.y / (float)canvasStretchHeight)*tileAreaHeight) + sourceFrame.top;
 	}
 

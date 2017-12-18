@@ -169,13 +169,6 @@ Uint8 WgSurfaceSoft::GetOpacity( WgCoord coord ) const
 	  return 0xff;
 }
 
-//____ Size() __________________________________________________________________
-
-WgSize WgSurfaceSoft::Size() const
-{
-	return m_size;
-}
-
 //____ IsOpaque() ______________________________________________________________
 
 bool WgSurfaceSoft::IsOpaque() const

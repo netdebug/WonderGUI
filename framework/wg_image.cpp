@@ -90,7 +90,7 @@ void WgImage::SetSource( const WgBlocksetPtr& pBlockset )
 WgSize WgImage::PreferredPixelSize() const
 {
 	if( m_pGfx )
-		return (m_pGfx->Size(m_scale)*m_scale) / WG_SCALE_BASE;
+		return m_pGfx->Size(m_scale);
 
 	return WgSize(1,1);
 }
@@ -164,6 +164,15 @@ void WgImage::_onDisable()
 	}
 }
 
+//____ _setScale() ____________________________________________________________
+
+void WgImage::_setScale( int scale )
+{
+    WgWidget::_setScale(scale);
+    
+    if( m_pGfx )
+        _requestResize();
+}
 
 
 

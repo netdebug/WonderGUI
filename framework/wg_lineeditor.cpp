@@ -628,6 +628,7 @@ void WgLineEditor::_setScale( int scale )
 	WgWidget::_setScale(scale);
 
 	m_text.SetScale(scale);
+	_requestResize();
 }
 
 

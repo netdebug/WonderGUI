@@ -69,7 +69,6 @@ public:
 
     // Methods needed by WgSurface
 
-    WgSize		Size() const;
     bool		IsOpaque() const;
 
     uint32_t	GetPixel( WgCoord coord ) const;
@@ -97,8 +96,7 @@ private:
     GLenum		m_accessFormat;		// GL_BGR or GL_BGRA.
     WgBlobPtr   m_pBlob;
     
-    WgSize		m_size;				// Width and height in pixels.
-    uint32_t	m_pixelWgSize;		// WgSize in bytes of a pixel.
+    uint32_t	m_pixelSize;		// Size in bytes of a pixel.
 };
 
 #endif //WG_GLSURFACE_DOT_H

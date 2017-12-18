@@ -43,7 +43,6 @@ class WgSurfaceSoft : public WgSurface
 	const char *Type() const;
 	static const char * GetClass();
 
-	WgSize		Size() const;
 	bool		IsOpaque() const;
 
 	Uint32		GetPixel( WgCoord coord ) const;
@@ -61,7 +60,6 @@ protected:
 
 	void        _copy(const WgSurfaceSoft * pOther);
 
-	WgSize		m_size;
 	float    	m_fScaleAlpha;
 	bool		m_bOwnsData;
 	Uint8 *		m_pData;

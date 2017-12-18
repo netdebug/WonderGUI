@@ -686,16 +686,16 @@ void WgGfxDevice::ClipBlitVertStretchBar(	const WgRect& _clip, const WgSurface *
     
     ClipStretchBlit( _clip, _pSurf, src, dest );
     
-    src.y += _src.h;
+    src.y += src.h;
     src.h = _src.h - _srcBorders.Height();
-    dest.y += _dest.h;
+    dest.y += dest.h;
     dest.h = _dest.h - _destBorders.Height();
     
     ClipStretchBlit( _clip, _pSurf, src, dest );
     
-    src.y += _src.h;
+    src.y += src.h;
     src.h = _srcBorders.bottom;
-    dest.y += _dest.h;
+    dest.y += dest.h;
     dest.h = _destBorders.bottom;
     
     ClipStretchBlit( _clip, _pSurf, src, dest );

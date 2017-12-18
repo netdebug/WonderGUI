@@ -87,7 +87,7 @@ public:
 
 
 	//.____ Misc ____________________________________________________	
-	
+
 	bool	MarkTest( const WgCoord& ofs, const WgSize& canvas, WgState state, int opacityTreshold, int scale ) const override;
 	
 	bool	IsOpaque() const override;
@@ -120,6 +120,7 @@ private:
 	WgBorders		m_frame;
 	int				m_tiledSections;
 	bool			m_bIsOpaque;
+	int 			m_scale = WG_SCALE_BASE;
 	
 	StateData		m_state[WG_NB_STATES];
 };

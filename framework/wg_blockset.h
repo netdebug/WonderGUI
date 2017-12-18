@@ -154,17 +154,7 @@ protected:
 
 	struct Alt_Data
 	{
-		int					scale;
-
 		const WgSurface *	pSurf;
-		WgBorders			frame;
-		WgBorders			padding;
-
-		WgCoord8			contentShift[WG_NB_MODES];		// Only shift for WG_MODE_MARKED and WG_MODE_SELECTED are used.
-		Uint16				x[WG_NB_MODES];
-		Uint16				y[WG_NB_MODES];
-		Uint16				w;
-		Uint16				h;
 	};
 
 	class LinkedAlt : public WgLink
@@ -185,17 +175,15 @@ public:
 	static WgBlocksetPtr CreateFromColumn( WgSurface * pSurf, const WgRect& rect, int nBlocks, int spacing=0, int flags = 0 );
 
 
-	bool				AddAlternative( int activationScale, const WgSurface * pSurf, const WgRect& normal, const WgRect& marked,
-										const WgRect& selected, const WgRect& disabled, const WgRect& special,
-										WgBorders frame, WgBorders padding, WgCoord shiftMarked, WgCoord shiftPressed );
+	bool				AddAlternative( const WgSurface * pSurf);
 
 //	bool				SetSize( WgSize size, int alt = 0 );
 //	bool				SetPos( WgMode mode, WgCoord pos, int alt = 0 );
 
 	void				SetTextColors( const WgColorsetPtr& colors );
-	void				SetFrame( const WgBorders& frame, int alt = 0 );
-	void				SetPadding( const WgBorders& padding, int alt = 0 );
-	bool				SetContentShift( WgMode mode, WgCoord ofs, int alt = 0 );
+	void				SetFrame( const WgBorders& frame );
+	void				SetPadding( const WgBorders& padding );
+	bool				SetContentShift( WgMode mode, WgCoord ofs );
 	bool				SetTile(Uint32 place, bool bTile);
 	bool				SetScale(bool bScale);
 	bool				SetFixedSize(bool bFixedSize);						//TODO: Make center-mode enum of fixed-size/tile/stretch/scale.
@@ -217,7 +205,7 @@ public:
 	const WgSurface *	Surface( int scale ) const;
 	WgBorders			Frame( int scale ) const;
 	WgBorders			Padding( int scale ) const;
-	WgCoord				ContentShift( WgMode mode, int alt = 0 ) const;
+	WgCoord				ContentShift( WgMode mode, int scale ) const;
 	inline Uint32		Flags() const { return m_flags; }
 
 	inline bool			IsOpaque() const { return ((m_flags & WG_OPAQUE) != 0); }
@@ -236,7 +224,7 @@ public:
 
 	bool				IsFixedSize() const { return ((m_flags & WG_FIXED_CENTER) != 0); }
 
-	bool				SameBlock( WgMode one, WgMode two, int alt = 0 );
+	bool				SameBlock( WgMode one, WgMode two );
 	inline bool			IsModeSkipable( WgMode m ) const;
 
 
@@ -250,11 +238,20 @@ private:
 
 	WgBlock	_getBlock( WgMode mode, const Alt_Data * pAlt, int scale ) const;
 
-	WgColorsetPtr				m_pTextColors;		// Default colors for text placed on this block.
-	Uint32						m_flags;
-	Alt_Data					m_base;				// Original blocks (Alt=0)
+	WgColorsetPtr			m_pTextColors;		// Default colors for text placed on this block.
+	Uint32					m_flags;
+    
+    WgBorders               m_frame;
+    WgBorders               m_padding;
+    
+    WgCoord8                m_contentShift[WG_NB_MODES];		// Only shift for WG_MODE_MARKED and WG_MODE_SELECTED are used.
+    
+	WgCoord					m_pos[WG_NB_MODES];
+	WgSize					m_size;
+    
+	Alt_Data				m_base;				// Original blocks (Alt=0)
 
-	WgChain<LinkedAlt>			m_altChain;			// Blocks for Alts 1+.
+	WgChain<LinkedAlt>		m_altChain;			// Blocks for Alts 1+.
 
 
 	static WgMemPool *	g_pMemPool;

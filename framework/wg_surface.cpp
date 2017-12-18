@@ -48,18 +48,33 @@ WgSurface::~WgSurface()
 		delete [] (uint8_t*)m_pMetaData;
 }
 
+//____ PixelSize() ______________________________________________________________
+
+WgSize WgSurface::PixelSize() const
+{
+    return m_size;
+}
+
+//____ PointSize() ______________________________________________________________
+
+WgSize WgSurface::PointSize() const
+{
+    return m_size * WG_SCALE_BASE / m_scaleFactor;
+}
+
+
 //____ Width() ________________________________________________________________
 
 int WgSurface::Width() const
 {
-	return Size().w;
+	return m_size.w;
 }
 
 //____ Height() _______________________________________________________________
 
 int WgSurface::Height() const
 {
-	return Size().h;
+	return m_size.h;
 }
 
 
@@ -109,7 +124,7 @@ WgRect WgSurface::_lockAndAdjustRegion( WgAccessMode modeNeeded, const WgRect& r
 
 bool WgSurface::Fill( WgColor col )
 {
-	return Fill( col, WgRect(0,0,Size()) );
+	return Fill( col, WgRect(0,0,m_size) );
 }
 
 bool WgSurface::Fill( WgColor col, const WgRect& _rect )
@@ -233,7 +248,7 @@ bool WgSurface::CopyFrom( WgSurface * pSrcSurface, WgCoord dst )
 	if( pSrcSurface == 0 )
 		return false;
 
-	return CopyFrom( pSrcSurface, WgRect(0,0,pSrcSurface->Size()), dst );
+	return CopyFrom( pSrcSurface, WgRect(0,0,pSrcSurface->PixelSize()), dst );
 }
 
 bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoord _dst )

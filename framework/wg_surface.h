@@ -49,11 +49,16 @@ public:
 	// Methods for reading dimensions and abilities.
 
 	virtual const char *Type() const = 0;
-	virtual	WgSize		Size() const = 0;
+	virtual	WgSize		PixelSize() const;
+    virtual WgSize      PointSize() const;
+    
 	virtual	int			Width() const;
 	virtual	int			Height() const;
 	virtual bool		IsOpaque() const = 0;
 
+    void                SetScaleFactor( int factor ) { m_scaleFactor = factor; }
+    int                 ScaleFactor() const { return m_scaleFactor; }
+    
 	virtual void		setScaleMode( WgScaleMode mode );
 	WgScaleMode			scaleMode() const { return m_scaleMode; }
 
@@ -95,8 +100,6 @@ public:
 	void				SetMetaData( void * pData, int byts );
 	void				ClearMetaData();
 
-    void                SetScaleFactor( int factor ) { m_scaleFactor = factor; }
-    int                 ScaleFactor() const { return m_scaleFactor; }
     
     
 	
@@ -124,6 +127,7 @@ protected:
 	int					m_nMetaBytes;
     
     int                 m_scaleFactor;      // Scale of surface content. Default is WG_SCALE_BASE.
+    WgSize              m_size;
     
     int                 m_iResource;         // handy to have when debugging
 };

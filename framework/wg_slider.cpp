@@ -388,9 +388,9 @@ WgSize WgWidgetSlider::PreferredPixelSize() const
 	int addPix = (50*m_scale) >> WG_SCALE_BINALS; 
 
 	if( m_bHorizontal )
-		sz.w += 50;
+		sz.w += addPix;
 	else
-		sz.h += 50;
+		sz.h += addPix;
 
 	return sz;
 }
@@ -407,16 +407,22 @@ void WgWidgetSlider::_updateMinSize()
 
 	if( m_pBgGfx )
 	{
-		minW = Max( minW, m_pBgGfx->MinWidth(m_scale) );
-		minH = Max( minH, m_pBgGfx->MinHeight(m_scale) );
+        WgSize min = m_pBgGfx->MinSize(m_scale);
+        WgSize def = m_pBgGfx->Size(m_scale);
+        
+        minW = Max( minW, m_bHorizontal ? min.w : def.w );
+        minH = Max( minH, m_bHorizontal ? def.h : min.h );
 	}
 
 	// Check min w/h for BarGfx.
 
 	if( m_pBarGfx )
 	{
-		minW = Max( minW, m_pBarGfx->MinWidth(m_scale) );
-		minH = Max( minH, m_pBarGfx->MinHeight(m_scale) );
+        WgSize min = m_pBarGfx->MinSize(m_scale);
+        WgSize def = m_pBarGfx->Size(m_scale);
+        
+        minW = Max( minW, m_bHorizontal ? min.w : def.w );
+        minH = Max( minH, m_bHorizontal ? def.h : min.h );
 	}
 
 

@@ -59,6 +59,8 @@ protected:
 	void	_onEnable();
 	void	_onDisable();
 
+    void    _setScale( int scale );
+
 private:
 
 	WgBlocksetPtr	m_pGfx;

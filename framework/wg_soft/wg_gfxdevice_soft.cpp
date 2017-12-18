@@ -48,7 +48,7 @@ WgGfxDeviceSoft::WgGfxDeviceSoft() : WgGfxDevice(WgSize(0,0))
 	_initTables();
 }
  
-WgGfxDeviceSoft::WgGfxDeviceSoft( WgSurfaceSoft * pCanvas ) : WgGfxDevice( pCanvas?pCanvas->Size():WgSize() )
+WgGfxDeviceSoft::WgGfxDeviceSoft( WgSurfaceSoft * pCanvas ) : WgGfxDevice( pCanvas?pCanvas->PixelSize():WgSize() )
 {
 	m_pCanvas = pCanvas;
 	WgGfxDevice::m_pCanvas = pCanvas;
@@ -73,7 +73,7 @@ bool WgGfxDeviceSoft::SetCanvas( WgSurface * pCanvas )
 	m_pCanvas = static_cast<WgSurfaceSoft*>(pCanvas);
 	WgGfxDevice::m_pCanvas = pCanvas;
 	if( pCanvas )
-		m_canvasSize = pCanvas->Size();
+		m_canvasSize = pCanvas->PixelSize();
 	else
 		m_canvasSize = WgSize();
 

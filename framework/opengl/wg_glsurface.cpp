@@ -124,8 +124,8 @@ WgGlSurface::WgGlSurface( WgSurface * pOther )
 	assert(glGetError() == 0);
     _setPixelDetails(pOther->PixelFormat()->type);
 
-	m_size	= pOther->Size();
-    m_pitch = m_size.w * m_pixelWgSize;
+	m_size	= pOther->PixelSize();
+    m_pitch = m_size.w * m_pixelSize;
     m_pBlob = WgBlob::Create(m_pitch*m_size.h);
     
     m_pPixels = (uint8_t *) m_pBlob->Content();
@@ -154,13 +154,13 @@ void WgGlSurface::_setPixelDetails( WgPixelType type )
     {
         m_internalFormat = GL_RGB8;
         m_accessFormat = GL_BGR;
-        m_pixelWgSize = 3;
+        m_pixelSize = 3;
     }
     else
     {
         m_internalFormat = GL_RGBA8;
         m_accessFormat = GL_BGRA;
-        m_pixelWgSize = 4;
+        m_pixelSize = 4;
     }
     
     WgUtil::PixelTypeToFormat(type, m_pixelFormat);
@@ -216,13 +216,6 @@ void WgGlSurface::setScaleMode( WgScaleMode mode )
 	WgSurface::setScaleMode(mode);
 }
 
-//____ Size() ______________________________________________________________
-
-WgSize WgGlSurface::Size() const
-{
-    return m_size;
-}
-
 //____ IsOpaque() ______________________________________________________________
 
 bool WgGlSurface::IsOpaque() const
@@ -259,7 +252,7 @@ void * WgGlSurface::LockRegion( WgAccessMode mode, const WgRect& region )
     m_pPixels = (uint8_t*) m_pBlob->Content();
     m_lockRegion = region;
     m_accessMode = mode;
-    return m_pPixels += (m_size.w*region.y+region.x)*m_pixelWgSize;
+    return m_pPixels += (m_size.w*region.y+region.x)*m_pixelSize;
 }
 
 
@@ -298,7 +291,7 @@ uint32_t WgGlSurface::GetPixel( WgCoord coord ) const
 
 		uint8_t * pPixel = (uint8_t*) m_pBlob->Content();
 
-		switch( m_pixelWgSize )
+		switch( m_pixelSize )
 		{
 			case 1:
 				val = (uint32_t) *pPixel;
@@ -342,6 +335,7 @@ bool WgGlSurface::unload()
 	m_texture = 0;
 	
 	assert(glGetError() == 0);	
+    return true;
 }
 
 bool WgGlSurface::isLoaded()

@@ -404,7 +404,7 @@ bool WgGlGfxDevice::SetCanvas( WgSurface * _pSurface )
     WgGlSurface * pSurface = static_cast<WgGlSurface*>(_pSurface);
 
     m_pCanvas       = pSurface;
-    m_canvasSize    = pSurface->Size();
+    m_canvasSize    = pSurface->PixelSize();
     _updateProgramDimensions();
 
     if (m_bRendering)

@@ -709,7 +709,7 @@ void WgScrollChart::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 		m_scrollFraction += ticks;
 		
-		float samplesPerPixel = m_sampleTTL / (float) m_pCanvas->Size().w;
+		float samplesPerPixel = m_sampleTTL / (float) m_pCanvas->PixelSize().w;
 
 		int scrollAmount =  (int) ((m_scrollFraction-1) / samplesPerPixel);
 
@@ -751,7 +751,7 @@ void WgScrollChart::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas,
 
 	if (m_pCanvas)
 	{
-		WgSize sz = m_pCanvas->Size();
+		WgSize sz = m_pCanvas->PixelSize();
 		double	timestampInc = m_sampleTTL / (double)sz.w;
 
 		if (m_bRefreshCanvas || m_scrollAmount >= sz.w)
@@ -882,7 +882,7 @@ void WgScrollChart::_renderWaveSegment(WgGfxDevice * pDevice, const WgRect& _can
 
 	// Calculate yOfs, chart floor and valueFactor
 
-	int canvasHeight = m_pCanvas->Size().h;
+	int canvasHeight = m_pCanvas->PixelSize().h;
 	float valueFactor = canvasHeight / (m_bottomValue - m_topValue);
 
 	float graphFloor;
@@ -965,7 +965,7 @@ void WgScrollChart::_resampleWavePortion(int& ofs, int& nSamples, int * pOutTop,
 
 	//
 
-	int canvasHeight = m_pCanvas->Size().h;
+	int canvasHeight = m_pCanvas->PixelSize().h;
 	float valueFactor = canvasHeight / (m_bottomValue - m_topValue);
 
 	float floor;
@@ -1091,13 +1091,13 @@ void WgScrollChart::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, cons
 
 	if (m_pCanvas)
 	{
-		assert(m_pCanvas->Size() == scrollCanvas.Size());
+		assert(m_pCanvas->PixelSize() == scrollCanvas.Size());
 	
 		if( m_windowBegin == 0 )
 			pDevice->ClipBlitFromCanvas(_clip, m_pCanvas, { 0, 0, scrollCanvas.w, scrollCanvas.h }, scrollCanvas.x, scrollCanvas.y);
 		else
 		{
-			int firstPartLen = m_pCanvas->Size().w - m_canvasOfs;
+			int firstPartLen = m_pCanvas->PixelSize().w - m_canvasOfs;
 
 			pDevice->ClipBlitFromCanvas(_clip, m_pCanvas, { m_canvasOfs, 0, firstPartLen, scrollCanvas.h }, scrollCanvas.x, scrollCanvas.y);
 			pDevice->ClipBlitFromCanvas(_clip, m_pCanvas, { 0, 0, scrollCanvas.w - firstPartLen, scrollCanvas.h }, scrollCanvas.x + firstPartLen, scrollCanvas.y);
