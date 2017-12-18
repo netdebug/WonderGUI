@@ -1193,6 +1193,14 @@ WgWidget * WgEventHandler::_updateEnteredWidgets( WgWidget * pMarkedWidget )
 
 void WgEventHandler::_processKeyPress( WgEvent::KeyPress * pEvent )
 {
+	// Make sure we don't already have this key press
+
+	for (KeyDownInfo * p : m_keysDown)
+	{
+		if (p->pEvent->NativeKeyCode() == pEvent->NativeKeyCode())
+			return;
+	}
+
 	// Fill in the info-structure.
 
 	KeyDownInfo * pInfo = new KeyDownInfo();

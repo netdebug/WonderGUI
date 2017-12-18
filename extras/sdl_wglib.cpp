@@ -251,7 +251,7 @@ namespace sdl_wglib
 		WgBlocksetPtr pButtonBlocks = WgBlockset::CreateFromRects(pSurface, buttonRects[0], buttonRects[1], buttonRects[2], buttonRects[3], WG_OPAQUE);
 		pButtonBlocks->SetFrame(buttonFrame);
 		pButtonBlocks->SetPadding(buttonPadding);
-
+/*
 		for( int i = 0 ; i < 2 ; i++ )
 		{
 			for( int r = 0 ; r < 4 ; r++ )
@@ -267,9 +267,9 @@ namespace sdl_wglib
 			
 			pButtonBlocks->AddAlternative( WG_SCALE_BASE << (i+1), surfaces[i+1], buttonRects[0], buttonRects[1], buttonRects[2], buttonRects[3], buttonRects[3], 
 					buttonFrame, buttonPadding, WgCoord(), WgCoord() );
-			
+		
 		}
-
+*/
 
 
 

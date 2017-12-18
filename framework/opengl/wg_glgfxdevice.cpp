@@ -107,6 +107,8 @@ const char horrWaveFragmentShader[] =
 " cFrac -= dFrac;"
 " dFrac = 0.0;"
 
+
+
 " if(bFlipped != 0) "
 " { "
 "	float x = aFrac;"
@@ -120,6 +122,7 @@ const char horrWaveFragmentShader[] =
 "  bFrac *= frontColor.a;"
 "  cFrac *= bottomBorderColor.a;"
 "  dFrac *= backColor.a;"
+
 
 "  float totalAlpha = aFrac + bFrac + cFrac + dFrac;"
 "  aFrac /= totalAlpha; "
@@ -1471,14 +1474,17 @@ void WgGlGfxDevice::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int leng
 	}
 
 	top = begin.y + (top >> 8);
-	bottom = begin.y + ((bottom + 255) >> 8);
+	bottom = begin.y + ((bottom + 255) >> 8) + 1;			//TODO: We should not need +1 here, but we do... What is wrong here?
 
 
 	box.y = top > clip.y ? top : clip.y;
 	box.h = bottom < (clip.y + clip.h) ? bottom - box.y : clip.y + clip.h - box.y;
 
 	if (box.w <= 0 || box.h <= 0)
+	{
+		WgBase::MemStackRelease(traceBufferSize);
 		return;
+	}
 
 	// Render columns
 

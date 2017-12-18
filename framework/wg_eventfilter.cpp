@@ -824,7 +824,7 @@ bool WgEventFilter::_filterKeyEvents( const WgEvent::Event * pEvent, const WgEve
 {
 	if( pEvent->Type() == filter.EventType() && (!filter.Widget() || filter.Widget() == pEvent->Widget()) )
 	{
-		if( filter.m_data1 == 0 )
+		if( filter.m_data1 == WG_KEY_UNMAPPED )
 			return true;
 		else
 		{

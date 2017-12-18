@@ -41,7 +41,7 @@
 
 #include "testwidget.h"
 
-//#define USE_OPEN_GL
+#define USE_OPEN_GL
 
 
 WgSurfaceFactory *	g_pSurfaceFactory = nullptr;
@@ -136,7 +136,7 @@ int main ( int argc, char** argv )
 	// Setup gfxdevice and gui
 
 #ifdef USE_OPEN_GL
-	g_pGfxDevice = new WgGlGfxDevice( WgSize(640,480) );
+	g_pGfxDevice = new WgGlGfxDevice( WgSize(width,height) );
 	g_pSurfaceFactory = new WgGlSurfaceFactory();
 #else
 	SDL_Surface * pScreen = SDL_GetWindowSurface(pWin);
@@ -501,6 +501,9 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	WgSurface * pPlateImg = sdl_wglib::LoadSurface("../resources/grey_pressable_plate.bmp", *g_pSurfaceFactory);
 
+//	WgBlockSkinPtr pTagSkin = WgBlockSkin::Create();
+
+
 
 	// Bottom Flex
 
@@ -521,8 +524,31 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	WgFlexHook * pHook = pFlex->AddChild(pBackground);
 	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
 
-	// Flow Panel Test
 
+	// Esc callback test
+
+	{
+		auto p = new WgLineEditor();
+		p->SetSkin(WgColorSkin::Create(WgColor::aliceblue));
+
+		pEventHandler->AddCallback(WgEventFilter::KeyPress(p),
+			[](const WgEvent::Event * pEvent) {
+
+			const WgEvent::KeyPress * p = static_cast<const WgEvent::KeyPress*>(pEvent);
+			int keyCode = p->NativeKeyCode();
+		}
+
+
+			);
+
+		WgFlexHook * pHook = pFlex->AddChild(p, { 10,10,200,100 });
+
+
+
+	}
+
+	// Flow Panel Test
+/*
 	{
 		WgFlowPanel * pFlow = new WgFlowPanel();
 
@@ -553,7 +579,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pLE->SetSkin(WgColorSkin::Create(WgColor::yellow));
 		pFlow->AddChild(pLE);
 	}
-
+*/
 
 	// Volume meter direction test
 /*
@@ -646,7 +672,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	// Scroll chart widget
 
-/*
+
 	m_pScrollChart = new WgScrollChart();
 
 	WgBoxSkinPtr pChartSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
@@ -657,6 +683,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	m_pScrollChart->SetDynamicValueRange(false);
 
 	m_pScrollChart->SetSurfaceFactory(g_pSurfaceFactory);
+
+//	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 5.f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
 
 	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 5.f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
 	m_pScrollChart->Start(4000);
@@ -687,7 +715,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pValueScaleButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pValueScaleButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
 	{
-		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNowPoints();
 
 		WgChart * pChart = static_cast<WgChart*>(pWin);
 
@@ -696,7 +724,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 		m_pScrollChart->SetValueRange(first, last);
 	}, m_pScrollChart);
-*/
+
 /*
 	auto pZoomButton = (WgButton*)pDB->CloneWidget("button");
 	pZoomButton->SetText(" ");
@@ -727,13 +755,13 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pChart->SetFixedSampleRange(first, last);
 	}, pChart);
 */
-/*
+
 	auto pResizeButton = (WgButton*)pDB->CloneWidget("button");
 	pResizeButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pResizeButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
 	{
-		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
-		static_cast<WgFlexHook*>(pWin->Hook())->SetSize(WgSize(pWin->Size() + WgSize(drag.x, drag.y)) / 1);
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNowPoints();
+		static_cast<WgFlexHook*>(pWin->Hook())->SetPointSize(WgSize(pWin->PointSize() + WgSize(drag.x, drag.y)) / 1);
 	}, pWindow);
 
 	pButtonBar->AddChild(pFiller)->SetWeight(2);
@@ -747,10 +775,10 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pHook = pFlex->AddChild(pWindow, WgRect(0, 0, 500, 300));
 
-	pHook->SetScaleGeo(true);
+//	pHook->SetScaleGeo(true);
 
 //	pFlex->SetScale(WG_SCALE_BASE * 2);
-*/
+
 
 	// Chart widget
 /*

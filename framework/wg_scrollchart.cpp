@@ -459,7 +459,7 @@ int WgScrollChart::StartComplexWave(SamplePair startSample, float topLineThickne
 	w.startTimestamp = m_windowEnd;
 
 	w.id = m_waveIdCounter++;
-	w.type = WaveType::Simple;
+	w.type = WaveType::Complex;
 	w.startTopSample = startSample.top;
 	w.startBottomSample = startSample.bottom;
 	w.floorValue = startSample.bottom;
