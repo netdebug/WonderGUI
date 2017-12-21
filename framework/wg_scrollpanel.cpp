@@ -27,6 +27,9 @@
 #include <wg_event.h>
 #include <wg_eventhandler.h>
 
+#include <algorithm>
+
+
 
 static const char	c_widgetType[] = {"ScrollPanel"};
 static const char	c_hookType[] = {"ScrollHook"};
@@ -712,10 +715,71 @@ WgWidget * WgScrollPanel::FindWidget( const WgCoord& pos, WgSearchMode mode )
 
 WgSize WgScrollPanel::PreferredPixelSize() const
 {
+	WgSize sz;
+
+	if (m_elements[WINDOW].m_pWidget)
+		sz = m_elements[WINDOW]._paddedPreferredPixelSize();
+
+	if (m_elements[XDRAG].m_pWidget && !m_bAutoHideSliderX)
+	{
+		WgSize scrollbar = m_elements[XDRAG]._paddedPreferredPixelSize();
+		sz.h += scrollbar.h;
+		if (scrollbar.w > sz.w)
+			sz.w = scrollbar.w;
+	}
+
+	if (m_elements[YDRAG].m_pWidget && !m_bAutoHideSliderY)
+	{
+		WgSize scrollbar = m_elements[YDRAG]._paddedPreferredPixelSize();
+		sz.w += scrollbar.w;
+		if (scrollbar.h > sz.h)
+			sz.h = scrollbar.h;
+	}
+
+	return sz;
+}
+
+//____ MatchingPixelHeight() __________________________________________________
+
+int WgScrollPanel::MatchingPixelHeight(int pixelWidth) const
+{
+	int height = 0;
+
+	// If YDRAG needs to be present, we need to remove its width and consider its height.
+
+	if (m_elements[YDRAG].m_pWidget && !m_bAutoHideSliderY)
+	{
+		WgSize sz = m_elements[YDRAG]._paddedPreferredPixelSize();
+		height = sz.h;
+		pixelWidth -= sz.w;
+	}
+
+	int contentWidth = 0;
+	if (m_elements[WINDOW].m_pWidget)
+	{
+		height = std::max(m_elements[WINDOW]._paddedMatchingPixelHeight(pixelWidth), height);
+		contentWidth = m_elements[WINDOW]._paddedPreferredPixelSize().w;
+	}
+
+	// If XDRAG needs to be displayed at this width, we need to include its height.
+
+	if (m_elements[XDRAG].m_pWidget && (!m_bAutoHideSliderX || contentWidth > pixelWidth) )
+		height += m_elements[XDRAG]._paddedPreferredPixelSize().h;
+
+
+	return height;
+}
+
+//____ MatchingPixelWidth() ___________________________________________________
+
+int WgScrollPanel::MatchingPixelWidth(int pixelHeight) const
+{
 	//TODO: Implement!!!
 
-	return WgSize( 128,128 );
+	return PreferredPixelSize().w;
 }
+
+
 
 //____ SetBgColor() ____________________________________________________________
 

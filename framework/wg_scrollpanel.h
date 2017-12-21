@@ -230,8 +230,10 @@ public:
 
 	// Overloaded from Widget
 
-	WgSize				PreferredPixelSize() const;				// = preferred size of dragbars in the geometry, fixed value if dragbars are missing.
+	WgSize				PreferredPixelSize() const;
 
+	int					MatchingPixelHeight(int pixelWidth) const;
+	int					MatchingPixelWidth(int pixelHeight) const;
 
 
 /*
