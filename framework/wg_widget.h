@@ -80,6 +80,7 @@ friend class WgPanel;
 friend class WgPackPanel;
 friend class WgShaderCapsule;
 friend class WgMenuLayer;
+friend class WgFlowPanel;
 
 friend class WgTableRow;
 

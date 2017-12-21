@@ -436,7 +436,12 @@ void WgFlowPanel::_refreshChildGeo()
 			{
 				_requestRender(newGeo);
 				_requestRender(pH->m_geo);
+
+				int oldW = pH->m_geo.w;
+				int oldH = pH->m_geo.h;
 				pH->m_geo = newGeo;
+				if (newGeo.w != oldW || newGeo.h != oldH)
+					pH->m_pWidget->_onNewSize(newGeo.Size());
 			}
 
 		}

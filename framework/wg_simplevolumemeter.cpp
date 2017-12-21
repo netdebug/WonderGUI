@@ -459,8 +459,8 @@ void WgSimpleVolumeMeter::_updateIValues( WgSize sz )
 	m_iPeak[0] = m_fPeak[0] * length;
 	m_iPeak[1] = m_fPeak[1] * length;
 
-    m_iHold[0] = _calcIHold( m_fHold[0], { width, length } );
-	m_iHold[1] = _calcIHold( m_fHold[1], { width, length } );
+    m_iHold[0] = _calcIHold( m_fHold[0], sz );
+	m_iHold[1] = _calcIHold( m_fHold[1], sz );
 }
 
 //____ _onCloneContent() _________________________________________________________________ 

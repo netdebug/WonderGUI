@@ -686,7 +686,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 //	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 5.f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
 
-	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 5.f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
+	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 0.8f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
 	m_pScrollChart->Start(4000);
 
 	WgScrollChart::GridLine valueGrid[3]{ { 0.25f,1.f,WgColor::red,"0.25" },{ 0.5f,1.f,WgColor::red,"0.5" },{ -0.5f,1.f,WgColor::red,"-0.5" } };
