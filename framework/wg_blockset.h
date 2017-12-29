@@ -39,6 +39,10 @@
 #	include <wg_chain.h>
 #endif
 
+#ifndef WG_SURFACE_DOT_H
+#	include <wg_surface.h>
+#endif
+
 class WgColor;
 class WgRect;
 class WgBlock;
@@ -95,7 +99,8 @@ public:
 	inline int					Width() const { return m_rect.w; }
 	inline int					Height() const { return m_rect.h; }
 	inline WgSize				Size() const { return WgSize(m_rect.w, m_rect.h); }
-	inline int 					Scale() const { return m_scale; }
+	inline int 					OutputScale() const { return m_scale; }
+	inline int 					SurfaceScale() const { return m_pSurf->ScaleFactor(); }
 
 	inline int					MinWidth() const { return m_canvasFrame.Width(); }
 	inline int					MinHeight() const { return m_canvasFrame.Height(); }

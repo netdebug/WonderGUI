@@ -91,8 +91,8 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
 	const WgBorders& canvasFrame = block.CanvasFrame();
 	const WgBorders& sourceFrame = block.SourceFrame();
 
-	int outputScale = block.Scale();
-	int surfaceScale = block.Surface()->ScaleFactor();
+	int outputScale = block.OutputScale();
+	int surfaceScale = block.SurfaceScale();
 
 	WgSize dimensions = block.Size();	
 

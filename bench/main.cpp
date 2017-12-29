@@ -642,7 +642,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	// Text InputFocus test
-/*
+
 
 	WgBlockSkinPtr pSkin = WgBlockSkin::CreateStatic(pPlateImg, { 0,0,10,10 }, 3);
 	pSkin->SetStateBlock(WG_STATE_FOCUSED, { 10,0 });
@@ -652,27 +652,47 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	WgTextDisplay * pDisplay1 = new WgTextDisplay();
-	pDisplay1->SetText("DISPLAY 1");
+	pDisplay1->SetText("DISPLAY 1 WITH A LONG LINE THAT NEEDS TO AUTOWRAP SOONER OR LATER");
 	pDisplay1->SetEditMode(WG_TEXT_EDITABLE);
 	pDisplay1->SetSkin(pSkin);
 
-	pFlex->AddChild(pDisplay1, WgRect(0, 0, 200, 50));
+	WgTextprop selectionProp;
+	selectionProp.SetBgColor(WgColor::red);
+
+
+
+	pDisplay1->SetSelectionProperties(selectionProp.Register());
+
+	pFlex->AddChild(pDisplay1, WgRect(0, 0, 200, 100));
 
 
 	WgScrollPanel * pScroll = new WgScrollPanel();
-	pFlex->AddChild(pScroll, WgRect(0, 50, 200, 50));
+	pScroll->SetContentSizePolicy(WG_BOUND, WG_DEFAULT);
+	pFlex->AddChild(pScroll, WgRect(0, 110, 200, 100));
 
 	WgTextDisplay * pDisplay2 = new WgTextDisplay();
-	pDisplay2->SetText("DISPLAY 2");
+	pDisplay2->SetText("DISPLAY WITH MANY LINES\n");
+
+	for (int i = 0; i < 20; i++)
+	{
+		pDisplay2->AddText("Line X\nAnother Line\n");
+	}
+
 	pDisplay2->SetEditMode(WG_TEXT_EDITABLE);
 	pDisplay2->SetSkin(pSkin);
-	pScroll->SetContent(pDisplay2);
-*/
+	pDisplay2->SetSelectionProperties(selectionProp.Register());
 
+	pScroll->SetContent(pDisplay2);
+
+	WgVSlider * pSlider = (WgVSlider*) pDB->CloneWidget("vslider");
+	pScroll->SetVSlider(pSlider);
+
+
+	pFlex->SetScale(WG_SCALE_BASE * 2);
 
 	// Scroll chart widget
 
-
+/*
 	m_pScrollChart = new WgScrollChart();
 
 	WgBoxSkinPtr pChartSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
@@ -724,7 +744,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 		m_pScrollChart->SetValueRange(first, last);
 	}, m_pScrollChart);
-
+*/
 /*
 	auto pZoomButton = (WgButton*)pDB->CloneWidget("button");
 	pZoomButton->SetText(" ");
@@ -755,7 +775,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pChart->SetFixedSampleRange(first, last);
 	}, pChart);
 */
-
+/*
 	auto pResizeButton = (WgButton*)pDB->CloneWidget("button");
 	pResizeButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pResizeButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
@@ -778,7 +798,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 //	pHook->SetScaleGeo(true);
 
 //	pFlex->SetScale(WG_SCALE_BASE * 2);
-
+*/
 
 	// Chart widget
 /*

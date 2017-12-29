@@ -367,6 +367,7 @@ void WgWidgetSlider::_onDisable( void )
 void WgWidgetSlider::_setScale( int scale )
 {
 	WgWidget::_setScale(scale);
+	_headerFooterChanged();
 	_updateMinSize();
 }
 
@@ -465,10 +466,10 @@ void WgWidgetSlider::_updateMinSize()
 
 void WgWidgetSlider::_renderButton( WgGfxDevice * pDevice, const WgRect& _clip, WgRect& _dest, const WgBlock& _block )
 {
-		if( m_bHorizontal )
-			_dest.w = _block.Width();
-		else
-			_dest.h = _block.Height();
+	if (m_bHorizontal)
+		_dest.w = _block.Width() *m_scale / _block.SurfaceScale();
+	else
+		_dest.h = _block.Height() *m_scale / _block.SurfaceScale();
 
 		pDevice->ClipBlitBlock( _clip, _block, _dest );
 
@@ -486,9 +487,8 @@ void WgWidgetSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 
 	// Render header buttons
 
-	if( m_pBtnBwdGfx && (m_btnLayout & HEADER_BWD) )
-		_renderButton( pDevice, _clip, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_HEADER_BWD],m_scale) );
-
+	if (m_pBtnBwdGfx && (m_btnLayout & HEADER_BWD))
+		_renderButton(pDevice, _clip, dest, m_pBtnBwdGfx->GetBlock(m_mode[C_HEADER_BWD], m_scale));
 	if( m_pBtnFwdGfx && (m_btnLayout & HEADER_FWD) )
 		_renderButton( pDevice, _clip, dest, m_pBtnFwdGfx->GetBlock(m_mode[C_HEADER_FWD],m_scale) );
 
@@ -673,10 +673,14 @@ void WgWidgetSlider::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * p
 			if( static_cast<const WgEvent::MouseButtonEvent*>(pEvent)->Button() != 1 )
 				return;
 
-			// Just put them all to NORMAL and request render.
-			// Release is followed by over before render anyway so right one will be highlighted.
-
 			_unmarkReqRender();
+			Component c = _findMarkedComponent(pos);
+			if (c != C_NONE)
+			{
+				m_mode[c] = WG_MODE_MARKED;
+				if (c == C_BAR)
+					m_mode[C_BG] = WG_MODE_MARKED;			// Always also mark bg if bar is marked.
+			}
 			break;
 		}
 
@@ -701,7 +705,9 @@ void WgWidgetSlider::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * p
 
 			Component c = _findMarkedComponent(pos);
 
-			if( c != C_NONE && m_mode[c] == WG_MODE_NORMAL )
+			if( c == C_NONE )
+				_unmarkReqRender();
+			else if( m_mode[c] == WG_MODE_NORMAL || (c == C_BG && m_mode[C_BAR] == WG_MODE_MARKED) )
 			{
 				_unmarkReqRender();
 				m_mode[c] = WG_MODE_MARKED;
