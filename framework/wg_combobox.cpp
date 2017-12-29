@@ -1089,7 +1089,7 @@ bool WgCombobox::_onAlphaTest( const WgCoord& ofs )
 
 void WgCombobox::_onGotInputFocus()
 {
-	m_bFocused = true;
+	WgWidget::_onGotInputFocus();
 
 	if( _isEditable() )
 	{
@@ -1107,7 +1107,7 @@ void WgCombobox::_onGotInputFocus()
 
 void WgCombobox::_onLostInputFocus()
 {
-	m_bFocused = false;
+	WgWidget::_onLostInputFocus();
 
 	if( _isEditable() )
 	{

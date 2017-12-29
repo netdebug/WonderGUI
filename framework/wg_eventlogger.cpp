@@ -206,6 +206,12 @@ void WgEventLogger::OnEvent( const WgEvent::Event * _pEvent )
 			id = "PointerChange";
 			sprintf( params, " style=%s", _formatPointerStyle( (const WgEvent::PointerChange*)_pEvent).c_str() );
 			break;
+		case WG_EVENT_FOCUS_GAINED:
+			id = "FocusGained";
+			break;
+		case WG_EVENT_FOCUS_LOST:
+			id = "FocusLost";
+			break;
 		case WG_EVENT_MOUSE_ENTER:
 			id = "MouseEnter";
 			break;

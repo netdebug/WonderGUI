@@ -579,7 +579,7 @@ void WgLineEditor::_onDisable()
 
 void WgLineEditor::_onGotInputFocus()
 {
-	m_bFocused = true;
+	WgWidget::_onGotInputFocus();
 
 	if( _isEditable() )
 	{
@@ -594,7 +594,7 @@ void WgLineEditor::_onGotInputFocus()
 
 void WgLineEditor::_onLostInputFocus()
 {
-	m_bFocused = false;
+	WgWidget::_onLostInputFocus();
 
 	if( _isSelectable() )
 	{

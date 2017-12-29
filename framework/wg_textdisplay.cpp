@@ -409,7 +409,8 @@ void WgTextDisplay::_onNewSize( const WgSize& size )
 
 void WgTextDisplay::_onGotInputFocus()
 {
-	m_bFocused = true;
+	WgWidget::_onGotInputFocus();
+
 	if( IsEditable() ) // render with cursor on
 	{
 		_startReceiveTicks();
@@ -423,7 +424,8 @@ void WgTextDisplay::_onGotInputFocus()
 
 void WgTextDisplay::_onLostInputFocus()
 {
-	m_bFocused = false;
+	WgWidget::_onLostInputFocus();
+
 	m_bResetCursorOnFocus = false;
 	if( IsEditable() )
 	{

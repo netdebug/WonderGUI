@@ -489,6 +489,7 @@ bool WgScrollPanel::SetContent( WgWidget * pContent )
 
 	_updateElementGeo( PixelSize() );
 	_requestRender( m_elements[WINDOW].m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
+	_requestResize();
 	return true;
 
 }
@@ -718,11 +719,11 @@ WgSize WgScrollPanel::PreferredPixelSize() const
 	WgSize sz;
 
 	if (m_elements[WINDOW].m_pWidget)
-		sz = m_elements[WINDOW]._paddedPreferredPixelSize();
+		sz = m_elements[WINDOW]._paddedPreferredPixelSize(m_scale);
 
 	if (m_elements[XDRAG].m_pWidget && !m_bAutoHideSliderX)
 	{
-		WgSize scrollbar = m_elements[XDRAG]._paddedPreferredPixelSize();
+		WgSize scrollbar = m_elements[XDRAG]._paddedPreferredPixelSize(m_scale);
 		sz.h += scrollbar.h;
 		if (scrollbar.w > sz.w)
 			sz.w = scrollbar.w;
@@ -730,7 +731,7 @@ WgSize WgScrollPanel::PreferredPixelSize() const
 
 	if (m_elements[YDRAG].m_pWidget && !m_bAutoHideSliderY)
 	{
-		WgSize scrollbar = m_elements[YDRAG]._paddedPreferredPixelSize();
+		WgSize scrollbar = m_elements[YDRAG]._paddedPreferredPixelSize(m_scale);
 		sz.w += scrollbar.w;
 		if (scrollbar.h > sz.h)
 			sz.h = scrollbar.h;
@@ -749,7 +750,7 @@ int WgScrollPanel::MatchingPixelHeight(int pixelWidth) const
 
 	if (m_elements[YDRAG].m_pWidget && !m_bAutoHideSliderY)
 	{
-		WgSize sz = m_elements[YDRAG]._paddedPreferredPixelSize();
+		WgSize sz = m_elements[YDRAG]._paddedPreferredPixelSize(m_scale);
 		height = sz.h;
 		pixelWidth -= sz.w;
 	}
@@ -757,14 +758,14 @@ int WgScrollPanel::MatchingPixelHeight(int pixelWidth) const
 	int contentWidth = 0;
 	if (m_elements[WINDOW].m_pWidget)
 	{
-		height = std::max(m_elements[WINDOW]._paddedMatchingPixelHeight(pixelWidth), height);
-		contentWidth = m_elements[WINDOW]._paddedPreferredPixelSize().w;
+		height = std::max(m_elements[WINDOW]._paddedMatchingPixelHeight(pixelWidth,m_scale), height);
+		contentWidth = m_elements[WINDOW]._paddedPreferredPixelSize(m_scale).w;
 	}
 
 	// If XDRAG needs to be displayed at this width, we need to include its height.
 
 	if (m_elements[XDRAG].m_pWidget && (!m_bAutoHideSliderX || contentWidth > pixelWidth) )
-		height += m_elements[XDRAG]._paddedPreferredPixelSize().h;
+		height += m_elements[XDRAG]._paddedPreferredPixelSize(m_scale).h;
 
 
 	return height;
@@ -840,28 +841,28 @@ WgSize WgScrollPanel::_calcContentSize( WgSize mySize )
 
 	//
 
-	WgSize contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy );
+	WgSize contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy, m_scale );
 
 	if( contentSize.h > mySize.h && m_bAutoHideSliderY && m_elements[YDRAG].Widget() )
 	{
 		mySize.w -= m_elements[YDRAG].Widget()->PreferredPixelSize().w;
-		contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy );
+		contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy, m_scale );
 
 		if( contentSize.w > mySize.w && m_bAutoHideSliderX && m_elements[XDRAG].Widget() )
 		{
 			mySize.h -= m_elements[XDRAG].Widget()->PreferredPixelSize().h;
-			contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy );
+			contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy, m_scale );
 		}
 	}
 	else if( contentSize.w > mySize.w && m_bAutoHideSliderX && m_elements[XDRAG].Widget() )
 	{
 		mySize.h -= m_elements[XDRAG].Widget()->PreferredPixelSize().h;
-		contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy );
+		contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy, m_scale );
 
 		if( contentSize.h > mySize.h && m_bAutoHideSliderY && m_elements[YDRAG].Widget() )
 		{
 			mySize.w -= m_elements[YDRAG].Widget()->PreferredPixelSize().w;
-			contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy );
+			contentSize = m_elements[WINDOW]._sizeFromPolicy( mySize, m_widthPolicy, m_heightPolicy, m_scale );
 		}
 	}
 
@@ -1556,6 +1557,7 @@ void WgScrollHook::_requestResize()
 {
 	m_pView->_updateElementGeo( m_pView->PixelSize() );
 	m_pView->_requestRender( m_windowGeo );		// If geometry is same as the old one, we need to request render ourselves.
+	m_pView->_requestResize();
 }
 
 //____ WgScrollHook::_prevHook() ___________________________________________________

@@ -66,7 +66,9 @@ public:
 	static WgEventFilter	PointerChange();
 
 	static WgEventFilter	FocusGained();
+	static WgEventFilter	FocusGained( WgWidget * pWidget );
 	static WgEventFilter	FocusLost();
+	static WgEventFilter	FocusLost(WgWidget * pWidget);
 
 	static WgEventFilter	MouseEnter();
 	static WgEventFilter	MouseEnter( WgWidget * pWidget );

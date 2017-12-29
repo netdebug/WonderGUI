@@ -832,8 +832,9 @@ void WgValueEditor::_onDisable( void )
 
 void WgValueEditor::_onGotInputFocus()
 {
+	WgWidget::_onGotInputFocus();
+
 	_startReceiveTicks();
-	m_bFocused = true;
 	m_text.showCursor();
 	m_text.goEOL();
 	m_useFormat = m_format;
@@ -853,10 +854,11 @@ void WgValueEditor::_onGotInputFocus()
 
 void WgValueEditor::_onLostInputFocus()
 {
+	WgWidget::_onLostInputFocus();
+
 	_stopReceiveTicks();
 	_queueEvent( new WgEvent::EditvalueSet(this,m_value,FractionalValue()) );
 
-	m_bFocused = false;
 	m_text.hideCursor();
 	m_useFormat = m_format;
 	_regenText();

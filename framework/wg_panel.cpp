@@ -162,12 +162,11 @@ bool WgPanelHook::SetVisible( bool bVisible )
 
 //____ WgPanelHook::SetPadding() ______________________________________________
 
-bool WgPanelHook::SetPadding( WgBorders padding, WgUnit unit )
+bool WgPanelHook::SetPadding( WgBorders padding )
 {
-	if( padding != m_padding || unit != m_paddingUnit )
+	if( padding != m_padding )
 	{
 		m_padding = padding;
-        m_paddingUnit = unit;
 		_requestResize();
 	}
 	return true;
@@ -175,9 +174,9 @@ bool WgPanelHook::SetPadding( WgBorders padding, WgUnit unit )
 
 //____ WgPanelHook::_sizeFromPolicy() ________________________________________________________
 
-WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPolicy, WgSizePolicy heightPolicy ) const
+WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPolicy, WgSizePolicy heightPolicy, int scale ) const
 {
-	WgSize	defaultSize = _paddedPreferredPixelSize();
+	WgSize	defaultSize = _paddedPreferredPixelSize(scale);
 
 	WgSize	sz;
 
@@ -186,22 +185,22 @@ WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPol
 		case WG_DEFAULT:
 		{
 			sz.h = WgUtil::SizeFromPolicy( defaultSize.h, specifiedSize.h, heightPolicy );
-			sz.w = _paddedMatchingPixelWidth(sz.h);
+			sz.w = _paddedMatchingPixelWidth(sz.h, scale);
 			break;
 		case WG_BOUND:
 			sz.w = specifiedSize.w;
-			sz.h = WgUtil::SizeFromPolicy( _paddedMatchingPixelHeight(sz.w), specifiedSize.h, heightPolicy );
+			sz.h = WgUtil::SizeFromPolicy( _paddedMatchingPixelHeight(sz.w, scale), specifiedSize.h, heightPolicy );
 			break;
 		case WG_CONFINED:
 			if( defaultSize.w > specifiedSize.w )
 			{
 				sz.w = specifiedSize.w;
-				sz.h = WgUtil::SizeFromPolicy( _paddedMatchingPixelHeight(sz.w), specifiedSize.h, heightPolicy );
+				sz.h = WgUtil::SizeFromPolicy( _paddedMatchingPixelHeight(sz.w, scale), specifiedSize.h, heightPolicy );
 			}
 			else
 			{
 				sz.h = WgUtil::SizeFromPolicy( defaultSize.h, specifiedSize.h, heightPolicy );
-				sz.w = _paddedMatchingPixelWidth(sz.h);
+				sz.w = _paddedMatchingPixelWidth(sz.h, scale);
 				if( sz.w > specifiedSize.w )
 					sz.w = specifiedSize.w;
 			}
@@ -210,12 +209,12 @@ WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPol
 			if( defaultSize.w < specifiedSize.w )
 			{
 				sz.w = specifiedSize.w;
-				sz.h = WgUtil::SizeFromPolicy( _paddedMatchingPixelHeight(sz.w), specifiedSize.h, heightPolicy );
+				sz.h = WgUtil::SizeFromPolicy( _paddedMatchingPixelHeight(sz.w, scale), specifiedSize.h, heightPolicy );
 			}
 			else
 			{
 				sz.h = WgUtil::SizeFromPolicy( defaultSize.h, specifiedSize.h, heightPolicy );
-				sz.w = _paddedMatchingPixelWidth(sz.h);
+				sz.w = _paddedMatchingPixelWidth(sz.h, scale);
 				if( sz.w < specifiedSize.w )
 					sz.w = specifiedSize.w;
 			}
@@ -226,96 +225,31 @@ WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPol
 	return sz;
 }
 
-WgSize WgPanelHook::_paddedPreferredPixelSize() const
+WgSize WgPanelHook::_paddedPreferredPixelSize(int scale) const
 {
-    switch( m_paddingUnit )
-    {
-        case WG_PIXELS:
-            return m_pWidget->PreferredPixelSize() + m_padding;
-        case WG_FRACTION:
-        {
-            WgSize sz = m_pWidget->PreferredPixelSize();
-            sz.w += ((sz.w * m_padding.left) >> 8) + ((sz.w * m_padding.right) >> 8);
-            sz.h += ((sz.h * m_padding.top) >> 8) + ((sz.h * m_padding.bottom) >> 8);
-            return sz;
-        }
-            
-    }
-
-    return WgSize();
+    return m_pWidget->PreferredPixelSize() + m_padding.Scale(scale);
 }
 
-WgSize WgPanelHook::_paddedMinSize() const
+WgSize WgPanelHook::_paddedMinPixelSize(int scale) const
 {
-    switch( m_paddingUnit )
-    {
-        case WG_PIXELS:
-            return m_pWidget->MinPixelSize() + m_padding;
-        case WG_FRACTION:
-        {
-            WgSize sz = m_pWidget->MinPixelSize();
-            sz.w += ((sz.w * m_padding.left) >> 8) + ((sz.w * m_padding.right) >> 8);
-            sz.h += ((sz.h * m_padding.top) >> 8) + ((sz.h * m_padding.bottom) >> 8);
-            return sz;
-        }
-            
-    }
-
-    return WgSize();
+    return m_pWidget->MinPixelSize() + m_padding.Scale(scale);
 }
 
-WgSize WgPanelHook::_paddedMaxSize() const
+WgSize WgPanelHook::_paddedMaxPixelSize(int scale) const
 {
-    switch( m_paddingUnit )
-    {
-        case WG_PIXELS:
-            return m_pWidget->MaxPixelSize() + m_padding;
-        case WG_FRACTION:
-        {
-            WgSize sz = m_pWidget->MaxPixelSize();
-            sz.w += ((sz.w * m_padding.left) >> 8) + ((sz.w * m_padding.right) >> 8);
-            sz.h += ((sz.h * m_padding.top) >> 8) + ((sz.h * m_padding.bottom) >> 8);
-            return sz;
-        }
-            
-    }
-
-    return WgSize();
+        return m_pWidget->MaxPixelSize() + m_padding.Scale(scale);
 }
 
-int WgPanelHook::_paddedMatchingPixelWidth( int paddedHeight ) const
+int WgPanelHook::_paddedMatchingPixelWidth( int paddedHeight, int scale ) const
 {
-    switch( m_paddingUnit )
-    {
-        case WG_PIXELS:
-            return m_pWidget->MatchingPixelWidth( paddedHeight - m_padding.Height() ) + m_padding.Width();
-        case WG_FRACTION:
-        {
-        }
-            
-    }
+    WgBorders padding = m_padding.Scale(scale);
 
-    return 0;
+    return m_pWidget->MatchingPixelWidth( paddedHeight - padding.Height() ) + padding.Width();
 }
 
-int WgPanelHook::_paddedMatchingPixelHeight( int paddedWidth ) const
+int WgPanelHook::_paddedMatchingPixelHeight( int paddedWidth, int scale ) const
 {
-    switch( m_paddingUnit )
-    {
-        case WG_PIXELS:
-            return m_pWidget->MatchingPixelHeight( paddedWidth - m_padding.Width() ) + m_padding.Height();
-        case WG_FRACTION:
-        {
-            float fOrgWidth = paddedWidth / 1.f + (m_padding.left + m_padding.right)/256.f;
-            
-            float leftPadding = fOrgWidth * m_padding.left/256.f;
-            float rightPadding = fOrgWidth * m_padding.right/256.f;
-            
-            int orgWidth = paddedWidth - ((int)leftPadding) - ((int)rightPadding);
-            
-        }
-            
-    }
+    WgBorders padding = m_padding.Scale(scale);
 
-    return 0;
+    return m_pWidget->MatchingPixelHeight( paddedWidth - padding.Width() ) + padding.Height();
 }

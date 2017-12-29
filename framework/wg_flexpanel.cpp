@@ -547,7 +547,7 @@ void WgFlexHook::_refreshRealGeo()
 		
 		// Calculate size
 
-		WgSize sz = _sizeFromPolicy( scaledGeo.Size() + scaledPadding, m_widthPolicy, m_heightPolicy );
+		WgSize sz = _sizeFromPolicy( scaledGeo.Size() + scaledPadding, m_widthPolicy, m_heightPolicy, scale );
 
 		// Calculate position
 

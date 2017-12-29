@@ -167,7 +167,7 @@ int WgPackPanel::MatchingPixelHeight( int width ) const
 			{
 				if( pH->IsVisible() )
 				{
-					int itemHeight = pH->_paddedMatchingPixelHeight( pI->output );
+					int itemHeight = pH->_paddedMatchingPixelHeight( pI->output, m_scale );
 					if( itemHeight > height )
 						height = itemHeight;
 					pI++;
@@ -219,7 +219,7 @@ int WgPackPanel::MatchingPixelHeight( int width ) const
 			while( p )
 			{
 				if( p->IsVisible() )
-					height += p->_paddedMatchingPixelHeight( width );
+					height += p->_paddedMatchingPixelHeight( width, m_scale );
 
 				p = p->Next();
 			}
@@ -256,7 +256,7 @@ int WgPackPanel::MatchingPixelWidth( int height ) const
 			{
 				if( pH->IsVisible() )
 				{
-					int itemWidth = pH->_paddedMatchingPixelWidth( pI->output );
+					int itemWidth = pH->_paddedMatchingPixelWidth( pI->output, m_scale );
 					if( itemWidth > width )
 						width = itemWidth;
 					pI++;
@@ -308,7 +308,7 @@ int WgPackPanel::MatchingPixelWidth( int height ) const
 			while( p )
 			{
 				if( p->IsVisible() )
-					width += p->_paddedMatchingPixelWidth( height );
+					width += p->_paddedMatchingPixelWidth( height, m_scale );
 
 				p = p->Next();
 			}
@@ -387,7 +387,7 @@ void WgPackPanel::_onResizeRequested( WgVectorHook * pHook )
 	// Update cached preferred size of child
 	
 	WgPackHook * p = static_cast<WgPackHook*>(pHook);
-	p->m_preferredSize = p->_paddedPreferredPixelSize();
+	p->m_preferredSize = p->_paddedPreferredPixelSize(m_scale);
 
 	//
 	
@@ -401,7 +401,7 @@ void WgPackPanel::_onWidgetAppeared( WgVectorHook * pInserted )
 	// Update cached preferred size of child
 	
 	WgPackHook * p = static_cast<WgPackHook*>(pInserted);
-	p->m_preferredSize = p->_paddedPreferredPixelSize();
+	p->m_preferredSize = p->_paddedPreferredPixelSize(m_scale);
 	
 	//
 	
@@ -472,7 +472,7 @@ void WgPackPanel::_updatePreferredPixelSize()
 		{
 			if( pH->IsVisible() )
 			{
-				int b = m_bHorizontal?pH->_paddedMatchingPixelHeight(pI->output):pH->_paddedMatchingPixelWidth(pI->output);
+				int b = m_bHorizontal?pH->_paddedMatchingPixelHeight(pI->output, m_scale):pH->_paddedMatchingPixelWidth(pI->output, m_scale);
 				if( b > breadth )
 					breadth = b;			
 				pI++;
@@ -566,7 +566,7 @@ void WgPackPanel::_refreshChildGeo()
 					geo.h = p->m_preferredSize.h;
 					pos.y += p->m_preferredSize.h;
 				}
-				geo -= p->m_padding;
+				geo -= p->m_padding.Scale(m_scale);
             
 				if( geo != p->m_geo )
 				{
@@ -638,7 +638,7 @@ void WgPackPanel::_refreshChildGeo()
 					geo.h = pI->output;
 					pos.y += pI->output;
 				}
-				geo -= pH->m_padding;
+				geo -= pH->m_padding.Scale(m_scale);
 			
 				if( geo != pH->m_geo )
 				{					
@@ -694,8 +694,8 @@ int WgPackPanel::_populateSizeBrokerArray( WgSizeBrokerItem * pArray ) const
 			if( pH->IsVisible() )
 			{
 				pI->preferred = pH->m_preferredSize.w;
-				pI->min = pH->_paddedMinSize().w;
-				pI->max = pH->_paddedMaxSize().w;
+				pI->min = pH->_paddedMinPixelSize(m_scale).w;
+				pI->max = pH->_paddedMaxPixelSize(m_scale).w;
 				pI->weight = pH->m_weight;			
 				pI++;
 			}
@@ -709,8 +709,8 @@ int WgPackPanel::_populateSizeBrokerArray( WgSizeBrokerItem * pArray ) const
 			if( pH->IsVisible() )
 			{
 				pI->preferred = pH->m_preferredSize.h;
-				pI->min = pH->_paddedMinSize().h;
-				pI->max = pH->_paddedMaxSize().h;
+				pI->min = pH->_paddedMinPixelSize(m_scale).h;
+				pI->max = pH->_paddedMaxPixelSize(m_scale).h;
 				pI->weight = pH->m_weight;			
 				pI++;
 			}
@@ -732,9 +732,9 @@ int WgPackPanel::_populateSizeBrokerArray( WgSizeBrokerItem * pArray, int forced
 		{
 			if( pH->IsVisible() )
 			{
-				pI->preferred = pH->_paddedMatchingPixelWidth(forcedBreadth);
-				pI->min = pH->_paddedMinSize().w;
-				pI->max = pH->_paddedMaxSize().w;
+				pI->preferred = pH->_paddedMatchingPixelWidth(forcedBreadth,m_scale);
+				pI->min = pH->_paddedMinPixelSize(m_scale).w;
+				pI->max = pH->_paddedMaxPixelSize(m_scale).w;
 				pI->weight = pH->m_weight;			
 				pI++;
 			}
@@ -747,9 +747,9 @@ int WgPackPanel::_populateSizeBrokerArray( WgSizeBrokerItem * pArray, int forced
 		{
 			if( pH->IsVisible() )
 			{
-				pI->preferred = pH->_paddedMatchingPixelHeight(forcedBreadth);
-				pI->min = pH->_paddedMinSize().h;
-				pI->max = pH->_paddedMaxSize().h;
+				pI->preferred = pH->_paddedMatchingPixelHeight(forcedBreadth, m_scale);
+				pI->min = pH->_paddedMinPixelSize(m_scale).h;
+				pI->max = pH->_paddedMaxPixelSize(m_scale).h;
 				pI->weight = pH->m_weight;			
 				pI++;
 			}

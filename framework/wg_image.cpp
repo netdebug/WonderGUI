@@ -81,7 +81,8 @@ void WgImage::SetSource( const WgBlocksetPtr& pBlockset )
 		else
 			m_bOpaque = false;
 
-		_requestRender();
+        _requestResize();
+        _requestRender();
 	}
 }
 
@@ -169,7 +170,7 @@ void WgImage::_onDisable()
 void WgImage::_setScale( int scale )
 {
     WgWidget::_setScale(scale);
-    
+
     if( m_pGfx )
         _requestResize();
 }

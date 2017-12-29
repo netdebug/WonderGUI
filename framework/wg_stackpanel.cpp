@@ -379,7 +379,7 @@ void WgStackPanel::_refreshPreferredPixelSize()
 	WgStackHook * pHook = FirstHook();
 	while( pHook )
 	{
-		WgSize sz = pHook->_paddedPreferredPixelSize();
+		WgSize sz = pHook->_paddedPreferredPixelSize(m_scale);
 		if( sz.w > preferredSize.w )
 			preferredSize.w = sz.w;
 		if( sz.h > preferredSize.h )

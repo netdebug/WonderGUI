@@ -116,8 +116,8 @@ private:
 	static const int ALL_SECTIONS = 0x1FF;
 	
 	WgSurface *		m_pSurface;
-	WgSize			m_dimensions;
-	WgBorders		m_frame;
+	WgSize			m_dimensions;                   // Stored in pixels
+	WgBorders		m_frame;                        // Stored in points
 	int				m_tiledSections;
 	bool			m_bIsOpaque;
 	int 			m_scale = WG_SCALE_BASE;

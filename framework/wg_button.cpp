@@ -237,6 +237,8 @@ void WgButton::_setScale( int scale )
 	WgWidget::_setScale(scale);
 
 	m_text.SetScale(scale);
+    
+    _requestResize();
 }
 
 
@@ -476,7 +478,7 @@ bool WgButton::_onAlphaTest( const WgCoord& ofs )
 
 void WgButton::_onGotInputFocus()
 {
-	m_bFocused = true;
+	WgWidget::_onGotInputFocus();
 	_requestRender();
 }
 
@@ -484,7 +486,7 @@ void WgButton::_onGotInputFocus()
 
 void WgButton::_onLostInputFocus()
 {
-	m_bFocused = false;
+	WgWidget::_onLostInputFocus();
 	m_bReturnPressed = false;
 	_requestRender();
 }

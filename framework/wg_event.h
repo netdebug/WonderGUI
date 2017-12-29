@@ -135,15 +135,21 @@ namespace WgEvent
 	class FocusGained : public Event
 	{
 		friend class ::WgEventHandler;
+		friend class ::WgWidget;
 	public:
 		FocusGained();
+	protected:
+		FocusGained(WgWidget * pWidget);
 	};
 
 	class FocusLost : public Event
 	{
 		friend class ::WgEventHandler;
+		friend class ::WgWidget;
 	public:
 		FocusLost();
+	protected:
+		FocusLost(WgWidget * pWidget);
 	};
 
 	class MouseEnter : public Event

@@ -91,11 +91,22 @@ WgEventFilter	WgEventFilter::FocusGained()
 	return WgEventFilter( WG_EVENT_FOCUS_GAINED, 0, _filterType );
 }
 
+WgEventFilter	WgEventFilter::FocusGained( WgWidget * pWidget )
+{
+	return WgEventFilter(WG_EVENT_FOCUS_GAINED, pWidget, _filterTypeWidget);
+}
+
+
 //____ FocusGained() __________________________________________________________
 
 WgEventFilter	WgEventFilter::FocusLost()
 {
 	return WgEventFilter( WG_EVENT_FOCUS_LOST, 0, _filterType );
+}
+
+WgEventFilter	WgEventFilter::FocusLost( WgWidget * pWidget )
+{
+	return WgEventFilter(WG_EVENT_FOCUS_LOST, pWidget, _filterType);
 }
 
 //____ MouseEnter() _________________________________________________________

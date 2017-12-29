@@ -48,27 +48,25 @@ public:
 	virtual bool	SetVisible( bool bVisible );
 	bool			IsVisible() { return m_bVisible; }
 
-	virtual bool	SetPadding( WgBorders padding, WgUnit mode = WG_PIXELS );
+	virtual bool	SetPadding( WgBorders padding );
 	WgBorders		Padding() const { return m_padding; }
-    WgUnit          PaddingUnit() const { return m_paddingUnit; }
-
+ 
 protected:
-	WgPanelHook() : m_bVisible(true), m_paddingUnit(WG_PIXELS) {}
+	WgPanelHook() : m_bVisible(true) {}
 	 virtual ~WgPanelHook() {};
 
 	 WgWidgetHolder* _holder() const { return _parent(); }
 
-	WgSize		_paddedPreferredPixelSize() const;
-	WgSize		_paddedMinSize() const;
-	WgSize		_paddedMaxSize() const;
-	int			_paddedMatchingPixelWidth( int paddedHeight ) const;
-	int			_paddedMatchingPixelHeight( int paddedWidth ) const;
+	WgSize		_paddedPreferredPixelSize( int scale ) const;
+	WgSize		_paddedMinPixelSize( int scale ) const;
+	WgSize		_paddedMaxPixelSize( int scale ) const;
+	int			_paddedMatchingPixelWidth( int paddedHeight, int scale ) const;
+	int			_paddedMatchingPixelHeight( int paddedWidth, int scale ) const;
 
-	WgSize		_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPolicy, WgSizePolicy heightPolicy ) const;
+	WgSize		_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPolicy, WgSizePolicy heightPolicy, int scale ) const;
 
 	bool			m_bVisible;
 	WgBorders		m_padding;
-    WgUnit          m_paddingUnit;
 };
 
 

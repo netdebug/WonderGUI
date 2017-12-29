@@ -1480,11 +1480,11 @@ void WgGlGfxDevice::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int leng
 	box.y = top > clip.y ? top : clip.y;
 	box.h = bottom < (clip.y + clip.h) ? bottom - box.y : clip.y + clip.h - box.y;
 
-	if (box.w <= 0 || box.h <= 0)
-	{
-		WgBase::MemStackRelease(traceBufferSize);
-		return;
-	}
+        if (box.w <= 0 || box.h <= 0)
+          {
+            WgBase::MemStackRelease(traceBufferSize);
+            return;
+          }
 
 	// Render columns
 

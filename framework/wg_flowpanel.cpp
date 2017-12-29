@@ -156,12 +156,12 @@ int WgFlowPanel::MatchingPixelHeight( int width ) const
 		{
 			if (pH->IsVisible())
 			{
-				WgSize sz = pH->_paddedPreferredPixelSize();
+				WgSize sz = pH->_paddedPreferredPixelSize(m_scale);
 
 				if (sz.w > width)
 				{
 					height += row.h;
-					height += pH->_paddedMatchingPixelHeight(width);
+					height += pH->_paddedMatchingPixelHeight(width, m_scale);
 					row.Clear();
 				}
 				else
@@ -271,7 +271,7 @@ void WgFlowPanel::_onResizeRequested( WgVectorHook * pHook )
 	// Update cached preferred size of child
 	
 	WgFlowHook * p = static_cast<WgFlowHook*>(pHook);
-	p->m_preferredSize = p->_paddedPreferredPixelSize();
+	p->m_preferredSize = p->_paddedPreferredPixelSize(m_scale);
 
 	//
 	
@@ -285,7 +285,7 @@ void WgFlowPanel::_onWidgetAppeared( WgVectorHook * pInserted )
 	// Update cached preferred size of child
 	
 	WgFlowHook * p = static_cast<WgFlowHook*>(pInserted);
-	p->m_preferredSize = p->_paddedPreferredPixelSize();
+	p->m_preferredSize = p->_paddedPreferredPixelSize(m_scale);
 	
 	//
 	
@@ -394,7 +394,7 @@ void WgFlowPanel::_refreshChildGeo()
 	{
 		if (pH->IsVisible())
 		{
-			WgSize sz = pH->_paddedPreferredPixelSize();
+			WgSize sz = pH->_paddedPreferredPixelSize(m_scale);
 
 			if (sz.w > canvas.w)
 			{
@@ -403,7 +403,7 @@ void WgFlowPanel::_refreshChildGeo()
 				row.h = 0;
 				row.w = 0;
 
-				int paddedHeight = pH->_paddedMatchingPixelHeight(canvas.w);
+				int paddedHeight = pH->_paddedMatchingPixelHeight(canvas.w, m_scale);
 
 				newGeo = {	pH->m_padding.left,
 								row.y+pH->m_padding.top,
@@ -474,8 +474,8 @@ int WgFlowPanel::_populateSizeBrokerArray( WgSizeBrokerItem * pArray ) const
 			if( pH->IsVisible() )
 			{
 				pI->preferred = pH->m_preferredSize.w;
-				pI->min = pH->_paddedMinSize().w;
-				pI->max = pH->_paddedMaxSize().w;
+				pI->min = pH->_paddedMinPixelSize(m_scale).w;
+				pI->max = pH->_paddedMaxPixelSize(m_scale).w;
 				pI->weight = pH->m_weight;			
 				pI++;
 			}
@@ -489,8 +489,8 @@ int WgFlowPanel::_populateSizeBrokerArray( WgSizeBrokerItem * pArray ) const
 			if( pH->IsVisible() )
 			{
 				pI->preferred = pH->m_preferredSize.h;
-				pI->min = pH->_paddedMinSize().h;
-				pI->max = pH->_paddedMaxSize().h;
+				pI->min = pH->_paddedMinPixelSize(m_scale).h;
+				pI->max = pH->_paddedMaxPixelSize(m_scale).h;
 				pI->weight = pH->m_weight;			
 				pI++;
 			}
@@ -512,9 +512,9 @@ int WgFlowPanel::_populateSizeBrokerArray( WgSizeBrokerItem * pArray, int forced
 		{
 			if( pH->IsVisible() )
 			{
-				pI->preferred = pH->_paddedMatchingPixelWidth(forcedBreadth);
-				pI->min = pH->_paddedMinSize().w;
-				pI->max = pH->_paddedMaxSize().w;
+				pI->preferred = pH->_paddedMatchingPixelWidth(forcedBreadth, m_scale);
+				pI->min = pH->_paddedMinPixelSize(m_scale).w;
+				pI->max = pH->_paddedMaxPixelSize(m_scale).w;
 				pI->weight = pH->m_weight;			
 				pI++;
 			}
@@ -527,9 +527,9 @@ int WgFlowPanel::_populateSizeBrokerArray( WgSizeBrokerItem * pArray, int forced
 		{
 			if( pH->IsVisible() )
 			{
-				pI->preferred = pH->_paddedMatchingPixelHeight(forcedBreadth);
-				pI->min = pH->_paddedMinSize().h;
-				pI->max = pH->_paddedMaxSize().h;
+				pI->preferred = pH->_paddedMatchingPixelHeight(forcedBreadth, m_scale);
+				pI->min = pH->_paddedMinPixelSize(m_scale).h;
+				pI->max = pH->_paddedMaxPixelSize(m_scale).h;
 				pI->weight = pH->m_weight;			
 				pI++;
 			}

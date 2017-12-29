@@ -443,11 +443,13 @@ void WgWidget::_onDisable()
 void WgWidget::_onGotInputFocus()
 {
 	m_bFocused = true;
+	_queueEvent(new WgEvent::FocusGained(this));
 }
 
 void WgWidget::_onLostInputFocus()
 {
 	m_bFocused = false;
+	_queueEvent(new WgEvent::FocusLost(this));
 }
 
 bool WgWidget::TempIsInputField() const

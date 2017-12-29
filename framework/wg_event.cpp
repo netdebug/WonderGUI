@@ -147,11 +147,25 @@ namespace WgEvent
 		m_type = WG_EVENT_FOCUS_GAINED;
 	}
 
+	FocusGained::FocusGained(WgWidget * pWidget)
+	{
+		m_type = WG_EVENT_FOCUS_GAINED;
+		m_bIsForWidget = true;
+		m_pWidget = pWidget;
+	}
+
 	//____ FocusLost __________________________________________________________
 
 	FocusLost::FocusLost()
 	{
 		m_type = WG_EVENT_FOCUS_LOST;
+	}
+
+	FocusLost::FocusLost(WgWidget * pWidget)
+	{
+		m_type = WG_EVENT_FOCUS_LOST;
+		m_bIsForWidget = true;
+		m_pWidget = pWidget;
 	}
 
 	//____ MouseEnter _______________________________________________________
