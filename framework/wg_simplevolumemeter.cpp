@@ -98,6 +98,33 @@ void WgSimpleVolumeMeter::SetHoldHeight( float fraction )
 	}
 }
 
+//____ SetPeakSkin() _________________________________________________________
+
+void WgSimpleVolumeMeter::SetPeakSkin(const WgSkinPtr& pSkin)
+{
+	//TODO: Should request resize too...
+
+	if (pSkin != m_pPeakSkin)
+	{
+		m_pPeakSkin = pSkin;
+		_requestRender();
+	}
+}
+
+//____ SetHoldSkin() _________________________________________________________
+
+void WgSimpleVolumeMeter::SetHoldSkin(const WgSkinPtr& pSkin)
+{
+	//TODO: Should request resize too...
+
+	if (pSkin != m_pHoldSkin)
+	{
+		m_pHoldSkin = pSkin;
+		_requestRender();
+	}
+}
+
+
 //____ SetValue() ______________________________________________________________
 
 void WgSimpleVolumeMeter::SetValue( float peak, float hold )
@@ -185,7 +212,7 @@ void WgSimpleVolumeMeter::SetDirection(WgDirection direction)
 void WgSimpleVolumeMeter::_requestRenderPartial( WgSize sz, int newLeftPeak, int newLeftHold, int newRightPeak, int newRightHold )
 {
 	int	beg = INT_MAX, end = INT_MIN;
-	
+
 	if( newLeftPeak != m_iPeak[0] )
 	{
 		beg = WgMin(newLeftPeak,m_iPeak[0]);
@@ -227,7 +254,15 @@ void WgSimpleVolumeMeter::_requestRenderPartial( WgSize sz, int newLeftPeak, int
 				end = e;
 		}
 	}
-	
+
+	// If peak meter is skinned we need to update the whole meter since we don't know how
+	// skin changes when it is resized.
+
+	if (m_pPeakSkin)
+		beg = 0;
+
+	//
+
 	switch( m_direction )
 	{ 
 		case WG_UP:
@@ -259,7 +294,7 @@ int WgSimpleVolumeMeter::_calcIHold( float holdValue, WgSize canvas )
 
 	int ofs = (int) (holdValue * canvasLength);
 
-	if( ofs > m_iSectionHeight[0] )
+	if( !m_pHoldSkin && ofs > m_iSectionHeight[0] )
 	{
 		if( ofs - height < m_iSectionHeight[0] )
 			ofs = m_iSectionHeight[0] + height;
@@ -382,28 +417,59 @@ void WgSimpleVolumeMeter::_renderBar( WgGfxDevice * pDevice, int nb, const WgRec
 				break;
 			}
 
-			pDevice->Fill( WgRect( r, _clip ), c );
+			if (m_pHoldSkin)
+				m_pHoldSkin->Render(pDevice, WG_STATE_NORMAL, _rect, _clip, m_scale);
+			else
+				pDevice->Fill( WgRect( r, _clip ), c );
 		}
 		else if( holdOfs > peakHeight )
 			peakHeight = m_iHold[nb];							// Hold and Peak are connected, so we let Hold extend the peakHeight.
 	}
 	
 	// Render Peak
-		
-	int ofs = 0;
-	
-	for( int i = 0 ; i < 3 ; i++ )
+
+	if (peakHeight < 1)
+		return;
+
+	if (m_pPeakSkin)
 	{
-		if( peakHeight <= 0 )
-			break;
-		
-		int sectionHeight = m_iSectionHeight[i];
-		if( sectionHeight > peakHeight )
-			sectionHeight = peakHeight;
-		
 		WgRect r = _rect;
 		switch (m_direction)
 		{
+		case WG_UP:
+			r.y += _rect.h - peakHeight;
+			r.h = peakHeight;
+			break;
+		case WG_DOWN:
+			r.h = peakHeight;
+			break;
+		case WG_LEFT:
+			r.x += _rect.w - peakHeight;
+			r.w = peakHeight;
+			break;
+		case WG_RIGHT:
+			r.w = peakHeight;
+			break;
+		}
+
+		m_pPeakSkin->Render(pDevice, WG_STATE_NORMAL, r, _clip, m_scale);
+	}
+	else
+	{
+		int ofs = 0;
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (peakHeight <= 0)
+				break;
+
+			int sectionHeight = m_iSectionHeight[i];
+			if (sectionHeight > peakHeight)
+				sectionHeight = peakHeight;
+
+			WgRect r = _rect;
+			switch (m_direction)
+			{
 			case WG_UP:
 				r.y += _rect.h - ofs - sectionHeight;
 				r.h = sectionHeight;
@@ -420,13 +486,15 @@ void WgSimpleVolumeMeter::_renderBar( WgGfxDevice * pDevice, int nb, const WgRec
 				r.x += ofs;
 				r.w = sectionHeight;
 				break;
-		}
+			}
 
-		pDevice->Fill( WgRect( r, _clip ), m_sectionColors[i] );
-		
-		ofs += sectionHeight;
-		peakHeight -= sectionHeight;
+			pDevice->Fill(WgRect(r, _clip), m_sectionColors[i]);
+
+			ofs += sectionHeight;
+			peakHeight -= sectionHeight;
+		}
 	}
+
 		
 }
 
@@ -484,6 +552,9 @@ void WgSimpleVolumeMeter::_onCloneContent( const WgWidget * _pOrg )
 	m_fPeak[1] = pOrg->m_fPeak[1];
 	m_fHold[0] = pOrg->m_fHold[0];
 	m_fHold[1] = pOrg->m_fHold[1];
+
+	m_pPeakSkin = pOrg->m_pPeakSkin;
+	m_pHoldSkin = pOrg->m_pHoldSkin;
 	
 	_updateIValues( PixelSize() );
 }
