@@ -52,8 +52,8 @@
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\Tord\Workspace\SDL_image-1.2.12\include;C:\Users\Tord\Workspace\SDL-1.2.15\include;C:\Users\Tord\Workspace\freetype\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Tord\Workspace\version_1_9\Debug;C:\Users\Tord\Workspace\freetype\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\framework;..\framework\opengl;..\framework\wg_soft;..\..\glew\include;..\..\freetype\include;..;$(IncludePath)</IncludePath>
+    <LibraryPath>..\Release;..\..\SDL2\lib\x86;..\..\SDL2_image\lib\x86;..\..\glew\lib\Release\Win32;..\..\freetype\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -68,7 +68,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;opengl32.lib;glew32.lib;wondergui.lib;wg_soft.lib;wg_gl.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;opengl32.lib;glew32.lib;wondergui.lib;wg_soft.lib;wg_gl.lib;freetype.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Users\Tord\Workspace\SDL2\lib\x86;C:\Users\Tord\Workspace\SDL2_image\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -82,7 +82,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\SDL-1.2.15\include;..\..\SDL_image-1.2.12\include;..\include;..\wg_soft;..\wg_gl;..\wg_sdl;..\extras;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\SDL2\include;..\..\SDL2_image\include;..\include;..\wg_soft;..\wg_gl;..\wg_sdl;..\extras;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -91,8 +91,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL.lib;SDLmain.lib;SDL_image.lib;wondergui.lib;wg_soft.lib;freetype26.lib;wg_sdl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\SDL-1.2.15\lib\x86;..\..\SDL_image-1.2.12\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;opengl32.lib;glew32.lib;wondergui.lib;wg_soft.lib;wg_gl.lib;freetype.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Tord\Workspace\SDL2\lib\x86;C:\Users\Tord\Workspace\SDL2_image\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
