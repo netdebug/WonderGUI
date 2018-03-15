@@ -1251,7 +1251,7 @@ bool WgScrollChart::_updateDynamics()
 
 WgCoord	WgScrollChart::_placeLabel(WgCoord startPoint, WgOrigo alignment, WgCoord labelOffset, WgSize labelSize) const
 {
-	return startPoint + labelOffset - WgCoord(labelSize.w, labelSize.h) + WgUtil::OrigoToOfs(alignment, labelSize);
+	return startPoint + (labelOffset*m_scale/WG_SCALE_BASE) - WgCoord(labelSize.w, labelSize.h) + WgUtil::OrigoToOfs(alignment, labelSize);
 }
 
 //____ _getWave() _____________________________________________________________

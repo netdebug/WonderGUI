@@ -143,6 +143,7 @@ protected:
 
 		std::vector<int>	resampledTop;
 		std::vector<int>	resampledBottom;
+		int					resampledDefault;
 	};
 
 	struct LabelStyle

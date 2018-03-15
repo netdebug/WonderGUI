@@ -606,13 +606,13 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 		top.thickness = wave.topLineThickness*m_scale/WG_SCALE_BASE;
 		top.length = (int) wave.resampledTop.size();
 		top.pWave = wave.resampledTop.data();
-		top.hold = wave.defaultSample;
+		top.hold = wave.resampledDefault;
 
 		bottom.color = wave.bottomLineColor;
 		bottom.thickness = wave.bottomLineThickness*m_scale/WG_SCALE_BASE;
 		bottom.length = (int)wave.resampledBottom.size();
 		bottom.pWave = wave.resampledBottom.data();
-		bottom.hold = wave.defaultSample;
+		bottom.hold = wave.resampledDefault;
 
 		int length = WgMax(top.length, bottom.length);
 
@@ -625,7 +625,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 
 WgCoord	WgChart::_placeLabel(WgCoord startPoint, WgOrigo alignment, WgCoord labelOffset, WgSize labelSize) const
 {
-	return startPoint + labelOffset -WgCoord(labelSize.w,labelSize.h) + WgUtil::OrigoToOfs(alignment, labelSize);
+	return startPoint + (labelOffset*m_scale/WG_SCALE_BASE) -WgCoord(labelSize.w,labelSize.h) + WgUtil::OrigoToOfs(alignment, labelSize);
 }
 
 //____ _getWave() _____________________________________________________________
@@ -774,6 +774,7 @@ void WgChart::_resampleWave(Wave * pWave)
 		yOfs = 0;
 	}
 
+	pWave->resampledDefault = yOfs + (int)((pWave->defaultSample - floor) * valueFactor * 256);
 
 
 	if (pWave->orgTopSamples.empty())
