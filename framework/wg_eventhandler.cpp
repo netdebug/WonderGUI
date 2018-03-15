@@ -1053,6 +1053,9 @@ void WgEventHandler::_processMouseLeave( WgEvent::MouseLeave * pEvent )
 
 void WgEventHandler::_processMouseMove( WgEvent::MouseMove * pEvent )
 {
+    if( pEvent->m_pointerScreenPixelPos == m_pointerPos )
+        return;                                              // No real pointer movement.
+        
 	// Post events for button drag
 
 	for( int i = 0 ; i <= WG_MAX_BUTTONS ; i++ )
