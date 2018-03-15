@@ -1,5 +1,7 @@
 #include <cstdlib>
 
+#include <dwmapi.h>
+
 #ifdef WIN32
 #	include <SDL.h>
 #	include <SDL_image.h>
@@ -41,7 +43,7 @@
 
 #include "testwidget.h"
 
-#define USE_OPEN_GL
+//#define USE_OPEN_GL
 
 
 WgSurfaceFactory *	g_pSurfaceFactory = nullptr;
@@ -85,6 +87,22 @@ bool	leftUp = true, rightUp = false;
 WgScrollChart * m_pScrollChart = nullptr;
 int				m_hWave1 = 0;
 
+WgFlexHook * g_pSpriteHook = nullptr;
+
+
+volatile int	m_bGotVsync = 0;
+
+static int TestThread(void *ptr)
+{
+	while (true)
+	{
+		m_bGotVsync = 1;
+		DwmFlush();
+	}
+
+	return 0;
+}
+
 
 //____ main() _________________________________________________________________
 
@@ -97,7 +115,7 @@ int main ( int argc, char** argv )
 
 	SDL_Init(SDL_INIT_VIDEO);
 
-	int posX = 100, posY = 100, width = 1920, height = 1080;
+	int posX = 100, posY = 100, width = 1000, height = 200;
 
 	int flags = 0;
 
@@ -113,6 +131,10 @@ int main ( int argc, char** argv )
 
 	SDL_GLContext context = SDL_GL_CreateContext(pWin);
 
+	SDL_GL_SetSwapInterval(1);
+
+	SDL_Renderer * pRenderer = SDL_CreateRenderer(pWin, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
 #ifdef WIN32  
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
@@ -124,6 +146,12 @@ int main ( int argc, char** argv )
 
 
 	IMG_Init( IMG_INIT_PNG | IMG_INIT_JPG );
+
+
+	SDL_Thread *thread;
+	int         threadReturnValue;
+	thread = SDL_CreateThread(TestThread, "TestThread", (void *)NULL);
+
 
 	// Init WonderGUI
 
@@ -249,14 +277,24 @@ int main ( int argc, char** argv )
 
 	int counter = 0;
 
-
+/*
 	glDrawBuffer(GL_FRONT);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glFlush();
-
+*/
     while (eventLoop( pRoot->EventHandler() ))
     {
+		if (g_pSpriteHook)
+		{
+			WgRect pos = g_pSpriteHook->PointGeo();
+			pos.x-= 10;
+			if (pos.x + pos.w <= 0)
+				pos.x = width-1;
+
+			g_pSpriteHook->SetPointOfs(pos);
+		}
+
 
 		if( m_pCounter )
 			m_pCounter->IncValue();
@@ -422,8 +460,17 @@ int main ( int argc, char** argv )
 //		SDL_GL_SwapBuffers();
         // Pause for a while
 
+//		SDL_Delay(32);
 
-		SDL_Delay(5);
+		while (!m_bGotVsync)
+		{
+			SDL_Delay(1);
+		}
+		m_bGotVsync = 0;
+
+//		DwmFlush();
+
+//		SDL_RenderPresent(pRenderer);
 
 		counter++;
 
@@ -525,8 +572,38 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
 
 
-	// Esc callback test
+	// Setup moving sprite
 
+	{
+		WgFiller * pSprite = new WgFiller();
+		pSprite->SetColors(WgColorset::Create(WgColor::red));
+
+		g_pSpriteHook = pFlex->AddChild(pSprite, WgRect(0, 100, 100, 100));
+	}
+
+	// PackPanel padding test
+/*
+	{
+		auto pPack = new WgPackPanel();
+		pPack->SetSkin(WgColorSkin::Create(WgColor::blue));
+		pFlex->AddChild(pPack, { 0,0,300,100 });
+		pPack->SetOrientation(WG_VERTICAL);
+
+		for (int i = 0; i < 3; i++)
+		{
+			auto pFiller = new WgFiller();
+			pFiller->SetColors(WgColorset::Create(WgColor::red));
+			pFiller->SetPreferredPointSize({ 10,10 });
+
+			pPack->AddChild(pFiller)->SetPadding(4);
+		}
+
+	}
+*/
+
+
+	// Esc callback test
+/*
 	{
 		auto p = new WgLineEditor();
 		p->SetSkin(WgColorSkin::Create(WgColor::aliceblue));
@@ -538,15 +615,11 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 			int keyCode = p->NativeKeyCode();
 		}
 
-
 			);
 
 		WgFlexHook * pHook = pFlex->AddChild(p, { 10,10,200,100 });
-
-
-
 	}
-
+*/
 	// Flow Panel Test
 /*
 	{
@@ -642,7 +715,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	// Text InputFocus test
-
+/*
 
 	WgBlockSkinPtr pSkin = WgBlockSkin::CreateStatic(pPlateImg, { 0,0,10,10 }, 3);
 	pSkin->SetStateBlock(WG_STATE_FOCUSED, { 10,0 });
@@ -689,14 +762,14 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	pFlex->SetScale(WG_SCALE_BASE * 2);
-
+*/
 	// Scroll chart widget
 
 /*
 	m_pScrollChart = new WgScrollChart();
 
-	WgBoxSkinPtr pChartSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
-	pChartSkin->SetContentPadding(2);
+	WgBoxSkinPtr pChartSkin = WgBoxSkin::Create(WgColor::white, WgBorders(1), WgColor::black);
+	pChartSkin->SetContentPadding({ 50,2,2,2});
 	m_pScrollChart->SetSkin(pChartSkin);
 
 //	m_pScrollChart->SetValueRange(10, -10);
@@ -707,15 +780,15 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 //	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 5.f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
 
 	m_hWave1 = m_pScrollChart->StartSimpleWave(0.f, 0.f, 0.8f, WgColor::black, 1.f, WgColor::red, WgColor::grey, WgColor::darkred);
-	m_pScrollChart->Start(4000);
+	m_pScrollChart->Start(2000);
 
 	WgScrollChart::GridLine valueGrid[3]{ { 0.25f,1.f,WgColor::red,"0.25" },{ 0.5f,1.f,WgColor::red,"0.5" },{ -0.5f,1.f,WgColor::red,"-0.5" } };
 	WgBoxSkinPtr pLabelSkin = WgBoxSkin::Create(WgColor::antiquewhite, WgBorders(1), WgColor::black);
 	pLabelSkin->SetContentPadding(3);
 
 	m_pScrollChart->SetValueGridLines(3, valueGrid);
-	m_pScrollChart->SetValueLabelStyle(WG_SOUTHEAST, { 0,0 }, pLabelSkin, 0);
-
+	m_pScrollChart->SetValueLabelStyle(WG_NORTHWEST, { -10,0 }, pLabelSkin, 0);
+//	m_pScrollChart->SetCanvasPadding(WgBorders(50, 0, 0, 0));
 
 	auto pWindow = new WgPackPanel();
 	pWindow->SetOrientation(WG_VERTICAL);
@@ -1342,7 +1415,7 @@ bool eventLoop( WgEventHandler * pHandler )
 		int ticks = SDL_GetTicks();
 		
 
-		m_pScrollChart->FeedSample(m_hWave1, sin(ticks / 1000.0)*0.9 );
+		m_pScrollChart->FeedSample(m_hWave1, sin(ticks / 100.0)*0.9 );
 	}
 	sdl_wglib::BeginEvents( pHandler );
 
