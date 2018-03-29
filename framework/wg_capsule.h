@@ -80,8 +80,8 @@ protected:
 		WgCapsule* 		Parent() const { return m_pParent; }
 
 	protected:
-		void			_requestRender() { m_pParent->_requestRender(); }
-		void			_requestRender( const WgRect& rect ) { m_pParent->_requestRender(rect); }
+		void			_requestRender() { m_pParent->_onRenderRequested(); }
+		void			_requestRender( const WgRect& rect ) { m_pParent->_onRenderRequested(rect); }
 		void			_requestResize() { m_pParent->_requestResize(); }
 
 		WgHook *		_prevHook() const { return 0; }
@@ -105,6 +105,9 @@ protected:
 	void			_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode );
 	void			_onCloneContent( const WgWidget * _pOrg );
 	void			_onNewSize( const WgSize& size );
+
+	virtual void	_onRenderRequested();
+	virtual void	_onRenderRequested(const WgRect& rect);
 
 
 	WgHook*			_firstHook() const;

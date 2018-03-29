@@ -205,6 +205,18 @@ void WgCapsule::_onNewSize( const WgSize& size )
 		m_hook.Widget()->_onNewSize(size);
 }
 
+//____ _onRenderRequested() ___________________________________________________
+
+void WgCapsule::_onRenderRequested()
+{
+	_requestRender();
+}
+
+void WgCapsule::_onRenderRequested(const WgRect& rect)
+{
+	_requestRender(rect);
+}
+
 //____ _firstHook() ____________________________________________________________
 
 WgHook* WgCapsule::_firstHook() const

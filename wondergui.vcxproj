@@ -88,6 +88,7 @@
     <ClInclude Include="framework\wg_blockskin.h" />
     <ClInclude Include="framework\wg_boxskin.h" />
     <ClInclude Include="framework\wg_button.h" />
+    <ClInclude Include="framework\wg_canvascapsule.h" />
     <ClInclude Include="framework\wg_capsule.h" />
     <ClInclude Include="framework\wg_chain.h" />
     <ClInclude Include="framework\wg_char.h" />
@@ -204,6 +205,7 @@
     <ClCompile Include="framework\wg_blockskin.cpp" />
     <ClCompile Include="framework\wg_boxskin.cpp" />
     <ClCompile Include="framework\wg_button.cpp" />
+    <ClCompile Include="framework\wg_canvascapsule.cpp" />
     <ClCompile Include="framework\wg_capsule.cpp" />
     <ClCompile Include="framework\wg_chain.cpp" />
     <ClCompile Include="framework\wg_char.cpp" />
