@@ -203,7 +203,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 			m_pText->setSelectionMode(true);
 		}
 
-        WgRect textCanvas = PixelGeo();
+        WgRect textCanvas = PixelSize();
         if( m_pSkin )
             textCanvas = m_pSkin->ContentRect( textCanvas, WG_STATE_NORMAL, m_scale );
 
