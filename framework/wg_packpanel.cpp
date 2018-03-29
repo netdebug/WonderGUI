@@ -520,11 +520,12 @@ void WgPackPanel::_updatePreferredPixelSize()
 	//
 	
 	WgSize size = m_bHorizontal?WgSize(length,breadth):WgSize(breadth,length);
-	if( size != m_preferredSize )
-	{
+// This optimization caused trouble for wrap text. MatchingHeight might get different even if PreferredSize remains the same.
+//	if( size != m_preferredSize )
+//	{
 		m_preferredSize = size;
 		_requestResize();
-	}
+//	}
 }
 
 //____ _refreshChildGeo() _________________________________________________________

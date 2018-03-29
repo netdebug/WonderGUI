@@ -142,7 +142,7 @@ int WgUniformSizeBroker::SetPreferredLengths( WgSizeBrokerItem * pItems, int nIt
 
 bool WgUniformSizeBroker::MayAlterPreferredLengths() const
 {
-    return true;
+    return false; //true;
 }
 
 int WgUniformSizeBroker::_findLongestUnified( WgSizeBrokerItem * pItems, int nItems ) const

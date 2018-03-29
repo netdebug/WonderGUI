@@ -192,14 +192,14 @@ WgCoord WgWidget::Abs2localPixel( const WgCoord& cord ) const
 
 WgCoord WgWidget::Local2absPoint( const WgCoord& cord ) const
 {
-    return (Local2absPixel(cord)*WG_SCALE_BASE) / m_scale;
+    return (Local2absPixel(cord*m_scale/WG_SCALE_BASE)*WG_SCALE_BASE) / m_scale;
 }
 
 //____ Abs2localPoint() ____________________________________________________________
 
 WgCoord WgWidget::Abs2localPoint( const WgCoord& cord ) const
 {
-    return (Abs2localPixel(cord)*WG_SCALE_BASE) / m_scale;
+    return (Abs2localPixel(cord*m_scale/WG_SCALE_BASE)*WG_SCALE_BASE) / m_scale;
 }
 
 

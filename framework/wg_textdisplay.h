@@ -83,7 +83,7 @@ public:
 	bool	IsEditable() const { return m_text.IsEditable(); }
 	bool	IsSelectable() const { return m_text.IsSelectable(); }
 
-    void    SelectAll() { m_text.selectText(0, 0, 1000000, 1000000); }
+    void    SelectAll() { m_text.selectAll(); }
 
     /* Added by Niklas */
     void    ChangeText( std::string str )

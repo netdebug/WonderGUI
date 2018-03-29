@@ -259,22 +259,22 @@ WgEventFilter	WgEventFilter::MouseButtonClick( WgWidget * pWidget, int button )
 
 WgEventFilter	WgEventFilter::MouseButtonDoubleClick()
 {
-	return WgEventFilter( WG_EVENT_MOUSEBUTTON_CLICK, 0, _filterMouseButtonEvents, 0 );
+	return WgEventFilter( WG_EVENT_MOUSEBUTTON_DOUBLE_CLICK, 0, _filterMouseButtonEvents, 0 );
 }
 
 WgEventFilter	WgEventFilter::MouseButtonDoubleClick( int button)
 {
-	return WgEventFilter( WG_EVENT_MOUSEBUTTON_CLICK, 0, _filterMouseButtonEvents, button );
+	return WgEventFilter( WG_EVENT_MOUSEBUTTON_DOUBLE_CLICK, 0, _filterMouseButtonEvents, button );
 }
 
 WgEventFilter	WgEventFilter::MouseButtonDoubleClick( WgWidget * pWidget )
 {
-	return WgEventFilter( WG_EVENT_MOUSEBUTTON_CLICK, pWidget, _filterMouseButtonEvents, 0 );
+	return WgEventFilter( WG_EVENT_MOUSEBUTTON_DOUBLE_CLICK, pWidget, _filterMouseButtonEvents, 0 );
 }
 
 WgEventFilter	WgEventFilter::MouseButtonDoubleClick( WgWidget * pWidget, int button )
 {
-	return WgEventFilter( WG_EVENT_MOUSEBUTTON_CLICK, pWidget, _filterMouseButtonEvents, button );
+	return WgEventFilter( WG_EVENT_MOUSEBUTTON_DOUBLE_CLICK, pWidget, _filterMouseButtonEvents, button );
 }
 
 //____ KeyPress() _____________________________________________________________

@@ -1199,8 +1199,8 @@ void WgGfxDevice::_printEllipsisTextSpan( WgPen& pen, const WgText * pText, int 
 	{
 		color = pen.GetColor();
 		SetTintColor( baseCol * color );
-	}	
-	
+	}
+
 	if( ellipsisChar == '.' )
 	{
 		pen.SetChar( ellipsisChar );		// Set once more to get kerning between dots to work.

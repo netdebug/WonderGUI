@@ -669,7 +669,8 @@ void WgEventHandler::ProcessEvents()
 
 	// Post Widget-specific tick events now we know how much time has passed
 
-	_postTickEvents( (int) (m_time-time) );
+    if( m_time > time )
+        _postTickEvents( (int) (m_time-time) );
 
 	// Process Widget-specific tick events (and any events they might trigger)
 
