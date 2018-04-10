@@ -187,8 +187,9 @@ protected:
 	//
 	
 	WgSize		m_size;
-	WgCoord     m_viewportOffset;
-	
+	WgCoord     m_viewportOffset;           // Viewport offset for screen canvas as set by a call to SetViewportOffset, with top-left origo coordinates.
+    WgCoord     m_canvasOfs;                // Viewport offset for current canvas, with bottom-left origo coordinates.
+    
 };
 
 #endif //WG_GLGFXDEVICE_DOT_H
