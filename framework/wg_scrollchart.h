@@ -73,6 +73,9 @@ public:
 	void		SetChartColor(WgColor color);
 	WgColor		ChartColor() const { return m_chartColor;  }
 
+	void		SetScrollFromStart(bool bScrollOnStart);
+	bool		ScrollFromStart() const { return m_bScrollFromStart; }
+
 	struct GridLine
 	{
 		float	pos;
@@ -235,7 +238,7 @@ private:
 	WgBorders		m_pointPadding;			// Padding for the canvas in points. To allow thick lines to fully stay inside widget. Grid is allowed outside.
 	WgBorders		m_pixelPadding;			// Same, but in pixels.
 
-
+	bool			m_bScrollFromStart;		// If set, first data is scrolled in from right. If not set, data is filled from left to right before the chart starts to scroll. 
 	bool			m_bStarted;
 	bool			m_bPaused;
 

@@ -24,61 +24,70 @@
 #define WG_CANVASCAPSULE_DOT_H
 
 #ifndef WG_CAPSULE_DOT_H
-#	include <wg_capsule.h>
+#    include <wg_capsule.h>
 #endif
 
 #ifndef WG_SURFACEFACTORY_DOT_H
-#	include <wg_surfacefactory.h>
+#    include <wg_surfacefactory.h>
 #endif
 
 #ifndef WG_PATCHES_DOT_H
-#	include <wg_patches.h>
+#    include <wg_patches.h>
 #endif
 
 class WgCanvasCapsule : public WgCapsule
 {
 public:
-	WgCanvasCapsule();
-	~WgCanvasCapsule();
+    WgCanvasCapsule();
+    ~WgCanvasCapsule();
 
-	virtual const char *Type( void ) const;
-	static const char * GetClass();
-	virtual WgWidget * NewOfMyType() const { return new WgCanvasCapsule(); };
+    virtual const char *Type( void ) const;
+    static const char * GetClass();
+    virtual WgWidget * NewOfMyType() const { return new WgCanvasCapsule(); };
 
-	void				SetSkin(const WgSkinPtr& pSkin);		// Method added separately to those widgets that support skin so far.
+    void                SetSkin(const WgSkinPtr& pSkin);        // Method added separately to those widgets that support skin so far.
 
-	void				SetSurfaceFactory(WgSurfaceFactory * pFactory);
-	const WgSurfaceFactory * SurfaceFactory() const { return m_pFactory; }
+    void                SetSurfaceFactory(WgSurfaceFactory * pFactory);
+    const WgSurfaceFactory * SurfaceFactory() const { return m_pFactory; }
 
-	void				SetColor( const WgColor& color);
-	void				SetTintMode( WgTintMode mode );
-	void				SetBlendMode( WgBlendMode mode );
+    void                StartFade(WgColor destination, int ms);
+    void                StopFade();
 
-	inline WgColor		Color() { return m_tintColor; }
-	inline WgBlendMode	BlendMode() { return m_blendMode; }
-	inline WgTintMode	TintMode() { return m_tintMode; }
+    void                SetColor( const WgColor& color);
+    void                SetTintMode( WgTintMode mode );
+    void                SetBlendMode( WgBlendMode mode );
+
+    inline WgColor       Color() { return m_tintColor; }
+    inline WgBlendMode   BlendMode() { return m_blendMode; }
+    inline WgTintMode    TintMode() { return m_tintMode; }
 
 
 protected:
-	void			_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches );
-	void			_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip);
-	void			_onCloneContent( const WgWidget * _pOrg );
-	WgBlendMode		_getBlendMode() const;
+    void            _onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHandler);
+    void            _renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches );
+    void            _onRender(WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip);
+    void            _onCloneContent( const WgWidget * _pOrg );
+    WgBlendMode     _getBlendMode() const;
 
-	void			_onNewSize(const WgSize& size);
+    void            _onNewSize(const WgSize& size);
 
-	void			_onRenderRequested();
-	void			_onRenderRequested(const WgRect& rect);
+    void            _onRenderRequested();
+    void            _onRenderRequested(const WgRect& rect);
 
 
 private:
-	WgColor			m_tintColor;
-	WgBlendMode		m_blendMode;
-	WgTintMode		m_tintMode;
+    WgColor            m_tintColor;
+    WgColor            m_fadeStartColor;
+    WgColor            m_fadeEndColor;
+    int                m_fadeTime;
+    int                m_fadeTimeCounter;
 
-	WgSurfaceFactory * m_pFactory;
-	WgSurface *		m_pCanvas;
-	WgPatches		m_dirtyPatches;			// Dirty patches on our own canvas.
+    WgBlendMode        m_blendMode;
+    WgTintMode         m_tintMode;
+
+    WgSurfaceFactory * m_pFactory;
+    WgSurface *        m_pCanvas;
+    WgPatches          m_dirtyPatches;            // Dirty patches on our own canvas.
 };
 
 #endif //WG_CANVASCAPSULE_DOT_H

@@ -54,6 +54,7 @@ WgScrollChart::WgScrollChart()
 	m_pCanvas = nullptr;
 	m_pFactory = nullptr;
 
+	m_bScrollFromStart = true;
 	m_bStarted = false;
 	m_bPaused = false;
 
@@ -159,6 +160,12 @@ void WgScrollChart::SetChartColor(WgColor color)
 	}
 }
 
+//____ SetScrollFromStart() ___________________________________________________
+
+void WgScrollChart::SetScrollFromStart(bool bScrollOnStart)
+{
+	m_bScrollFromStart = bScrollOnStart;
+}
 
 
 //____ SetCanvasPadding() _____________________________________________________
@@ -189,10 +196,14 @@ bool WgScrollChart::Start(int sampleTTL)
 	m_sampleTTL = sampleTTL;
 	m_bStarted = true;
 
+	m_sampleBeginTimestamp = 0;
+	m_sampleEndTimestamp = m_bScrollFromStart ? sampleTTL : 0;
+
+
 	// Add start samples so that we start to draw the waves.
 
 	for (auto& wave : m_waves)
-		wave.samples.push_front({ 0,wave.startTopSample,wave.startBottomSample });
+		wave.samples.push_front({ (int) m_sampleEndTimestamp,wave.startTopSample,wave.startBottomSample });
 
 	if (m_bDynamicValueRange && _updateDynamics() )
 	{
@@ -202,6 +213,7 @@ bool WgScrollChart::Start(int sampleTTL)
 		m_bRefreshCanvas = true;
 		_requestRender();
 	}
+
 
 	_startReceiveTicks();
 	return true;

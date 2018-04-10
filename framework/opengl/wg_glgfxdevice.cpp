@@ -433,13 +433,22 @@ bool WgGlGfxDevice::_setFramebuffer()
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             return false;
         }
+
+        m_canvasOfs.x = 0;
+        m_canvasOfs.y = 0;
     }
     else
+    {
+        m_canvasOfs.x = m_viewportOffset.x;
+        m_canvasOfs.y = -m_viewportOffset.y;
+        
+        
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 
-	glScissor(0, 0, m_canvasSize.w, m_canvasSize.h);
-	glViewport(m_viewportOffset.x, m_viewportOffset.y, m_canvasSize.w, m_canvasSize.h);
-
+    glViewport(m_canvasOfs.x, m_canvasOfs.y, m_canvasSize.w, m_canvasSize.h);
+    glScissor( m_canvasOfs.x, m_canvasOfs.y, m_canvasSize.w, m_canvasSize.h);
+    
     return true;
 }
 
@@ -773,7 +782,7 @@ void WgGlGfxDevice::FillSubPixel( const WgRectF& rect, const WgColor& col )
     
     // Set frame coords in GL coordinate space
     
-    glUniform4f( m_aaFillProgFrameLoc, frameX1, m_canvasSize.h - frameY1, frameX2, m_canvasSize.h - frameY2 );
+    glUniform4f( m_aaFillProgFrameLoc, m_canvasOfs.x + frameX1, m_canvasOfs.y + m_canvasSize.h - frameY1, m_canvasOfs.x + frameX2, m_canvasOfs.y + m_canvasSize.h - frameY2 );
     
     
     // Convert rect to topLeft and bottomRight coordinates in GL coordinate space
@@ -1233,16 +1242,19 @@ void WgGlGfxDevice::ClipPlotSoftPixels( const WgRect& clip, int nCoords, const W
     
 }
 
+//____ ClipPlotPixels() __________________________________________________________
+
 void WgGlGfxDevice::ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor * pColors)
 {
     GLenum err;
     assert( 0 == (err = glGetError()) );
-    glScissor( clip.x, m_canvasSize.h - clip.y - clip.h, clip.w, clip.h );
+    glScissor( m_canvasOfs.x + clip.x, m_canvasOfs.y + m_canvasSize.h - clip.y - clip.h, clip.w, clip.h );
     PlotPixels( nCoords, pCoords, pColors );
-    glScissor( 0, 0, m_canvasSize.w, m_canvasSize.h );
+    glScissor( m_canvasOfs.x, m_canvasOfs.y, m_canvasSize.w, m_canvasSize.h );
     assert( 0 == (err = glGetError()) );
 }
 
+//____ PlotPixels() ______________________________________________________________
 
 void WgGlGfxDevice::PlotPixels( int nCoords, const WgCoord * pCoords, const WgColor * pColors)
 {
@@ -1285,6 +1297,8 @@ void WgGlGfxDevice::PlotPixels( int nCoords, const WgCoord * pCoords, const WgCo
     assert( 0 == (err = glGetError()) );
 }
 
+//____ DrawLine() _____________________________________________________________
+
 void WgGlGfxDevice::DrawLine( WgCoord beg, WgCoord end, WgColor color, float thickness )
 {
     GLenum err;
@@ -1311,7 +1325,7 @@ void WgGlGfxDevice::DrawLine( WgCoord beg, WgCoord end, WgColor color, float thi
         WgColor fillColor = color * m_tintColor;
         glUniform4f( m_mildSlopeProgColorLoc, fillColor.r/255.f, fillColor.g/255.f, fillColor.b/255.f, fillColor.a/255.f );
         //            glUniform2f( m_mildSlopeProgStartLoc, beg.x + 0.5, m_canvasSize.h - (beg.y + 0.5));
-        glUniform1f( m_mildSlopeProgSLoc, (beg.x + 0.5)*slope + (m_canvasSize.h - (beg.y + 0.5)));
+        glUniform1f( m_mildSlopeProgSLoc, (m_canvasOfs.x + beg.x + 0.5)*slope + (m_canvasOfs.y + m_canvasSize.h - (beg.y + 0.5)));
         glUniform1f( m_mildSlopeProgWLoc, width/2 + 0.5 );
         glUniform1f( m_mildSlopeProgSlopeLoc, slope );
         
@@ -1349,7 +1363,7 @@ void WgGlGfxDevice::DrawLine( WgCoord beg, WgCoord end, WgColor color, float thi
         WgColor fillColor = color * m_tintColor;
         glUniform4f( m_steepSlopeProgColorLoc, fillColor.r/255.f, fillColor.g/255.f, fillColor.b/255.f, fillColor.a/255.f );
         //            glUniform2f( m_steepSlopeProgStartLoc, beg.x + 0.5, m_canvasSize.h - (beg.y + 0.5));
-        glUniform1f( m_steepSlopeProgSLoc, (beg.x + 0.5) + (m_canvasSize.h - (beg.y + 0.5))*slope );
+        glUniform1f( m_steepSlopeProgSLoc, (m_canvasOfs.x + beg.x + 0.5) + (m_canvasOfs.y + m_canvasSize.h - (beg.y + 0.5))*slope );
         glUniform1f( m_steepSlopeProgWLoc, width/2 + 0.5f );
         glUniform1f( m_steepSlopeProgSlopeLoc, slope );
         
@@ -1395,13 +1409,15 @@ void WgGlGfxDevice::DrawLine( WgCoord beg, WgCoord end, WgColor color, float thi
     assert( 0 == (err = glGetError()) );
 }
 
+//____ ClipDrawLine() ________________________________________________________________
+
 void WgGlGfxDevice::ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness )
 {
     GLenum err;
     assert( 0 == (err = glGetError()) );
-    glScissor( clip.x, m_canvasSize.h - clip.y - clip.h, clip.w, clip.h );
+    glScissor( m_canvasOfs.x + clip.x, m_canvasOfs.y + m_canvasSize.h - clip.y - clip.h, clip.w, clip.h );
     DrawLine( begin, end, color, thickness );
-    glScissor( 0, 0, m_canvasSize.w, m_canvasSize.h );
+    glScissor( m_canvasOfs.x, m_canvasOfs.y, m_canvasSize.w, m_canvasSize.h );
     assert( 0 == (err = glGetError()) );
 }
 
@@ -1579,8 +1595,10 @@ void WgGlGfxDevice::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int leng
 	}
 
 	// Now we have the data generated, setup GL to operate on it
-
-	glBindBuffer(GL_TEXTURE_BUFFER, m_horrWaveBufferTextureData);
+//    if(g_bSoftubeProductUseCodeInDevelopment)
+    {
+        glBindBuffer(GL_TEXTURE_BUFFER, m_horrWaveBufferTextureData);
+    }
 	glBufferData(GL_TEXTURE_BUFFER, textureBufferDataSize, pTextureBufferData, GL_STREAM_DRAW);
 
 	int	dx1 = box.x;
@@ -1597,17 +1615,20 @@ void WgGlGfxDevice::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int leng
 	m_vertexBufferData[6] = (GLfloat)dx1;
 	m_vertexBufferData[7] = (GLfloat)dy2;
 
-	glUseProgram(m_horrWaveProg);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_BUFFER, m_horrWaveBufferTexture);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, m_horrWaveBufferTextureData);
-	glUniform1i(m_horrWaveProgTexIdLoc, 0);
-	glUniform2f(m_horrWaveProgWindowOfsLoc, begin.x, begin.y);
-	glUniform4f(m_horrWaveProgTopBorderColorLoc, topBorder.color.r / 255.f, topBorder.color.g / 255.f, topBorder.color.b / 255.f, topBorder.color.a / 255.f);
-	glUniform4f(m_horrWaveProgBottomBorderColorLoc, bottomBorder.color.r / 255.f, bottomBorder.color.g / 255.f, bottomBorder.color.b / 255.f, bottomBorder.color.a / 255.f);
-	glUniform4f(m_horrWaveProgFrontFillLoc, frontFill.r / 255.f, frontFill.g / 255.f, frontFill.b / 255.f, frontFill.a / 255.f);
-	glUniform4f(m_horrWaveProgBackFillLoc, backFill.r / 255.f, backFill.g / 255.f, backFill.b / 255.f, backFill.a / 255.f);
+//    if(g_bSoftubeProductUseCodeInDevelopment)
+    {
+        glUseProgram(m_horrWaveProg);
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_BUFFER, m_horrWaveBufferTexture);
+        glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, m_horrWaveBufferTextureData);
+        glUniform1i(m_horrWaveProgTexIdLoc, 0);
+        glUniform2f(m_horrWaveProgWindowOfsLoc, begin.x + m_canvasOfs.x, begin.y - m_canvasOfs.y);        // This fragment shader has top-left coordinate system.
+        glUniform4f(m_horrWaveProgTopBorderColorLoc, topBorder.color.r / 255.f, topBorder.color.g / 255.f, topBorder.color.b / 255.f, topBorder.color.a / 255.f);
+        glUniform4f(m_horrWaveProgBottomBorderColorLoc, bottomBorder.color.r / 255.f, bottomBorder.color.g / 255.f, bottomBorder.color.b / 255.f, bottomBorder.color.a / 255.f);
+        glUniform4f(m_horrWaveProgFrontFillLoc, frontFill.r / 255.f, frontFill.g / 255.f, frontFill.b / 255.f, frontFill.a / 255.f);
+        glUniform4f(m_horrWaveProgBackFillLoc, backFill.r / 255.f, backFill.g / 255.f, backFill.b / 255.f, backFill.a / 255.f);
+    }
 
 	glBindVertexArray(m_vertexArrayId);
 
