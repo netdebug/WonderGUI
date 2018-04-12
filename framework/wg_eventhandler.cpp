@@ -1086,7 +1086,6 @@ void WgEventHandler::_processMousePosition( WgEvent::MousePosition * pEvent )
 
 void WgEventHandler::_updateMarkedWidget(bool bPostMouseMoveEvents)
 {
-	WgWidget*  pNowMarked = 0;
 
 	WgWidget * pWidgetTarget = m_pRoot->FindWidget( m_pointerPos, WG_SEARCH_ACTION_TARGET );
 
@@ -1100,11 +1099,34 @@ void WgEventHandler::_updateMarkedWidget(bool bPostMouseMoveEvents)
 			button = i;
 	}
 
-	// We are only marking the Widget if no mouse button is pressed or the first pressed button
-	// was pressed on it.
+	// We are only marking the Widget if no mouse button is pressed or widget was marked when the first button was pressed
 
-	if( button == 0 || pWidgetTarget == m_latestPressWidgets[button].GetRealPtr() )
+	WgWidget*  pNowMarked = 0;
+
+	if( button == 0 )
 		pNowMarked = pWidgetTarget;
+	else
+	{
+		// Checking widgets marked while the button was pressed recursively
+		//TODO: This check can fail if hierarchy has changed since button was pressed. 
+		// We need to explicitly save all widgets receiving the press and check against that list.
+		// I believe we have the same problem inside _updateEnteredWidgets().
+
+		while (pNowMarked == 0 && pWidgetTarget != 0)
+		{
+			WgWidget * pPressed = m_latestPressWidgets[button].GetRealPtr();
+			while (pPressed)
+			{
+				if (pWidgetTarget == pPressed)
+				{
+					pNowMarked = pWidgetTarget;
+					break;
+				}
+				pPressed = pPressed->Parent();
+			}
+			pWidgetTarget = pWidgetTarget->Parent();
+		}
+	}
 
 	// Post POINTER_EXIT events for widgets no longer marked,
 	// Post POINTER_ENTER events for new marked widgets
@@ -1154,12 +1176,12 @@ void WgEventHandler::_updateMarkedWidget(bool bPostMouseMoveEvents)
 
 WgWidget * WgEventHandler::_updateEnteredWidgets( WgWidget * pMarkedWidget )
 {
-	
+	WgWidget * pFirstAlreadyMarked = 0;
+
 	// Loop through our new widgets and check if they already
 	// were entered. Send MouseEnter to all new widgets and notice the first
 	// common ancestor .
 
-	WgWidget * pFirstAlreadyMarked = 0;
 	for( WgWidget * pWidget = pMarkedWidget ; pWidget != 0 ; pWidget = pWidget->Parent() )
 	{
 		int ofs = _widgetPosInList( pWidget, m_vEnteredWidgets );
