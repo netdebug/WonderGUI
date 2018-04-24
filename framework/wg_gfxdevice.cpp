@@ -1495,11 +1495,13 @@ void WgGfxDevice::_genCurveTab()
 
 void WgGfxDevice::_traceLine(int * pDest, int nPoints, const WgWaveLine& wave, int offset)
 {
-	static int brush[128];
+	static const int c_supersamples = 4;
+
+	static int brush[128*c_supersamples];
 	static float prevThickness = -1.f;
 
 	float thickness = wave.thickness;
-	int brushSteps = (int)(thickness / 2 + 0.99f);
+	int brushSteps = (int)(thickness / 2);
 
 	// Generate brush
 
@@ -1508,8 +1510,8 @@ void WgGfxDevice::_traceLine(int * pDest, int nPoints, const WgWaveLine& wave, i
 		int scaledThickness = (int)(thickness / 2 * 256);
 
 		brush[0] = scaledThickness;
-		for (int i = 1; i < brushSteps; i++)
-			brush[i] = (scaledThickness * s_pCurveTab[c_nCurveTabEntries - (i*c_nCurveTabEntries) / brushSteps - 1]) >> 16;
+		for (int i = 1; i <= brushSteps; i++)
+			brush[i] = (scaledThickness * s_pCurveTab[c_nCurveTabEntries - (i*c_nCurveTabEntries) / brushSteps]) >> 16;
 		prevThickness = thickness;
 	}
 
@@ -1528,12 +1530,17 @@ void WgGfxDevice::_traceLine(int * pDest, int nPoints, const WgWaveLine& wave, i
 
 		// Check brush's coverage from previous points
 
-		int end = WgMin(i + 1, brushSteps);
+		int end = WgMin(i + 1, brushSteps+1);
 
 		for (int j = 1; j < end; j++)
 		{
-			int topCover = pSrc[i - j] - brush[j];
-			int bottomCover = pSrc[i - j] + brush[j];
+			int from = pSrc[i - j / c_supersamples];
+			int to = pSrc[i - j / c_supersamples - 1];
+
+			int sample = (to - from) * (j%c_supersamples) / c_supersamples + from;
+
+			int topCover = sample - brush[j];
+			int bottomCover = sample + brush[j];
 
 			if (topCover < top)
 				top = topCover;
@@ -1543,12 +1550,17 @@ void WgGfxDevice::_traceLine(int * pDest, int nPoints, const WgWaveLine& wave, i
 
 		// Check brush's coverage from following points
 
-		end = WgMin(nPoints - i, brushSteps);
+		end = WgMin(nPoints - i, brushSteps+1);
 
 		for (int j = 1; j < end; j++)
 		{
-			int topCover = pSrc[i + j] - brush[j];
-			int bottomCover = pSrc[i + j] + brush[j];
+			int from = pSrc[i + j / c_supersamples];
+			int to = pSrc[i + j / c_supersamples + 1];
+
+			int sample = (to - from) * (j%c_supersamples) / c_supersamples + from;
+
+			int topCover = sample - brush[j];
+			int bottomCover = sample + brush[j];
 
 			if (topCover < top)
 				top = topCover;
