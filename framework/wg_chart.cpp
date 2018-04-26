@@ -46,6 +46,9 @@ WgChart::WgChart()
 	m_firstSample		= 0.f;
 	m_lastSample		= 0.f;
 
+	m_upsampleMethod = WG_UPSAMPLE_INTERPOLATE;
+	m_downsampleMethod = WG_DOWNSAMPLE_AVERAGE;
+
 	m_sampleLabelStyle.alignment = WG_SOUTH;
 	m_sampleLabelStyle.offset = { 0,0 };
 
@@ -120,6 +123,7 @@ void WgChart::SetCanvasPadding(WgBorders padding)
 	{
 		m_pixelPadding = pixelPadding;
 		_resampleAllWaves();
+		_requestRender();
 	}
 }
 
@@ -384,9 +388,49 @@ void WgChart::SetDynamicSampleRange()
 		m_bDynamicSampleRange = true;
 		_updateDynamics();
 		_resampleAllWaves();
+		_requestRender();
 
 //		if (m_sampleRangeResponder)
 //			m_sampleRangeResponder(this, m_firstSample, m_lastValue);
+	}
+}
+
+//____ SetUpsampleMethod() ____________________________________________________
+
+void WgChart::SetUpsampleMethod(WgUpsampleMethod method)
+{
+	if (method != m_upsampleMethod)
+	{
+		m_upsampleMethod = method;
+		_resampleAllWaves();			//Optimize: Only resample and requestRender if we are upsampling.
+		_requestRender();
+	}
+}
+
+//____ SetDownsampleMethod() __________________________________________________
+
+void WgChart::SetDownsampleMethod(WgDownsampleMethod method)
+{
+	if (method != m_upsampleMethod)
+	{
+		m_downsampleMethod = method;
+		_resampleAllWaves();			//Optimize: Only resample and requestRender if we are downsampling.
+		_requestRender();
+	}
+}
+
+//____ SetResampleMethods() ___________________________________________________
+
+void WgChart::SetResampleMethods(WgUpsampleMethod upMethod, WgDownsampleMethod downMethod)
+{
+	//Optimize: Same kind of optimizations here as in SetUpsampleMethod() and SetDownsampleMethod()
+
+	if (upMethod != m_upsampleMethod || downMethod != m_downsampleMethod )
+	{
+		m_upsampleMethod = upMethod;
+		m_downsampleMethod = downMethod;
+		_resampleAllWaves();
+		_requestRender();
 	}
 }
 
@@ -504,7 +548,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 	{
 		for (auto& line : m_sampleGridLines)
 		{
-			int xOfs = waveCanvas.x + (line.pos - m_firstSample) * sampleScale;
+			int xOfs = waveCanvas.x + (int) ((line.pos - m_firstSample) * sampleScale);
 			pDevice->ClipDrawLine(_clip, { xOfs, canvas.y }, WG_DOWN, canvas.h, line.color, line.thickness * m_scale / WG_SCALE_BASE);
 
 			if (!line.label.IsEmpty())
@@ -762,7 +806,7 @@ void WgChart::_resampleWave(Wave * pWave)
 	float valueFactor = canvas.h / (m_bottomValue - m_topValue);
 
 	float floor;
-	float yOfs;
+	int yOfs;
 	if (valueFactor < 0)
 	{
 		floor = m_bottomValue;
@@ -776,7 +820,6 @@ void WgChart::_resampleWave(Wave * pWave)
 
 	pWave->resampledDefault = yOfs + (int)((pWave->defaultSample - floor) * valueFactor * 256);
 
-
 	if (pWave->orgTopSamples.empty())
 	{
 		pWave->resampledTop.clear();
@@ -784,49 +827,7 @@ void WgChart::_resampleWave(Wave * pWave)
 	else
 	{
 		pWave->resampledTop.resize(nResampled);
-
-		if (nResampled == pWave->nSamples)
-		{
-			for (int i = 0; i < nResampled; i++)
-				pWave->resampledTop[i] = yOfs + (int)((pWave->orgTopSamples[i] - floor) * valueFactor * 256);
-		}
-		else if (nResampled > pWave->nSamples)
-		{
-			float stepFactor = (pWave->orgTopSamples.size() - 1) / (float) nResampled;
-
-			for (int i = 0; i < nResampled; i++)
-			{
-				float sample = stepFactor*i;
-				int ofs = (int)sample;
-				int frac2 = ((int)(sample * 256)) & 0xFF;
-				int frac1 = 256 - frac2;
-
-				int val1 = (int)((pWave->orgTopSamples[ofs] - floor) * valueFactor * 256);
-				int val2 = (int)((pWave->orgTopSamples[ofs+1] - floor) * valueFactor * 256);
-
-				pWave->resampledTop[i] = yOfs + ((val1*frac1 + val2*frac2) >> 8) ;
-			}
-		}
-		else // if( nResampled < pWave->nSamples )
-		{
-			for (int i = 0; i < nResampled; i++)
-			{
-				int ofs = (int) (sampleScale*i);
-				int end = (int)(sampleScale*(i+1));
-
-				int val = yOfs + (int)((pWave->orgTopSamples[ofs++] - floor) * valueFactor * 256);
-
-				while (ofs < end)
-				{
-					int s = yOfs + (int)((pWave->orgTopSamples[ofs++] - floor) * valueFactor * 256);
-					if (s < val)
-						val = s;
-				}
-				pWave->resampledTop[i] = val;
-			}
-
-		}
-
+		_resample(sampleScale, valueFactor, yOfs, floor, false, pWave->nSamples, pWave->orgTopSamples.data(), nResampled, const_cast<int *>(pWave->resampledTop.data()) );
 	}
 
 
@@ -837,47 +838,135 @@ void WgChart::_resampleWave(Wave * pWave)
 	else
 	{
 		pWave->resampledBottom.resize(nResampled);
+		_resample(sampleScale, valueFactor, yOfs, floor, false, pWave->nSamples, pWave->orgBottomSamples.data(), nResampled, const_cast<int *>(pWave->resampledBottom.data()));
+	}
+}
 
-		if (nResampled == pWave->nSamples)
-		{
-			for (int i = 0; i < nResampled; i++)
-				pWave->resampledBottom[i] = yOfs + (int)((pWave->orgBottomSamples[i] - floor) * valueFactor * 256);
-		}
-		else if (nResampled > pWave->nSamples)
-		{
-			float stepFactor = (pWave->orgTopSamples.size() - 1) / (float)nResampled;
+//____ _resample() ____________________________________________________________
 
-			for (int i = 0; i < nResampled; i++)
+void WgChart::_resample(float sampleScale, float valueFactor, int yOfs, float floor, bool bNegativePeak, int nSrc, float * pSrc, int nDest, int * pDest)
+{
+	if (nDest == nSrc)
+	{
+		for (int i = 0; i < nDest; i++)
+			pDest[i] = yOfs + (int)((pSrc[i] - floor) * valueFactor * 256);
+	}
+	else if (nDest > nSrc)
+	{
+		switch (m_upsampleMethod)
+		{
+			case WG_UPSAMPLE_NEAREST:
 			{
-				float sample = stepFactor*i;
-				int ofs = (int)sample;
-				int frac2 = ((int)(sample * 256)) & 0xFF;
-				int frac1 = 256 - frac2;
+				float stepFactor = nSrc / (float)nDest;
 
-				int val1 = (int)((pWave->orgBottomSamples[ofs] - floor) * valueFactor * 256);
-				int val2 = (int)((pWave->orgBottomSamples[ofs + 1] - floor) * valueFactor * 256);
-
-				pWave->resampledBottom[i] = yOfs + ((val1*frac1 + val2*frac2) >> 8);
-			}
-		}
-		else // if( nResampled < pWave->nSamples )
-		{
-			for (int i = 0; i < nResampled; i++)
-			{
-				int ofs = (int)(sampleScale*i);
-				int end = (int)(sampleScale*(i + 1));
-
-				int val = yOfs + (int)((pWave->orgBottomSamples[ofs++] - floor) * valueFactor * 256);
-
-				while (ofs < end)
+				for (int i = 0; i < nDest; i++)
 				{
-					int s = yOfs + (int)((pWave->orgBottomSamples[ofs++] - floor) * valueFactor * 256);
-					if (s > val)
-						val = s;
+					int ofs = (int)(stepFactor * i + 0.5f);
+					int val = (int)((pSrc[ofs] - floor) * valueFactor * 256);
+
+					pDest[i] = yOfs + val;
 				}
-				pWave->resampledBottom[i] = val;
 			}
+			break;
+
+			case WG_UPSAMPLE_INTERPOLATE:
+			{
+				float stepFactor = (nSrc - 1) / (float)nDest;
+
+				for (int i = 0; i < nDest; i++)
+				{
+					float sample = stepFactor * i;
+					int ofs = (int)sample;
+					int frac2 = ((int)(sample * 256)) & 0xFF;
+					int frac1 = 256 - frac2;
+
+					int val1 = (int)((pSrc[ofs] - floor) * valueFactor * 256);
+					int val2 = (int)((pSrc[ofs + 1] - floor) * valueFactor * 256);
+
+					pDest[i] = yOfs + ((val1*frac1 + val2 * frac2) >> 8);
+				}
+			}
+			break;
 		}
 
+	}
+	else // if( nResampled < pWave->nSamples )
+	{
+		switch (m_downsampleMethod)
+		{
+			case WG_DOWNSAMPLE_NEAREST:
+			{
+				float stepFactor = nSrc / (float)nDest;
+
+				for (int i = 0; i < nDest; i++)
+				{
+					int ofs = (int)(stepFactor * i + 0.5f);
+					int val = (int)((pSrc[ofs] - floor) * valueFactor * 256);
+
+					pDest[i] = yOfs + val;
+				}
+			}
+			break;
+
+			case WG_DOWNSAMPLE_AVERAGE:
+			{
+				for (int i = 0; i < nDest; i++)
+				{
+					int ofs = (int)(sampleScale*i);
+					int end = (int)(sampleScale*(i + 1));
+
+					int divider = ofs - end;
+					int val = yOfs + (int)((pSrc[ofs++] - floor) * valueFactor * 256);
+
+					while (ofs < end)
+						val += yOfs + (int)((pSrc[ofs++] - floor) * valueFactor * 256);
+					val /= divider;
+
+					pDest[i] = val;
+				}
+			}
+			break;
+
+			case WG_DOWNSAMPLE_PEAK:
+			{
+				if (bNegativePeak)
+				{
+					for (int i = 0; i < nDest; i++)
+					{
+						int ofs = (int)(sampleScale*i);
+						int end = (int)(sampleScale*(i + 1));
+
+						int val = yOfs + (int)((pSrc[ofs++] - floor) * valueFactor * 256);
+
+						while (ofs < end)
+						{
+							int s = yOfs + (int)((pSrc[ofs++] - floor) * valueFactor * 256);
+							if (s < val)
+								val = s;
+						}
+						pDest[i] = val;
+					}
+				}
+				else
+				{
+					for (int i = 0; i < nDest; i++)
+					{
+						int ofs = (int)(sampleScale*i);
+						int end = (int)(sampleScale*(i + 1));
+
+						int val = yOfs + (int)((pSrc[ofs++] - floor) * valueFactor * 256);
+
+						while (ofs < end)
+						{
+							int s = yOfs + (int)((pSrc[ofs++] - floor) * valueFactor * 256);
+							if (s > val)
+								val = s;
+						}
+						pDest[i] = val;
+					}
+				}
+			}
+			break;
+		}
 	}
 }

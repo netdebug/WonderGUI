@@ -641,6 +641,24 @@ enum WgAccessMode
 	WG_READ_WRITE
 };
 
+//____ DownsampleMethod _______________________________________________________
+
+enum WgDownsampleMethod
+{
+	WG_DOWNSAMPLE_NEAREST,
+	WG_DOWNSAMPLE_AVERAGE,
+	WG_DOWNSAMPLE_PEAK				// Keep the "peak value", highest or lowest value depending or situation
+};
+
+//____ WgUpsampleMethod _______________________________________________________
+
+enum WgUpsampleMethod
+{
+	WG_UPSAMPLE_NEAREST,
+	WG_UPSAMPLE_INTERPOLATE
+};
+
+
 //____ ScaleMode ____________________________________________________________
 
 enum WgScaleMode

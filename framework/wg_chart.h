@@ -101,7 +101,11 @@ public:
 	float	FirstSample() { return m_firstSample;  }
 	float	LastSample() { return m_lastSample;  }
 
-//	bool	SetResampleMethod();			// Nearest, Interpolate etc   We have two dimensions here...  Average, Maintain peaks...
+	void	SetUpsampleMethod( WgUpsampleMethod method );
+	void	SetDownsampleMethod( WgDownsampleMethod method );
+	void	SetResampleMethods( WgUpsampleMethod upMethod, WgDownsampleMethod downMethod );
+	WgUpsampleMethod	UpsampleMethod() const { return m_upsampleMethod; }
+	WgDownsampleMethod	DownsampleMethod() const { return m_downsampleMethod;  }
 
 	void	SetSampleLabelStyle(WgOrigo alignment, WgCoord offset, const WgSkinPtr& pSkin, const WgTextpropPtr& prop);
 	void	SetSampleGridLines(int nLines, GridLine * pLines);
@@ -161,6 +165,8 @@ protected:
 	void	_onNewSize( const WgSize& size );
 	void	_setScale( int scale );
 
+	void	_resample(float sampleScale, float valueFactor, int yOfs, float floor, bool bNegativePeak, int nSrc, float * pSrc, int nDest, int * pDest);
+
 	
 	bool	_setWaveSamples(int waveId, int firstSample, int nSamples, float * pTopBorderSamples, float * pBottomBorderSamples, float defaultSample);
 	void	_resampleAllWaves();
@@ -196,6 +202,9 @@ private:
 
 	float		m_firstSample;
 	float		m_lastSample;
+
+	WgUpsampleMethod	m_upsampleMethod;
+	WgDownsampleMethod	m_downsampleMethod;
 
 	LabelStyle	m_sampleLabelStyle;
 	LabelStyle	m_valueLabelStyle;
