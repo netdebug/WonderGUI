@@ -41,6 +41,7 @@ WgAnimPlayer::WgAnimPlayer()
 {
 	m_pAnim			= 0;
 	m_playPos		= 0.0;
+	m_destinationPos = 0;
 
 	m_bPlaying		= false;
 	m_speed			= 1.f;
@@ -75,6 +76,7 @@ bool WgAnimPlayer::SetAnimation( WgGfxAnim * pAnim )
 {
 	m_pAnim			= pAnim;
 	m_playPos		= 0.0;
+	_playPosUpdated();
 
 	WgSize	currSize = PixelSize();
 	WgSize	wantedSize;
@@ -112,9 +114,7 @@ bool WgAnimPlayer::SetPlayPosFractional( float _fraction )
 	if( !m_pAnim )
 		return false;
 
-	_fraction *= m_pAnim->Duration();
-
-	m_playPos		= _fraction;
+	m_playPos = _fraction * m_pAnim->Duration();
 	_playPosUpdated();
 	return true;
 }
@@ -211,10 +211,42 @@ bool WgAnimPlayer::Play()
 	if( !m_pAnim )
 		return false;
 
+	m_destinationPos = -1;
+
 	m_bPlaying = true;
 	_startReceiveTicks();
 	return true;
 }
+
+//____ PlayToFractional() _________________________________________________________________
+
+bool WgAnimPlayer::PlayToFractional(float fraction)
+{
+	if (!m_pAnim || fraction < 0.f )
+		return false;
+
+	m_destinationPos = (int) (fraction * m_pAnim->Duration() + 0.5f);
+	
+	m_bPlaying = true;
+	_startReceiveTicks();
+	return true;
+}
+
+
+//____ PlayTo() _________________________________________________________________
+
+bool WgAnimPlayer::PlayTo( int pos )
+{
+	if (!m_pAnim || pos < 0 )
+		return false;
+
+	m_destinationPos = pos;
+
+	m_bPlaying = true;
+	_startReceiveTicks();
+	return true;
+}
+
 
 //____ Stop() _________________________________________________________________
 
@@ -283,7 +315,34 @@ void WgAnimPlayer::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHa
 				return;
 
 			const WgEvent::Tick * pTick = static_cast<const WgEvent::Tick*>(pEvent);
-			m_playPos += pTick->Millisec() * m_speed;
+
+			double posChange = pTick->Millisec() * m_speed;
+
+			if (m_destinationPos >= 0)
+			{
+				if (m_playPos > m_destinationPos)
+				{
+					m_playPos -= posChange;
+					if (m_playPos < m_destinationPos)
+					{
+						m_playPos = m_destinationPos;
+						Stop();
+					}
+				}
+				else
+				{
+					m_playPos += posChange;
+					if (m_playPos > m_destinationPos)
+					{
+						m_playPos = m_destinationPos;
+						Stop();
+					}
+				}
+			}
+			else
+			{
+				m_playPos += posChange;
+			}
 			_playPosUpdated();
 
 		}
@@ -354,7 +413,7 @@ bool WgAnimPlayer::_onAlphaTest( const WgCoord& ofs )
 {
 	WgSize sz = PixelSize();
 
-	if( m_pAnim && m_bEnabled )
+	if( m_pAnim && m_bEnabled && m_animFrame.IsValid() )
 		return WgUtil::MarkTestBlock( ofs, m_animFrame, WgRect(0,0,sz), m_markOpacity );
 	else if( m_pStaticBlock )
 	{

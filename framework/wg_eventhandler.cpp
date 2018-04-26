@@ -39,6 +39,7 @@ WgEventHandler::WgEventHandler( WgRootPanel * pRoot )
 
 	m_bIsProcessing			= false;
 	m_bWindowFocus			= true;
+	m_bIgnoreNextCharacterEvent = false;
 
 	for( int i = 0 ; i <= WG_MAX_BUTTONS ; i++ )
 	{
@@ -550,6 +551,12 @@ int WgEventHandler::_deleteCallback( const WgEventFilter& filter, const void * p
 
 bool WgEventHandler::QueueEvent( WgEvent::Event * pEvent )
 {
+	if (m_bIgnoreNextCharacterEvent && pEvent->Type() == WG_EVENT_CHARACTER)
+	{
+		m_bIgnoreNextCharacterEvent = false;
+		return true;							// Not queued, but not an error so we pretend everything is ok.
+	}
+
 	if( m_bIsProcessing )
 	{
 		// Events that are posted as a direct result of another event being processed
@@ -649,6 +656,12 @@ bool WgEventHandler::ForwardEvent( const WgEvent::Event * _pEvent, WgWidget * pR
 	return true;
 }
 
+//____ 	IgnoreNextCharacterEvent() ____________________________________________
+
+void WgEventHandler::IgnoreNextCharacterEvent()
+{
+	m_bIgnoreNextCharacterEvent = true;
+}
 
 //____ ProcessEvents() ________________________________________________________
 
@@ -1653,4 +1666,3 @@ void * WgEventHandler::ListenerCallback::Receiver() const
 {
 	return m_pListener;
 }
-

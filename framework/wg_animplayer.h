@@ -67,6 +67,10 @@ public:
 	bool			Stop();
 	bool			IsPlaying() { return m_bPlaying; };
 
+	bool			PlayTo(int pos );					/// Play to position measured in ticks
+	bool			PlayToFractional(float fraction);	/// Play to position measured in ticks
+
+
 	WgSize			PreferredPixelSize() const;
 
     void SetTint(WgColor kColor);
@@ -92,7 +96,9 @@ private:
 
 	bool			m_bPlaying;
 	double			m_playPos;
+	int				m_destinationPos;		// -1 = none.
 	float			m_speed;
+    float           m_playStateFraction = 0.0f;
 
     WgColor         m_kTintColor;
 };

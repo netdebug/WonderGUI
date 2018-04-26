@@ -64,6 +64,9 @@ public:
 
 	void	ProcessEvents();
 
+	void	IgnoreNextCharacterEvent();			// Hack to allow us to forget a /n Character event following a WG_KEY_RETURN that switched focus for us.
+												// In WG3 we should have something similar in InputHandler instead (ignoreNextText?) or some generic intercept msg callback.
+
 	//----
 
 	bool	SetFocusGroup( WgPanel * pFocusGroup );
@@ -171,6 +174,7 @@ private:
 	std::deque<WgEvent::Event*>				m_eventQueue;
 	bool									m_bIsProcessing;	// Set when we are inside ProcessEvents().
 	std::deque<WgEvent::Event*>::iterator	m_insertPos;		// Position where we insert events being queued when processing.
+	bool									m_bIgnoreNextCharacterEvent;
 
 	int64_t			m_time;
 	WgCoord			m_pointerPos;
