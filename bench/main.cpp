@@ -40,6 +40,7 @@
 #include <wg_simplevolumemeter.h>
 #include <wg_chart.h>
 #include <wg_scrollchart.h>
+#include <wg_canvascapsule.h>
 
 #include "testwidget.h"
 
@@ -115,7 +116,7 @@ int main ( int argc, char** argv )
 
 	SDL_Init(SDL_INIT_VIDEO);
 
-	int posX = 100, posY = 100, width = 1000, height = 200;
+	int posX = 100, posY = 100, width = 1000, height = 600;
 
 	int flags = 0;
 
@@ -133,12 +134,19 @@ int main ( int argc, char** argv )
 
 	SDL_GL_SetSwapInterval(1);
 
-	SDL_Renderer * pRenderer = SDL_CreateRenderer(pWin, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+//	SDL_Renderer * pRenderer = SDL_CreateRenderer(pWin, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 #ifdef WIN32  
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 #endif
+
+
+	glDrawBuffer(GL_FRONT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glFlush();
+
 
 #else
 	SDL_Window * pWin = SDL_CreateWindow("WonderGUI Testbench (Software)", posX, posY, width, height, 0);
@@ -257,32 +265,27 @@ int main ( int argc, char** argv )
 
 	WgWaveLine	topLine, bottomLine;
 
-	topLine.color = { 255,255,255,32 };
-	topLine.thickness = 10.f;
+	topLine.color = WgColor::transparent;
+	topLine.thickness = 1.f;
 	topLine.pWave = topWave;
 	topLine.length = 2001;
 
-	bottomLine.color = WgColor::white;
-	bottomLine.thickness = 0.2f;
+	bottomLine.color = WgColor::transparent;
+	bottomLine.thickness = 1.f;
 	bottomLine.pWave = bottomWave;
 	bottomLine.length = 2001;
 
 	for (int i = 0; i < 2001; i++)
 	{
-		topWave[i] = (int)((sin(i / 10.0) * 80) * 256);
-		bottomWave[i] = (int)((0 + sin(i / 20.0) * 6) * 256);
+		topWave[i] = (int)((sin(i / 20.f) * 100) * 256);
+		bottomWave[i] = topWave[i]+360;
+//		bottomWave[i] = (int)((0 + sin(i / 20.0) * 6) * 256);
 	}
 
    // program main loop
 
 	int counter = 0;
 
-/*
-	glDrawBuffer(GL_FRONT);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glFlush();
-*/
     while (eventLoop( pRoot->EventHandler() ))
     {
 		if (g_pSpriteHook)
@@ -403,16 +406,16 @@ int main ( int argc, char** argv )
 		SDL_LockSurface( pScreen );
 #endif
 /*
-		pGfxDevice->BeginRender();
+		g_pGfxDevice->BeginRender();
 
-		pGfxDevice->Fill(pCanvas->Size(), WgColor::black);
+		g_pGfxDevice->Fill(WgSize(width,height), WgColor::black);
 
-		pGfxDevice->ClipDrawHorrWave({ 10,100,380,800 }, { 0,500 }, 1900, topLine, bottomLine, { 0,0,255,128 }, WgColor::yellow);
+		g_pGfxDevice->ClipDrawHorrWave({ 10,100,380,800 }, { 0,500 }, 1900, topLine, bottomLine, WgColor::red, WgColor::red);
 
 		//		pGfxDevice->stretchBlitSubPixelWithInvert(pMyCanvas, 0,0,400,400, 0,0, 200, 200 );
 		//		pGfxDevice->blit(pMyCanvas, { 0,0,400,400 }, { 0,0 });
 		//		pGfxDevice->stretchBlit(pMyCanvas, { 0,0,400,400 }, { 0,0,200,200 });
-		pGfxDevice->EndRender();
+		g_pGfxDevice->EndRender();
 */
 
 		pRoot->Render();
@@ -457,7 +460,6 @@ int main ( int argc, char** argv )
 		SDL_UpdateWindowSurfaceRects(pWin, updatedRects, nUpdatedRects);
 #endif
  
-//		SDL_GL_SwapBuffers();
         // Pause for a while
 
 //		SDL_Delay(32);
@@ -548,7 +550,12 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	WgSurface * pPlateImg = sdl_wglib::LoadSurface("../resources/grey_pressable_plate.bmp", *g_pSurfaceFactory);
 
+	WgSurface * pAnimSurf = sdl_wglib::LoadSurface("../resources/dummy_anim.png", *g_pSurfaceFactory);
+
+
 //	WgBlockSkinPtr pTagSkin = WgBlockSkin::Create();
+
+
 
 
 
@@ -567,20 +574,90 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	WgImage * pBackground = new WgImage();
 	pBackground->SetSource(pBackBlock);
-
 	WgFlexHook * pHook = pFlex->AddChild(pBackground);
 	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
 
 
-	// Setup moving sprite
+	// Animplayer test
+/*
+	{
+		auto pPlayerFrame = new WgFlexPanel();
 
+		auto pBgSkin = WgBoxSkin::Create(WgColor::white, 2, WgColor::black);
+		pBgSkin->SetContentPadding(2);
+
+		pPlayerFrame->SetSkin( pBgSkin );
+
+
+		auto pPlayer = new WgAnimPlayer();
+		pPlayerFrame->AddChild(pPlayer, { 2,2,100,100 });
+
+		auto pBtn1 = (WgButton*)pDB->CloneWidget("button");
+		pPlayerFrame->AddChild(pBtn1, { 2,102,30,30 } );
+
+
+		auto pBtn2 = (WgButton*)pDB->CloneWidget("button");
+		pPlayerFrame->AddChild(pBtn2, { 32,102,30,30 });
+
+		auto pBtn3 = (WgButton*)pDB->CloneWidget("button");
+		pPlayerFrame->AddChild(pBtn3, { 62,102,30,30 });
+
+		pFlex->AddChild(pPlayerFrame, { 20,20,104,154 });
+
+
+
+		auto pGfxAnim = new WgGfxAnim({ 100,100 });
+		pGfxAnim->AddFrames(pAnimSurf, 500, 5);
+
+		pPlayer->SetAnimation(pGfxAnim);
+
+
+		pEventHandler->AddCallback(WgEventFilter::ButtonPress(pBtn1), [](const WgEvent::Event * pEvent, WgWidget *pPlayer)
+		{
+			static_cast<WgAnimPlayer*>(pPlayer)->PlayToFractional(0.1f);
+		}, pPlayer);
+
+		pEventHandler->AddCallback(WgEventFilter::ButtonPress(pBtn2), [](const WgEvent::Event * pEvent, WgWidget *pPlayer)
+		{
+			static_cast<WgAnimPlayer*>(pPlayer)->PlayToFractional(0.5f);
+		}, pPlayer);
+
+		pEventHandler->AddCallback(WgEventFilter::ButtonPress(pBtn3), [](const WgEvent::Event * pEvent, WgWidget *pPlayer)
+		{
+			static_cast<WgAnimPlayer*>(pPlayer)->PlayToFractional(0.9f);
+		}, pPlayer);
+
+
+//		pPlayer->Play();
+	}
+*/
+
+
+	// Test for mouse leave on parent while button pressed and leaving child
+/*
+	{
+		auto pSkin = WgBoxSkin::Create(WgColor::cornsilk, 2, WgColor::deeppink);
+		pSkin->SetStateColor(WG_STATE_HOVERED, WgColor::white, WgColor::red );
+		pSkin->SetStateColor(WG_STATE_PRESSED, WgColor::yellow, WgColor::red);
+		pSkin->SetContentPadding(3 );
+		pSkin->SetContentShift(WG_STATE_PRESSED, { 2,2 });
+
+		auto pButton = new WgButton();
+		pButton->SetSkin(pSkin);
+//		pButton->SetText("TEST");
+		pFlex->AddChild(pButton, { 50,50,200,100 } );
+	}
+*/
+
+	// Setup moving sprite
+/*
 	{
 		WgFiller * pSprite = new WgFiller();
 		pSprite->SetColors(WgColorset::Create(WgColor::red));
 
 		g_pSpriteHook = pFlex->AddChild(pSprite, WgRect(0, 100, 100, 100));
 	}
-
+*/
 	// PackPanel padding test
 /*
 	{
@@ -715,7 +792,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	// Text InputFocus test
-/*
+
 
 	WgBlockSkinPtr pSkin = WgBlockSkin::CreateStatic(pPlateImg, { 0,0,10,10 }, 3);
 	pSkin->SetStateBlock(WG_STATE_FOCUSED, { 10,0 });
@@ -736,7 +813,15 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pDisplay1->SetSelectionProperties(selectionProp.Register());
 
-	pFlex->AddChild(pDisplay1, WgRect(0, 0, 200, 100));
+
+	auto pCanvas = new WgCanvasCapsule();
+	pCanvas->SetChild(pDisplay1);
+	pCanvas->SetSurfaceFactory(g_pSurfaceFactory);
+	pCanvas->SetColor(WgColor::transparent);
+
+	pCanvas->StartFade(WgColor::white, 3000);
+
+	pFlex->AddChild(pCanvas, WgRect(0, 0, 200, 100));
 
 
 	WgScrollPanel * pScroll = new WgScrollPanel();
@@ -761,8 +846,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pScroll->SetVSlider(pSlider);
 
 
-	pFlex->SetScale(WG_SCALE_BASE * 2);
-*/
+//	pFlex->SetScale(WG_SCALE_BASE * 2);
+
 	// Scroll chart widget
 
 /*
@@ -790,12 +875,26 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	m_pScrollChart->SetValueLabelStyle(WG_NORTHWEST, { -10,0 }, pLabelSkin, 0);
 //	m_pScrollChart->SetCanvasPadding(WgBorders(50, 0, 0, 0));
 
-	auto pWindow = new WgPackPanel();
-	pWindow->SetOrientation(WG_VERTICAL);
-	pWindow->SetSizeBroker(new WgUniformSizeBroker());
 
-	pWindow->AddChild(m_pScrollChart)->SetWeight(2);
 
+
+	auto pWindowContent = new WgPackPanel();
+	pWindowContent->SetOrientation(WG_VERTICAL);
+	pWindowContent->SetSizeBroker(new WgUniformSizeBroker());
+
+	pWindowContent->AddChild(m_pScrollChart)->SetWeight(2);
+*/
+
+	// Canvas Capsule
+
+//	auto pWindow = pWindowContent;
+/*
+	auto pWindow = new WgCanvasCapsule();
+	pWindow->SetChild(pWindowContent);
+	pWindow->SetSurfaceFactory(g_pSurfaceFactory);
+
+	pWindow->SetColor(0xFFFFFFFF);
+	pWindow->StartFade(0x00FFFFFF, 4000);
 
 	auto pButtonBar = new WgPackPanel();
 	pButtonBar->SetSizeBroker(new WgUniformSizeBroker());
@@ -848,6 +947,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pChart->SetFixedSampleRange(first, last);
 	}, pChart);
 */
+
+
 /*
 	auto pResizeButton = (WgButton*)pDB->CloneWidget("button");
 	pResizeButton->SetText(" ");
@@ -862,7 +963,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 //	pButtonBar->AddChild(pZoomButton)->SetWeight(0);
 //	pButtonBar->AddChild(pScrollButton)->SetWeight(0);
 	pButtonBar->AddChild(pResizeButton)->SetWeight(0);
-	pWindow->AddChild(pButtonBar)->SetWeight(0);
+	pWindowContent->AddChild(pButtonBar)->SetWeight(0);
 
 
 
@@ -871,8 +972,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 //	pHook->SetScaleGeo(true);
 
 //	pFlex->SetScale(WG_SCALE_BASE * 2);
-*/
 
+*/
 	// Chart widget
 /*
 	WgChart * pChart = new WgChart();
@@ -900,7 +1001,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 //	pChartSkin->SetContentPadding({ 20 });
 
 	int iWave = pChart->AddWave();
-	pChart->SetWaveSamples(iWave, 0, 1001, topWave, bottomWave);
+	pChart->SetWaveSamples(iWave, 0, 1001, topWave);
 	pChart->SetWaveStyle(iWave, WgColor::antiquewhite, WgColor::brown, 2.f, WgColor::black, 8.f, WgColor::black);
 
 //	int iWave2 = pChart->AddWave();
@@ -910,7 +1011,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pChart->SetSkin( pChartSkin );
 	pChart->SetCanvasPadding({ 10 });
 
-	pChart->SetFixedValueRange(pChart->ValueRangeStart()+20, pChart->ValueRangeEnd()-20);
+//	pChart->SetFixedValueRange(pChart->ValueRangeStart()+20, pChart->ValueRangeEnd()-20);
 
 	WgChart::GridLine valueGrid[3]{ {0.f,1.f,WgColor::red,"0"},{ 100.f,1.f,WgColor::red,"100" },{ -100.f,1.f,WgColor::red,"-100" } };
 
@@ -948,7 +1049,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pValueScaleButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pValueScaleButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
 	{
-		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNowPoints();
 
 		WgChart * pChart = static_cast<WgChart*>(pWin);
 
@@ -963,7 +1064,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pZoomButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pZoomButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
 	{
-		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNowPoints();
 
 		WgChart * pChart = static_cast<WgChart*>(pWin);
 
@@ -978,7 +1079,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pScrollButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pScrollButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
 	{
-		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNowPoints();
 
 		WgChart * pChart = static_cast<WgChart*>(pWin);
 
@@ -993,8 +1094,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pResizeButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pResizeButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
 	{ 
-		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
-		static_cast<WgFlexHook*>(pWin->Hook())->SetSize(WgSize(pWin->Size() + WgSize(drag.x, drag.y))/2); 
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNowPoints();
+		static_cast<WgFlexHook*>(pWin->Hook())->SetPointSize(WgSize(pWin->PointSize() + WgSize(drag.x, drag.y))/2); 
 	}, pWindow);
 
 	pButtonBar->AddChild(pFiller)->SetWeight(2);
@@ -1007,11 +1108,11 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	pHook = pFlex->AddChild(pWindow, WgRect(10, 10, 500, 300) );
-
-	pHook->SetScaleGeo(true);
-
-	pFlex->SetScale(WG_SCALE_BASE*2);
 */
+//	pHook->SetScaleGeo(true);
+
+//	pFlex->SetScale(WG_SCALE_BASE*2);
+
 
 	// LED Volume meter
 /*	

@@ -1501,7 +1501,7 @@ void WgGfxDevice::_traceLine(int * pDest, int nPoints, const WgWaveLine& wave, i
 	static float prevThickness = -1.f;
 
 	float thickness = wave.thickness;
-	int brushSteps = (int)(thickness / 2);
+	int brushSteps = (int)(thickness * c_supersamples / 2);
 
 	// Generate brush
 

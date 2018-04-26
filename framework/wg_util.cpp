@@ -72,6 +72,9 @@ bool WgUtil::AdjustScaledArea(const WgBlock& block, WgRect& area)
 
 bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, int opacityTreshold )
 {
+	if (!block.IsValid())
+		return false;
+
 	AdjustScaledArea(block, canvas);
 
 	// Sanity check & shortcuts.

@@ -213,7 +213,7 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
         if (_canvas.w > maxSize.w || _canvas.h > maxSize.h)
             return;                            // Can't create a canvas of the required size!
 
-        m_pCanvas = m_pFactory->CreateSurface(_canvas.Size(), WG_PIXEL_BGRA_8);
+        m_pCanvas = m_pFactory->CreateSurface(_canvas.Size(), WG_PIXEL_BGR_8);
         m_dirtyPatches.Clear();
         m_dirtyPatches.Add(_canvas.Size());
     }
