@@ -32,6 +32,15 @@
 
 
 class WgSurfaceSoft;
+/*
+struct WgSegmentEdge
+{
+	int			begin;				// Pixeloffset, 24.8 format.
+	int			end;				// Pixeloffset, 24.8 format. First pixel after edge (segment after the edge has 100% coverage)
+	int			coverage;			// 0-65536
+	int			coverageInc;		// 24.8 format
+};
+*/
 
 
 class WgGfxDeviceSoft : public WgGfxDevice
@@ -81,6 +90,10 @@ protected:
 	void 	_clipDrawLineSegment( int clipStart, int clipEnd, Uint8 * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, WgColor color );
 
 	void	_clipDrawWaveColumn(int clipBeg, int clipLen, uint8_t * pColumn, int leftPos[4], int rightPos[4], WgColor col[3], int linePitch);
+
+//	void	_clipDrawSegmentColumn(int clipBeg, int clipEnd, uint8_t * pColumn, int linePitch, int nEdges, WgSegmentEdge * pEdges, WgColor * pSegmentColors);
+	
+
 
 
 	void	_drawHorrFadeLine( Uint8 * pLineStart, int begOfs, int peakOfs, int endOfs, WgColor color );

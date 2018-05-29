@@ -952,8 +952,182 @@ void WgGfxDeviceSoft::_clipDrawWaveColumn(int clipBeg, int clipLen, uint8_t * pC
 	}
 }
 
+//____ _clipDrawSegmentColumn() _______________________________________________
+/*
+void WgGfxDeviceSoft::_clipDrawSegmentColumn(int clipBeg, int clipEnd, uint8_t * pColumn, int linePitch, int nEdges, WgSegmentEdge * pEdges, WgColor * pSegmentColors)
+{
+	// Do clipping of edges, part 1 - completely remove segments that are fully clipped
+
+	while (nEdges > 0 && pEdges[nEdges - 1].begin >= clipEnd)
+	{
+		nEdges--;																	// Edge fully below clip rectangle, segment following edge will never be shown
+	}
+
+	while (nEdges > 0 && pEdges[0].end <= clipBeg)
+	{
+		pSegmentColors++;
+		pEdges++;																	// Edge fully above clip rectangel, segment preceeding edge will never be shown
+		nEdges--;
+	}
+
+	// Do clipping of edges, part 2 - adjust edges of partially clipped segments
+
+	for (int i = 0; i < nEdges; i++)
+	{
+		WgSegmentEdge * p = pEdges + i;
+
+		if (p->begin < clipBeg)
+		{
+			int cut = clipBeg - p->begin;
+			p->begin = clipBeg;
+			p->coverage += (p->coverageInc*cut) >> 8;
+		}
+
+		if (p->end > clipEnd)
+			p->begin = clipEnd;
+	}
+
+	// Render the column
+
+	uint8_t * pDst = pColumn;
+	int offset = clipBeg;
+
+	int nUseEdges = 1;
 
 
+	while (offset < clipEnd)
+	{
+		if (nEdges == 0 || offset < pEdges[0].begin)
+		{
+			// We are fully inside a segment, no need to take any edge into account.
+
+			int end = std::min(clipEnd, pEdges[0].begin);
+			WgColor segmentColor = *pSegmentColors;
+
+			if (segmentColor.a == 0)
+			{
+				pDst = pColumn + end * linePitch;
+				offset = end;												// Just skip segment since it is transparent
+			}
+			else
+			{
+				int storedRed = ((int)segmentColor.r) * segmentColor.a;
+				int storedGreen = ((int)segmentColor.g) * segmentColor.a;
+				int storedBlue = ((int)segmentColor.b) * segmentColor.a;
+				int invAlpha = 255 - segmentColor.a;
+
+				while (offset < end)
+				{
+					pDst[0] = m_pDivTab[pDst[0] * invAlpha + storedBlue];
+					pDst[1] = m_pDivTab[pDst[1] * invAlpha + storedGreen];
+					pDst[2] = m_pDivTab[pDst[2] * invAlpha + storedRed];
+					pDst += linePitch;
+					offset++;
+				}
+			}
+		}
+		else
+		{
+			WgColor	* pCol = pSegmentColors;
+
+			if (nEdges == 1 || offset < pEdges[1].begin)
+			{
+				int aFrac = 65536 - pEdges[0].coverage;
+				int bFrac = pEdges[0].coverage;
+
+				aFrac = (aFrac*pCol[0].a) / 255;
+				bFrac = (bFrac*pCol[1].a) / 255;
+
+				int backFraction = 65536 - aFrac - bFrac;
+
+				pDst[0] = (pDst[0] * backFraction + pCol[0].b * aFrac + pCol[1].b * bFrac) >> 16;
+				pDst[1] = (pDst[1] * backFraction + pCol[0].g * aFrac + pCol[1].g * bFrac) >> 16;
+				pDst[2] = (pDst[2] * backFraction + pCol[0].r * aFrac + pCol[1].r * bFrac) >> 16;
+
+				pEdges[0].coverage += pEdges[0].coverageInc;
+			}
+			else if (nEdges == 2 || offset < pEdges[2].begin)
+			{
+				int aFrac = 65536 - pEdges[0].coverage;
+				int bFrac = pEdges[0].coverage - pEdges[1].coverage;
+				int cFrac = pEdges[1].coverage;
+
+				aFrac = (aFrac*pCol[0].a) / 255;
+				bFrac = (bFrac*pCol[1].a) / 255;
+				cFrac = (cFrac*pCol[2].a) / 255;
+
+				int backFraction = 65536 - aFrac - bFrac - cFrac;
+
+				pDst[0] = (pDst[0] * backFraction + pCol[0].b * aFrac + pCol[1].b * bFrac + pCol[2].b * cFrac) >> 16;
+				pDst[1] = (pDst[1] * backFraction + pCol[0].g * aFrac + pCol[1].g * bFrac + pCol[2].g * cFrac) >> 16;
+				pDst[2] = (pDst[2] * backFraction + pCol[0].r * aFrac + pCol[1].r * bFrac + pCol[2].r * cFrac) >> 16;
+
+				pEdges[0].coverage += pEdges[0].coverageInc;
+				pEdges[1].coverage += pEdges[1].coverageInc;
+			}
+			else if (nEdges == 3 || offset < pEdges[3].begin)
+			{
+				int aFrac = 65536 - pEdges[0].coverage;
+				int bFrac = pEdges[0].coverage - pEdges[1].coverage;
+				int cFrac = pEdges[1].coverage - pEdges[2].coverage;
+				int dFrac = pEdges[2].coverage;
+
+				aFrac = (aFrac*pCol[0].a) / 255;
+				bFrac = (bFrac*pCol[1].a) / 255;
+				cFrac = (cFrac*pCol[2].a) / 255;
+				dFrac = (dFrac*pCol[3].a) / 255;
+
+				int backFraction = 65536 - aFrac - bFrac - cFrac - dFrac;
+
+				pDst[0] = (pDst[0] * backFraction + pCol[0].b * aFrac + pCol[1].b * bFrac + pCol[2].b * cFrac + pCol[3].b * dFrac) >> 16;
+				pDst[1] = (pDst[1] * backFraction + pCol[0].g * aFrac + pCol[1].g * bFrac + pCol[2].g * cFrac + pCol[3].g * dFrac) >> 16;
+				pDst[2] = (pDst[2] * backFraction + pCol[0].r * aFrac + pCol[1].r * bFrac + pCol[2].r * cFrac + pCol[3].r * dFrac) >> 16;
+
+				pEdges[0].coverage += pEdges[0].coverageInc;
+				pEdges[1].coverage += pEdges[1].coverageInc;
+				pEdges[2].coverage += pEdges[2].coverageInc;
+			}
+			else if (nEdges == 4 || offset < pEdges[4].begin)
+			{
+				int aFrac = 65536 - pEdges[0].coverage;
+				int bFrac = pEdges[0].coverage - pEdges[1].coverage;
+				int cFrac = pEdges[1].coverage - pEdges[2].coverage;
+				int dFrac = pEdges[2].coverage - pEdges[3].coverage;
+				int eFrac = pEdges[3].coverage;
+
+				aFrac = (aFrac*pCol[0].a) / 255;
+				bFrac = (bFrac*pCol[1].a) / 255;
+				cFrac = (cFrac*pCol[2].a) / 255;
+				dFrac = (dFrac*pCol[3].a) / 255;
+				eFrac = (eFrac*pCol[4].a) / 255;
+
+				int backFraction = 65536 - aFrac - bFrac - cFrac - dFrac - eFrac;
+
+				pDst[0] = (pDst[0] * backFraction + pCol[0].b * aFrac + pCol[1].b * bFrac + pCol[2].b * cFrac + pCol[3].b * dFrac + pCol[4].b * eFrac) >> 16;
+				pDst[1] = (pDst[1] * backFraction + pCol[0].g * aFrac + pCol[1].g * bFrac + pCol[2].g * cFrac + pCol[3].g * dFrac + pCol[4].g * eFrac) >> 16;
+				pDst[2] = (pDst[2] * backFraction + pCol[0].r * aFrac + pCol[1].r * bFrac + pCol[2].r * cFrac + pCol[3].r * dFrac + pCol[4].r * eFrac) >> 16;
+
+				pEdges[0].coverage += pEdges[0].coverageInc;
+				pEdges[1].coverage += pEdges[1].coverageInc;
+				pEdges[2].coverage += pEdges[2].coverageInc;
+				pEdges[3].coverage += pEdges[3].coverageInc;
+			}
+
+			pDst += linePitch;
+			offset++;
+		}
+
+		while (nEdges > 0 && offset >= pEdges[0].end)
+		{
+			pEdges++;
+			nEdges--;
+			pSegmentColors++;
+		}
+
+	}
+
+}
+*/
 //____ _drawHorrLine() _____________________________________________________
 
 void WgGfxDeviceSoft::_drawHorrLine( const WgCoord& start, int length, const WgColor& col )

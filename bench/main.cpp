@@ -44,7 +44,7 @@
 
 #include "testwidget.h"
 
-//#define USE_OPEN_GL
+#define USE_OPEN_GL
 
 
 WgSurfaceFactory *	g_pSurfaceFactory = nullptr;
@@ -259,25 +259,29 @@ int main ( int argc, char** argv )
 	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 0 );
 */
 
+//	WgColor lineColor = WgColor::transparent;
+	WgColor lineColor = WgColor::white;
+
+	int lineThickness = 1.f;
 
 	int		topWave[2001];
 	int		bottomWave[2001];
 
 	WgWaveLine	topLine, bottomLine;
 
-	topLine.color = WgColor::transparent;
-	topLine.thickness = 1.f;
+	topLine.color = lineColor;
+	topLine.thickness = lineThickness;
 	topLine.pWave = topWave;
 	topLine.length = 2001;
 
-	bottomLine.color = WgColor::transparent;
-	bottomLine.thickness = 1.f;
-	bottomLine.pWave = bottomWave;
+	bottomLine.color = lineColor;
+	bottomLine.thickness = lineThickness;
+	bottomLine.pWave = topWave;
 	bottomLine.length = 2001;
 
 	for (int i = 0; i < 2001; i++)
 	{
-		topWave[i] = (int)((sin(i / 20.f) * 100) * 256);
+		topWave[i] = (int)((sin(i / 5.f) * 100) * 256);
 		bottomWave[i] = topWave[i]+360;
 //		bottomWave[i] = (int)((0 + sin(i / 20.0) * 6) * 256);
 	}
@@ -405,20 +409,20 @@ int main ( int argc, char** argv )
 #ifndef USE_OPEN_GL
 		SDL_LockSurface( pScreen );
 #endif
-/*
+
 		g_pGfxDevice->BeginRender();
 
 		g_pGfxDevice->Fill(WgSize(width,height), WgColor::black);
 
-		g_pGfxDevice->ClipDrawHorrWave({ 10,100,380,800 }, { 0,500 }, 1900, topLine, bottomLine, WgColor::red, WgColor::red);
+		g_pGfxDevice->ClipDrawHorrWave({ 10,100,380,500 }, { 0,500 }, 1900, topLine, bottomLine, WgColor::red, WgColor::red);
 
 		//		pGfxDevice->stretchBlitSubPixelWithInvert(pMyCanvas, 0,0,400,400, 0,0, 200, 200 );
 		//		pGfxDevice->blit(pMyCanvas, { 0,0,400,400 }, { 0,0 });
 		//		pGfxDevice->stretchBlit(pMyCanvas, { 0,0,400,400 }, { 0,0,200,200 });
 		g_pGfxDevice->EndRender();
-*/
 
-		pRoot->Render();
+
+//		pRoot->Render();
 
 #ifndef USE_OPEN_GL
 		SDL_UnlockSurface( pScreen );
@@ -793,7 +797,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	// Text InputFocus test
 
-
+/*
 	WgBlockSkinPtr pSkin = WgBlockSkin::CreateStatic(pPlateImg, { 0,0,10,10 }, 3);
 	pSkin->SetStateBlock(WG_STATE_FOCUSED, { 10,0 });
 
@@ -844,13 +848,13 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	WgVSlider * pSlider = (WgVSlider*) pDB->CloneWidget("vslider");
 	pScroll->SetVSlider(pSlider);
-
+*/
 
 //	pFlex->SetScale(WG_SCALE_BASE * 2);
 
 	// Scroll chart widget
 
-/*
+
 	m_pScrollChart = new WgScrollChart();
 
 	WgBoxSkinPtr pChartSkin = WgBoxSkin::Create(WgColor::white, WgBorders(1), WgColor::black);
@@ -883,12 +887,12 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pWindowContent->SetSizeBroker(new WgUniformSizeBroker());
 
 	pWindowContent->AddChild(m_pScrollChart)->SetWeight(2);
-*/
+
 
 	// Canvas Capsule
 
 //	auto pWindow = pWindowContent;
-/*
+
 	auto pWindow = new WgCanvasCapsule();
 	pWindow->SetChild(pWindowContent);
 	pWindow->SetSurfaceFactory(g_pSurfaceFactory);
@@ -916,13 +920,13 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 		m_pScrollChart->SetValueRange(first, last);
 	}, m_pScrollChart);
-*/
-/*
+
+
 	auto pZoomButton = (WgButton*)pDB->CloneWidget("button");
 	pZoomButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pZoomButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
 	{
-		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNowPoints();
 
 		WgChart * pChart = static_cast<WgChart*>(pWin);
 
@@ -930,14 +934,14 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		float last = pChart->LastSample() + drag.x / 5.f;
 
 		pChart->SetFixedSampleRange(first, last);
-	}, pChart);
+	}, pWindow);
 
 
 	auto pScrollButton = (WgButton*)pDB->CloneWidget("button");
 	pScrollButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pScrollButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
 	{
-		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNow();
+		WgCoord drag = static_cast<const WgEvent::MouseButtonDrag*>(pEvent)->DraggedNowPoints();
 
 		WgChart * pChart = static_cast<WgChart*>(pWin);
 
@@ -945,11 +949,11 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		float last = pChart->LastSample() + drag.x / 10.f;
 
 		pChart->SetFixedSampleRange(first, last);
-	}, pChart);
-*/
+	}, pWindow);
 
 
-/*
+
+
 	auto pResizeButton = (WgButton*)pDB->CloneWidget("button");
 	pResizeButton->SetText(" ");
 	pEventHandler->AddCallback(WgEventFilter::MouseButtonDrag(pResizeButton, 1), [](const WgEvent::Event * pEvent, WgWidget *pWin)
@@ -973,7 +977,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 //	pFlex->SetScale(WG_SCALE_BASE * 2);
 
-*/
+
 	// Chart widget
 /*
 	WgChart * pChart = new WgChart();

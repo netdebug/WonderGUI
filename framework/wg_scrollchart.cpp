@@ -83,6 +83,7 @@ WgScrollChart::WgScrollChart()
 
 WgScrollChart::~WgScrollChart()
 {
+	_stopReceiveTicks();
 }
 
 //____ Type() _________________________________________________________________
