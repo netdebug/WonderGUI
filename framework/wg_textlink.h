@@ -30,9 +30,10 @@
 #	include <wg_smartptr.h>
 #endif
 
+#include <wg_geo.h>
+
 class WgText;
 class WgTextlink;
-class WgCoord;
 
 typedef	WgSmartPtr<class WgTextlink> WgTextLinkPtr;
 

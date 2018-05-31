@@ -59,7 +59,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeader />
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
@@ -79,6 +79,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="framework\wg3_base.h" />
+    <ClInclude Include="framework\wg3_blob.h" />
+    <ClInclude Include="framework\wg3_color.h" />
+    <ClInclude Include="framework\wg3_geo.h" />
+    <ClInclude Include="framework\wg3_gfxdevice.h" />
+    <ClInclude Include="framework\wg3_interface.h" />
+    <ClInclude Include="framework\wg3_nullgfxdevice.h" />
+    <ClInclude Include="framework\wg3_object.h" />
+    <ClInclude Include="framework\wg3_pointers.h" />
+    <ClInclude Include="framework\wg3_stronginterfaceptr.h" />
+    <ClInclude Include="framework\wg3_strongptr.h" />
+    <ClInclude Include="framework\wg3_surface.h" />
+    <ClInclude Include="framework\wg3_surfacefactory.h" />
+    <ClInclude Include="framework\wg3_types.h" />
+    <ClInclude Include="framework\wg3_util.h" />
+    <ClInclude Include="framework\wg3_weakinterfaceptr.h" />
+    <ClInclude Include="framework\wg3_weakptr.h" />
     <ClInclude Include="framework\wg_anim.h" />
     <ClInclude Include="framework\wg_animplayer.h" />
     <ClInclude Include="framework\wg_base.h" />
@@ -189,6 +206,7 @@
     <ClInclude Include="framework\wg_valueformat.h" />
     <ClInclude Include="framework\wg_vectorglyphs.h" />
     <ClInclude Include="framework\wg_vectorpanel.h" />
+    <ClInclude Include="framework\wg_versionbridge.h" />
     <ClInclude Include="framework\wg_volumemeter.h" />
     <ClInclude Include="framework\wg_widget.h" />
     <ClInclude Include="framework\wg_widgetcollection.h" />
@@ -196,6 +214,16 @@
     <ClInclude Include="framework\wondergui.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="framework\wg3_blob.cpp" />
+    <ClCompile Include="framework\wg3_color.cpp" />
+    <ClCompile Include="framework\wg3_geo.cpp" />
+    <ClCompile Include="framework\wg3_gfxdevice.cpp" />
+    <ClCompile Include="framework\wg3_interface.cpp" />
+    <ClCompile Include="framework\wg3_nullgfxdevice.cpp" />
+    <ClCompile Include="framework\wg3_object.cpp" />
+    <ClCompile Include="framework\wg3_surface.cpp" />
+    <ClCompile Include="framework\wg3_surfacefactory.cpp" />
+    <ClCompile Include="framework\wg3_util.cpp" />
     <ClCompile Include="framework\wg_anim.cpp" />
     <ClCompile Include="framework\wg_animplayer.cpp" />
     <ClCompile Include="framework\wg_base.cpp" />

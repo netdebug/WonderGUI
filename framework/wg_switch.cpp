@@ -144,7 +144,7 @@ void WgSwitch::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const Wg
             } else {
                 color = m_offColor;
             }
-			pDevice->ClipDrawElipse( _clip, WgRect(x,y,itemSize,itemSize), color );
+//			pDevice->ClipDrawElipse( _clip, WgRect(x,y,itemSize,itemSize), color );
 			y += itemSize + stepping;
 		}
 	}	

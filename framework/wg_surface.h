@@ -38,10 +38,14 @@
 
 #include <vector>
 
+#include <wg3_surface.h>
+
 //____ WgSurface ______________________________________________________________
 
 class WgSurface
 {
+	friend class WgGfxDevice;
+	friend class WgGfxDeviceSoft;
 
 public:
 	virtual ~WgSurface();
@@ -54,36 +58,36 @@ public:
     
 	virtual	int			Width() const;
 	virtual	int			Height() const;
-	virtual bool		IsOpaque() const = 0;
+	inline bool			IsOpaque() const { return m_pRealSurface->isOpaque(); }
 
     void                SetScaleFactor( int factor ) { m_scaleFactor = factor; }
     int                 ScaleFactor() const { return m_scaleFactor; }
     
 	virtual void		setScaleMode( WgScaleMode mode );
-	WgScaleMode			scaleMode() const { return m_scaleMode; }
+	WgScaleMode			scaleMode() const;
 
 
 	// Slow, simple methods for reading and parsing individual pixels.
 
 
-	virtual Uint32		GetPixel( WgCoord coord ) const = 0;
+	virtual Uint32		GetPixel(WgCoord coord) const;
 	inline Uint32		GetPixel( int x, int y ) const;
-	virtual Uint8		GetOpacity( WgCoord coord ) const = 0;
+	virtual Uint8		GetOpacity( WgCoord coord ) const;
 	inline Uint8		GetOpacity( int x, int y ) const;
 	virtual	Uint32		Col2Pixel( const WgColor& col ) const;
 	virtual	WgColor		Pixel2Col( Uint32 pixel ) const;
 
 	// Enums and methods for locking/unlocking of surface.
 
-	virtual void *			Lock( WgAccessMode mode ) = 0;
-	virtual void *			LockRegion( WgAccessMode mode, const WgRect& region ) = 0;
-	virtual void			Unlock() = 0;
-	inline 	bool			IsLocked() const { return (m_accessMode != WG_NO_ACCESS); }
-	inline	WgAccessMode 	GetLockStatus() const { return m_accessMode; }
-	inline  WgRect			GetLockRegion() const { return m_lockRegion; }
+	virtual void *			Lock(WgAccessMode mode);
+	virtual void *			LockRegion(WgAccessMode mode, const WgRect& region);
+	virtual void			Unlock() { return m_pRealSurface->unlock(); };
+	inline 	bool			IsLocked() const { return (m_pRealSurface->isLocked()); }
+	WgAccessMode 			GetLockStatus() const;
+	WgRect					GetLockRegion() const;
 	inline  int				Pitch() const;									// of locked surface
-	inline const WgPixelFormat *PixelFormat() const;						// of locked surface
-	inline void *			Pixels() const { return m_pPixels; }			// of locked surface
+	const WgPixelFormat *	PixelFormat();						// of locked surface
+	inline void *			Pixels() const { return m_pRealSurface->pixels(); }			// of locked surface
 
 
 	// Methods for modifying surface content
@@ -111,25 +115,13 @@ public:
 	
 protected:
 	WgSurface();
-	WgRect				_lockAndAdjustRegion( WgAccessMode modeNeeded, const WgRect& region );
-    bool                _copyFrom( const WgPixelFormat * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const WgRect& srcRect, const WgRect& dstRect );
     
-	WgPixelFormat		m_pixelFormat;
-	int					m_pitch;
-
-	WgScaleMode			m_scaleMode;
-
-	WgAccessMode		m_accessMode;
-	Uint8 *				m_pPixels;			// Pointer at pixels when surface locked.
-	WgRect				m_lockRegion;		// Region of surface that is locked. Width/Height should be set to 0 when not locked.
-
+	WgPixelFormat		m_format;
 	void *				m_pMetaData;
-	int					m_nMetaBytes;
-    
+	int					m_nMetaBytes;    
     int                 m_scaleFactor;      // Scale of surface content. Default is WG_SCALE_BASE.
-    WgSize              m_size;
-    
     int                 m_iResource;         // handy to have when debugging
+	wg::Surface_p		m_pRealSurface;
 };
 
 
@@ -139,18 +131,7 @@ protected:
 
 int WgSurface::Pitch() const
 {
-	if( m_accessMode == WG_NO_ACCESS )
-		return 0;
-
-	return m_pitch;
-}
-
-
-//____ WgSurface::PixelFormat() _______________________________________________
-
-const WgPixelFormat *  WgSurface::PixelFormat() const
-{
-	return &m_pixelFormat;
+	return m_pRealSurface->pitch();
 }
 
 

@@ -27,6 +27,7 @@
 #	include <wg_types.h>
 #endif
 
+#include <wg_geo.h>
 
 class WgWidget;
 class WgRootPanel;
@@ -37,7 +38,6 @@ class WgCapsule;
 class WgLayer;
 class WgModalLayer;
 class WgMenuLayer;
-class WgCoord;
 
 class WgWidgetHolder
 {

@@ -27,6 +27,7 @@
 #endif
 
 
+
 //____ Class WgSurfaceSoft _____________________________________________________________________
 
 class WgSurfaceSoft : public WgSurface
@@ -43,26 +44,9 @@ class WgSurfaceSoft : public WgSurface
 	const char *Type() const;
 	static const char * GetClass();
 
-	bool		IsOpaque() const;
-
-	Uint32		GetPixel( WgCoord coord ) const;
-	Uint8		GetOpacity( WgCoord coord ) const;
-
-	void *		Lock( WgAccessMode mode );
-	void *		LockRegion( WgAccessMode mode, const WgRect& region );
-	void		Unlock();
-
-	inline float ScaleAlpha() { return m_fScaleAlpha; }
-	void        SetScaleAlpha(float fScaleAlpha);
 
 	static WgSize	MaxSize();
 protected:
-
-	void        _copy(const WgSurfaceSoft * pOther);
-
-	float    	m_fScaleAlpha;
-	bool		m_bOwnsData;
-	Uint8 *		m_pData;
 };
 
 

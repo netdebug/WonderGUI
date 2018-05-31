@@ -1,6 +1,9 @@
 #include <cstdlib>
 
 #include <dwmapi.h>
+#undef min
+#undef max
+
 
 #ifdef WIN32
 #	include <SDL.h>

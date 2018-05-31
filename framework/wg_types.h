@@ -689,7 +689,6 @@ enum WgPixelType
  * values are different on a big-endian and little-endian system. 
  */
 
-
 struct WgPixelFormat
 {
 	WgPixelType	type;			///< Enum specifying the format if it exacty matches a predefined format, otherwise set to CUSTOM or UNKNOWN.

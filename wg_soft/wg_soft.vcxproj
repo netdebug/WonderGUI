@@ -11,11 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\framework\wg_soft\wg3_softgfxdevice.cpp" />
+    <ClCompile Include="..\framework\wg_soft\wg3_softsurface.cpp" />
+    <ClCompile Include="..\framework\wg_soft\wg3_softsurfacefactory.cpp" />
     <ClCompile Include="..\framework\wg_soft\wg_gfxdevice_soft.cpp" />
     <ClCompile Include="..\framework\wg_soft\wg_surfacefactory_soft.cpp" />
     <ClCompile Include="..\framework\wg_soft\wg_surface_soft.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\framework\wg_soft\wg3_softgfxdevice.h" />
+    <ClInclude Include="..\framework\wg_soft\wg3_softsurface.h" />
+    <ClInclude Include="..\framework\wg_soft\wg3_softsurfacefactory.h" />
     <ClInclude Include="..\framework\wg_soft\wg_gfxdevice_soft.h" />
     <ClInclude Include="..\framework\wg_soft\wg_surfacefactory_soft.h" />
     <ClInclude Include="..\framework\wg_soft\wg_surface_soft.h" />

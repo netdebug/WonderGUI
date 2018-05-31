@@ -21,76 +21,15 @@
 =========================================================================*/
 
 #include <wg_gfxdevice_null.h>
+#include <wg3_nullgfxdevice.h>
+#include <wg_versionbridge.h>
 
-WgGfxDeviceNull::WgGfxDeviceNull( WgSize size ) : WgGfxDevice(size)
+
+WgGfxDeviceNull::WgGfxDeviceNull( WgSize size )
 {
+	m_pRealDevice = wg::NullGfxDevice::create(_convert(size));
 }
 
 WgGfxDeviceNull::~WgGfxDeviceNull()
-{
-}
-
-void WgGfxDeviceNull::Fill( const WgRect& rect, const WgColor& col )
-{
-}
-
-void WgGfxDeviceNull::Blit( const WgSurface* src, const WgRect& srcrect, int dx, int dy  )
-{
-}
-
-void WgGfxDeviceNull::TileBlit( const WgSurface* src, const WgRect& srcrect, const WgRect& dest )
-{
-}
-
-void WgGfxDeviceNull::FillSubPixel( const WgRectF& rect, const WgColor& col )
-{
-}
-
-void WgGfxDeviceNull::StretchBlitSubPixel( 	const WgSurface * pSrc, float sx, float sy, float sw, float sh,
-						   		 			float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias )
-{
-}
-
-void WgGfxDeviceNull::DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness )
-{
-}
-
-void WgGfxDeviceNull::DrawArcNE( const WgRect& rect, WgColor color )
-{
-}
-
-void WgGfxDeviceNull::DrawElipse( const WgRect& rect, WgColor color )
-{
-}
-
-void WgGfxDeviceNull::DrawFilledElipse( const WgRect& rect, WgColor color )
-{
-}
-
-void WgGfxDeviceNull::ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness )
-{
-}
-
-void WgGfxDeviceNull::ClipDrawArcNE( const WgRect& clip, const WgRect& rect, WgColor color )
-{
-}
-
-void WgGfxDeviceNull::ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color )
-{
-}
-
-void WgGfxDeviceNull::ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color )
-{
-}
-
-void WgGfxDeviceNull::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topLine, const WgWaveLine& bottomLine, WgColor front, WgColor back)
-{
-}
-
-void WgGfxDeviceNull::_drawHorrLine(const WgCoord& start, int length, const WgColor& col)
-{
-}
-
-void WgGfxDeviceNull::_drawVertLine(const WgCoord& start, int length, const WgColor& col)
 {
 }

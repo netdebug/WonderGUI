@@ -19,39 +19,36 @@
   should contact Tord Jansson [tord.jansson@gmail.com] for details.
 
 =========================================================================*/
-#ifndef WG_GFXDEVICE_SOFT_DOT_H
-#define WG_GFXDEVICE_SOFT_DOT_H
 
-#ifndef WG_GEO_DOT_H
-#	include <wg_geo.h>
-#endif
+#include <wg3_interface.h>
+#include <wg3_stronginterfaceptr.h>
 
-#ifndef	WG_GFXDEVICE_DOT_H
-#	include <wg_gfxdevice.h>
-#endif
-
-
-class WgSurfaceSoft;
-/*
-struct WgSegmentEdge
+namespace wg 
 {
-	int			begin;				// Pixeloffset, 24.8 format.
-	int			end;				// Pixeloffset, 24.8 format. First pixel after edge (segment after the edge has 100% coverage)
-	int			coverage;			// 0-65536
-	int			coverageInc;		// 24.8 format
-};
-*/
+	
+	//____ ptr() _______________________________________________________________
+
+	/** @brief Get a pointer to this interface.	
+	 * 
+	 * 
+	 */ 
+	
+	Interface_p	Interface::ptr() 
+	{ 
+		return Interface_p(this);
+	}
+
+	//____ object() _______________________________________________________________
+
+	/** @brief Get a pointer to the object providing this interface.
+	 * 
+	 * 
+	 */ 
+
+	Object_p Interface::object()
+	{ 
+		return Object_p( _object() ); 
+	};
 
 
-class WgGfxDeviceSoft : public WgGfxDevice
-{
-public:
-	WgGfxDeviceSoft();
-	WgGfxDeviceSoft( WgSurfaceSoft * pCanvas );
-	~WgGfxDeviceSoft();
-
-	bool	SetCanvas( WgSurface * pCanvas );
-};
-
-#endif //WG_GFXDEVICE_SOFT_DOT_H
-
+}

@@ -4,10 +4,16 @@
     <ClCompile Include="..\framework\opengl\wg_glgfxdevice.cpp" />
     <ClCompile Include="..\framework\opengl\wg_glsurface.cpp" />
     <ClCompile Include="..\framework\opengl\wg_glsurfacefactory.cpp" />
+    <ClCompile Include="..\framework\opengl\wg3_glgfxdevice.cpp" />
+    <ClCompile Include="..\framework\opengl\wg3_glsurface.cpp" />
+    <ClCompile Include="..\framework\opengl\wg3_glsurfacefactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\framework\opengl\wg_glgfxdevice.h" />
     <ClInclude Include="..\framework\opengl\wg_glsurface.h" />
     <ClInclude Include="..\framework\opengl\wg_glsurfacefactory.h" />
+    <ClInclude Include="..\framework\opengl\wg3_glgfxdevice.h" />
+    <ClInclude Include="..\framework\opengl\wg3_glsurface.h" />
+    <ClInclude Include="..\framework\opengl\wg3_glsurfacefactory.h" />
   </ItemGroup>
 </Project>

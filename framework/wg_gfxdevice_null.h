@@ -41,37 +41,6 @@ public:
 	WgGfxDeviceNull( WgSize size );
 	~WgGfxDeviceNull();
 
-	//
-
-	void	Fill( const WgRect& rect, const WgColor& col );
-	void	Blit( const WgSurface* src, const WgRect& srcrect, int dx, int dy  );
-	void	TileBlit( const WgSurface* src, const WgRect& srcrect, const WgRect& dest );
-
-	void	FillSubPixel( const WgRectF& rect, const WgColor& col );
-	void	StretchBlitSubPixel( const WgSurface * pSrc, float sx, float sy, float sw, float sh,
-						   		 float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias );
-
-
-	void	DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
-	void	DrawArcNE( const WgRect& rect, WgColor color );
-	void	DrawElipse( const WgRect& rect, WgColor color );
-	void	DrawFilledElipse( const WgRect& rect, WgColor color );
-
-	void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
-	void	ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topLine, const WgWaveLine& bottomLine, WgColor front, WgColor back);
-
-
-	void	ClipDrawArcNE( const WgRect& clip, const WgRect& rect, WgColor color );
-	void	ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color );
-	void	ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color );
-
-
-protected:
-
-	void	_drawHorrLine(const WgCoord& start, int length, const WgColor& col);
-	void	_drawVertLine(const WgCoord& start, int length, const WgColor& col);
-
-
 };
 
 #endif //WG_GFXDEVICE_NULL_DOT_H

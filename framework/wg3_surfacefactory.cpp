@@ -19,39 +19,40 @@
   should contact Tord Jansson [tord.jansson@gmail.com] for details.
 
 =========================================================================*/
-#ifndef WG_GFXDEVICE_SOFT_DOT_H
-#define WG_GFXDEVICE_SOFT_DOT_H
 
-#ifndef WG_GEO_DOT_H
-#	include <wg_geo.h>
-#endif
+#include <wg3_surfacefactory.h>
 
-#ifndef	WG_GFXDEVICE_DOT_H
-#	include <wg_gfxdevice.h>
-#endif
-
-
-class WgSurfaceSoft;
-/*
-struct WgSegmentEdge
+namespace wg 
 {
-	int			begin;				// Pixeloffset, 24.8 format.
-	int			end;				// Pixeloffset, 24.8 format. First pixel after edge (segment after the edge has 100% coverage)
-	int			coverage;			// 0-65536
-	int			coverageInc;		// 24.8 format
-};
-*/
+	
+	const char SurfaceFactory::CLASSNAME[] = {"SurfaceFactory"};
+	
+	//____ isInstanceOf() _________________________________________________________
+	
+	bool SurfaceFactory::isInstanceOf( const char * pClassName ) const
+	{ 
+		if( pClassName==CLASSNAME )
+			return true;
+	
+		return Object::isInstanceOf(pClassName);
+	}
+	
+	//____ className() ____________________________________________________________
+	
+	const char * SurfaceFactory::className( void ) const
+	{ 
+		return CLASSNAME; 
+	}
+	
+	//____ cast() _________________________________________________________________
+	
+	SurfaceFactory_p SurfaceFactory::cast( Object * pObject )
+	{
+		if( pObject && pObject->isInstanceOf(CLASSNAME) )
+			return SurfaceFactory_p( static_cast<SurfaceFactory*>(pObject) );
+	
+		return 0;
+	}
+	
 
-
-class WgGfxDeviceSoft : public WgGfxDevice
-{
-public:
-	WgGfxDeviceSoft();
-	WgGfxDeviceSoft( WgSurfaceSoft * pCanvas );
-	~WgGfxDeviceSoft();
-
-	bool	SetCanvas( WgSurface * pCanvas );
-};
-
-#endif //WG_GFXDEVICE_SOFT_DOT_H
-
+} // namespace wg

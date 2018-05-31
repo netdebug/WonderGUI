@@ -51,6 +51,8 @@
 #endif
 */
 
+#include <wg3_gfxdevice.h>
+
 //____ WgWaveLine ___________________________________________________________
 
 struct WgWaveLine
@@ -89,89 +91,78 @@ public:
 
 	virtual ~WgGfxDevice();
 
-	virtual void	SetTintColor( WgColor color );
-	virtual bool	SetBlendMode( WgBlendMode blendMode );
-	virtual Uint32	SetRenderFlags( Uint32 flags );
-	virtual bool	SetSaveDirtyRects( bool bSave );
+	void			SetTintColor( WgColor color );
+	bool			SetBlendMode( WgBlendMode blendMode );
+//	virtual Uint32	SetRenderFlags( Uint32 flags );
+//	virtual bool	SetSaveDirtyRects( bool bSave );
 
-	inline const WgColor&	GetTintColor() const { return m_tintColor; }
-	inline WgBlendMode 	GetBlendMode() const { return m_blendMode; }
-	inline Uint32		GetRenderFlags() const { return m_renderFlags; }
-	inline bool			GetSaveDirtyRects() const { return m_bSaveDirtyRects; }
+	const WgColor&		GetTintColor() const;
+	WgBlendMode 	GetBlendMode() const;
+//	inline Uint32		GetRenderFlags() const { return m_renderFlags; }
+//	inline bool			GetSaveDirtyRects() const { return m_bSaveDirtyRects; }
 
 	// Geometry related methods.
 
-	virtual bool	SetCanvas(WgSurface * pCanvas) = 0;
-	WgSurface *		Canvas() const { return m_pCanvas;  }
+	bool			SetCanvas(WgSurface * pCanvas);
+	WgSurface *		Canvas() const;
 
-	inline WgSize	CanvasSize() const { return m_canvasSize; }
+	WgSize			CanvasSize() const;
 
 	// Begin/end render methods.
 
-	virtual bool	BeginRender();
-	virtual bool	EndRender();
+	bool	BeginRender();
+	bool	EndRender();
 
 
 	// Special blit methods
 
-	virtual void	ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, const WgRect& src, int dx, int dy);	// Blit from surface that has been used as canvas. Will flip Y on OpenGL.
+	 void	ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, const WgRect& src, int dx, int dy);	// Blit from surface that has been used as canvas. Will flip Y on OpenGL.
 
 
 	// Low level draw methods.
 
-	virtual void	Fill( const WgRect& rect, const WgColor& col ) = 0;
+	 void	Fill( const WgRect& rect, const WgColor& col );
 
-	virtual void	ClipDrawLine(const WgRect& clip, const WgCoord& begin, WgDirection dir, int length, WgColor col, float thickness = 1.f);
+	 void	ClipDrawLine(const WgRect& clip, const WgCoord& begin, WgDirection dir, int length, WgColor col, float thickness = 1.f);
 
-//	virtual void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) = 0;
-//	virtual void	ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) = 0;
-	virtual void	ClipPlotSoftPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor& col, float thickness ) = 0;
-	virtual void    ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor * colors) = 0;
+//	 void	ClipDrawHorrLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) = 0;
+//	 void	ClipDrawVertLine( const WgRect& clip, const WgCoord& start, int length, const WgColor& col ) = 0;
+	 void    ClipPlotPixels( const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor * colors);
 
-	virtual void	DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f ) = 0;
-	virtual void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f ) = 0;
+	 void	DrawLine( WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
+	 void	ClipDrawLine( const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness = 1.f );
 
-	virtual void	ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topBorder, const WgWaveLine& bottomBorder, WgColor frontFill, WgColor backFill) = 0;
+	 void	ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topBorder, const WgWaveLine& bottomBorder, WgColor frontFill, WgColor backFill);
 
+	 void	Blit( const WgSurface* pSrc );
+	 void	Blit( const WgSurface* pSrc, int dx, int dy );
+	 void	Blit( const WgSurface* pSrc, const WgRect& src, int dx, int dy );
 
-	virtual void	DrawArcNE( const WgRect& rect, WgColor color ) = 0;
-	virtual void	DrawElipse( const WgRect& rect, WgColor color ) = 0;
-	virtual void	DrawFilledElipse( const WgRect& rect, WgColor color ) = 0;
+	 void	StretchBlit( const WgSurface * pSrc, bool bTriLinear = false, float mipmapBias = 0.f );
+	 void	StretchBlit( const WgSurface * pSrc, const WgRect& dest, bool bTriLinear = false, float mipmapBias = 0.f );
+	 void	StretchBlit( const WgSurface * pSrc, const WgRect& src, const WgRect& dest, bool bTriLinear = false, float mipmapBias = 0.f );
 
-	virtual void	ClipDrawArcNE( const WgRect& clip, const WgRect& rect, WgColor color ) = 0;
-	virtual void	ClipDrawElipse( const WgRect& clip, const WgRect& rect, WgColor color ) = 0;
-	virtual void	ClipDrawFilledElipse( const WgRect& clip, const WgRect& rect, WgColor color ) = 0;
-
-
-	virtual void	Blit( const WgSurface* pSrc );
-	virtual void	Blit( const WgSurface* pSrc, int dx, int dy );
-	virtual void	Blit( const WgSurface* pSrc, const WgRect& src, int dx, int dy ) = 0;
-
-	virtual void	StretchBlit( const WgSurface * pSrc, bool bTriLinear = false, float mipmapBias = 0.f );
-	virtual void	StretchBlit( const WgSurface * pSrc, const WgRect& dest, bool bTriLinear = false, float mipmapBias = 0.f );
-	virtual void	StretchBlit( const WgSurface * pSrc, const WgRect& src, const WgRect& dest, bool bTriLinear = false, float mipmapBias = 0.f );
-
-	virtual void	TileBlit( const WgSurface* pSrc );
-	virtual void	TileBlit( const WgSurface* pSrc, const WgRect& dest );
-	virtual void	TileBlit( const WgSurface* pSrc, const WgRect& src, const WgRect& dest );
+	 void	TileBlit( const WgSurface* pSrc );
+	 void	TileBlit( const WgSurface* pSrc, const WgRect& dest );
+	 void	TileBlit( const WgSurface* pSrc, const WgRect& src, const WgRect& dest );
 
 
-	virtual void	ClipFill( const WgRect& clip, const WgRect& rect, const WgColor& col );
+	 void	ClipFill( const WgRect& clip, const WgRect& rect, const WgColor& col );
 
-	virtual void	ClipBlit( const WgRect& clip, const WgSurface* src );
-	virtual void	ClipBlit( const WgRect& clip, const WgSurface* src, int dx, int dy  );
-	virtual void	ClipBlit( const WgRect& clip, const WgSurface* src,
+	 void	ClipBlit( const WgRect& clip, const WgSurface* src );
+	 void	ClipBlit( const WgRect& clip, const WgSurface* src, int dx, int dy  );
+	 void	ClipBlit( const WgRect& clip, const WgSurface* src,
 							  const WgRect& srcrect, int dx, int dy  );
 
-	virtual void	ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, bool bTriLinear = false, float mipBias = 0.f );
-	virtual void	ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, const WgRect& dest, bool bTriLinear = false, float mipBias = 0.f );
-	virtual void	ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, const WgRect& src, const WgRect& dest, bool bTriLinear = false, float mipBias = 0.f );
-	virtual void	ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias = 0.f);
+	 void	ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, bool bTriLinear = false, float mipBias = 0.f );
+	 void	ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, const WgRect& dest, bool bTriLinear = false, float mipBias = 0.f );
+	 void	ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, const WgRect& src, const WgRect& dest, bool bTriLinear = false, float mipBias = 0.f );
+	 void	ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias = 0.f);
 
-	virtual void	ClipTileBlit( const WgRect& clip, const WgSurface* src );
-	virtual void	ClipTileBlit( const WgRect& clip, const WgSurface* src,
+	void			ClipTileBlit( const WgRect& clip, const WgSurface* src );
+	void			ClipTileBlit( const WgRect& clip, const WgSurface* src,
 								  const WgRect& dest );
-	virtual void	ClipTileBlit( const WgRect& clip, const WgSurface* src,
+	void			ClipTileBlit( const WgRect& clip, const WgSurface* src,
 								  const WgRect& srcrect, const WgRect& dest );
 
 
@@ -183,88 +174,57 @@ public:
 
 	// Mid-level draw methods
 
-    virtual void ClipBlitHorrStretchBar(const WgRect& _clip, const WgSurface * _pSurf,
+    void		ClipBlitHorrStretchBar(const WgRect& _clip, const WgSurface * _pSurf,
                                         const WgRect& _src, const WgBorders& _srcBorders,
                                         const WgRect& _dest, const WgBorders& _destBorders );
 
-    virtual void ClipBlitVertStretchBar(const WgRect& _clip, const WgSurface * _pSurf,
+    void		ClipBlitVertStretchBar(const WgRect& _clip, const WgSurface * _pSurf,
                                         const WgRect& _src, const WgBorders& _srcBorders,
                                         const WgRect& _dest, const WgBorders& _destBorders );
     
     
-	virtual void	ClipBlitHorrBar(	const WgRect& _clip, const WgSurface * _pSurf, const WgRect& _src,
+	void		ClipBlitHorrBar(	const WgRect& _clip, const WgSurface * _pSurf, const WgRect& _src,
 										const WgBorders& _borders, bool _bTile,
 										int _dx, int _dy, int _len );
 
-	virtual void	ClipBlitVertBar(	const WgRect& _clip, const WgSurface * _pSurf, const WgRect& _src,
+	void		ClipBlitVertBar(	const WgRect& _clip, const WgSurface * _pSurf, const WgRect& _src,
 										const WgBorders& _borders, bool _bTile,
 										int _dx, int _dy, int _len );
 
 
-	virtual void	BlitHorrBar(		const WgSurface * _pSurf, const WgRect& _src,
+	void		BlitHorrBar(		const WgSurface * _pSurf, const WgRect& _src,
 										const WgBorders& _borders, bool _bTile,
 										int _dx, int _dy, int _len );
 
-	virtual void	BlitVertBar(		const WgSurface * _pSurf, const WgRect& _src,
+	void		BlitVertBar(		const WgSurface * _pSurf, const WgRect& _src,
 										const WgBorders& _borders, bool _bTile,
 										int _dx, int _dy, int _len );
 
 	// High-level print methods
 
-	virtual bool		PrintText( const WgRect& clip, const WgText * pText, const WgRect& dest );
+	bool		PrintText( const WgRect& clip, const WgText * pText, const WgRect& dest );
 
 	// Low-level print methods
 
-	virtual void		PrintLine( WgPen& pen, const WgTextAttr& baseAttr, const WgChar * _pLine, int maxChars = INT_MAX, WgMode mode = WG_MODE_NORMAL );
+	void		PrintLine( WgPen& pen, const WgTextAttr& baseAttr, const WgChar * _pLine, int maxChars = INT_MAX, WgMode mode = WG_MODE_NORMAL );
 
-	virtual void	FillSubPixel( const WgRectF& rect, const WgColor& col ) = 0;
-	virtual void	StretchBlitSubPixel( const WgSurface * pSrc, float sx, float sy, float sw, float sh,
-								   		 float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias = 0.f ) = 0;
+	void	FillSubPixel( const WgRectF& rect, const WgColor& col );
+	void	StretchBlitSubPixel( const WgSurface * pSrc, float sx, float sy, float sw, float sh,
+						   		 float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias = 0.f );
 
 	
 protected:
-	WgGfxDevice( WgSize canvasSize );
 
-	virtual void	_drawHorrLine(const WgCoord& begin, int length, const WgColor& col) = 0;
-	virtual void	_drawVertLine(const WgCoord& begin, int length, const WgColor& col) = 0;
-
-
-
-	void	_printTextSpan( WgPen& pen, const WgText * pText, int ofs, int len, bool bLineEnding );
-	void	_printEllipsisTextSpan( WgPen& pen, const WgText * pText, int ofs, int len, int endX );
-
-	void	_drawTextBg( const WgRect& clip, const WgText * pText, const WgRect& dest );
-	void	_drawTextSectionBg( const WgRect& clip, const WgText * pText, const WgRect& dstRect,
-							  int iStartOfs, int iEndOfs, WgColor color );
+	void _printTextSpan(WgPen& pen, const WgText * pText, int ofs, int len, bool bLineEnding);
+	void _printEllipsisTextSpan(WgPen& pen, const WgText * pText, int ofs, int len, int endX);
+	void _drawTextBg(const WgRect& _clip, const WgText * pText, const WgRect& dest);
+	void _drawTextSectionBg(const WgRect& clip, const WgText * pText, const WgRect& dstRect,
+		int iStartOfs, int iEndOfs, WgColor color);
+	void _drawUnderline(const WgRect& clip, const WgText * pText, int _x, int _y, int ofs, int maxChars);
 
 
-//
-//	virtual void	BlitSubPixel( const WgSurface * pSrc, const WgRect& srcrect,
-//								  float dx, float dy ) = 0;
-
-	virtual void	_drawUnderline( const WgRect& clip, const WgText * pText, int _x, int _y, int ofs, int maxChars );
-
-
-	// Static, shared data
-
-	static	int		s_gfxDeviceCount;				// Number of existing gfxDevices. Ref count for shared data.
-
-	void	_genCurveTab();
-	void	_traceLine(int * pDest, int nPoints, const WgWaveLine& wave, int offset);
-
-	const static int c_nCurveTabEntries = 1024;
-	static int *	s_pCurveTab;
-
-	//
-
-	WgSurface *	m_pCanvas;
-
-	WgColor		m_tintColor;		// Current Tint color.
-	WgBlendMode	m_blendMode;		// Current BlendMode.
-	Uint32		m_renderFlags;		// Current flags.
-
-	WgSize		m_canvasSize;
-	bool		m_bSaveDirtyRects;
+	wg::GfxDevice_p m_pRealDevice;
+	WgSurface *		m_pCanvas = nullptr;		// We need to save pointer to WgSurface since we can't retrieve it from our real canvas (wg::Surface).
 
 };
 

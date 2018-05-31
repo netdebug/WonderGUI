@@ -35,82 +35,101 @@
 #include <wg_util.h>
 #include <wg_pen.h>
 
-int		WgGfxDevice::s_gfxDeviceCount = 0;
-int *	WgGfxDevice::s_pCurveTab = nullptr;
+#include <wg_versionbridge.h>
 
 //____ Constructor _____________________________________________________________
 
-WgGfxDevice::WgGfxDevice( WgSize canvasSize )
-{
-	m_pCanvas			= nullptr;
-	m_tintColor 		= WgColor(255,255,255);
-	m_blendMode 		= WG_BLENDMODE_BLEND;
-	m_bSaveDirtyRects 	= false;
-	m_renderFlags		= 0;
-	m_canvasSize		= canvasSize;
-
-	if (s_gfxDeviceCount == 0)
-	{
-		_genCurveTab();
-	}
-	s_gfxDeviceCount++;
-}
 
 //____ Destructor _________________________________________________________
 
 WgGfxDevice::~WgGfxDevice()
 {
-	s_gfxDeviceCount--;
-	if (s_gfxDeviceCount == 0)
-	{
-		delete[] s_pCurveTab;
-	}
 }
 
 //____ SetSaveDirtyRects() _____________________________________________________
-
+/*
 bool WgGfxDevice::SetSaveDirtyRects( bool bSave )
 {
 	m_bSaveDirtyRects = bSave;
 	return true;
 }
-
+*/
 //____ SetTintColor() __________________________________________________________
 
 void WgGfxDevice::SetTintColor( WgColor color )
 {
-	m_tintColor = color;
+	m_pRealDevice->setTintColor( _convert(color) );
 }
 
 //____ SetBlendMode() __________________________________________________________
 
 bool WgGfxDevice::SetBlendMode( WgBlendMode blendMode )
 {
-	m_blendMode = blendMode;
+	return m_pRealDevice->setBlendMode(_convert(blendMode));
 	return false;				// Not implemented.
 }
 
-//______________________________________________________________________________
-Uint32 WgGfxDevice::SetRenderFlags( Uint32 flags )
-{
-	Uint32 oldFlags = m_renderFlags;
-	m_renderFlags = flags;
-	return oldFlags;
+//____ GetTintColor() _________________________________________________________
+
+const WgColor& WgGfxDevice::GetTintColor() const 
+{ 
+	return _convert(m_pRealDevice->tintColor()); 
 }
+
+//____ GetBlendMode() _________________________________________________________
+
+WgBlendMode WgGfxDevice::GetBlendMode() const 
+{ 
+	return _convert(m_pRealDevice->blendMode()); 
+}
+
+//____ SetCanvas() ____________________________________________________________
+
+bool WgGfxDevice::SetCanvas(WgSurface * pCanvas)
+{
+	bool ret = m_pRealDevice->setCanvas(pCanvas->m_pRealSurface);
+	if (ret)
+		m_pCanvas = pCanvas;
+	return ret;
+}
+
+//____ Canvas() _______________________________________________________________
+
+WgSurface *	 WgGfxDevice::Canvas() const 
+{ 
+	return m_pCanvas; 
+}
+
+//____ CanvasSize() ___________________________________________________________
+
+WgSize WgGfxDevice::CanvasSize() const 
+{ 
+	return _convert(m_pRealDevice->canvasSize()); 
+}
+
+
 
 //____ BeginRender() ___________________________________________________________
 
 bool WgGfxDevice::BeginRender()
 {
-	return true;	// Assumed to be ok if device doesn't have its own method.
+	return m_pRealDevice->beginRender();
 }
 
 //____ EndRender() _____________________________________________________________
 
 bool WgGfxDevice::EndRender()
 {
-	return true;	// Assumed to be ok if device doesn't have its own method.
+	return m_pRealDevice->endRender();
 }
+
+//____ Fill() _________________________________________________________________
+
+void WgGfxDevice::Fill(const WgRect& rect, const WgColor& col)
+{
+	m_pRealDevice->fill(_convert(rect), _convert(col));
+}
+
 
 //____ ClipDrawLine() _________________________________________________________
 
@@ -120,136 +139,42 @@ bool WgGfxDevice::EndRender()
 
 void WgGfxDevice::ClipDrawLine(const WgRect& clip, const WgCoord& _begin, WgDirection dir, int length, WgColor _col, float thickness)
 {
-	if (thickness <= 0.f)
-		return;
-
-	WgCoord begin = _begin;
-
-	switch (dir)
-	{
-	case WG_LEFT:
-		begin.x -= length;
-	case WG_RIGHT:
-	{
-		if (begin.x > clip.x + clip.w)
-			return;
-
-		if (begin.x < clip.x)
-		{
-			length -= clip.x - begin.x;
-			if (length <= 0)
-				return;
-			begin.x = clip.x;
-		}
-
-		if (begin.x + length > clip.x + clip.w)
-		{
-			length = clip.x + clip.w - begin.x;
-			if (length <= 0)
-				return;
-		}
-
-		if (thickness <= 1.f)
-		{
-			if (begin.y < clip.y || begin.y >= clip.y + clip.h)
-				return;
-
-			WgColor col = _col;
-			col.a = (uint8_t) (thickness * col.a);
-
-			_drawHorrLine(begin, length, col);
-		}
-		else
-		{
-			int expanse = (int) 1 + (thickness - 1) / 2;
-			WgColor edgeColor( _col.r, _col.g, _col.b, _col.a * ((thickness - 1) / 2 - (expanse - 1)));
-
-			if (begin.y + expanse <= clip.y || begin.y - expanse >= clip.y + clip.h)
-				return;
-
-			int beginY = begin.y - expanse;
-			int endY = begin.y + expanse+1;
-
-			if (beginY < clip.y)
-				beginY = clip.y - 1;
-			else
-				_drawHorrLine({ begin.x, beginY }, length, edgeColor);
-
-			if (endY > clip.y + clip.h)
-				endY = clip.y + clip.h + 1;
-			else
-				_drawHorrLine({ begin.x, endY-1 }, length, edgeColor);
-
-			Fill({ begin.x, beginY + 1, length, endY - beginY - 2 }, _col );
-		}
-
-		break;
-	}
-	case WG_UP:
-		begin.y -= length;
-	case WG_DOWN:
-		if (begin.y > clip.y + clip.h )
-			return;
-
-		if (begin.y < clip.y)
-		{
-			length -= clip.y - begin.y;
-			if (length <= 0)
-				return;
-			begin.y = clip.y;
-		}
-
-		if (begin.y + length > clip.y + clip.h)
-		{
-			length = clip.y + clip.h - begin.y;
-			if (length <= 0)
-				return;
-		}
-
-		if (thickness <= 1.f)
-		{
-			if (begin.x < clip.x || begin.x >= clip.x + clip.w)
-				return;
-
-			WgColor col = _col;
-			col.a = (uint8_t)(thickness * col.a);
-
-			_drawVertLine(begin, length, col);
-		}
-		else
-		{
-			int expanse = (int)1 + (thickness - 1) / 2;
-			WgColor edgeColor(_col.r, _col.g, _col.b, _col.a * ((thickness - 1) / 2 - (expanse - 1)));
-
-			if (begin.x + expanse <= clip.x || begin.x - expanse >= clip.x + clip.w)
-				return;
-
-			int beginX = begin.x - expanse;
-			int endX = begin.x + expanse+1;
-
-			if (beginX < clip.x)
-				beginX = clip.x - 1;
-			else
-				_drawVertLine({ beginX, begin.y }, length, edgeColor);
-
-			if (endX > clip.x + clip.w)
-				endX = clip.x + clip.w + 1;
-			else
-				_drawVertLine({ endX-1, begin.y }, length, edgeColor);
-
-			Fill({ beginX + 1, begin.y, endX - beginX - 2, length }, _col);
-		}
-
-		break;
-	}
+	m_pRealDevice->clipDrawLine(_convert(clip), _convert(_begin), _convert(dir), length, _convert(_col), thickness);
 }
 
+//____ ClipPlotPixels() _______________________________________________________
+
+void WgGfxDevice::ClipPlotPixels(const WgRect& clip, int nCoords, const WgCoord * pCoords, const WgColor * colors)
+{
+	m_pRealDevice->clipPlotPixels(_convert(clip), nCoords, (const wg::Coord*) pCoords, (const wg::Color*) colors);
+}
+
+//____ DrawLine() _____________________________________________________________
+
+void WgGfxDevice::DrawLine(WgCoord begin, WgCoord end, WgColor color, float thickness)
+{
+	m_pRealDevice->drawLine(_convert(begin), _convert(end), _convert(color), thickness);
+}
+
+//____ ClipDrawLine() _________________________________________________________
+
+void WgGfxDevice::ClipDrawLine(const WgRect& clip, WgCoord begin, WgCoord end, WgColor color, float thickness)
+{
+	m_pRealDevice->clipDrawLine(_convert(clip), _convert(begin), _convert(end), _convert(color), thickness);
+}
+
+//____ ClipDrawHorrWave() _____________________________________________________
+
+void WgGfxDevice::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topBorder, const WgWaveLine& bottomBorder, WgColor frontFill, WgColor backFill)
+{
+	m_pRealDevice->clipDrawHorrWave(_convert(clip), _convert(begin), length, (const wg::WaveLine*) &topBorder, (const wg::WaveLine*) &bottomBorder, _convert(frontFill), _convert(backFill));
+}
 
 //_____ ClipBlitFromCanvas() ______________________________________________________
 
 void WgGfxDevice::ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, const WgRect& src, int dx, int dy)
 {
-	ClipBlit(clip, pSrc, src, dx, dy);		// Default is a normal blit, only OpenGL needs to flip (until that has been fixed)
+	m_pRealDevice->clipBlitFromCanvas(_convert(clip), pSrc->m_pRealSurface, _convert(src), wg::Coord(dx, dy));
 }
 
 
@@ -257,101 +182,52 @@ void WgGfxDevice::ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, 
 
 void WgGfxDevice::Blit( const WgSurface* pSrc )
 {
-	Blit( pSrc, WgRect( 0, 0, pSrc->Width(), pSrc->Height() ), 0, 0 );
+	m_pRealDevice->blit(pSrc->m_pRealSurface);
 }
 
 void WgGfxDevice::Blit( const WgSurface* pSrc, int dx, int dy )
 {
-	Blit( pSrc, WgRect( 0, 0, pSrc->Width(), pSrc->Height() ), dx, dy );
+	m_pRealDevice->blit(pSrc->m_pRealSurface, wg::Coord(dx, dy));
 }
+
+void WgGfxDevice::Blit(const WgSurface* pSrc, const WgRect& src, int dx, int dy)
+{
+	m_pRealDevice->blit(pSrc->m_pRealSurface, _convert(src), wg::Coord(dx, dy));
+}
+
 
 //____ StretchBlit() ___________________________________________________________
 
 void WgGfxDevice::StretchBlit( const WgSurface * pSrc, bool bTriLinear, float mipmapBias )
 {
-	StretchBlit( pSrc, WgRect(0, 0, pSrc->Width(),pSrc->Height()), WgRect(0,0,m_canvasSize.w,m_canvasSize.h), bTriLinear, mipmapBias );
+	m_pRealDevice->stretchBlit(pSrc->m_pRealSurface);
 }
 
 void WgGfxDevice::StretchBlit( const WgSurface * pSrc, const WgRect& dest, bool bTriLinear, float mipmapBias )
 {
-	StretchBlit( pSrc, WgRect(0, 0, pSrc->Width(),pSrc->Height()), dest, bTriLinear, mipmapBias );
+	m_pRealDevice->stretchBlit(pSrc->m_pRealSurface, _convert(dest));
 }
 
 void WgGfxDevice::StretchBlit( const WgSurface * pSrc, const WgRect& src, const WgRect& dest, bool bTriLinear, float mipmapBias )
 {
-	float srcW = (float) src.w;
-	float srcH = (float) src.h;
-
-	float destW = (float) dest.w;
-	float destH = (float) dest.h;
-
-	if( pSrc->scaleMode() == WG_SCALEMODE_INTERPOLATE )
-	{
-		if( srcW < destW )
-			srcW--;
-
-		if( srcH < destH )
-			srcH--;
-	}
-
-	StretchBlitSubPixel( pSrc, (float) src.x, (float) src.y, srcW, srcH, (float) dest.x, (float) dest.y, destW, destH, bTriLinear, mipmapBias );
+	m_pRealDevice->stretchBlit(pSrc->m_pRealSurface, _convert(src), _convert(dest));
 }
 
 //____ TileBlit() ______________________________________________________________
 
 void WgGfxDevice::TileBlit( const WgSurface* _pSrc )
 {
-	TileBlit( _pSrc, WgRect( 0, 0, _pSrc->Width(), _pSrc->Height() ), WgRect(0,0,m_canvasSize) );
+	m_pRealDevice->tileBlit(_pSrc->m_pRealSurface);
 }
 
 void WgGfxDevice::TileBlit( const WgSurface* _pSrc, const WgRect& _dest )
 {
-	TileBlit( _pSrc, WgRect( 0, 0, _pSrc->Width(), _pSrc->Height() ), _dest );
+	m_pRealDevice->tileBlit(_pSrc->m_pRealSurface, _convert(_dest));
 }
 
 void WgGfxDevice::TileBlit( const WgSurface* _pSrc, const WgRect& _src, const WgRect& _dest )
 {
-	if( !_pSrc || _dest.h == 0 || _dest.w == 0 )
-		return;
-
-	WgRect	r = _src;
-	WgRect	r2 = _src;
-
-	int nCol = _dest.w / _src.w;
-	r2.w = _dest.w % _src.w;
-
-	int nRow = (_dest.h+(_src.h-1))/ _src.h;	// Including any cut row....
-
-	int		destX = _dest.x;
-	int		destY = _dest.y;
-
-	for( int row = 1 ; row <= nRow ; row++ )
-	{
-		// Possibly cut the height if this is the last row...
-
-		if( row == nRow )
-		{
-			r.h = _dest.y + _dest.h - destY;
-			r2.h = r.h;
-		}
-
-		// Blit a row.
-
-		for( int col = 0 ; col < nCol ; col++ )
-		{
-			Blit( _pSrc, r, destX, destY );
-			destX += r.w;
-		}
-
-		// Blit any left over part at end of row.
-
-		if( r2.w > 0 )
-			Blit( _pSrc, r2, destX, destY );
-
-		destX = _dest.x;
-		destY += _src.h;
-	}
-	return;
+	m_pRealDevice->tileBlit(_pSrc->m_pRealSurface, _convert(_src), _convert(_dest));
 }
 
 
@@ -359,198 +235,65 @@ void WgGfxDevice::TileBlit( const WgSurface* _pSrc, const WgRect& _src, const Wg
 
 void WgGfxDevice::ClipFill( const WgRect& _clip, const WgRect& _rect, const WgColor& _col )
 {
-	Fill( WgRect( _clip, _rect ), _col );
+	m_pRealDevice->clipFill(_convert(_clip), _convert(_rect), _convert(_col));
 }
 
 //____ ClipBlit() ______________________________________________________________
 
 void WgGfxDevice::ClipBlit( const WgRect& clip, const WgSurface* pSrc )
 {
-	ClipBlit( clip, pSrc, WgRect(0,0,pSrc->Width(),pSrc->Height()), 0, 0 );
+	m_pRealDevice->clipBlit(_convert(clip), pSrc->m_pRealSurface);
 }
 
 void WgGfxDevice::ClipBlit( const WgRect& clip, const WgSurface* pSrc, int dx, int dy  )
 {
-	ClipBlit( clip, pSrc, WgRect(0,0,pSrc->Width(),pSrc->Height()), dx, dy );
+	m_pRealDevice->clipBlit(_convert(clip), pSrc->m_pRealSurface, wg::Coord(dx, dy));
 }
 
 void WgGfxDevice::ClipBlit( const WgRect& clip, const WgSurface* pSrc, const WgRect& srcRect, int dx, int dy  )
 {
-	if( (clip.x <= dx) && (clip.x + clip.w > dx + srcRect.w) &&
-      (clip.y <= dy) && (clip.y + clip.h > dy + srcRect.h) )
-	{
-		Blit( pSrc, srcRect, dx, dy );														// Totally inside clip-rect.
-		return;
-	}
-
-	if( (clip.x > dx + srcRect.w) || (clip.x + clip.w < dx) ||
-      (clip.y > dy + srcRect.h) || (clip.y + clip.h < dy) )
-		return;																						// Totally outside clip-rect.
-
-	// Do Clipping
-
-	WgRect	newSrc = srcRect;
-
-	if( dx < clip.x )
-	{
-		newSrc.w -= clip.x - dx;
-		newSrc.x += clip.x - dx;
-		dx = clip.x;
-	}
-
-	if( dy < clip.y )
-	{
-		newSrc.h -= clip.y - dy;
-		newSrc.y += clip.y - dy;
-		dy = clip.y;
-	}
-
-	if( dx + newSrc.w > clip.x + clip.w )
-		newSrc.w = (clip.x + clip.w) - dx;
-
-	if( dy + newSrc.h > clip.y + clip.h )
-		newSrc.h = (clip.y + clip.h) - dy;
-
-
-	Blit( pSrc, newSrc, dx, dy );
+	m_pRealDevice->clipBlit(_convert(clip), pSrc->m_pRealSurface, _convert(srcRect), wg::Coord(dx, dy));
 }
 
 //____ ClipStretchBlit() _______________________________________________________
 
 void WgGfxDevice::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, bool bTriLinear, float mipBias )
 {
-	ClipStretchBlit( clip, pSrc, WgRect(0,0,pSrc->Width(), pSrc->Height()), WgRect( 0,0,m_canvasSize), bTriLinear, mipBias );
+	m_pRealDevice->clipStretchBlit(_convert(clip), pSrc->m_pRealSurface);
 }
 
 void WgGfxDevice::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, const WgRect& dest, bool bTriLinear, float mipBias )
 {
-	ClipStretchBlit( clip, pSrc, WgRect(0,0,pSrc->Width(), pSrc->Height()), dest, bTriLinear, mipBias );
+	m_pRealDevice->clipStretchBlit(_convert(clip), pSrc->m_pRealSurface, _convert(dest));
 }
 
 void WgGfxDevice::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, const WgRect& src, const WgRect& dest, bool bTriLinear, float mipBias )
 {
-	ClipStretchBlit( clip, pSrc, (float)src.x, (float)src.y, (float)src.w, (float)src.h, (float)dest.x, (float)dest.y, (float)dest.w, (float)dest.h, false );
+	m_pRealDevice->clipStretchBlit(_convert(clip), pSrc->m_pRealSurface, _convert(src), _convert(dest));
 }
 
 void WgGfxDevice::ClipStretchBlit( const WgRect& clip, const WgSurface * pSrc, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias)
 {
-	if( pSrc->scaleMode() == WG_SCALEMODE_INTERPOLATE )
-	{
-		if( sw < dw )
-			sw--;
-
-		if( sh < dh )
-			sh--;
-	}
-
-	float cx = std::max(float(clip.x), dx);
-	float cy = std::max(float(clip.y), dy);
-	float cw = std::min(float(clip.x + clip.w), dx + dw) - cx;
-	float ch = std::min(float(clip.y + clip.h), dy + dh) - cy;
-
-	if(cw <= 0 || ch <= 0)
-		return;
-
-	if( dw > cw )
-	{
-		float	sdxr = sw / dw;			// Source/Destination X Ratio.
-
-		sw = sdxr * cw;
-
-		if( dx < cx )
-			sx += sdxr * (cx - dx);
-	}
-
-	if( dh > ch )
-	{
-		float	sdyr = sh / dh;			// Source/Destination Y Ratio.
-
-		sh = sdyr * ch;
-
-		if( dy < cy )
-			sy += sdyr * (cy - dy);
-	}
-
-	StretchBlitSubPixel( pSrc, sx, sy, sw, sh, cx, cy, cw, ch, bTriLinear, mipBias );
+	m_pRealDevice->clipStretchBlit(_convert(clip), pSrc->m_pRealSurface, wg::RectF(sx, sy, sw, sh), wg::Rect((int)dx, (int)dy, (int)dw, (int)dh));
 }
 
 //____ ClipTileBlit() __________________________________________________________
 
 void WgGfxDevice::ClipTileBlit( const WgRect& clip, const WgSurface* pSrc )
 {
-	ClipTileBlit( clip, pSrc, WgRect( 0,0,pSrc->Width(),pSrc->Height() ),
-				  WgRect(0,0,m_canvasSize) );
+	m_pRealDevice->clipTileBlit(_convert(clip), pSrc->m_pRealSurface);
 }
 
 void WgGfxDevice::ClipTileBlit( const WgRect& clip, const WgSurface* pSrc,
 								  const WgRect& dest )
 {
-	ClipTileBlit( clip, pSrc, WgRect(0,0,pSrc->Width(),pSrc->Height()), dest );
+	m_pRealDevice->clipTileBlit(_convert(clip), pSrc->m_pRealSurface, _convert(dest));
 }
 
 
 void WgGfxDevice::ClipTileBlit( const WgRect& _clip, const WgSurface* _pSrc, const WgRect& _src, const WgRect& _dest )
 {
-	if( !_pSrc )
-		return;
-
-	WgRect	myRect;
-
-	WgRect	clip;
-	if( !clip.Intersection( _dest, _clip ) )
-		return;
-
-	// Take care of start-offset change caused by clipping.
-
-	int		xStart = (clip.x - _dest.x) % _src.w;
-	if( xStart < 0 )
-		xStart += _src.w;
-	xStart += _src.x;
-
-	int		yStart = (clip.y - _dest.y) % _src.h;
-	if( yStart < 0 )
-		yStart += _src.h;
-	yStart += _src.y;
-
-
-	int		destY = clip.y, destX;
-
-	myRect.y = yStart;
-	myRect.h =_src.y + _src.h - yStart;
-
-	while( destY < clip.y + clip.h )
-	{
-		if( myRect.h > clip.y + clip.h - destY )
-			myRect.h = clip.y + clip.h - destY;
-
-		myRect.x = xStart;
-		myRect.w = _src.x + _src.w - xStart;
-		if( myRect.w > clip.w )
-			myRect.w = clip.w;
-
-
-		// Blit a row.
-
-		destX = clip.x;
-		Blit( _pSrc, myRect, destX, destY );
-		destX += myRect.w;
-		myRect.x = _src.x;
-		myRect.w = _src.w;
-
-		while( destX <= clip.x + clip.w - _src.w )
-		{
-			Blit( _pSrc, myRect, destX, destY );
-			destX += myRect.w;
-		}
-		myRect.w = clip.x + clip.w - destX;
-		if( myRect.w > 0 )
-			Blit( _pSrc, myRect, destX, destY );
-
-		destY += myRect.h;
-		myRect.y = _src.y;
-		myRect.h = _src.h;
-	}
-	return;
+	m_pRealDevice->clipTileBlit(_convert(_clip), _pSrc->m_pRealSurface, _convert(_src), _convert(_dest));
 }
 
 //____ BlitBlock() ____________________________________________________________
@@ -996,7 +739,7 @@ bool WgGfxDevice::PrintText( const WgRect& clip, const WgText * pText, const WgR
 
 void WgGfxDevice::_printTextSpan( WgPen& pen, const WgText * pText, int ofs, int len, bool bLineEnding )
 {
-	WgColor baseCol	= m_tintColor;
+	WgColor baseCol	= _convert(m_pRealDevice->tintColor());
 	WgColor	color	= baseCol;
 
 	const WgChar * pChars = pText->getText();
@@ -1084,7 +827,7 @@ void WgGfxDevice::_printTextSpan( WgPen& pen, const WgText * pText, int ofs, int
 
 	// Restore tint color.
 
-	if( m_tintColor != baseCol )
+	if( GetTintColor() != baseCol )
 		SetTintColor(baseCol);
 }
 
@@ -1093,7 +836,7 @@ void WgGfxDevice::_printTextSpan( WgPen& pen, const WgText * pText, int ofs, int
 
 void WgGfxDevice::_printEllipsisTextSpan( WgPen& pen, const WgText * pText, int ofs, int len, int endX )
 {
-	WgColor baseCol	= m_tintColor;
+	WgColor baseCol	= _convert(m_pRealDevice->tintColor());
 	WgColor	color	= baseCol;
 
 	const WgChar * pChars = pText->getText();
@@ -1217,7 +960,7 @@ void WgGfxDevice::_printEllipsisTextSpan( WgPen& pen, const WgText * pText, int 
 
 	// Restore tint color.
 
-	if( m_tintColor != baseCol )
+	if( GetTintColor() != baseCol )
 		SetTintColor(baseCol);
 }
 
@@ -1360,7 +1103,7 @@ void WgGfxDevice::PrintLine( WgPen& pen, const WgTextAttr& baseAttr, const WgCha
 	if( !_pLine )
 		return;
 
-	WgColor baseCol	= m_tintColor;
+	WgColor baseCol	= _convert( m_pRealDevice->tintColor() );
 	WgColor	color	= baseCol;
 
 	Uint16	hProp				= 0xFFFF;		// Setting to impossible value forces setting of properties in first loop.
@@ -1433,8 +1176,23 @@ void WgGfxDevice::PrintLine( WgPen& pen, const WgTextAttr& baseAttr, const WgCha
 
 	// Restore tint color.
 
-	if( m_tintColor != baseCol )
+	if( GetTintColor() != baseCol )
 		SetTintColor(baseCol);
+}
+
+//____ FillSubPixel() _________________________________________________________
+
+void WgGfxDevice::FillSubPixel(const WgRectF& rect, const WgColor& col)
+{
+	m_pRealDevice->fillSubPixel(_convert(rect), _convert(col));
+}
+
+//____ StretchBlitSubPixel() __________________________________________________
+
+void WgGfxDevice::StretchBlitSubPixel(const WgSurface * pSrc, float sx, float sy, float sw, float sh,
+		float dx, float dy, float dw, float dh, bool bTriLinear, float mipBias)
+{
+	m_pRealDevice->stretchBlit(pSrc->m_pRealSurface, wg::RectF(sx, sy, sw, sh), wg::Rect((int)dx, (int)dy, (int)dw, (int)dh));
 }
 
 
@@ -1474,116 +1232,4 @@ void WgGfxDevice::_drawUnderline( const WgRect& clip, const WgText * pText, int 
 
 	ClipBlitHorrBar( clip, pUnderline->pSurf, pUnderline->rect, WgBorders( pUnderline->leftBorder, pUnderline->rightBorder, 0, 0 ), false,
 					_x + pUnderline->bearingX, _y + pUnderline->bearingY, pen.GetPosX() );
-}
-
-//____ _genCurveTab() ___________________________________________________________
-
-void WgGfxDevice::_genCurveTab()
-{
-	s_pCurveTab = new int[c_nCurveTabEntries];
-
-	//		double factor = 3.14159265 / (2.0 * c_nCurveTabEntries);
-
-	for (int i = 0; i < c_nCurveTabEntries; i++)
-	{
-		double y = 1.f - i / (double)c_nCurveTabEntries;
-		s_pCurveTab[i] = (int)(sqrt(1.f - y*y)*65536.f);
-	}
-}
-
-//____ _traceLine() __________________________________________________________
-
-void WgGfxDevice::_traceLine(int * pDest, int nPoints, const WgWaveLine& wave, int offset)
-{
-	static const int c_supersamples = 4;
-
-	static int brush[128*c_supersamples];
-	static float prevThickness = -1.f;
-
-	float thickness = wave.thickness;
-	int brushSteps = (int)(thickness * c_supersamples / 2);
-
-	// Generate brush
-
-	if (thickness != prevThickness)
-	{
-		int scaledThickness = (int)(thickness / 2 * 256);
-
-		brush[0] = scaledThickness;
-		for (int i = 1; i <= brushSteps; i++)
-			brush[i] = (scaledThickness * s_pCurveTab[c_nCurveTabEntries - (i*c_nCurveTabEntries) / brushSteps]) >> 16;
-		prevThickness = thickness;
-	}
-
-	int nTracePoints = WgMax(0, WgMin(nPoints, wave.length - offset));
-	int nFillPoints = nPoints - nTracePoints;
-
-	// Trace...
-
-	int * pSrc = wave.pWave + offset;
-	for (int i = 0; i < nTracePoints; i++)
-	{
-		// Start with top and bottom for current point
-
-		int top = pSrc[i] - brush[0];
-		int bottom = pSrc[i] + brush[0];
-
-		// Check brush's coverage from previous points
-
-		int end = WgMin(i + 1, brushSteps+1);
-
-		for (int j = 1; j < end; j++)
-		{
-			int from = pSrc[i - j / c_supersamples];
-			int to = pSrc[i - j / c_supersamples - 1];
-
-			int sample = (to - from) * (j%c_supersamples) / c_supersamples + from;
-
-			int topCover = sample - brush[j];
-			int bottomCover = sample + brush[j];
-
-			if (topCover < top)
-				top = topCover;
-			else if (bottomCover > bottom)
-				bottom = bottomCover;
-		}
-
-		// Check brush's coverage from following points
-
-		end = WgMin(nPoints - i, brushSteps+1);
-
-		for (int j = 1; j < end; j++)
-		{
-			int from = pSrc[i + j / c_supersamples];
-			int to = pSrc[i + j / c_supersamples + 1];
-
-			int sample = (to - from) * (j%c_supersamples) / c_supersamples + from;
-
-			int topCover = sample - brush[j];
-			int bottomCover = sample + brush[j];
-
-			if (topCover < top)
-				top = topCover;
-			else if (bottomCover > bottom)
-				bottom = bottomCover;
-		}
-
-		// Save traced values
-
-		*pDest++ = top;
-		*pDest++ = bottom;
-	}
-
-	// Fill...
-
-	if (nFillPoints)
-	{
-		int top = wave.hold - brush[0];
-		int bottom = wave.hold + brush[0];
-		for (int i = 0; i < nFillPoints; i++)
-		{
-			*pDest++ = top;
-			*pDest++ = bottom;
-		}
-	}
 }

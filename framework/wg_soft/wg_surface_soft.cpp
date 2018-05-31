@@ -25,7 +25,8 @@
 #include <wg_surface_soft.h>
 #include <wg_util.h>
 
-
+#include <wg3_softsurface.h>
+#include <wg_versionbridge.h>
 
 
 static const char	c_surfaceType[] = {"Software"};
@@ -34,7 +35,7 @@ static const char	c_surfaceType[] = {"Software"};
 
 WgSize WgSurfaceSoft::MaxSize()
 {
-	return WgSize(65536,65536);
+	return _convert(wg::SoftSurface::maxSize());
 }
 
 
@@ -42,55 +43,33 @@ WgSize WgSurfaceSoft::MaxSize()
 
 WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type )
 {
-	assert( type == WG_PIXEL_BGR_8 || type == WG_PIXEL_BGRA_8 );
-	WgUtil::PixelTypeToFormat(type, m_pixelFormat);
-
-	m_pitch = ((size.w+3)&0xFFFFFFFC)*m_pixelFormat.bits/8;
-	m_size = size;
-	m_pData = new Uint8[ m_pitch*size.h ];
-	m_bOwnsData = true;
-	m_fScaleAlpha = 1.f;
+	m_pRealSurface = wg::SoftSurface::create(_convert(size), _convert(type));
 }
 
 WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, int pitch )
 {
-	assert( type == WG_PIXEL_BGR_8 || type == WG_PIXEL_BGRA_8 );
-	WgUtil::PixelTypeToFormat(type, m_pixelFormat);
-
-	m_pitch = pitch;
-	m_size = size;
-	m_pData = pPixels;
-	m_bOwnsData = false;
-	m_fScaleAlpha = 1.f;
+	auto pBlob = wg::Blob::create(pPixels, nullptr);
+	m_pRealSurface = wg::SoftSurface::create(_convert(size), _convert(type), pBlob, pitch);
 }
 
 WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, int pitch, const WgPixelFormat& pixelFormat )
 {
-	WgUtil::PixelTypeToFormat(type, m_pixelFormat);
-	
-	m_size	= size;
-    m_pitch = ((size.w*m_pixelFormat.bits/8)+3)&0xFFFFFFFC;
-	m_pData = new Uint8[ m_pitch*size.h ];
-	m_bOwnsData = true;
-	m_fScaleAlpha = 1.f;
+	wg::PixelFormat format;
+	_convert(pixelFormat, format);
 
-	m_pPixels = (uint8_t *) m_pData;
-    _copyFrom( &pixelFormat, pPixels, pitch, size, size );
-    m_pPixels = 0;	
+	m_pRealSurface = wg::SoftSurface::create(_convert(size), _convert(type), pPixels, pitch, &format);
 }
 
 
 WgSurfaceSoft::WgSurfaceSoft( const WgSurfaceSoft * pOther )
 {
-	_copy( pOther );
+	m_pRealSurface = wg::SoftSurface::create(pOther->m_pRealSurface);
 }
 
 //____ Destructor ______________________________________________________________
 
 WgSurfaceSoft::~WgSurfaceSoft()
 {
-	if(m_bOwnsData)
-		delete [] m_pData;
 }
 
 //____ Type() __________________________________________________________________
@@ -106,110 +85,3 @@ const char * WgSurfaceSoft::GetClass()
 {
 	return c_surfaceType;
 }
-
-
-//____ _copy() _________________________________________________________________
-
-void WgSurfaceSoft::_copy(const WgSurfaceSoft * pOther)
-{
-	m_pixelFormat 	= pOther->m_pixelFormat;
-	m_pitch 		= ((pOther->m_size.w+3)&0xFFFFFFFC)*pOther->m_pixelFormat.bits/8;
-	m_size 			= pOther->m_size;
-	m_bOwnsData		= true;
-	m_fScaleAlpha 	= pOther->m_fScaleAlpha;
-
-	m_pData = new Uint8[ m_pitch*m_size.h ];
-
-	int linebytes = m_size.w * m_pixelFormat.bits/8;
-	for( int y = 0 ; y < m_size.h ; y++ )
-		memcpy( m_pData+y*m_pitch, pOther->m_pData+y*pOther->m_pitch, linebytes );
-}
-
-//____ GetPixel() _________________________________________________________________
-
-Uint32 WgSurfaceSoft::GetPixel( WgCoord coord ) const
-{
-	if( coord.x >= m_size.w || coord.x < 0 ||
-		coord.y >= m_size.h || coord.y < 0  )
-		return 0;
-
-	if( m_pixelFormat.type == WG_PIXEL_BGRA_8 )
-    {
-		Uint32 k = * ((Uint32*) &m_pData[ m_pitch*coord.y+coord.x*4 ]);
-		return k;
-    }
-	else
-    {
-		Uint8 * pPixel = m_pData + m_pitch*coord.y + coord.x*3;
-
-#if WG_IS_BIG_ENDIAN
-		Uint32 k = pPixel[2] + (((Uint32)pPixel[1]) << 8) + (((Uint32)pPixel[0]) << 16);
-#else
-		Uint32 k = pPixel[0] + (((Uint32)pPixel[1]) << 8) + (((Uint32)pPixel[2]) << 16);
-#endif
-		return k;
-    }
-
-}
-
-//____ GetOpacity() _______________________________________________________________
-
-Uint8 WgSurfaceSoft::GetOpacity( WgCoord coord ) const
-{
-	if( coord.x >= m_size.w || coord.x < 0 ||
-		coord.y >= m_size.h || coord.y < 0  )
-		return 0;
-
-	if( m_pixelFormat.type == WG_PIXEL_BGRA_8 )
-	  {
-		Uint8 * pPixel = m_pData + m_pitch*coord.y + coord.x*4;
-	    return (Uint8)(m_fScaleAlpha * (float)pPixel[3]);
-	  }
-	else
-	  return 0xff;
-}
-
-//____ IsOpaque() ______________________________________________________________
-
-bool WgSurfaceSoft::IsOpaque() const
-{
-	return m_pixelFormat.A_bits==0?true:false;
-}
-
-//____ Lock() __________________________________________________________________
-
-void * WgSurfaceSoft::Lock( WgAccessMode mode )
-{
-	m_accessMode = WG_READ_WRITE;
-	m_pPixels = m_pData;
-	m_lockRegion = WgRect(0,0,m_size);
-	return m_pPixels;
-}
-
-//____ LockRegion() ____________________________________________________________
-
-void * WgSurfaceSoft::LockRegion( WgAccessMode mode, const WgRect& region )
-{
-	m_accessMode = mode;
-	m_pPixels = m_pData + m_pitch*region.y + region.x*m_pixelFormat.bits/8;
-	m_lockRegion = region;
-	return m_pPixels;
-}
-
-//____ Unlock() ________________________________________________________________
-
-void WgSurfaceSoft::Unlock()
-{
-	m_accessMode = WG_NO_ACCESS;
-	m_pPixels = 0;
-	m_lockRegion.Clear();
-}
-
-//____ SetScaleAlpha() _________________________________________________________
-
-void WgSurfaceSoft::SetScaleAlpha(float fScaleAlpha)
-{
-        m_fScaleAlpha = fScaleAlpha;
-}
-
-
