@@ -46,18 +46,12 @@ WgGfxDeviceSoft::WgGfxDeviceSoft()
 WgGfxDeviceSoft::WgGfxDeviceSoft( WgSurfaceSoft * pCanvas )
 {
 	m_pRealDevice = wg::SoftGfxDevice::create( (wg::SoftSurface*) pCanvas->m_pRealSurface.rawPtr() );
+    m_pCanvas = pCanvas;
 }
 
 //____ Destructor ______________________________________________________________
 
 WgGfxDeviceSoft::~WgGfxDeviceSoft()
 {
-}
-
-//____ SetCanvas() _______________________________________________________________
-
-bool WgGfxDeviceSoft::SetCanvas( WgSurface * pCanvas )
-{
-	return m_pRealDevice->setCanvas((wg::SoftSurface*) pCanvas->m_pRealSurface.rawPtr());
 }
 

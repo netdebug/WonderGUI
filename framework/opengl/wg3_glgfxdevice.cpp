@@ -21,6 +21,7 @@
 =========================================================================*/
 
 #include <cmath>
+#include <cstdlib>
 
 #include <wg3_glgfxdevice.h>
 #include <wg3_glsurface.h>
@@ -28,6 +29,11 @@
 #include <wg3_base.h>
 #include <wg3_util.h>
 #include <assert.h>
+
+#ifdef SOFTUBE_USE_PACE_FUSION
+#include "PaceFusion.h"
+PACE_FUSION_EXCLUDE_USER_CALLBACKS
+#endif
 
 using namespace std;
 

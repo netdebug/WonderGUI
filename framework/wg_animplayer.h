@@ -71,7 +71,7 @@ public:
 	bool			PlayToFractional(float fraction);	/// Play to position measured in ticks
 
 
-	WgSize			PreferredPixelSize() const; 
+	WgSize			PreferredPixelSize() const;
 
     void SetTint(WgColor kColor);
     const WgColor& GetTint() { return m_kTintColor; }

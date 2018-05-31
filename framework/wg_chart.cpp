@@ -47,7 +47,7 @@ WgChart::WgChart()
 	m_lastSample		= 0.f;
 
 	m_upsampleMethod = WG_UPSAMPLE_INTERPOLATE;
-	m_downsampleMethod = WG_DOWNSAMPLE_AVERAGE;
+	m_downsampleMethod = WG_DOWNSAMPLE_PEAK;
 
 	m_sampleLabelStyle.alignment = WG_SOUTH;
 	m_sampleLabelStyle.offset = { 0,0 };
@@ -411,7 +411,7 @@ void WgChart::SetUpsampleMethod(WgUpsampleMethod method)
 
 void WgChart::SetDownsampleMethod(WgDownsampleMethod method)
 {
-	if (method != m_upsampleMethod)
+	if (method != m_downsampleMethod)
 	{
 		m_downsampleMethod = method;
 		_resampleAllWaves();			//Optimize: Only resample and requestRender if we are downsampling.
@@ -915,7 +915,7 @@ void WgChart::_resample(float sampleScale, float valueFactor, int yOfs, float fl
 					int ofs = (int)(sampleScale*i);
 					int end = (int)(sampleScale*(i + 1));
 
-					int divider = ofs - end;
+					int divider = end - ofs;
 					int val = yOfs + (int)((pSrc[ofs++] - floor) * valueFactor * 256);
 
 					while (ofs < end)

@@ -50,7 +50,6 @@ public:
 	WgGfxDeviceSoft( WgSurfaceSoft * pCanvas );
 	~WgGfxDeviceSoft();
 
-	bool	SetCanvas( WgSurface * pCanvas );
 };
 
 #endif //WG_GFXDEVICE_SOFT_DOT_H

@@ -270,7 +270,7 @@ namespace WgEvent
 		
 		m_bPressInside		= pOrg->m_bPressInside;
 		m_bReleaseInside	= pOrg->m_bReleaseInside;
-		Event::_cloneContentFrom( pOrg );
+		MouseButtonEvent::_cloneContentFrom( pOrg );
 	}
 
 

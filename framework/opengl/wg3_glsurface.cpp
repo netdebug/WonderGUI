@@ -360,10 +360,7 @@ namespace wg
 
 	void GlSurface::unlock()
 	{
-		AccessMode a = AccessMode::None;
-		
-
-		if(a == AccessMode::None )
+		if(m_accessMode == AccessMode::None )
 			return;
 
 		glUnmapBuffer( GL_PIXEL_UNPACK_BUFFER );

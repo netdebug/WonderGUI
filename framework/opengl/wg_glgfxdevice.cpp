@@ -67,3 +67,11 @@ bool WgGlGfxDevice::SetCanvas( WgSize dimensions )
 {
 	return ((wg::GlGfxDevice*)m_pRealDevice.rawPtr())->setCanvas(_convert(dimensions));		
 }
+
+//____ StretchBlitSubPixelWithInvert() _______________________________________________
+
+void WgGlGfxDevice::StretchBlitSubPixelWithInvert(const WgSurface * pSrc, float sx, float sy, float sw, float sh,
+                                      float dx, float dy, float dw, float dh)
+{
+    ((wg::GlGfxDevice*)m_pRealDevice.rawPtr())->stretchBlitSubPixelWithInvert( pSrc->m_pRealSurface, sx, sy, sw, sh, dx, dy, dw, dh );
+}

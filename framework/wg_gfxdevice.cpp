@@ -87,7 +87,12 @@ WgBlendMode WgGfxDevice::GetBlendMode() const
 
 bool WgGfxDevice::SetCanvas(WgSurface * pCanvas)
 {
-	bool ret = m_pRealDevice->setCanvas(pCanvas->m_pRealSurface);
+    wg::Surface * pSurf = nullptr;
+    
+    if( pCanvas )
+        pSurf = pCanvas->m_pRealSurface;
+        
+	bool ret = m_pRealDevice->setCanvas(pSurf);
 	if (ret)
 		m_pCanvas = pCanvas;
 	return ret;

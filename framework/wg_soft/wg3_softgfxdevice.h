@@ -81,7 +81,7 @@ namespace wg
 		//.____ Creation __________________________________________
 
 		static SoftGfxDevice_p	create();
-		static SoftGfxDevice_p	create( SoftSurface * pCanvas );
+		static SoftGfxDevice_p	create( Surface * pCanvas );
 	
 		//.____ Identification __________________________________________
 
@@ -137,7 +137,7 @@ namespace wg
 		
 	protected:
 		SoftGfxDevice();
-		SoftGfxDevice( SoftSurface * pCanvas );
+		SoftGfxDevice( Surface * pCanvas );
 		~SoftGfxDevice();
 
 		void	_lineToEdges(const WaveLine * pWave, int offset, int nPoints, SegmentEdge * pDest, int pitch);

@@ -33,6 +33,10 @@
 #include <wg_valueeditor.h>
 //#include <wg_menu.h>
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+#include "PaceFusion.h"
+#endif
+
 
 
 //____ Source() _________________________________________________________________
@@ -157,11 +161,17 @@ WgEventFilter	WgEventFilter::MouseButtonPress( int button)
 	return WgEventFilter( WG_EVENT_MOUSEBUTTON_PRESS, 0, _filterMouseButtonEvents, button );
 }
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+PACE_FUSION_NO_USER_CALLBACK
+#endif
 WgEventFilter	WgEventFilter::MouseButtonPress( WgWidget * pWidget )
 {
 	return WgEventFilter( WG_EVENT_MOUSEBUTTON_PRESS, pWidget, _filterMouseButtonEvents, 0 );
 }
 
+#ifdef SOFTUBE_USE_PACE_FUSION
+PACE_FUSION_NO_USER_CALLBACK
+#endif
 WgEventFilter	WgEventFilter::MouseButtonPress( WgWidget * pWidget, int button )
 {
 	return WgEventFilter( WG_EVENT_MOUSEBUTTON_PRESS, pWidget, _filterMouseButtonEvents, button );

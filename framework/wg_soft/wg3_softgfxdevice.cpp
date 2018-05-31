@@ -24,9 +24,15 @@
 #include <wg3_util.h>
 #include <math.h>
 #include <algorithm>
+#include <cstdlib>
 #include <wg3_base.h>
 
 #include <assert.h>
+
+#ifdef SOFTUBE_USE_PACE_FUSION
+#include "PaceFusion.h"
+PACE_FUSION_EXCLUDE_USER_CALLBACKS
+#endif
 
 using namespace std;
 
@@ -45,7 +51,7 @@ namespace wg
 		return SoftGfxDevice_p(new SoftGfxDevice());
 	}
 	
-	SoftGfxDevice_p SoftGfxDevice::create( SoftSurface * pCanvas )
+	SoftGfxDevice_p SoftGfxDevice::create( Surface * pCanvas )
 	{
 		return SoftGfxDevice_p(new SoftGfxDevice(pCanvas));
 	}
@@ -66,7 +72,7 @@ namespace wg
 		
 	}
 	
-	SoftGfxDevice::SoftGfxDevice( SoftSurface * pCanvas ) : GfxDevice( pCanvas?pCanvas->size():Size() )
+	SoftGfxDevice::SoftGfxDevice( Surface * pCanvas ) : GfxDevice( pCanvas?pCanvas->size():Size() )
 	{
 		m_bEnableCustomFunctions = false;
 		m_bUseCustomFunctions = false;

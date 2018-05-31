@@ -46,6 +46,8 @@ class WgSurface
 {
 	friend class WgGfxDevice;
 	friend class WgGfxDeviceSoft;
+	friend class WgGlGfxDevice;
+    
 
 public:
 	virtual ~WgSurface();
