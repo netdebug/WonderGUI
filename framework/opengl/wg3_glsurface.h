@@ -90,6 +90,11 @@ namespace wg
 		uint8_t *	lockRegion(AccessMode mode, const Rect& region);
 		void		unlock();
 
+		bool		unload();
+		bool		isLoaded();
+		void		reload();
+
+
 		//.____ Misc __________________________________________________________
 
 		inline	GLuint	getTexture() const { return m_texture; }
@@ -103,15 +108,12 @@ namespace wg
 
 
 		void		_setPixelDetails( PixelType type );
-		void		_initBuffer();
 
         GLuint 		m_texture;			// GL texture handle.
         GLint       m_internalFormat;   // GL_RGB8 or GL_RGBA8.
         GLenum		m_accessFormat;		// GL_BGR or GL_BGRA.
         Blob_p      m_pBlob;
-		bool		m_bDynamic;			// Set if surface is dynamic, thus having a GL pixel buffer.
 		
-		GLuint		m_buffer;			// Pointer at GL pixel buffer, if any.
 		Size		m_size;				// Width and height in pixels.
 		uint32_t	m_pixelSize;		// Size in bytes of a pixel.
 

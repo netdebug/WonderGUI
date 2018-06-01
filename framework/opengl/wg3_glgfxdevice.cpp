@@ -345,6 +345,9 @@ namespace wg
         m_fillProg = _createGLProgram( fillVertexShader, fillFragmentShader );
         m_fillProgColorLoc = glGetUniformLocation( m_fillProg, "color");
 
+		GLint err = glGetError();
+		assert( err == 0 );
+    
         m_aaFillProg = _createGLProgram( fillVertexShader, aaFillFragmentShader );
         m_aaFillProgColorLoc = glGetUniformLocation( m_aaFillProg, "color");
         m_aaFillProgFrameLoc = glGetUniformLocation( m_aaFillProg, "frame");
@@ -390,17 +393,34 @@ namespace wg
  
 		glGenFramebuffers(1, &m_framebufferId);
 
-		glGenTextures(1, &m_horrWaveBufferTexture);
-		glGenBuffers(1, &m_horrWaveBufferTextureData);
-
+    	// For some unknown reason this causes issues with techture bliting in the second open instance
+    	// For now only turn this on for products that needs it (i.e. Weiss plug-ins)
+		//   if(g_bSoftubeProductUseCodeInDevelopment)
+    	{
+			glGenTextures(1, &m_horrWaveBufferTexture);
+			glGenBuffers(1, &m_horrWaveBufferTextureData);
+        	glGenBuffers(1, &m_dummyBuffer);
+		
+}
         setCanvas( viewport );
-        setTintColor( Color::White );        
+        setTintColor( Color::White );  
+
+		assert( glGetError() == 0 );      
     }
 
 	//____ Destructor ______________________________________________________________
 
 	GlGfxDevice::~GlGfxDevice()
 	{
+		assert( glGetError() == 0 );
+		glDeleteBuffers(1, &m_vertexBufferId);
+		glDeleteBuffers(1, &m_texCoordBufferId);
+		glDeleteBuffers(1, &m_dummyBuffer);
+		assert( glGetError() == 0 );
+		glDeleteVertexArrays(1, &m_vertexArrayId);
+		assert( glGetError() == 0 );
+		glDeleteVertexArrays(1, &m_texCoordArrayId);
+		assert( glGetError() == 0 );
 	}
 
 	//____ isInstanceOf() _________________________________________________________
@@ -583,6 +603,7 @@ namespace wg
 
 	bool GlGfxDevice::beginRender()
 	{
+		assert( glGetError() == 0 );
 
         if( m_bRendering == true )
 			return false;
@@ -617,7 +638,8 @@ namespace wg
 		_setBlendMode(m_blendMode);
 
         //
-
+    	
+		assert( glGetError() == 0 );
 		m_bRendering = true;
 		return true;
 	}
@@ -626,6 +648,7 @@ namespace wg
 
 	bool GlGfxDevice::endRender()
 	{
+    	assert( glGetError() == 0 );
 		if( m_bRendering == false )
 			return false;
 
@@ -647,6 +670,7 @@ namespace wg
 		glScissor(m_glScissorBox[0], m_glScissorBox[1], m_glScissorBox[2], m_glScissorBox[3]);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_glReadFrameBuffer);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_glDrawFrameBuffer);
+    	assert( glGetError() == 0 );
 
 		m_bRendering = false;
 		return true;
@@ -945,7 +969,7 @@ namespace wg
 		if ((clip.x <= dest.x) && (clip.x + clip.w > dest.x + srcRect.w) &&
 			(clip.y <= dest.y) && (clip.y + clip.h > dest.y + srcRect.h))
 		{
-			stretchBlitSubPixelWithInvert(pSrc, srcRect.x, srcRect.y, srcRect.w, srcRect.h, dest.x, dest.y, srcRect.w, srcRect.h); // Totally inside clip-rect.
+			stretchBlitSubPixelWithInvert(pSrc, (float) srcRect.x, (float) srcRect.y, (float) srcRect.w, (float) srcRect.h, (float) dest.x, (float) dest.y, (float) srcRect.w, (float) srcRect.h); // Totally inside clip-rect.
 			return;
 		}
 
@@ -977,7 +1001,7 @@ namespace wg
 		if (dest.y + newSrc.h > clip.y + clip.h)
 			newSrc.h = (clip.y + clip.h) - dest.y;
 
-		stretchBlitSubPixelWithInvert(pSrc, newSrc.x, newSrc.y, newSrc.w, newSrc.h, dest.x, dest.y, newSrc.w, newSrc.h);
+		stretchBlitSubPixelWithInvert(pSrc, (float) newSrc.x, (float) newSrc.y, (float) newSrc.w, (float) newSrc.h, (float) dest.x, (float) dest.y, (float) newSrc.w, (float) newSrc.h);
 	}
 
 
@@ -1323,7 +1347,7 @@ namespace wg
 
 	//____ clipDrawHorrWave() _____________________________________________________
 
-	void GlGfxDevice::clipDrawHorrWave(const Rect&clip, Coord begin, int length, const WaveLine * pTopBorder, const WaveLine * pBottomBorder, Color frontFill, Color backFill)
+	void GlGfxDevice::clipDrawHorrWave(const Rect& clip, Coord begin, int length, const WaveLine * pTopBorder, const WaveLine * pBottomBorder, Color frontFill, Color backFill)
 	{
 		// Do early rough X-clipping with margin (need to trace lines with margin of thickest line).
 
@@ -1388,14 +1412,17 @@ namespace wg
 		}
 
 		top = begin.y + (top >> 8);
-		bottom = begin.y + ((bottom + 255) >> 8);
+		bottom = begin.y + ((bottom + 255) >> 8) + 1;			//TODO: We should not need +1 here, but we do... What is wrong here?
 
 
 		box.y = top > clip.y ? top : clip.y;
 		box.h = bottom < (clip.y + clip.h) ? bottom - box.y : clip.y + clip.h - box.y;
 
 		if (box.w <= 0 || box.h <= 0)
+        {
+        	WgBase::MemStackRelease(traceBufferSize);
 			return;
+        }
 
 		// Render columns
 
@@ -1514,7 +1541,7 @@ namespace wg
 		glBindTexture(GL_TEXTURE_BUFFER, m_horrWaveBufferTexture);
 		glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, m_horrWaveBufferTextureData);
 		glUniform1i(m_horrWaveProgTexIdLoc, 0);
-		glUniform2f(m_horrWaveProgWindowOfsLoc, (GLfloat)(begin.x + m_canvasViewport.x), (GLfloat)(begin.y + m_canvasViewport.y));
+		glUniform2f(m_horrWaveProgWindowOfsLoc, (GLfloat)(begin.x + m_canvasViewport.x), (GLfloat)(begin.y - m_canvasViewport.y));        // This fragment shader has top-left coordinate system.
 		glUniform4f(m_horrWaveProgTopBorderColorLoc, pTopBorder->color.r / 255.f, pTopBorder->color.g / 255.f, pTopBorder->color.b / 255.f, pTopBorder->color.a / 255.f);
 		glUniform4f(m_horrWaveProgBottomBorderColorLoc, pBottomBorder->color.r / 255.f, pBottomBorder->color.g / 255.f, pBottomBorder->color.b / 255.f, pBottomBorder->color.a / 255.f);
 		glUniform4f(m_horrWaveProgFrontFillLoc, frontFill.r / 255.f, frontFill.g / 255.f, frontFill.b / 255.f, frontFill.a / 255.f);
