@@ -401,7 +401,7 @@ namespace wg
 			glGenBuffers(1, &m_horrWaveBufferTextureData);
         	glGenBuffers(1, &m_dummyBuffer);
 		
-}
+        }
         setCanvas( viewport );
         setTintColor( Color::White );  
 
@@ -471,24 +471,28 @@ namespace wg
 
 	bool GlGfxDevice::setCanvas( const Rect& viewport )
 	{
+		assert( glGetError() == 0 );
 		m_pCanvas					= nullptr;
 		m_bFlipY					= true;
 		m_defaultCanvasViewport		= viewport;
-		m_defaultCanvasViewport.y	= -viewport.y;
 
 		m_canvasViewport			= m_defaultCanvasViewport;
+		m_canvasViewport.y          = -m_defaultCanvasViewport.y;
 		m_canvasSize 				= m_defaultCanvasViewport.size(); 
 		_updateProgramDimensions();
 
 		if (m_bRendering)
 			return _setFramebuffer();
 
+		assert( glGetError() == 0 );
 		return true;
 	}
 
 	bool GlGfxDevice::setCanvas( Surface * _pSurface )
 	{
-		if (!_pSurface)
+        assert( glGetError() == 0 );
+
+        if (!_pSurface)
 			return setCanvas(m_defaultCanvasViewport);		// Revert back to default frame buffer.
 
 		GlSurface * pSurface = GlSurface::cast(_pSurface);
@@ -504,6 +508,7 @@ namespace wg
 		if (m_bRendering)
 			return _setFramebuffer();
 
+        assert( glGetError() == 0 );
 		return true;
 	}
 
@@ -511,6 +516,8 @@ namespace wg
 
 	bool GlGfxDevice::_setFramebuffer()
 	{
+		assert( glGetError() == 0 );
+
 		if (m_pCanvas)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferId);
@@ -531,6 +538,7 @@ namespace wg
 		glScissor(m_canvasViewport.x, m_canvasViewport.y, m_canvasViewport.w, m_canvasViewport.h);
 		glViewport(m_canvasViewport.x, m_canvasViewport.y, m_canvasViewport.w, m_canvasViewport.h);
 
+        assert( glGetError() == 0 );
 		return true;
 	}
 
@@ -539,7 +547,9 @@ namespace wg
 
 	void GlGfxDevice::_updateProgramDimensions()
 	{
-		glUseProgram(m_fillProg);
+        assert( glGetError() == 0 );
+
+        glUseProgram(m_fillProg);
 		GLint dimLoc = glGetUniformLocation(m_fillProg, "dimensions");
 		glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
 
@@ -568,6 +578,7 @@ namespace wg
 		dimLoc = glGetUniformLocation(m_horrWaveProg, "dimensions");
 		glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
 
+        assert( glGetError() == 0 );
 	}
 
 
@@ -587,7 +598,9 @@ namespace wg
 
 	bool GlGfxDevice::setBlendMode( BlendMode blendMode )
 	{
-		if( blendMode != BlendMode::Blend && blendMode != BlendMode::Replace && 
+        assert( glGetError() == 0 );
+
+        if( blendMode != BlendMode::Blend && blendMode != BlendMode::Replace &&
 			blendMode != BlendMode::Add && blendMode != BlendMode::Subtract && blendMode != BlendMode::Multiply &&
 			blendMode != BlendMode::Invert )
 				return false;
@@ -596,6 +609,7 @@ namespace wg
 		if( m_bRendering )
 			_setBlendMode(blendMode);
 
+        assert( glGetError() == 0 );
 		return true;
 	}
 
@@ -1412,7 +1426,7 @@ namespace wg
 		}
 
 		top = begin.y + (top >> 8);
-		bottom = begin.y + ((bottom + 255) >> 8) + 1;			//TODO: We should not need +1 here, but we do... What is wrong here?
+        bottom = begin.y + ((bottom + 255) >> 8); // + 1;			//TODO: We should not need +1 here, but we do... What is wrong here?
 
 
 		box.y = top > clip.y ? top : clip.y;
@@ -1541,7 +1555,7 @@ namespace wg
 		glBindTexture(GL_TEXTURE_BUFFER, m_horrWaveBufferTexture);
 		glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, m_horrWaveBufferTextureData);
 		glUniform1i(m_horrWaveProgTexIdLoc, 0);
-		glUniform2f(m_horrWaveProgWindowOfsLoc, (GLfloat)(begin.x + m_canvasViewport.x), (GLfloat)(begin.y - m_canvasViewport.y));        // This fragment shader has top-left coordinate system.
+		glUniform2f(m_horrWaveProgWindowOfsLoc, (GLfloat)(begin.x + m_canvasViewport.x), (GLfloat)(begin.y + m_canvasViewport.y));        // This fragment shader has top-left coordinate system.
 		glUniform4f(m_horrWaveProgTopBorderColorLoc, pTopBorder->color.r / 255.f, pTopBorder->color.g / 255.f, pTopBorder->color.b / 255.f, pTopBorder->color.a / 255.f);
 		glUniform4f(m_horrWaveProgBottomBorderColorLoc, pBottomBorder->color.r / 255.f, pBottomBorder->color.g / 255.f, pBottomBorder->color.b / 255.f, pBottomBorder->color.a / 255.f);
 		glUniform4f(m_horrWaveProgFrontFillLoc, frontFill.r / 255.f, frontFill.g / 255.f, frontFill.b / 255.f, frontFill.a / 255.f);

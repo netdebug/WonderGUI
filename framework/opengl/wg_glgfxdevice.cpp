@@ -58,14 +58,18 @@ WgGlGfxDevice::~WgGlGfxDevice()
 
 void WgGlGfxDevice::SetViewportOffset(WgCoord ofs)
 {
-	((wg::GlGfxDevice*)m_pRealDevice.rawPtr())->setCanvas(wg::Rect(_convert(ofs), m_pRealDevice->canvasSize()));
+	bool ret = ((wg::GlGfxDevice*)m_pRealDevice.rawPtr())->setCanvas(wg::Rect(_convert(ofs), m_pRealDevice->canvasSize()));
+    if (ret)
+        m_pCanvas = nullptr;
 }
 
 //____ SetCanvas() __________________________________________________________________
 
 bool WgGlGfxDevice::SetCanvas( WgSize dimensions )
 {
-	return ((wg::GlGfxDevice*)m_pRealDevice.rawPtr())->setCanvas(_convert(dimensions));		
+	bool ret = ((wg::GlGfxDevice*)m_pRealDevice.rawPtr())->setCanvas(_convert(dimensions));
+    if(ret)
+        m_pCanvas = nullptr;
 }
 
 //____ StretchBlitSubPixelWithInvert() _______________________________________________

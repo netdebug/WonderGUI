@@ -98,6 +98,8 @@ namespace wg
 
         glTexImage2D( GL_TEXTURE_2D, 0, m_internalFormat, m_size.w, m_size.h, 0,
                      m_accessFormat, GL_UNSIGNED_BYTE, NULL );
+
+        assert( glGetError() == 0 );
     }
     
     
@@ -241,6 +243,7 @@ namespace wg
 
 	void GlSurface::setScaleMode( ScaleMode mode )
 	{
+        assert( glGetError() == 0 );
 		switch( mode )
 		{
 			case ScaleMode::Interpolate:
@@ -258,6 +261,7 @@ namespace wg
 		}
 		
 		Surface::setScaleMode(mode);
+        assert( glGetError() == 0 );
 	}
 
 	//____ size() ______________________________________________________________
@@ -311,10 +315,9 @@ namespace wg
 
 	void GlSurface::unlock()
 	{
+        assert( glGetError() == 0 );
 		if(m_accessMode == AccessMode::None )
 			return;
-
-		glUnmapBuffer( GL_PIXEL_UNPACK_BUFFER );
 
 		if( m_accessMode != AccessMode::ReadOnly )
 		{
@@ -326,6 +329,7 @@ namespace wg
 		m_pPixels = 0;
 		m_lockRegion.w = 0;
 		m_lockRegion.h = 0;
+        assert( glGetError() == 0 );
 	}
 
 
