@@ -96,7 +96,7 @@ public:
 //	virtual Uint32	SetRenderFlags( Uint32 flags );
 //	virtual bool	SetSaveDirtyRects( bool bSave );
 
-	const WgColor&		GetTintColor() const;
+	const WgColor		GetTintColor() const;
 	WgBlendMode 	GetBlendMode() const;
 //	inline Uint32		GetRenderFlags() const { return m_renderFlags; }
 //	inline bool			GetSaveDirtyRects() const { return m_bSaveDirtyRects; }

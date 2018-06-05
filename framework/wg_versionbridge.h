@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <assert.h>
+
 #include <wg_types.h>
 #include <wg3_types.h>
 #include <wg_geo.h>
@@ -108,6 +110,8 @@ inline WgBlendMode _convert(wg::BlendMode m)
 		return WG_BLENDMODE_MULTIPLY;
 	case wg::BlendMode::Invert:
 		return WG_BLENDMODE_INVERT;
+    default:
+            assert(false);                                      // Undefined, Ingore and Subtract doesn't exist in WG2, so let's catch them and see where we went wrong.
 	}
 }
 

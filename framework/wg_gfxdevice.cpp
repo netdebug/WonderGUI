@@ -71,7 +71,7 @@ bool WgGfxDevice::SetBlendMode( WgBlendMode blendMode )
 
 //____ GetTintColor() _________________________________________________________
 
-const WgColor& WgGfxDevice::GetTintColor() const 
+const WgColor WgGfxDevice::GetTintColor() const 
 { 
 	return _convert(m_pRealDevice->tintColor()); 
 }

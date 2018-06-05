@@ -471,7 +471,9 @@ namespace wg
 
 	bool GlGfxDevice::setCanvas( const Rect& viewport )
 	{
-		assert( glGetError() == 0 );
+		// Do NOT add any gl-calls here, INCLUDING glGetError()!!!
+		// This method can be called without us having our GL-context.
+        
 		m_pCanvas					= nullptr;
 		m_bFlipY					= true;
 		m_defaultCanvasViewport		= viewport;
@@ -479,18 +481,19 @@ namespace wg
 		m_canvasViewport			= m_defaultCanvasViewport;
 		m_canvasViewport.y          = -m_defaultCanvasViewport.y;
 		m_canvasSize 				= m_defaultCanvasViewport.size(); 
-		_updateProgramDimensions();
 
 		if (m_bRendering)
+		{
+			_updateProgramDimensions();
 			return _setFramebuffer();
-
-		assert( glGetError() == 0 );
+		}
 		return true;
 	}
 
 	bool GlGfxDevice::setCanvas( Surface * _pSurface )
 	{
-        assert( glGetError() == 0 );
+		// Do NOT add any gl-calls here, INCLUDING glGetError()!!!
+		// This method can be called without us having our GL-context.
 
         if (!_pSurface)
 			return setCanvas(m_defaultCanvasViewport);		// Revert back to default frame buffer.
@@ -503,12 +506,12 @@ namespace wg
 		m_bFlipY		= false;
 		m_canvasViewport = { 0,0,pSurface->size() };
 		m_canvasSize = m_canvasViewport.size();
-		_updateProgramDimensions();
 
 		if (m_bRendering)
+		{
+			_updateProgramDimensions();
 			return _setFramebuffer();
-
-        assert( glGetError() == 0 );
+		}
 		return true;
 	}
 
@@ -628,7 +631,7 @@ namespace wg
 		// Remember GL states so we can restore in EndRender()
 
 		m_glDepthTest 		= glIsEnabled(GL_DEPTH_TEST);
-        m_glScissorTest 	= glIsEnabled(GL_SCISSOR_TEST);
+		m_glScissorTest 	= glIsEnabled(GL_SCISSOR_TEST);
 		m_glBlendEnabled  	= glIsEnabled(GL_BLEND);
 		glGetIntegerv(GL_BLEND_SRC, &m_glBlendSrc);
 		glGetIntegerv(GL_BLEND_DST, &m_glBlendDst);
@@ -641,8 +644,12 @@ namespace wg
 		//  Modify states
 
 		glDisable(GL_DEPTH_TEST);
-        glEnable(GL_SCISSOR_TEST);
+		glEnable(GL_SCISSOR_TEST);
 
+		// Update program dimensions
+
+		_updateProgramDimensions();
+        
 		// Set correct framebuffer
 
 		_setFramebuffer();
@@ -651,7 +658,7 @@ namespace wg
 
 		_setBlendMode(m_blendMode);
 
-        //
+		//
     	
 		assert( glGetError() == 0 );
 		m_bRendering = true;

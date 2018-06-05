@@ -26,6 +26,8 @@
 
 #include <cstdint>
 
+#undef min
+#undef max
 
 namespace wg 
 {

@@ -50,8 +50,7 @@ WgSurface::~WgSurface()
 
 WgSize WgSurface::PixelSize() const
 {
-	wg::Size sz = m_pRealSurface->size();
-    return WgSize(sz.w,sz.h);
+	return _convert(m_pRealSurface->size());
 }
 
 //____ PointSize() ______________________________________________________________
@@ -60,7 +59,7 @@ WgSize WgSurface::PointSize() const
 {
 	wg::Size sz = m_pRealSurface->size();
 
-    return WgSize(sz.w,sz.h) * WG_SCALE_BASE / m_scaleFactor;
+    return _convert(sz) * WG_SCALE_BASE / m_scaleFactor;
 }
 
 
@@ -128,25 +127,14 @@ void * WgSurface::LockRegion(WgAccessMode mode, const WgRect& region)
 
 WgAccessMode WgSurface::GetLockStatus() const 
 { 
-	switch (m_pRealSurface->lockStatus())
-	{
-		case wg::AccessMode::None:
-			return WG_NO_ACCESS;
-		case wg::AccessMode::ReadOnly:
-			return WG_READ_ONLY;
-		case wg::AccessMode::WriteOnly:
-			return WG_WRITE_ONLY;
-		case wg::AccessMode::ReadWrite:
-			return WG_READ_WRITE;
-	}
+    return _convert(m_pRealSurface->lockStatus());
 }
 
 //____ GetLockRegion() ________________________________________________________
 
 WgRect WgSurface::GetLockRegion() const 
 { 
-	wg::Rect r = m_pRealSurface->regionLocked();
-	return WgRect(r.x,r.y,r.w,r.h); 
+	return _convert(m_pRealSurface->regionLocked());
 }
 
 
@@ -154,14 +142,14 @@ WgRect WgSurface::GetLockRegion() const
 
 Uint32 WgSurface::Col2Pixel( const WgColor& col ) const
 {
-	return m_pRealSurface->colorToPixel(wg::Color(col.argb));
+	return m_pRealSurface->colorToPixel(_convert(col));
 }
 
 //____ Pixel2Col() ____________________________________________________________
 
 WgColor WgSurface::Pixel2Col( Uint32 pixel ) const
 {
-	return WgColor( m_pRealSurface->pixelToColor(pixel).argb );
+	return _convert( m_pRealSurface->pixelToColor(pixel) );
 }
 
 //____ PixelFormat() __________________________________________________________
@@ -176,12 +164,12 @@ const WgPixelFormat *  WgSurface::PixelFormat()
 
 bool WgSurface::Fill( WgColor col )
 {
-	return m_pRealSurface->fill(wg::Color(col.argb));
+	return m_pRealSurface->fill(_convert(col));
 }
 
 bool WgSurface::Fill( WgColor col, const WgRect& _rect )
 {
-	return m_pRealSurface->fill(wg::Color(col.argb), wg::Rect(_rect.x,_rect.y,_rect.w,_rect.h));
+	return m_pRealSurface->fill(_convert(col), _convert(_rect));
 }
 
 //_____ SetMetaData() _________________________________________________________
@@ -220,12 +208,12 @@ void WgSurface::ClearMetaData()
 
 bool WgSurface::CopyFrom( WgSurface * pSrcSurface, WgCoord dst )
 {
-	return m_pRealSurface->copyFrom(pSrcSurface->m_pRealSurface, wg::Coord(dst.x, dst.y));
+	return m_pRealSurface->copyFrom(pSrcSurface->m_pRealSurface, _convert(dst));
 }
 
 bool WgSurface::CopyFrom( WgSurface * pSrcSurface, const WgRect& _srcRect, WgCoord _dst )
 {
-	return m_pRealSurface->copyFrom(pSrcSurface->m_pRealSurface, wg::Rect(_srcRect.x,_srcRect.y,_srcRect.w,_srcRect.h), wg::Coord(_dst.x, _dst.y));
+	return m_pRealSurface->copyFrom(pSrcSurface->m_pRealSurface, _convert(_srcRect), _convert(_dst));
 }
 
 
