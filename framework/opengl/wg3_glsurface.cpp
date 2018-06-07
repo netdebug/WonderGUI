@@ -288,6 +288,9 @@ namespace wg
 		if( m_accessMode != AccessMode::None || mode == AccessMode::None )
 			return 0;
 
+		if (m_bBackingBufferStale)
+			_refreshBackingBuffer();
+
     	m_pPixels = (uint8_t*) m_pBlob->data();
 		m_lockRegion = Rect(0,0,m_size);
 		m_accessMode = mode;
@@ -300,6 +303,9 @@ namespace wg
 	{
 		if( m_accessMode != AccessMode::None || mode == AccessMode::None )
 			return 0;
+
+		if (m_bBackingBufferStale)
+			_refreshBackingBuffer();
 
 		if( region.x + region.w > m_size.w || region.y + region.w > m_size.h || region.x < 0 || region.y < 0 )
 			return 0;
@@ -337,6 +343,9 @@ namespace wg
 
 	uint32_t GlSurface::pixel( Coord coord ) const
 	{
+//		if (m_bBackingBufferStale)
+//			_refreshBackingBuffer();
+
 		if( m_accessMode != AccessMode::WriteOnly )
 		{
 			uint32_t val;
@@ -367,16 +376,19 @@ namespace wg
 
 	uint8_t GlSurface::alpha( Coord coord ) const
 	{
+//		if (m_bBackingBufferStale)
+//			_refreshBackingBuffer();
+
 	if( m_pixelFormat.type == PixelType::BGRA_8 )
         {
 		uint8_t * p = (uint8_t*) m_pBlob->data();
         return p[coord.y*m_pitch+coord.x*4+3];            
     }
     else
-        return 255;
-            
+        return 255;   
 }
 
+	//____ unload() ___________________________________________________________
 
 bool GlSurface::unload()
 {
@@ -390,10 +402,14 @@ bool GlSurface::unload()
     return true;
 }
 
+	//____ isLoaded() _________________________________________________________
+
 bool GlSurface::isLoaded()
 {
 	return (m_texture == 0);
 }
+
+	//____ reloaded() _________________________________________________________
 
 void GlSurface::reload()
 {
@@ -410,8 +426,24 @@ void GlSurface::reload()
     glTexImage2D( GL_TEXTURE_2D, 0, m_internalFormat, m_size.w, m_size.h, 0,
                  m_accessFormat, GL_UNSIGNED_BYTE, m_pBlob->data() );
     
-
-	assert( glGetError() == 0);	
+		assert( glGetError() == 0);	
 	}
+
+	//____ _refreshBackingBuffer() ____________________________________________
+
+	void GlSurface::_refreshBackingBuffer()
+	{
+	assert( glGetError() == 0);	
+		glBindTexture(GL_TEXTURE_2D, m_texture);
+		glGetTexImage(GL_TEXTURE_2D, 0, m_accessFormat, GL_UNSIGNED_INT_8_8_8_8_REV, m_pBlob->data());
+
+		GLenum err;
+		assert(0 == (err = glGetError()));
+
+		m_bBackingBufferStale = false;
+	}
+
+
+
 
 } // namespace wg

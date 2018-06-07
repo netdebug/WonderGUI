@@ -52,6 +52,7 @@ namespace wg
 	class GlSurface : public Surface
 	{
 		friend class GlSurfaceFactory;
+		friend class GlGfxDevice;
 
 	public:
 
@@ -108,6 +109,9 @@ namespace wg
 
 
 		void		_setPixelDetails( PixelType type );
+
+		bool		m_bBackingBufferStale = false;
+		void		_refreshBackingBuffer();
 
         GLuint 		m_texture;			// GL texture handle.
         GLint       m_internalFormat;   // GL_RGB8 or GL_RGBA8.

@@ -297,7 +297,7 @@ namespace wg
 
 		//
 
-		SoftSurfaceFactory_p	m_pSurfaceFactory;
+		SurfaceFactory_p	m_pSurfaceFactory;
 
 		int				m_lineThicknessTable[17];
 		uint8_t *		m_pDivTab;

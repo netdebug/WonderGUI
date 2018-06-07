@@ -295,6 +295,8 @@ namespace wg
                 }
                 else
                 {
+					if (m_canvasPixelBits == 24)
+					{
                     for( int y = 0 ; y < rect.h ; y++ )
                     {
                         for( int x = 0 ; x < rect.w*pixelBytes ; x+=pixelBytes )
@@ -305,6 +307,21 @@ namespace wg
                         }
                         pDst +=m_canvasPitch;
                     }
+                }
+					else
+					{
+						for (int y = 0; y < rect.h; y++)
+						{
+							for (int x = 0; x < rect.w*pixelBytes; x += pixelBytes)
+							{
+								pDst[x] = fillColor.b;
+								pDst[x + 1] = fillColor.g;
+								pDst[x + 2] = fillColor.r;
+								pDst[x + 3] = fillColor.a;
+							}
+							pDst += m_canvasPitch;
+						}
+					}
                 }
                 break;
             }
@@ -322,6 +339,8 @@ namespace wg
 				int storedBlue = ((int)fillColor.b) * fillColor.a;
 				int invAlpha = 255-fillColor.a;
 	
+				if (m_canvasPixelBits == 24)
+				{
 				for( int y = 0 ; y < rect.h ; y++ )
 				{
 					for( int x = 0 ; x < rect.w*pixelBytes ; x+= pixelBytes )
@@ -332,6 +351,27 @@ namespace wg
 					}
 					pDst +=m_canvasPitch;
 				}
+				}
+				else
+				{
+					int storedAlpha = 255 * fillColor.a;
+
+					for (int y = 0; y < rect.h; y++)
+					{
+						for (int x = 0; x < rect.w*pixelBytes; x += pixelBytes)
+						{
+							pDst[x] = m_pDivTab[pDst[x] * invAlpha + storedBlue];
+							pDst[x + 1] = m_pDivTab[pDst[x + 1] * invAlpha + storedGreen];
+							pDst[x + 2] = m_pDivTab[pDst[x + 2] * invAlpha + storedRed];
+							pDst[x + 3] = m_pDivTab[pDst[x + 3] * invAlpha + storedAlpha];
+						}
+						pDst += m_canvasPitch;
+					}
+
+				}
+
+
+
 				break;
 			}
 			case BlendMode::Add:

@@ -52,6 +52,7 @@ namespace wg
 		//.____ Creation __________________________________________
 
 		static GlGfxDevice_p	create( const Rect& viewport );
+		static GlGfxDevice_p	create( GlSurface * pCanvas );
 
 		//.____ Identification __________________________________________
 
@@ -104,7 +105,9 @@ namespace wg
 
 
 	protected:
+		GlGfxDevice(Size viewportSize);
 		GlGfxDevice( const Rect& viewport );
+		GlGfxDevice(GlSurface * pCanvas);
 		~GlGfxDevice();
 
 		void	_drawStraightLine(Coord start, Orientation orientation, int _length, const Color& _col) override;

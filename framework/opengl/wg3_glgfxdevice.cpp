@@ -332,15 +332,33 @@ namespace wg
 		return p;
 	}
 
+	GlGfxDevice_p GlGfxDevice::create( GlSurface * pSurface )
+	{
+		GlGfxDevice_p p(new GlGfxDevice(pSurface));
 
+		GLenum err = glGetError();
+		if (err != 0)
+			return GlGfxDevice_p(nullptr);
+
+		return p;
+	}
 	//____ Constructor _____________________________________________________________
 
-	GlGfxDevice::GlGfxDevice( const Rect& viewport ) : GfxDevice(viewport.size())
+	GlGfxDevice::GlGfxDevice(GlSurface * pSurface) : GlGfxDevice(pSurface->size())
+	{
+		setCanvas(pSurface);
+	}
+
+	GlGfxDevice::GlGfxDevice(const Rect& viewport) : GlGfxDevice(viewport.size())
+	{
+		setCanvas(viewport);
+	}
+
+	GlGfxDevice::GlGfxDevice( Size viewportSize ) : GfxDevice(viewportSize)
 	{
 		m_bRendering = false;
 		m_bFlipY = true;
         _initTables();
-        
         
         m_fillProg = _createGLProgram( fillVertexShader, fillFragmentShader );
         m_fillProgColorLoc = glGetUniformLocation( m_fillProg, "color");
@@ -402,7 +420,6 @@ namespace wg
         	glGenBuffers(1, &m_dummyBuffer);
 		
         }
-        setCanvas( viewport );
         setTintColor( Color::White );  
 
 		assert( glGetError() == 0 );      
@@ -523,8 +540,11 @@ namespace wg
 
 		if (m_pCanvas)
 		{
+			auto pCanvas = GlSurface::cast(m_pCanvas);
+			pCanvas->m_bBackingBufferStale = true;
+
 			glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferId);
-			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GlSurface::cast(m_pCanvas)->getTexture(), 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, pCanvas->getTexture(), 0);
 
 			GLenum drawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 			glDrawBuffers(1, drawBuffers);
@@ -1127,7 +1147,8 @@ namespace wg
 			case BlendMode::Blend:
                 glBlendEquation( GL_FUNC_ADD );
 				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+				glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+//				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 				break;
 
 			case BlendMode::Add:
@@ -1394,7 +1415,7 @@ namespace wg
 		// Generate line traces
 
 		int	traceBufferSize = (length + 1) * 2 * sizeof(int) * 2;	// length+1 * values per point * sizeof(int) * 2 separate traces.
-		char * pTraceBuffer = Base::memStackAlloc(traceBufferSize);
+		char * pTraceBuffer = WgBase::MemStackAlloc(traceBufferSize);
 		int * pTopBorderTrace = (int*)pTraceBuffer;
 		int * pBottomBorderTrace = (int*)(pTraceBuffer + traceBufferSize / 2);
 
