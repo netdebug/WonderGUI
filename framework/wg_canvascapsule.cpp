@@ -213,7 +213,7 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
         if (_canvas.w > maxSize.w || _canvas.h > maxSize.h)
             return;                            // Can't create a canvas of the required size!
 
-        m_pCanvas = m_pFactory->CreateSurface(_canvas.Size(), WG_PIXEL_BGR_8);
+        m_pCanvas = m_pFactory->CreateSurface(_canvas.Size(), WG_PIXEL_BGRA_8);
         m_dirtyPatches.Clear();
         m_dirtyPatches.Add(_canvas.Size());
     }
@@ -224,21 +224,26 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
 
     for (const WgRect * pScreenRect = _pPatches->Begin(); pScreenRect != _pPatches->End(); pScreenRect++)
     {
-        WgRect r(0, 0, pScreenRect->w, pScreenRect->h);
+        WgRect r( _canvas, *pScreenRect );
 
-        bool    bIntersected = false;
-
-        for (const WgRect * pLocalDirt = m_dirtyPatches.Begin(); pLocalDirt != m_dirtyPatches.End(); pLocalDirt++)
+        if( r.w > 0 && r.h > 0 )
         {
-            if (pLocalDirt->IntersectsWith(r))
-            {
-                renderStack.Push(WgRect(*pLocalDirt,r));
-                bIntersected = true;
-            }
-        }
+            bool    bIntersected = false;
+            r.x -= _canvas.x;
+            r.y -= _canvas.y;
 
-        if (bIntersected)
-            m_dirtyPatches.Sub(r);
+            for (const WgRect * pLocalDirt = m_dirtyPatches.Begin(); pLocalDirt != m_dirtyPatches.End(); pLocalDirt++)
+            {
+                if (pLocalDirt->IntersectsWith(r))
+                {
+                    renderStack.Push(WgRect(*pLocalDirt,r));
+                    bIntersected = true;
+                }
+            }
+            
+            if (bIntersected)
+                m_dirtyPatches.Sub(r);
+        }
     }
 
     // Save old tint color and blend mode.
@@ -252,11 +257,19 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
 
     if (!renderStack.IsEmpty())
     {
-        pDevice->SetBlendMode(WG_BLENDMODE_BLEND);
-        pDevice->SetTintColor(WgColor::white);
-
         WgSurface * pOldCanvas = pDevice->Canvas();
         pDevice->SetCanvas(m_pCanvas);
+
+        pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+        pDevice->SetTintColor(WgColor::white);
+
+        for( const WgRect * pRect = renderStack.Begin() ; pRect != renderStack.End() ; pRect++ )
+        {
+            pDevice->Fill(*pRect, WgColor::transparent);
+        }
+
+        pDevice->SetBlendMode(WG_BLENDMODE_BLEND);
+
         m_hook.Widget()->_renderPatches(pDevice, _canvas.Size(), _canvas.Size(), &renderStack);
         pDevice->SetCanvas(pOldCanvas);
 
@@ -333,4 +346,15 @@ void WgCanvasCapsule::_onRenderRequested(const WgRect& rect)
 {
     m_dirtyPatches.Add(rect);
     _requestRender();
+}
+
+
+void WgCanvasCapsule::_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip )
+{
+    container.Add( WgRect( geo, clip ) );
+}
+
+void WgCanvasCapsule::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode )
+{
+    return;
 }

@@ -74,6 +74,10 @@ protected:
     void            _onRenderRequested();
     void            _onRenderRequested(const WgRect& rect);
 
+    void _onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip );
+
+    void _onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode );
+
 
 private:
     WgColor            m_tintColor;

@@ -250,7 +250,7 @@ namespace wg
 	
 		// Skip calls that won't affect destination
 	
-		if( fillColor.a == 0 && (m_blendMode == BlendMode::Blend || m_blendMode == BlendMode::Add || m_blendMode == BlendMode::Subtract) )
+		if( fillColor.a == 0 && (m_blendMode == BlendMode::Blend) )
 			return;
 	
 		// Optimize calls
