@@ -244,6 +244,11 @@
 #	include <wg_modallayer.h>
 #endif
 
+#ifndef WG_MODAL_LAYER_DOT_H
+#	include <wg_multislider.h>
+#endif
+
+
 #ifndef WG_OSCILLOSCOPE_DOT_H
 #	include <wg_oscilloscope.h>
 #endif

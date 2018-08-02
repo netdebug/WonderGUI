@@ -115,7 +115,7 @@ public:
 
 	void			SetMarkOpacity( int opacity ) { m_markOpacity = opacity; }
 	int				GetMarkOpacity() const { return m_markOpacity; }
-	bool			MarkTest( const WgCoord& ofs );
+	virtual bool	MarkTest( const WgCoord& ofs );
 
 	WgHook*			Hook() const { return m_pHook; }
 

@@ -116,6 +116,7 @@
     <ClCompile Include="framework\wg3_surfacefactory.cpp" />
     <ClCompile Include="framework\wg3_util.cpp" />
     <ClCompile Include="framework\wg3_nullgfxdevice.cpp" />
+    <ClCompile Include="framework\wg_multislider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h" />
@@ -252,5 +253,6 @@
     <ClInclude Include="framework\wg_versionbridge.h" />
     <ClInclude Include="framework\wg3_nullgfxdevice.h" />
     <ClInclude Include="framework\wg3_base.h" />
+    <ClInclude Include="framework\wg_multislider.h" />
   </ItemGroup>
 </Project>

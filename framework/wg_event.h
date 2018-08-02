@@ -59,6 +59,7 @@ class WgModalLayer;
 class WgTablePanel;
 class WgInterfaceEditText;
 class WgText;
+class WgMultiSlider;
 
 typedef class WgWeakPtr<WgWidget> WgWidgetWeakPtr;
 
@@ -614,6 +615,23 @@ namespace WgEvent
 	protected:
 		TableCellUnmarked( WgTablePanel * pTable, int row, int column, WgWidget * pCellContent );
 	};
+
+	//____ WgMultiSlider events _______________________________________________
+
+	class ParamChanged : public Event
+	{
+		friend class ::WgMultiSlider;
+	public:
+		int id() const { return m_id; }
+		int index() const { return m_index; }
+
+	protected:
+		ParamChanged(WgMultiSlider * pSlider, int paramIndex, int paramId);
+
+		int	m_index;
+		int m_id;
+	};
+
 
 	//____ Link events _________________________________________________________
 

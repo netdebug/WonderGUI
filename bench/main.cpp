@@ -256,11 +256,11 @@ int main ( int argc, char** argv )
 
 
 	// Setup debug overlays
-/*	
+	
 	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
 	pOverlaySkin->SetStateColor( WG_STATE_NORMAL, WgColor::transparent, WgColor::red );	
 	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 0 );
-*/
+
 
 //	WgColor lineColor = WgColor::transparent;
 	WgColor lineColor = WgColor::white;
@@ -412,7 +412,7 @@ int main ( int argc, char** argv )
 #ifndef USE_OPEN_GL
 		SDL_LockSurface( pScreen );
 #endif
-
+/*
 		g_pGfxDevice->BeginRender();
 
 		g_pGfxDevice->Fill(WgSize(width,height), WgColor::black);
@@ -423,9 +423,9 @@ int main ( int argc, char** argv )
 		//		pGfxDevice->blit(pMyCanvas, { 0,0,400,400 }, { 0,0 });
 		//		pGfxDevice->stretchBlit(pMyCanvas, { 0,0,400,400 }, { 0,0,200,200 });
 		g_pGfxDevice->EndRender();
+*/
 
-
-//		pRoot->Render();
+		pRoot->Render();
 
 #ifndef USE_OPEN_GL
 		SDL_UnlockSurface( pScreen );
@@ -477,7 +477,7 @@ int main ( int argc, char** argv )
 		}
 		m_bGotVsync = 0;
 
-//		DwmFlush();
+		DwmFlush();
 
 //		SDL_RenderPresent(pRenderer);
 
@@ -855,9 +855,111 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 //	pFlex->SetScale(WG_SCALE_BASE * 2);
 
+
+	// Multislider widget
+
+	static WgMultiSlider::Param params[] = {	{ 0, 0.00f, -3.5f,2.1f, 5 },
+										{ 0, 0.25f, 0.f,1.f, 0 },
+										{ 0, 0.50f, 0.f,1.f, 0 },
+										{ 0, 0.75f, 0.f,1.f, 0 },
+										{ 0, 1.00f, 0.f,1.f, 0 },
+										{ 0, 0.50f, 0.f, 1.f, 0 } };
+
+
+	WgSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::black, 1, WgColor::black);
+
+	WgBoxSkinPtr pSliderHandleSkin = WgBoxSkin::Create(WgColor::white, 1, WgColor::red);
+	pSliderHandleSkin->SetContentPadding(10);
+	pSliderHandleSkin->SetStateColor(WG_STATE_HOVERED, WgColor::blue);
+	pSliderHandleSkin->SetStateColor(WG_STATE_PRESSED, WgColor::red);
+
+
+	auto pMultiSlider = new WgMultiSlider();
+
+	pMultiSlider->SetSkin(WgBoxSkin::Create(WgColor::white, { 1 }, WgColor::black));
+
+	pMultiSlider->SetParamArray(params, 6, nullptr);
+
+	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin, 0);
+
+	pMultiSlider->AddSlider2D(0, 5, WG_NORTHWEST, 
+						[](WgMultiSlider::SetGeoVisitor& visitor) {
+							return WgRectF( 0.1f, 0.1f, 0.8f, 0.1f ); 
+						},
+						nullptr,
+						nullptr
+						);
+
+	pMultiSlider->AddSlider(1, WG_UP,
+						[](WgMultiSlider::SetGeoVisitor& visitor) { 
+			
+							WgRectF r = visitor.geo(0);
+							WgCoordF c = visitor.handlePos(0);
+							return WgRectF( r.x + r.w*c.x, r.y + r.h*c.y + 0.1f, 0.0f, 1.f - r.y -0.2f ); 
+						},
+						[](const WgMultiSlider::Param& param) {
+							return param.value;
+						},
+							[](WgMultiSlider::SetValueVisitor& visitor) {
+
+							static float prevValue = -1.f;
+
+							float	value = visitor.handleValue();
+							if (value < 0.001f)
+								value = 0.001f;
+
+							if (prevValue == -1.f)
+								prevValue = visitor.handleValue();
+
+							float	scaleFactor = value/prevValue;
+
+
+							prevValue = value;
+
+							auto * p2 = visitor.param(2);
+
+							visitor.setParamValue(p2, p2->value*scaleFactor);
+
+							auto * p3 = visitor.param(3);
+							visitor.setParamValue(p3, p3->value*scaleFactor);
+
+							return visitor.handleValue();
+						});
+
+	pMultiSlider->AddSlider(2, WG_UP,
+						[](WgMultiSlider::SetGeoVisitor& visitor) { 
+	
+							WgRectF r = visitor.geo(1);
+							return WgRectF(r.x-0.1f, r.y + 0.1f, r.w, r.h - 0.2f); 
+						},
+						[](const WgMultiSlider::Param& param) {
+							return param.value;
+						},
+							[](WgMultiSlider::SetValueVisitor& visitor) {
+							return visitor.handleValue(); 
+						});
+	
+	pMultiSlider->AddSlider(3, WG_UP,
+						[](WgMultiSlider::SetGeoVisitor& visitor) {
+
+							WgRectF r = visitor.geo(1);
+							return WgRectF(r.x + 0.1f, r.y + 0.1f, r.w, r.h - 0.2f );
+						},
+						[](const WgMultiSlider::Param& param) {						
+							return param.value;
+						},
+						[](WgMultiSlider::SetValueVisitor& visitor) { 
+							return visitor.handleValue(); 
+						}, nullptr, nullptr, { 1.f,1.f }, WgBorders(10) );
+
+
+	pHook = pFlex->AddChild(pMultiSlider, WgRect(0, 0, 500, 300));
+
+	pFlex->SetScale(WG_SCALE_BASE * 2);
+
 	// Scroll chart widget
 
-
+/*
 	m_pScrollChart = new WgScrollChart();
 
 	WgBoxSkinPtr pChartSkin = WgBoxSkin::Create(WgColor::white, WgBorders(1), WgColor::black);
@@ -901,7 +1003,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pWindow->SetSurfaceFactory(g_pSurfaceFactory);
 
 	pWindow->SetColor(0xFFFFFFFF);
-	pWindow->StartFade(0x00FFFFFF, 4000);
+//	pWindow->StartFade(0x00FFFFFF, 4000);
 
 	auto pButtonBar = new WgPackPanel();
 	pButtonBar->SetSizeBroker(new WgUniformSizeBroker());
@@ -980,7 +1082,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 //	pFlex->SetScale(WG_SCALE_BASE * 2);
 
-
+*/
 	// Chart widget
 /*
 	WgChart * pChart = new WgChart();

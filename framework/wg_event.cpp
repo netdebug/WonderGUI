@@ -35,6 +35,7 @@
 #include <wg_lineeditor.h>
 //#include <wg_menu.h>
 #include <wg_tablepanel.h>
+#include <wg_multislider.h>
 
 namespace WgEvent
 {
@@ -906,6 +907,16 @@ namespace WgEvent
 		m_row 			= row;
 		m_column 		= column;
 		m_pCellContent 	= pCellContent;
+	}
+
+	//____ MultiSlider event methods __________________________________________
+
+	ParamChanged::ParamChanged(WgMultiSlider * pSlider, int paramIndex, int paramId)
+	{
+		m_type		= WG_EVENT_PARAM_CHANGED;
+		m_pWidget	= pSlider;
+		m_index		= paramIndex;
+		m_id		= paramId;
 	}
 
 	//____ Link event methods __________________________________________________

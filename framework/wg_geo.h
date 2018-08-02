@@ -128,6 +128,56 @@ public:
 };
 
 
+//____ Class: WgCoordF _______________________________________________________
+
+class	WgCoordF
+{
+public:
+	//.____ Creation __________________________________________
+
+	WgCoordF() : x(0.f), y(0.f) {}
+	WgCoordF(float _x, float _y) { x = _x; y = _y; };
+//	WgCoordF(const WgRectF& rect);
+
+	//.____ Misc ______________________________________________
+
+//	inline WgSizeF toSize();
+	inline void clear() { x = 0.f; y = 0.f; }			///< Sets X and Y to 0.
+
+														//.____ Operators ___________________________________________
+
+	inline WgCoordF operator=(const WgCoordF& k) { x = k.x; y = k.y; return *this; }
+//	inline WgCoordF operator=(const WgRectF& r);
+
+	inline bool operator==(const WgCoordF& k) const { if (x == k.x && y == k.y) return true; return false; }
+	inline bool operator!=(const WgCoordF& k) const { if (x != k.x || y != k.y) return true; return false; }
+
+	inline void operator+=(const WgCoordF& k) { x += k.x; y += k.y; }
+	inline void operator-=(const WgCoordF& k) { x -= k.x; y -= k.y; }
+	inline WgCoordF operator+(const WgCoordF& k) const { WgCoordF res; res.x = x + k.x; res.y = y + k.y; return res; }
+	inline WgCoordF operator-(const WgCoordF& k) const { WgCoordF res; res.x = x - k.x; res.y = y - k.y; return res; }
+
+	inline void operator*=(double v) { x = (float)(x*v); y = (float)(x*v); }
+	inline void operator/=(double v) { x = (float)(x / v); y = (float)(y / v); }
+	inline WgCoordF operator*(double v) const { WgCoordF res; res.x = (float)(x*v); res.y = (float)(y*v); return res; }
+	inline WgCoordF operator/(double v) const { WgCoordF res; res.x = (float)(x / v); res.y = (float)(y / v); return res; }
+
+	inline void operator*=(float v) { x *= v; y *= v; }
+	inline void operator/=(float v) { x /= v; y /= v; }
+	inline WgCoordF operator*(float v) const { WgCoordF res; res.x = x * v; res.y = y * v; return res; }
+	inline WgCoordF operator/(float v) const { WgCoordF res; res.x = x / v; res.y = y / v; return res; }
+
+	inline void operator*=(int v) { x *= v; y *= v; }
+	inline void operator/=(int v) { x /= v; y /= v; }
+	inline WgCoordF operator*(int v) const { WgCoordF res; res.x = x * v; res.y = y * v; return res; }
+	inline WgCoordF operator/(int v) const { WgCoordF res; res.x = x / v; res.y = y / v; return res; }
+
+
+	//.____ Properties __________________________________________
+
+	float	x, y;
+};
+
 
 class WgSize;
 
@@ -160,7 +210,8 @@ public:
 	inline int		Height() const { return ((int)top)+bottom; }
 	inline void		Clear()			{ left = 0; right = 0; top = 0; bottom = 0; }
     WgBorders       Scale(int scale) const;
-    
+	inline bool		IsEmpty() const { return (left | top | right | bottom) == 0; }
+
 	bool			operator==(const WgBorders& borders) const { return left == borders.left &&
 																		right == borders.right &&
 																		top == borders.top &&
@@ -307,6 +358,8 @@ public:
 	inline bool Contains( const WgRect& _rect ) const;
 	inline bool	Contains( const WgCoord& _coord ) const;
 
+	inline WgCoord Limit(const WgCoord& coord) const;			///< @brief Limit given coordinate to stay within rectangle.
+
 	inline bool IntersectsWith( const WgRect& _rect ) const;
 
 	inline int Width() const		{ return w; }
@@ -337,7 +390,11 @@ public:
 	WgRectF( const WgRectF& r1, const WgRectF& r2 );
 
 	bool Intersection( const WgRectF& r1, const WgRectF& r2 );
-		
+
+
+	inline bool operator==(const WgRectF& rect) const;
+	inline bool operator!=(const WgRectF& rect) const;
+
 	float x, y, w, h;
 };
 
@@ -428,12 +485,52 @@ inline bool WgRect::IntersectsWith( const WgRect& _rect ) const
 }
 
 //_____________________________________________________________________________
+/**
+* Limit given coordinate to stay within rectangle.
+*
+* @param coord Coordinate to limit to the bounds of the rectangle.
+*
+* @return Coordinate limited to the rectangles geometry.
+**/
+inline WgCoord WgRect::Limit(const WgCoord& _coord) const
+{
+	WgCoord out = _coord;
+	if (out.x < x)
+		out.x = x;
+	if (out.y < y)
+		out.y = y;
+	if (out.x > x + w)
+		out.x = x + w;
+	if (out.y > y + h)
+		out.y = y + h;
+
+	return out;
+}
+//_____________________________________________________________________________
 inline void WgRect::operator=( const WgRect& r2 )
 {
 	x = r2.x;
 	y = r2.y;
 	w = r2.w;
 	h = r2.h;
+}
+
+//_____________________________________________________________________________
+/**
+* Standard comparison operator
+**/
+inline bool WgRectF::operator==(const WgRectF& rect) const
+{
+	return x == rect.x && y == rect.y && w == rect.w && h == rect.h;
+}
+
+//_____________________________________________________________________________
+/**
+* Standard comparison operator
+**/
+inline bool WgRectF::operator!=(const WgRectF& rect) const
+{
+	return !(*this == rect);
 }
 
 //=======================================================================================

@@ -555,6 +555,8 @@ enum	WgEventType
 	
 	WG_EVENT_KNOB_TURN,
 
+	WG_EVENT_PARAM_CHANGED,
+
 	WG_EVENT_MAX
 };
 
