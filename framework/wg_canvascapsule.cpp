@@ -159,10 +159,10 @@ void WgCanvasCapsule::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * p
 
                 float progress = m_fadeTimeCounter / (float) m_fadeTime;
 
-                newColor.r = m_fadeStartColor.r + r * progress;
-                newColor.g = m_fadeStartColor.g + g * progress;
-                newColor.b = m_fadeStartColor.b + b * progress;
-                newColor.a = m_fadeStartColor.a + a * progress;
+                newColor.r = m_fadeStartColor.r + (int) (r * progress);
+                newColor.g = m_fadeStartColor.g + (int)(g * progress);
+                newColor.b = m_fadeStartColor.b + (int)(b * progress);
+                newColor.a = m_fadeStartColor.a + (int)(a * progress);
             }
 
             if (newColor != m_tintColor)

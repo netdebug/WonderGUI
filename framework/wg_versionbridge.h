@@ -36,7 +36,7 @@ inline wg::Coord _convert(const WgCoord& r) { return wg::Coord(r.x, r.y); }
 inline WgSize _convert(const wg::Size& r) { return WgSize(r.w, r.h); }
 inline wg::Size _convert(const WgSize& r) { return wg::Size(r.w, r.h); }
 
-inline WgBorders _convert(const wg::Border& r) { return WgBorders(r.left,r.top,r.right,r.bottom); }
+inline WgBorders _convert(const wg::Border& r) { return WgBorders( (Uint8)r.left, (Uint8)r.top, (Uint8)r.right, (Uint8)r.bottom); }
 inline wg::Border _convert(const WgBorders& r) { return wg::Border(r.top,r.right,r.bottom,r.left); }
 
 inline WgRect _convert(const wg::Rect& r) { return WgRect(r.x, r.y, r.w, r.h); }
@@ -77,6 +77,9 @@ inline wg::Direction _convert(WgDirection dir)
 	case WG_LEFT:
 		return wg::Direction::Left;
 	}
+
+	assert(false);									// Should never get here
+	return wg::Direction::Down;						// Just avoiding compiler warnings
 }
 
 inline wg::BlendMode _convert(WgBlendMode m)
@@ -94,6 +97,9 @@ inline wg::BlendMode _convert(WgBlendMode m)
 	case WG_BLENDMODE_INVERT:
 		return wg::BlendMode::Invert;
 	}
+
+	assert(false);									// Should never get here
+	return wg::BlendMode::Blend;						// Just avoiding compiler warnings
 }
 
 inline WgBlendMode _convert(wg::BlendMode m)
@@ -111,7 +117,8 @@ inline WgBlendMode _convert(wg::BlendMode m)
 	case wg::BlendMode::Invert:
 		return WG_BLENDMODE_INVERT;
     default:
-            assert(false);                                      // Undefined, Ingore and Subtract doesn't exist in WG2, so let's catch them and see where we went wrong.
+		assert(false);                                      // Undefined, Ingore and Subtract doesn't exist in WG2, so let's catch them and see where we went wrong.
+		return WG_BLENDMODE_BLEND;
 	}
 }
 
@@ -128,12 +135,15 @@ inline WgPixelType _convert(wg::PixelType t)
 	case wg::PixelType::BGR_8:
 		return WG_PIXEL_BGR_8;
 	}
+	assert(false);									// Should never get here
+	return WG_PIXEL_UNKNOWN;						// Just avoiding compiler warnings
 }
 
 inline wg::PixelType _convert(WgPixelType t)
 {
 	switch (t)
 	{
+	default:
 	case WG_PIXEL_UNKNOWN:
 		return wg::PixelType::Unknown;
 	case WG_PIXEL_CUSTOM:
@@ -143,6 +153,8 @@ inline wg::PixelType _convert(WgPixelType t)
 	case WG_PIXEL_BGR_8:
 		return wg::PixelType::BGR_8;
 	}
+	assert(false);									// Should never get here
+	return wg::PixelType::Unknown;					// Just avoiding compiler warnings
 }
 
 inline void _convert(const wg::PixelFormat& f, WgPixelFormat& out )
@@ -203,6 +215,8 @@ inline WgAccessMode _convert(wg::AccessMode m)
 	case wg::AccessMode::ReadWrite:
 		return WG_READ_WRITE;
 	}
+	assert(false);									// Should never get here
+	return WG_NO_ACCESS;							// Just avoiding compiler warnings
 }
 
 inline wg::AccessMode _convert(WgAccessMode m)
@@ -218,5 +232,7 @@ inline wg::AccessMode _convert(WgAccessMode m)
 	case WG_READ_WRITE:
 		return wg::AccessMode::ReadWrite;
 	}
+	assert(false);									// Should never get here
+	return wg::AccessMode::None;					// Just avoiding compiler warnings
 }
 

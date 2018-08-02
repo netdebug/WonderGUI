@@ -485,7 +485,7 @@ void WgOscilloscope::plot(const int x, const int y, const float alpha)
   {
       m_pAAPix[m_iNextPixel] = WgCoord(x, y);
       m_pAACol[m_iNextPixel] = m_lineColor;
-      m_pAACol[m_iNextPixel].a = (Uint8)255*alpha;
+      m_pAACol[m_iNextPixel].a = (Uint8)(255*alpha);
       
       ++m_iNextPixel;
   }
@@ -550,8 +550,8 @@ void WgOscilloscope::_antiAlias(const int nPoints, const float *pYval, WgCoord o
    
         xend = round(x0);
         yend = y0 + gradient * (xend - x0);
-        xgap = rfpart(x0 + 0.5);
-        xpxl1 = xend;
+        xgap =  rfpart(x0 + 0.5f);
+        xpxl1 = (int) xend;
         ypxl1 = ipart(yend);
         
         if (steep) {
@@ -566,8 +566,8 @@ void WgOscilloscope::_antiAlias(const int nPoints, const float *pYval, WgCoord o
         // Second end point
         xend = round(x1);
         yend = y1 + gradient * (xend - x1);
-        xgap = fpart(x1 + 0.5);
-        xpxl2 = xend;
+        xgap = fpart(x1 + 0.5f);
+        xpxl2 = (int) xend;
         ypxl2 = ipart(yend);
         
         if (steep) {

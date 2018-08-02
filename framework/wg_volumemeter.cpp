@@ -25,7 +25,7 @@ WgVolumeMeter::WgVolumeMeter()
 	m_nSectionLEDs[2] = 1;
 	
 	m_nLEDs = m_nSectionLEDs[0] + m_nSectionLEDs[1] + m_nSectionLEDs[2];
-	m_LEDSpacing = 0.33;
+	m_LEDSpacing = 0.33f;
 	m_direction = WG_UP;
 	
 	m_iPeak = 0;
@@ -340,22 +340,22 @@ void WgVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 	switch( m_direction )
 	{
 		case WG_UP:
-			ledRect = WgRectF( _canvas.x + p, _canvas.y + _canvas.h - ledSize, _canvas.w - 2*p, ledSize );
+			ledRect = WgRectF( (float) (_canvas.x + p), _canvas.y + _canvas.h - ledSize, (float) (_canvas.w - 2*p), ledSize );
 			stepX = 0.f;
 			stepY = -stepSize;
 			break;
 		case WG_DOWN:
-			ledRect = WgRectF( _canvas.x+p, _canvas.y, _canvas.w - 2*p, ledSize );
+			ledRect = WgRectF( (float) (_canvas.x+p), (float) _canvas.y, (float) (_canvas.w - 2*p), ledSize );
 			stepX = 0.f;
 			stepY = stepSize;
 			break;
 		case WG_LEFT:
-			ledRect = WgRectF( _canvas.x + _canvas.w - ledSize, _canvas.y + p, ledSize, _canvas.h - 2*p);
+			ledRect = WgRectF( _canvas.x + _canvas.w - ledSize, (float) (_canvas.y + p), ledSize, (float) (_canvas.h - 2*p));
 			stepX = -stepSize;
 			stepY = 0.f;
 			break;
 		case WG_RIGHT:
-			ledRect = WgRectF( _canvas.x, _canvas.y + p, ledSize, _canvas.h - 2*p);
+			ledRect = WgRectF( (float) _canvas.x, (float) (_canvas.y + p), ledSize, (float) (_canvas.h - 2*p));
 			stepX = stepSize;
 			stepY = 0.f;
 			break;

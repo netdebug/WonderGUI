@@ -139,7 +139,7 @@ void WgSimpleVolumeMeter::SetValue( float peak, float hold )
 
     int length = (m_direction == WG_LEFT || m_direction == WG_RIGHT) ? sz.w : sz.h;
 
-	int	iPeak = peak * length;
+	int	iPeak = (int) (peak * length);
 	int iHold = _calcIHold(hold, sz);
 	
 	if( m_bStereo )
@@ -172,8 +172,8 @@ void WgSimpleVolumeMeter::SetValue( float leftPeak, float leftHold, float rightP
 
     int length = (m_direction == WG_LEFT || m_direction == WG_RIGHT) ? sz.w : sz.h;
 
-	int	iPeakL = leftPeak * length;
-	int	iPeakR = rightPeak * length;
+	int	iPeakL = (int) (leftPeak * length);
+	int	iPeakR = (int) (rightPeak * length);
 	int iHoldL = _calcIHold(leftHold, sz);
 	int iHoldR = _calcIHold(rightHold, sz);
 
@@ -516,7 +516,7 @@ void WgSimpleVolumeMeter::_updateIValues( WgSize sz )
     if( m_iSidePadding == 0 && m_fSidePadding > 0.f )
         m_iSidePadding = 1;
 				
-	m_iHoldHeight = m_fHoldHeight * length;
+	m_iHoldHeight = (int) (m_fHoldHeight * length);
 	if( m_iHoldHeight == 0 && m_fHoldHeight > 0.f )
 		m_iHoldHeight = 1;
 
@@ -524,8 +524,8 @@ void WgSimpleVolumeMeter::_updateIValues( WgSize sz )
 	m_iSectionHeight[1] =  ((int)((m_fSectionHeight[0] + m_fSectionHeight[1]) * length + 0.5f)) - m_iSectionHeight[0];
 	m_iSectionHeight[2] = length - m_iSectionHeight[1] - m_iSectionHeight[0];
 
-	m_iPeak[0] = m_fPeak[0] * length;
-	m_iPeak[1] = m_fPeak[1] * length;
+	m_iPeak[0] = (int)(m_fPeak[0] * length);
+	m_iPeak[1] = (int)(m_fPeak[1] * length);
 
     m_iHold[0] = _calcIHold( m_fHold[0], sz );
 	m_iHold[1] = _calcIHold( m_fHold[1], sz );

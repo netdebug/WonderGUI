@@ -234,7 +234,7 @@ bool WgRootPanel::BeginRender()
 		
 		// Possibly remove overlays from the back, put them into dirty rects for re-render
 		
-		while( m_afterglowRects.size() > m_afterglowFrames+1 )
+		while( (int) m_afterglowRects.size() > m_afterglowFrames+1 )
 		{
 			m_dirtyPatches.Add( &m_afterglowRects.back() );
 			m_afterglowRects.pop_back();

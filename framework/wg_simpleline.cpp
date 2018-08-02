@@ -165,11 +165,11 @@ void WgSimpleLine::SetLine( int iX1, int iY1, int iX2, int iY2 )
         iRenderBottomRightY = ipart(y1)+2;
     }
     
-    m_iX1 = (float)iX1;
-    m_iY1 = (float)iY1;
+    m_iX1 = (int) iX1;
+    m_iY1 = (int) iY1;
     
-    m_iX2 = (float)iX2;
-    m_iY2 = (float)iY2;
+    m_iX2 = (int) iX2;
+    m_iY2 = (int) iY2;
     
     // Check new line (to be drawn)
     x1 = (float)m_iX1;
