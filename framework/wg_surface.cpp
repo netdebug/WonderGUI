@@ -156,7 +156,7 @@ WgColor WgSurface::Pixel2Col( Uint32 pixel ) const
 
 const WgPixelFormat *  WgSurface::PixelFormat()
 {
-	_convert(*(m_pRealSurface->pixelFormat()), m_format);
+	_convert(*(m_pRealSurface->pixelDescription()), m_format);
 	return &m_format;
 }
 
@@ -230,11 +230,11 @@ void WgSurface::PutPixels(const vector<int> &x, const vector<int> &y, const vect
 	int pitch = m_pRealSurface->pitch();
 	uint8_t * pPixels = m_pRealSurface->pixels();
 
-	switch(m_pRealSurface->pixelFormat()->type)
+	switch(m_pRealSurface->pixelDescription()->format)
 	{
-	case wg::PixelType::BGR_8:
+	case wg::PixelFormat::BGR_8:
 			break;
-	case wg::PixelType::BGRA_8:
+	case wg::PixelFormat::BGRA_8:
 			for(int n=0; n<length; n++)
 			{
 				ind = y[n]*pitch + x[n]*4;

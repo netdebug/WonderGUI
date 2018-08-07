@@ -24,6 +24,9 @@
 #include <wg3_geo.h>
 #include <algorithm>
 #include <wg3_util.h>
+#include <algorithm>
+
+using namespace std;
 
 namespace wg 
 {
@@ -42,6 +45,8 @@ namespace wg
 		m_blendMode 		= BlendMode::Blend;
 		m_canvasSize		= canvasSize;
 
+		m_dummyClip = { numeric_limits<int>::min() >> 1,numeric_limits<int>::min() >> 1,numeric_limits<int>::max(),numeric_limits<int>::max() };
+
 		if (s_gfxDeviceCount == 0)
 		{
 			_genCurveTab();
@@ -58,7 +63,6 @@ namespace wg
 		{
 			delete [] s_pCurveTab;
 		}
-
 	}
 
 
@@ -123,19 +127,97 @@ namespace wg
 	{
 		return true;	// Assumed to be ok if device doesn't have its own method.
 	}
-	
-	//____ ClipDrawLine() _________________________________________________________
+
+	//____ plotPixels() _______________________________________________________
+
+	void GfxDevice::plotPixels(int nCoords, const Coord * pCoords, const Color * pColors)
+	{
+		clipPlotPixels(m_dummyClip, nCoords, pCoords, pColors);
+	}
+
+
+	//____ drawLine() _________________________________________________________
+
+	void GfxDevice::drawLine(Coord begin, Coord end, Color color, float thickness)
+	{
+		clipDrawLine(m_dummyClip, begin, end, color, thickness);
+	}
 
 	// Coordinates for start are considered to be + 0.5 in the width dimension, so they start in the middle of a line/column.
 	// A one pixel thick line will only be drawn one pixel think, while a two pixels thick line will cover three pixels in thickness,
 	// where the outer pixels are faded.
 
-	void GfxDevice::clipDrawLine(const Rect& clip, const Coord& _begin, Direction dir, int length, Color _col, float thickness)
+	void GfxDevice::drawLine(Coord begin, Direction dir, int length, Color _col, float thickness)
 	{
 		if (thickness <= 0.f)
 			return;
 
-		Coord begin = _begin;
+		switch (dir)
+		{
+			case Direction::Left:
+				begin.x -= length;
+			case Direction::Right:
+			{
+				if (thickness <= 1.f)
+				{
+					Color col = _col;
+					col.a = (uint8_t)(thickness * col.a);
+
+					_drawStraightLine(begin, Orientation::Horizontal, length, col);
+				}
+				else
+				{
+					int expanse = (int)(1 + (thickness - 1) / 2);
+					Color edgeColor(_col.r, _col.g, _col.b, (uint8_t)(_col.a * ((thickness - 1) / 2 - (expanse - 1))));
+
+					int beginY = begin.y - expanse;
+					int endY = begin.y + expanse + 1;
+
+					_drawStraightLine({ begin.x, beginY }, Orientation::Horizontal, length, edgeColor);
+					_drawStraightLine({ begin.x, endY - 1 }, Orientation::Horizontal, length, edgeColor);
+					fill({ begin.x, beginY + 1, length, endY - beginY - 2 }, _col);
+				}
+				break;
+			}
+			case Direction::Up:
+				begin.y -= length;
+			case Direction::Down:
+			{
+				if (thickness <= 1.f)
+				{
+					Color col = _col;
+					col.a = (uint8_t)(thickness * col.a);
+
+					_drawStraightLine(begin, Orientation::Vertical, length, col);
+				}
+				else
+				{
+					int expanse = (int)(1 + (thickness - 1) / 2);
+					Color edgeColor(_col.r, _col.g, _col.b, (uint8_t)(_col.a * ((thickness - 1) / 2 - (expanse - 1))));
+
+					int beginX = begin.x - expanse;
+					int endX = begin.x + expanse + 1;
+
+					_drawStraightLine({ beginX, begin.y }, Orientation::Vertical, length, edgeColor);
+					_drawStraightLine({ endX - 1, begin.y }, Orientation::Vertical, length, edgeColor);
+					fill({ beginX + 1, begin.y, endX - beginX - 2, length }, _col);
+				}
+				break;
+			}
+		}
+	}
+
+
+	//____ clipDrawLine() _________________________________________________________
+
+	// Coordinates for start are considered to be + 0.5 in the width dimension, so they start in the middle of a line/column.
+	// A one pixel thick line will only be drawn one pixel think, while a two pixels thick line will cover three pixels in thickness,
+	// where the outer pixels are faded.
+
+	void GfxDevice::clipDrawLine(const Rect& clip, Coord begin, Direction dir, int length, Color _col, float thickness)
+	{
+		if (thickness <= 0.f)
+			return;
 
 		switch (dir)
 		{
@@ -306,7 +388,7 @@ namespace wg
 	{
 		tileBlit(_pSrc, Rect(0, 0, _pSrc->size()), Rect(0, 0, m_pCanvas->size()));
 	}
-
+	
 	void GfxDevice::tileBlit( Surface * _pSrc, const Rect& _dest )
 	{
 		tileBlit( _pSrc, Rect( 0, 0, _pSrc->width(), _pSrc->height() ), _dest );
@@ -419,7 +501,7 @@ namespace wg
 	}
 	
 	//____ clipStretchBlit() _______________________________________________________
-
+	
 	void GfxDevice::clipStretchBlit(const Rect& clip, Surface * pSrc)
 	{
 		clipStretchBlit(clip, pSrc, Rect(0, 0, pSrc->size()), Rect(0,0,m_pCanvas->size()));
@@ -483,7 +565,7 @@ namespace wg
 	}
 	
 	//____ clipTileBlit() __________________________________________________________
-
+	
 	void GfxDevice::clipTileBlit(const Rect& clip, Surface * pSrc )
 	{
 		clipTileBlit(clip, pSrc, Rect(0, 0, pSrc->size()), Rect(0,0, m_pCanvas->size() ));
@@ -558,16 +640,20 @@ namespace wg
 		}
 		return;
 	}
-	
 
-	//_____ clipBlitFromCanvas() ______________________________________________________
+	//____ drawHorrWave() _____________________________________________________
+
+	void GfxDevice::drawHorrWave(Coord begin, int length, const WaveLine * pTopBorder, const WaveLine * pBottomBorder, Color frontFill, Color backFill)
+	{
+		clipDrawHorrWave(m_dummyClip, begin, length, pTopBorder, pBottomBorder, frontFill, backFill);
+	}
+
+	//_____ clipBlitFromCanvas() ______________________________________________
 
 	void GfxDevice::clipBlitFromCanvas(const Rect& clip, Surface* pSrc, const Rect& src, Coord dest)
 	{
 		clipBlit(clip, pSrc, src, dest);		// Default is a normal blit, only OpenGL needs to flip (until that has been fixed)
 	}
-
-
 	
 	//____ clipBlitHorrBar() ______________________________________________________
 	

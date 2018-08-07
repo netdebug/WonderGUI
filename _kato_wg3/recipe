@@ -20,6 +20,8 @@ wg3_blob.cpp						: base/wg_blob.cpp
 wg3_blob.h							: base/wg_blob.h 					
 wg3_color.cpp						: base/wg_color.cpp				
 wg3_color.h							: base/wg_color.h				
+wg3_enumextras.cpp					: base/wg_enumextras.cpp				
+wg3_enumextras.h					: base/wg_enumextras.h				
 wg3_geo.cpp							: base/wg_geo.cpp				
 wg3_geo.h							: base/wg_geo.h					
 wg3_gfxdevice.cpp					: base/wg_gfxdevice.cpp			

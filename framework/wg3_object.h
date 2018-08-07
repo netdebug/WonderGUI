@@ -110,4 +110,4 @@ namespace wg
 	
 
 } // namespace wg
-#endif //WG_OBJECT_DOT_H
+#endif //WG3_OBJECT_DOT_H

@@ -45,9 +45,9 @@ namespace wg
 
 		 //.____ Creation __________________________________________
 		 
-		static SoftSurface_p	create( Size size, PixelType type = PixelType::BGRA_8, int hint = SurfaceHint::Static );
-        static SoftSurface_p	create( Size size, PixelType type, Blob * pBlob, int pitch, int hint = SurfaceHint::Static );
-        static SoftSurface_p	create( Size size, PixelType type, uint8_t * pPixels, int pitch, const PixelFormat * pPixelFormat = 0, int hint = SurfaceHint::Static );
+		static SoftSurface_p	create( Size size, PixelFormat format = PixelFormat::BGRA_8, int hint = SurfaceHint::Static, const Color * pClut = nullptr );
+        static SoftSurface_p	create( Size size, PixelFormat format, Blob * pBlob, int pitch, int hint = SurfaceHint::Static, const Color * pClut = nullptr );
+        static SoftSurface_p	create( Size size, PixelFormat format, uint8_t * pPixels, int pitch, const PixelDescription * pPixelDescription = nullptr, int hint = SurfaceHint::Static, const Color * pClut = nullptr);
 		static SoftSurface_p	create( Surface * pOther, int hint = SurfaceHint::Static );
 	
 		//.____ Identification __________________________________________
@@ -76,11 +76,6 @@ namespace wg
 		uint8_t *	lock( AccessMode mode );
 		uint8_t *	lockRegion( AccessMode mode, const Rect& region );
 		void		unlock();
-
-		//.____ Misc __________________________________________________________
-
-		inline float scaleAlpha() { return m_fScaleAlpha; }
-		void		setScaleAlpha(float fScaleAlpha);
 	
 		//.____  Internal ____________________________________________________
 
@@ -88,16 +83,15 @@ namespace wg
 
 	
 	protected:
-		SoftSurface( Size size, PixelType type = PixelType::BGRA_8 );
-		SoftSurface( Size size, PixelType type, Blob * pBlob, int pitch );
-		SoftSurface( Size size, PixelType type, uint8_t * pPixels, int pitch, const PixelFormat * pPixelFormat );
+		SoftSurface( Size size, PixelFormat format, const Color * pClut );
+		SoftSurface( Size size, PixelFormat format, Blob * pBlob, int pitch, const Color * pClut );
+		SoftSurface( Size size, PixelFormat format, uint8_t * pPixels, int pitch, const PixelDescription * pPixelDescription, const Color * pClut );
 		SoftSurface( Surface * pOther );
 
 		virtual ~SoftSurface();
 		
 		Blob_p		m_pBlob;
 		Size		m_size;
-		float    	m_fScaleAlpha;
 		uint8_t*	m_pData;
 	};
 	
@@ -105,4 +99,4 @@ namespace wg
 	//========================================================================================
 
 } // namespace wg
-#endif // WG_SOFTSURFACE_DOT_H
+#endif // WG3_SOFTSURFACE_DOT_H

@@ -2,6 +2,8 @@ cp imports/wg3_blob.cpp ../../WonderGUI/src/base/wg_blob.cpp
 cp imports/wg3_blob.h ../../WonderGUI/src/base/wg_blob.h							
 cp imports/wg3_color.cpp ../../WonderGUI/src/base/wg_color.cpp						
 cp imports/wg3_color.h ../../WonderGUI/src/base/wg_color.h							
+cp imports/wg3_enumextras.cpp ../../WonderGUI/src/base/wg_enumextras.cpp
+cp imports/wg3_enumextras.h ../../WonderGUI/src/base/wg_enumextras.h							
 cp imports/wg3_geo.cpp ../../WonderGUI/src/base/wg_geo.cpp							
 cp imports/wg3_geo.h ../../WonderGUI/src/base/wg_geo.h							
 cp imports/wg3_gfxdevice.cpp ../../WonderGUI/src/base/wg_gfxdevice.cpp					

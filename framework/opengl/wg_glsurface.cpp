@@ -59,7 +59,7 @@ WgGlSurface::WgGlSurface( WgSize size, WgPixelType type )
 
 WgGlSurface::WgGlSurface( WgSize size, WgPixelType type, uint8_t * pPixels, int pitch,  const WgPixelFormat& pixelFormat )
 {
-	wg::PixelFormat	format;
+	wg::PixelDescription	format;
 	_convert(pixelFormat, format);
 	m_pRealSurface = wg::GlSurface::create(_convert(size), _convert(type), pPixels, pitch, &format);
 }

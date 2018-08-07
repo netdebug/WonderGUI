@@ -275,21 +275,20 @@ namespace wg
 							///< This value is used internally to distinguish undefined values from an explicitly set ignore,
 		Ignore,				///< Blitting: No blitting performed.
 							///< Color Blending: DstRGBA = DstRGBA
-		Blend,				///< Blitting: Normal mode, alpha of source and tint-color is taken into account.
-							///< Color Blending: DstA = SrcA, DstRGB = SrcRGB + ((TintRGB-SrcRGB)*TintA/255)
-		Invert,				///< Blitting: Inverts destination RGB values where alpha of source is non-zero. Ignores RBG components. Uses alpha of tint-color.
-							///< Color Blending: DstA = SrcA, DstRGB = ((255 - SrcRGB)*TintA + SrcRGB*(255-TintA))/255
 		Replace,			///< Blitting: Completely opaque blitting, ignoring alpha of source and tint-color.
 							///< Color Blending: DstRGBA = SrcRGBA
+		Blend,				///< Blitting: Normal mode, alpha of source and tint-color is taken into account.
+							///< Color Blending: DstA = SrcA, DstRGB = SrcRGB + ((TintRGB-SrcRGB)*TintA/255)
 		Add,				///< Blitting: RGB Additive, alpha of source and tint-color is taken into account.
 							///< Color Blending: DstRGBA = SrcRGBA + TintRGBA
-		Subtract,			///< Blitting: RGB Subtractive, alpha of source and tint-color is taken into account.
+		Subtract,			///< Blitting: RGB Subtractive, alpha is ignored.
 							///< Color Blending: DstRGBA = SrcRGBA - TintRGBA
-		Multiply			///< Blitting: RGB Multiply, alpha of source and tint-color is taken into account.
-							///< Color Blending: DstRGBA = SrcRGBA * TintRGBA/255
+		Multiply,			///< Blitting: RGB Multiply, alpha is ignored.
+							///< Color Blending: DstRGB = SrcRGBA * TintRGBA/255
+		Invert				///< Blitting: Inverts destination RGB values where alpha of source is non-zero. Ignores RBG components. Uses alpha of tint-color.
+							///< Color Blending: DstA = SrcA, DstRGB = ((255 - SrcRGB)*TintA + SrcRGB*(255-TintA))/255
 	};
 
-	
 	//____ PointerStyle __________________________________________________________
 	
 	enum class PointerStyle : uint8_t	//. autoExtras
@@ -403,9 +402,9 @@ namespace wg
 
 	enum class SizePolicy2D : uint8_t	//. autoExtras
 	{
-		Default,
-		Stretch,
-		Scale
+		Original,						///< Object maintains its original size.
+		Stretch,						///< Object is stretched to fill the space, ignoring aspect ratio.
+		Scale							///< Object is scaled to fill the space as much as possible, respecting original aspect ratio.
 	};
 
 
@@ -568,26 +567,30 @@ namespace wg
 	};
 
 	
-	//____ PixelType _____________________________________________________________
+	//____ PixelFormat _____________________________________________________________
 	
-	enum class PixelType	//. autoExtras
+	enum class PixelFormat	//. autoExtras
 	{
-		Unknown,			///< Pixelformat is unkown or can't be expressed in a PixelFormat struct.
-		Custom,				///< Pixelformat has no PixelType enum, but is fully specified through the PixelFormat struct.
-		BGR_8,				///< One byte of blue, green and red respectively in memory in exactly that order.
-		BGRA_8				///< One byte of blue, green, red and alpha respectively in memory in exactly that order.
+		Unknown,			///< Pixelformat is unkown or can't be expressed in a PixelDescription struct.
+		Custom,				///< Pixelformat has no PixelFormat enum, but is fully specified through the PixelDescription struct.
+		BGR_8,				///< One byte of blue, green and red in exactly that order in memory.
+		BGRX_8,				///< One byte of blue, green, red and padding in exactly that order in memory.
+		BGRA_8,				///< One byte of blue, green, red and alpha in exactly that order in memory.
+		BGRA_4,				///< 4 bits each of blue, green, red and alpha in exactly that order in memory.
+		BGR_565,			///< 5 bits of blue, 6 bits of green and 5 bits of red in exactly that order in memory.
+		I8,					///< 8 bits of index into the CLUT (Color Lookup Table).
+		A8					///< 8 bits of alpha only.
 	};
 	
-	
-	//____ PixelFormat __________________________________________________________
+	//____ PixelDescription __________________________________________________________
 	/**
 	 * @brief Describes the format of a pixel.
 	 *
 	 * Describes the format of a pixel.
 	 *
-	 * The format of the pixel is described in three ways by a PixelFormat object:
+	 * The format of the pixel is described in three ways by a PixelDescription object:
 	 *
-	 * First a PixelType enum that contains predefined values for common pixel formats.
+	 * First a PixelFormat enum that contains predefined values for common pixel formats.
 	 * This allows for human readable information and quick lockups.
 	 *
 	 * Secondly a set of variables containing the number of bits for each pixel and the
@@ -598,57 +601,64 @@ namespace wg
 	 * of each channel and allows for quick conversion to and from the default 32-bit RGBA format used by Color.
 	 *
 	 * Not all pixel formats (like those of index/palette-based surfaces) can
-	 * be fully described by a PixelFormat object. In that case the member type is set to Unknown.
+	 * be fully described by a PixelDescription object. In that case the member type is set to Unknown.
 	 *
 	 * As long as the type member is not set to Unknown, you can extract the value of any channel of a
 	 * pixel by applying the mask and shift variables. I.e. to extract the value of red from a pixel
 	 * as an 8-bit value in the range 0-255, you use the formula:
 	 *
-	 * redValue = (pixel & R_mask) >> R_shift
+	 * redValue = ((pixel & R_mask) >> R_shift) << R_loss
 	 *
 	 * Thus you can convert any specified pixel type to a Color structure using the following routine:
 	 *
 	 * uint32_t	pixel;
-	 * PixelFormat * pFormat;
+	 * PixelDescription * pFormat;
 	 *
-	 * 	Color col( (pixel & pFormat->R_mask) >> pFormat->R_shift,
-	 *				 (pixel & pFormat->G_mask) >> pFormat->G_shift,
-	 *				 (pixel & pFormat->B_mask) >> pFormat->B_shift,
-	 *				 (pixel & pFormat->A_mask) >> pFormat->A_shift );
+	 * 	Color col( ((pixel & pFormat->R_mask) >> pFormat->R_shift) << pFormat->R_loss,
+	 *			   ((pixel & pFormat->G_mask) >> pFormat->G_shift) << pFormat->G_loss,
+	 *			   ((pixel & pFormat->B_mask) >> pFormat->B_shift) << pFormat->B_loss,
+	 *			   ((pixel & pFormat->A_mask) >> pFormat->A_shift) << pFormat->A_loss );
 	 *
 	 * To convert a Color object to a pixel value you can use:
 	 *
 	 * Color color;
-	 * PixelFormat * pFormat;
+	 * PixelDescription * pFormat;
 	 *
-	 * 	uint32_t pix = ((color.r << pFormat->R_shift) & pFormat->R_mask) |
-	 *				 ((color.g << pFormat->G_shift) & pFormat->G_mask) |
-	 *				 ((color.b << pFormat->B_shift) & pFormat->B_mask) |
-	 *				 ((color.a << pFormat->A_shift) & pFormat->A_mask);
+	 * 	uint32_t pix = ((color.r >> pFormat->R_loss) << pFormat->R_shift) |
+	 *				   ((color.g >> pFormat->G_loss) << pFormat->G_shift) |
+	 *				   ((color.b >> pFormat->B_loss) << pFormat->B_shift) |
+	 *				   ((color.a >> pFormat->A_loss) << pFormat->A_shift);
 	 *
 	 * This is essentially what the default implementation for Surface::colorToPixel() and Surface::pixelToColor() does.
 	 *
 	 **/
 	
 	
-	struct PixelFormat
+	struct PixelDescription
 	{
 	public:	
 		//.____ Properties _____________________________________________________
 		
-		PixelType	type;			///< Enum specifying the format if it exacty matches a predefined format, otherwise set to CUSTOM or UNKNOWN.
+		PixelFormat	format;			///< Enum specifying the format if it exacty matches a predefined format, otherwise set to CUSTOM or UNKNOWN.
 		int			bits;			///< Number of bits for the pixel, includes any non-used padding bits.
-	
+		bool		bIndexed;		///< True if pixels are index into CLUT, no RGB values in pixel.
+
 		uint32_t	R_mask;			///< bitmask for getting the red bits out of the pixel
 		uint32_t	G_mask;			///< bitmask for getting the green bits out of the pixel
 		uint32_t	B_mask;			///< bitmask for getting the blue bits out of the pixel
 		uint32_t	A_mask;			///< bitmask for getting the alpha bits out of the pixel
 	
-		int		R_shift;			///< amount to shift the red bits to get an 8-bit representation of red. This can be negative.
-		int		G_shift;			///< amount to shift the green bits to get an 8-bit representation of red. This can be negative.
-		int		B_shift;			///< amount to shift the blue bits to get an 8-bit representation of red. This can be negative.
-		int		A_shift;			///< amount to shift the alpha bits to get an 8-bit representation of red. This can be negative.
-	
+		uint8_t		R_shift;		///< amount to shift the red bits to the right to get the value.
+		uint8_t		G_shift;		///< amount to shift the green bits to the right to get the value.
+		uint8_t		B_shift;		///< amount to shift the blue bits to the right to get the value.
+		uint8_t		A_shift;		///< amount to shift the alpha bits to the right to get the value.
+
+		uint8_t		R_loss;			///< amount to shift the red bits to the right to get the value.
+		uint8_t		G_loss;			///< amount to shift the green bits to the right to get the value.
+		uint8_t		B_loss;			///< amount to shift the blue bits to the right to get the value.
+		uint8_t		A_loss;			///< amount to shift the alpha bits to the right to get the value.
+
+
 		uint8_t	R_bits;				///< number of bits for red in the pixel
 		uint8_t	G_bits;				///< number of bits for green in the pixel
 		uint8_t	B_bits;				///< number of bits for blue in the pixel
@@ -699,4 +709,7 @@ namespace wg
 
 
 } // namespace wg
-#endif // WG_TYPES_DOT_H
+
+#include <wg3_enumextras.h>
+
+#endif // WG3_TYPES_DOT_H

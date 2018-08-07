@@ -55,13 +55,13 @@ namespace wg
 
 		//.____ Misc _______________________________________________________
 
-		Surface_p	createSurface( Size size, PixelType type = PixelType::BGRA_8, int hint = SurfaceHint::Static ) const;
-        Surface_p	createSurface( Size size, PixelType type, Blob * pBlob, int pitch, int hint = SurfaceHint::Static ) const;
-        Surface_p	createSurface( Size size, PixelType type, uint8_t * pPixels, int pitch, const PixelFormat * pPixelFormat = 0, int hint = SurfaceHint::Static ) const ;
+		Surface_p	createSurface( Size size, PixelFormat format = PixelFormat::BGRA_8, int hint = SurfaceHint::Static, const Color * pClut = nullptr ) const override;
+        Surface_p	createSurface( Size size, PixelFormat format, Blob * pBlob, int pitch, int hint = SurfaceHint::Static, const Color * pClut = nullptr ) const override;
+        Surface_p	createSurface( Size size, PixelFormat format, uint8_t * pPixels, int pitch, const PixelDescription * pPixelDescription = 0, int hint = SurfaceHint::Static, const Color * pClut = nullptr ) const override;
         Surface_p	createSurface( Surface * pOther, int hint = SurfaceHint::Static ) const;
 	};
 }
 
 
-#endif //WG_GLSURFACEFACTORY_DOT_H
+#endif //WG3_GLSURFACEFACTORY_DOT_H
 

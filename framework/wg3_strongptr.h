@@ -159,5 +159,5 @@ protected:
 	
 
 } // namespace wg
-#endif //WG_STRONGPTR_DOT_H
+#endif //WG3_STRONGPTR_DOT_H
 

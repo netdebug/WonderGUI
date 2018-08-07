@@ -420,7 +420,7 @@ namespace wg
         	glGenBuffers(1, &m_dummyBuffer);
 		
         }
-        setTintColor( Color::White );  
+        setTintColor( Color::White );        
 
 		assert( glGetError() == 0 );      
     }
@@ -512,7 +512,7 @@ namespace wg
 		// Do NOT add any gl-calls here, INCLUDING glGetError()!!!
 		// This method can be called without us having our GL-context.
 
-        if (!_pSurface)
+		if (!_pSurface)
 			return setCanvas(m_defaultCanvasViewport);		// Revert back to default frame buffer.
 
 		GlSurface * pSurface = GlSurface::cast(_pSurface);
@@ -572,7 +572,7 @@ namespace wg
 	{
         assert( glGetError() == 0 );
 
-        glUseProgram(m_fillProg);
+		glUseProgram(m_fillProg);
 		GLint dimLoc = glGetUniformLocation(m_fillProg, "dimensions");
 		glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
 
@@ -623,7 +623,7 @@ namespace wg
 	{
         assert( glGetError() == 0 );
 
-        if( blendMode != BlendMode::Blend && blendMode != BlendMode::Replace &&
+		if( blendMode != BlendMode::Blend && blendMode != BlendMode::Replace && 
 			blendMode != BlendMode::Add && blendMode != BlendMode::Subtract && blendMode != BlendMode::Multiply &&
 			blendMode != BlendMode::Invert )
 				return false;
@@ -651,7 +651,7 @@ namespace wg
 		// Remember GL states so we can restore in EndRender()
 
 		m_glDepthTest 		= glIsEnabled(GL_DEPTH_TEST);
-		m_glScissorTest 	= glIsEnabled(GL_SCISSOR_TEST);
+        m_glScissorTest 	= glIsEnabled(GL_SCISSOR_TEST);
 		m_glBlendEnabled  	= glIsEnabled(GL_BLEND);
 		glGetIntegerv(GL_BLEND_SRC, &m_glBlendSrc);
 		glGetIntegerv(GL_BLEND_DST, &m_glBlendDst);
@@ -664,7 +664,7 @@ namespace wg
 		//  Modify states
 
 		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_SCISSOR_TEST);
+        glEnable(GL_SCISSOR_TEST);
 
 		// Update program dimensions
 
@@ -678,8 +678,8 @@ namespace wg
 
 		_setBlendMode(m_blendMode);
 
-		//
-    	
+        //
+
 		assert( glGetError() == 0 );
 		m_bRendering = true;
 		return true;
@@ -723,7 +723,7 @@ namespace wg
 
 	void GlGfxDevice::fill( const Rect& _rect, const Color& _col )
 	{
-        if( (_col.a  == 0 && m_blendMode == BlendMode::Blend) || _rect.w < 1 || _rect.h < 1 )
+		if( (_col.a  == 0 && m_blendMode == BlendMode::Blend) || _rect.w < 1 || _rect.h < 1 )
 			return;
  
         Color fillColor = _col * m_tintColor;
@@ -1389,7 +1389,7 @@ namespace wg
 
 	//____ clipDrawHorrWave() _____________________________________________________
 
-	void GlGfxDevice::clipDrawHorrWave(const Rect& clip, Coord begin, int length, const WaveLine * pTopBorder, const WaveLine * pBottomBorder, Color frontFill, Color backFill)
+	void GlGfxDevice::clipDrawHorrWave(const Rect&clip, Coord begin, int length, const WaveLine * pTopBorder, const WaveLine * pBottomBorder, Color frontFill, Color backFill)
 	{
 		// Do early rough X-clipping with margin (need to trace lines with margin of thickest line).
 

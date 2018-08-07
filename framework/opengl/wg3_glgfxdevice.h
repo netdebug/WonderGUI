@@ -199,5 +199,5 @@ namespace wg
 
 	};
 } // namespace wg
-#endif //WG_GLGFXDEVICE_DOT_H
+#endif //WG3_GLGFXDEVICE_DOT_H
 

@@ -131,7 +131,9 @@ namespace wg
 	
 		virtual	uint32_t	colorToPixel( const Color& col ) const;///< @brief Convert specified color to a pixel in surface's native format.
 		virtual	Color		pixelToColor( uint32_t pixel ) const;		///< @brief Get the color and alpha values of a pixel.
-	
+
+		inline const Color * clut() const { return m_pClut; }
+
 		//.____ Control _______________________________________________________
 	
 		virtual uint8_t *	lock( AccessMode mode ) = 0;		///< @brief Lock the surface for direct access to pixel data.
@@ -196,7 +198,8 @@ namespace wg
 																			///< otherwise AccessMode::None.
 		inline  Rect		regionLocked() const;							///< @brief Get the locked region of the surface.
 		inline  int			pitch() const;									///< @brief Get the pitch of the locked region.
-		const PixelFormat *	pixelFormat() const { return &m_pixelFormat; }	///< @brief Get the pixel format of the surface.
+		const PixelDescription *	pixelDescription() const { return &m_pixelDescription; }	///< @brief Get the pixel format of the surface.
+		PixelFormat			pixelFormat() const { return m_pixelDescription.format; }
 		inline uint8_t *	pixels() const { return m_pPixels; }			///< @brief Get a pointer to the raw pixels of the locked region.
 																			///< Get a pointer to the first line of raw pixels of the locked region.
 																			///<
@@ -204,7 +207,6 @@ namespace wg
 																			///< by the call to lock() or lockRegion().
 																			///< @return Pointer to the raw pixels of the locked region or
 																			///<		 null if surface is not locked.
-	
 	
 		//.____  Rendering ____________________________________________________
 	
@@ -219,14 +221,15 @@ namespace wg
 		virtual ~Surface();
 	
 		Rect				_lockAndAdjustRegion( AccessMode modeNeeded, const Rect& region );
-		bool 				_copyFrom( const PixelFormat * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const Rect& srcRect, const Rect& dstRect );
+		bool 				_copyFrom( const PixelDescription * pSrcFormat, uint8_t * pSrcPixels, int srcPitch, const Rect& srcRect, const Rect& dstRect, const Color * pCLUT = nullptr );
 	
-		PixelFormat			m_pixelFormat;
+		PixelDescription			m_pixelDescription;
 		int					m_pitch;
 
 		ScaleMode			m_scaleMode;
 	
 		AccessMode			m_accessMode;
+		Color *				m_pClut;			// Pointer at color lookup table. Always 256 entries long.
 		uint8_t *			m_pPixels;			// Pointer at pixels when surface locked.
 		Rect				m_lockRegion;		// Region of surface that is locked. Width/Height should be set to 0 when not locked.
 
@@ -313,4 +316,4 @@ namespace wg
 	//==============================================================================
 
 } // namespace wg
-#endif // WG_SURFACE_DOT_H
+#endif // WG3_SURFACE_DOT_H

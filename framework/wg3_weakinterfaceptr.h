@@ -145,5 +145,5 @@ namespace wg
 	
 
 } // namespace wg
-#endif //WG_WEAKINTERFACEPTR_DOT_H
+#endif //WG3_WEAKINTERFACEPTR_DOT_H
 

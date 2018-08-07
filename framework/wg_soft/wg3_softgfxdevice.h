@@ -26,7 +26,6 @@
 #include <wg3_geo.h>
 #include <wg3_gfxdevice.h>
 #include <wg3_softsurface.h>
-#include <wg3_softsurfacefactory.h>
 
 namespace wg 
 {
@@ -48,261 +47,211 @@ namespace wg
 	class SoftGfxDevice : public GfxDevice
 	{
 	public:
-	
+
 		struct CustomFunctionTable
 		{
-			int (*setCanvas)( void * pPixels, int pixelFormat, int pitch );
-			void (*beginRender)(void );
-			void (*endRender)( void );
+			int(*setCanvas)(void * pPixels, int pixelDescription, int pitch);
+			void(*beginRender)(void);
+			void(*endRender)(void);
 
-			void (*fillReplace)( int x, int y, int w, int h, uint32_t color );
-			void (*fillBlend)( int x, int y, int w, int h, uint32_t color );
-			void (*fillAdd)( int x, int y, int w, int h, uint32_t color );
-			void (*fillSubtract)( int x, int y, int w, int h, uint32_t color );
-			void (*fillMultiply)( int x, int y, int w, int h, uint32_t color );
-			void (*fillInvert)( int x, int y, int w, int h, uint32_t color );
+			void(*fillReplace)(int x, int y, int w, int h, uint32_t color);
+			void(*fillBlend)(int x, int y, int w, int h, uint32_t color);
+			void(*fillAdd)(int x, int y, int w, int h, uint32_t color);
+			void(*fillSubtract)(int x, int y, int w, int h, uint32_t color);
+			void(*fillMultiply)(int x, int y, int w, int h, uint32_t color);
+			void(*fillInvert)(int x, int y, int w, int h, uint32_t color);
 
-			void (*blitReplace)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY );
-			void (*blitBlend)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY );
-			void (*blitAdd)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY );
-			void (*blitSubtract)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY );
-			void (*blitMultiply)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY );
-			void (*blitInvert)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY );
+			void(*blitReplace)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY);
+			void(*blitBlend)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY);
+			void(*blitAdd)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY);
+			void(*blitSubtract)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY);
+			void(*blitMultiply)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY);
+			void(*blitInvert)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY);
 
-			void (*tintBlitReplace)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color );
-			void (*tintBlitBlend)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color );
-			void (*tintBlitAdd)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color );
-			void (*tintBlitSubtract)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color );
-			void (*tintBlitMultiply)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color );
-			void (*tintBlitInvert)( void * pSource, int pixelFormat, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color );
-		};	
-	
-	
+			void(*tintBlitReplace)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color);
+			void(*tintBlitBlend)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color);
+			void(*tintBlitAdd)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color);
+			void(*tintBlitSubtract)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color);
+			void(*tintBlitMultiply)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color);
+			void(*tintBlitInvert)(void * pSource, int pixelDescription, int pitch, int x, int y, int w, int h, int destX, int destY, uint32_t color);
+		};
+
+
 		//.____ Creation __________________________________________
 
 		static SoftGfxDevice_p	create();
-		static SoftGfxDevice_p	create( Surface * pCanvas );
-	
+		static SoftGfxDevice_p	create(Surface * pCanvas);
+
 		//.____ Identification __________________________________________
 
-		bool					isInstanceOf( const char * pClassName ) const;
-		const char *			className( void ) const;
+		bool					isInstanceOf(const char * pClassName) const;
+		const char *			className(void) const;
 		static const char		CLASSNAME[];
-		static SoftGfxDevice_p	cast( Object * pObject );
-		const char *			surfaceClassName( void ) const;
+		static SoftGfxDevice_p	cast(Object * pObject);
+		const char *			surfaceClassName(void) const;
 
 		//.____ Misc _______________________________________________________
 
 		SurfaceFactory_p		surfaceFactory();
-		
+
 		inline CustomFunctionTable *	customFunctions() { return &m_customFunctions; }
-		inline void						enableCustomFunctions( bool enable ) { m_bEnableCustomFunctions = enable; };
+		inline void						enableCustomFunctions(bool enable) { m_bEnableCustomFunctions = enable; };
 		inline bool						customFunctionsEnabled() const { return m_bEnableCustomFunctions; }
-		
+
 		//.____ Geometry _________________________________________________
 
-		bool	setCanvas( Surface * pCanvas );
+		bool	setCanvas(Surface * pCanvas);
 
 		//.____ Rendering ________________________________________________
 
 		bool	beginRender();
 		bool	endRender();
-		
+
 		//
-	
-		void	fill( const Rect& rect, const Color& col )  override;
-		void	blit( Surface * pSrc, const Rect& srcrect, Coord dest ) override;
-	
-		void	drawLine( Coord begin, Coord end, Color color, float thickness = 1.f ) override;
-		void	clipDrawLine( const Rect& clip, Coord begin, Coord end, Color color, float thickness = 1.f ) override;
-	
-        void    plotPixels( int nCoords, const Coord * pCoords, const Color * pColors) override;
-        void    clipPlotPixels( const Rect& clip, int nCoords, const Coord * pCoords, const Color * pColors) override;
-	
-		void	fillSubPixel( const RectF& rect, const Color& col ) override;
-		void	stretchBlit( Surface * pSrc, const RectF& source, const Rect& dest) override;
+
+		void	fill(const Rect& rect, const Color& col)  override;
+		void	blit(Surface * pSrc, const Rect& srcrect, Coord dest) override;
+
+		void	drawLine(Coord begin, Coord end, Color color, float thickness = 1.f) override;
+		void	drawLine(Coord begin, Direction dir, int length, Color col, float thickness = 1.f) override;
+
+		void	clipDrawLine(const Rect& clip, Coord begin, Coord end, Color color, float thickness = 1.f) override;
+		void	clipDrawLine(const Rect& clip, Coord begin, Direction dir, int length, Color col, float thickness = 1.f) override;
+
+		void    clipPlotPixels(const Rect& clip, int nCoords, const Coord * pCoords, const Color * pColors) override;
+
+		void	fillSubPixel(const RectF& rect, const Color& col) override;
+		void	stretchBlit(Surface * pSrc, const RectF& source, const Rect& dest) override;
 
 		void	clipDrawHorrWave(const Rect&clip, Coord begin, int length, const WaveLine * PTopBorder, const WaveLine * pBottomBorder, Color frontFill, Color backFill);
 
-		// Experimental stuff...
 
-		void	drawArcNE( const Rect& rect, Color color );
-		void	drawElipse( const Rect& rect, Color color );
-		void	drawFilledElipse( const Rect& rect, Color color );
-	
-		void	clipDrawArcNE( const Rect& clip, const Rect& rect, Color color );
-		void	clipDrawElipse( const Rect& clip, const Rect& rect, Color color );
-		void	clipDrawFilledElipse( const Rect& clip, const Rect& rect, Color color );
+		struct ColTrans
+		{
+			Color	baseTint;
+			Color * pTintX;
+			Color * pTintY;
+		};
 
-		
+		static int		s_mulTab[256];
+
+
 	protected:
 		SoftGfxDevice();
-		SoftGfxDevice( Surface * pCanvas );
+		SoftGfxDevice(Surface * pCanvas);
 		~SoftGfxDevice();
+
+		struct Pitches
+		{
+			int srcX;
+			int srcY;
+			int dstX;
+			int dstY;
+		};
+
+		inline static void _read_pixel(const uint8_t * pPixel, PixelFormat format, const Color * pClut, uint8_t& outB, uint8_t& outG, uint8_t& outR, uint8_t& outA);
+		inline static void _write_pixel(uint8_t * pPixel, PixelFormat format, uint8_t b, uint8_t g, uint8_t r, uint8_t a);
+
+		inline static void	_blend_pixels(BlendMode mode, uint8_t srcB, uint8_t srcG, uint8_t srcR, uint8_t srcA,
+			uint8_t backB, uint8_t backG, uint8_t backR, uint8_t backA,
+			uint8_t& outB, uint8_t& outG, uint8_t& outR, uint8_t& outA);
+
+		template<BlendMode BLEND, int TINTFLAGS, PixelFormat DSTFORMAT>
+		static void _plot(uint8_t * pDst, Color col, const ColTrans& tint);
+
+		template<BlendMode BLEND, int TINTFLAGS, PixelFormat DSTFORMAT>
+		static void _plot_list(const Rect& clip, int nCoords, const Coord * pCoords, const Color * pColors, uint8_t * pCanvas, int pitchX, int pitchY, const ColTrans& tint);
+
+		template<BlendMode BLEND, int TINTFLAGS, PixelFormat DSTFORMAT>
+		static void _draw_line(uint8_t * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, Color color, const ColTrans& tint);
+
+		template<BlendMode BLEND, int TINTFLAGS, PixelFormat DSTFORMAT>
+		static void _clip_draw_line(int clipStart, int clipEnd, uint8_t * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, Color color, const ColTrans& tint);
+
+		template<BlendMode BLEND, int TINTFLAGS, PixelFormat DSTFORMAT>
+		static void _fill(uint8_t * pDst, int pitchX, int pitchY, int nLines, int lineLength, Color col, const ColTrans& tint);
+
+		template<BlendMode BLEND, int TINTFLAGS, PixelFormat DSTFORMAT>
+		static void _draw_wave_column(int clipBeg, int clipLen, uint8_t * pColumn, int leftPos[4], int rightPos[4], Color col[3], int linePitch);
+
+
+
+		template<PixelFormat SRCFORMAT, int TINTFLAGS, BlendMode BLEND, PixelFormat DSTFORMAT>
+		static void	_blit(const uint8_t * pSrc, uint8_t * pDst, const Color * pClut, const Pitches& pitches, int nLines, int lineLength, const ColTrans& tint);
+
+		template<PixelFormat SRCFORMAT, int TINTFLAGS, BlendMode BLEND, PixelFormat DSTFORMAT>
+		static void _stretch_blit(const SoftSurface * pSrcSurf, CoordF pos, const float matrix[2][2], uint8_t * pDst, int dstPitchX, int dstPitchY, int nLines, int lineLength, const SoftGfxDevice::ColTrans& tint);
+
+		template<PixelFormat SRCFORMAT, int TINTFLAGS, BlendMode BLEND, PixelFormat DSTFORMAT>
+		static void _transform_blit(const SoftSurface * pSrcSurf, CoordF pos, const float matrix[2][2], uint8_t * pDst, int dstPitchX, int dstPitchY, int nLines, int lineLength, const SoftGfxDevice::ColTrans& tint);
+
+
+
+
 
 		void	_lineToEdges(const WaveLine * pWave, int offset, int nPoints, SegmentEdge * pDest, int pitch);
 
-		void	_drawStraightLine( Coord start, Orientation orientation, int _length, const Color& _col) override;
+		void	_drawStraightLine(Coord start, Orientation orientation, int _length, const Color& _col) override;
 
 		void	_initTables();
 		void	_clearCustomFunctionTable();
-		int 	_scaleLineThickness( float thickness, int slope );
-	
-		void 	_drawLineSegment( uint8_t * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, Color color );
-		void 	_clipDrawLineSegment( int clipStart, int clipEnd, uint8_t * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, Color color );
-	
-		void	_clipDrawWaveColumn( int clipBeg, int clipLen, uint8_t * pColumn, int leftPos[4], int rightPos[4], Color col[3], int linePitch);
-	
-		void	_clipDrawSegmentColumn(int clipBeg, int clipEnd, uint8_t * pColumn, int linePitch, int nEdges, SegmentEdge * pEdges, Color * pSegmentColors);
+		int 	_scaleLineThickness(float thickness, int slope);
 
 
-		void	_drawHorrFadeLine( uint8_t * pLineStart, int begOfs, int peakOfs, int endOfs, Color color );
-		void	_clipDrawHorrFadeLine( int clipX1, int clipX2, uint8_t * pLineStart, int begOfs, int peakOfs, int endOfs, Color color );
-	
-		void	_plotAA( int _x, int _y, const Color& _col, BlendMode blendMode, int _aa );
-		void	_drawStraightLineAA( int _x, int _y, int _length, const Color& _col, BlendMode blendMode, int _aa, Orientation orientation );
-	
-		void 	_blit( const Surface* _pSrcSurf, const Rect& srcrect, int dx, int dy  );
-		void 	_tintBlit( const Surface* _pSrcSurf, const Rect& srcrect, int dx, int dy  );
-	
-		void	_stretchBlitTintedOpaque(	const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitTintedBlend32(	const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void 	_stretchBlitTintedBlend24(	const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitTintedAdd32(	const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitTintedAdd24(	const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitTintedSub32(	const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitTintedSub24(	const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitTintedMultiply(	const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitTintedInvert(	const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-	
-		void	_stretchBlitOpaque(			const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitBlend32(		const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-//		void 	_stretchBlitBlend24(		const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,	// Not used, takes shortcut to _stretchBlitOpaque()
-//											int dx, int dy, int dw, int dh );
-		void	_stretchBlitAdd32(			const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitAdd24(			const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitSub32(			const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitSub24(			const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitMultiply(		const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-		void	_stretchBlitInvert(			const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh,
-											int dx, int dy, int dw, int dh );
-	
+		//		void	_clipDrawSegmentColumn(int clipBeg, int clipEnd, uint8_t * pColumn, int linePitch, int nEdges, SegmentEdge * pEdges, Color * pSegmentColors);
+
+
+		typedef	void(*WaveOp_p)(int clipBeg, int clipLen, uint8_t * pColumn, int leftPos[4], int rightPos[4], Color col[3], int linePitch);
+
+		static void	_clip_wave_blend_24(int clipBeg, int clipLen, uint8_t * pColumn, int leftPos[4], int rightPos[4], Color col[3], int linePitch);
+		static void	_clip_wave_blend_32(int clipBeg, int clipLen, uint8_t * pColumn, int leftPos[4], int rightPos[4], Color col[3], int linePitch);
 
 		//
 
-		typedef	void(*BlitReader_p)(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color tint);
-		typedef	void(*BlitWriter_p)(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-
-		void	_twoPassStraightBlit(BlitReader_p, BlitWriter_p, const SoftSurface * pSource, const Rect& srcrect, Coord dest);
-		void	_twoPassStretchBlit(BlitReader_p, BlitWriter_p, const SoftSurface * pSource, const RectF& source, const Rect& dest);
-
-
-		static void	_move_32A_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color dummy);
-		static void	_tint_32A_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color tint);
-		static void	_scale_32A_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color dummy);
-		static void	_scale_tint_32A_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color tint);
-
-		static void	_move_32X_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color dummy);
-		static void	_tint_32X_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color tint);
-		static void	_scale_32X_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color dummy);
-		static void	_scale_tint_32X_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color tint);
-
-		static void	_move_24_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color dummy);
-		static void	_tint_24_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color tint);
-		static void	_scale_24_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color dummy);
-		static void	_scale_tint_24_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color tint);
-/*
-		void	_move_16_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color dummy);
-		void	_tint_16_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color tint);
-		void	_scale_16_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color dummy);
-		void	_scale_tint_16_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color tint);
-
-		void	_move_16A_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color dummy);
-		void	_tint_16A_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color tint);
-		void	_scale_16A_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color dummy);
-		void	_scale_tint_16A_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color tint);
-
-		void	_move_8I_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color dummy);
-		void	_tint_8I_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color tint);
-		void	_scale_8I_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color dummy);
-		void	_scale_tint_8I_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color tint);
-
-		void	_move_8A_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color dummy);
-		void	_tint_8A_to_32A(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength, Color tint);
-		void	_scale_8A_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color dummy);
-		void	_scale_tint_8A_to_32A(const SoftSurface * pSrcSurf, float sx, float sy, float sw, float sh, uint8_t * pDest, int nLines, int lineLength, int linePitch, Color tint);
-*/
-		//
-
-		static void	_move_32A_to_32A	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_blend_32A_to_32A	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_add_32A_to_32A		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_sub_32A_to_32A		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_mul_32A_to_32A		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_invert_32A_to_32A	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-
-		static void	_move_32A_to_32X	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_blend_32A_to_32X	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_add_32A_to_32X		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_sub_32A_to_32X		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_mul_32A_to_32X		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_invert_32A_to_32X	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-
-		static void	_move_32A_to_24		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_blend_32A_to_24	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_add_32A_to_24		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_sub_32A_to_24		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_mul_32A_to_24		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		static void	_invert_32A_to_24	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-/*
-		void	_move_32A_to_16		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_blend_32A_to_16	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_add_32A_to_16		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_sub_32A_to_16		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_mul_32A_to_16		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_invert_32A_to_16	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-
-		void	_move_32A_to_16A	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_blend_32A_to_16A	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_add_32A_to_16A		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_sub_32A_to_16A		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_mul_32A_to_16A		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_invert_32A_to_16A	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-
-		void	_move_32A_to_16X	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_blend_32A_to_16X	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_add_32A_to_16X		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_sub_32A_to_16X		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_mul_32A_to_16X		(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-		void	_invert_32A_to_16X	(const uint8_t * pSrc, int srcPitch, uint8_t * pDst, int dstPitch, int nLines, int lineLength);
-*/
+		typedef	void(*PlotOp_p)(uint8_t * pDst, Color col, const ColTrans& tint);
+		typedef	void(*PlotListOp_p)(const Rect& clip, int nCoords, const Coord * pCoords, const Color * pColors, uint8_t * pCanvas, int pitchX, int pitchY, const ColTrans& tint);
+		typedef	void(*LineOp_p)(uint8_t * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, Color color, const ColTrans& tint);
+		typedef	void(*ClipLineOp_p)(int clipStart, int clipEnd, uint8_t * pRow, int rowInc, int pixelInc, int length, int width, int pos, int slope, Color color, const ColTrans& tint);
+		typedef	void(*FillOp_p)(uint8_t * pDst, int pitchX, int pitchY, int nLines, int lineLength, Color col, const ColTrans& tint);
+		typedef	void(*BlitOp_p)(const uint8_t * pSrc, uint8_t * pDst, const Color * pClut, const Pitches& pitches, int nLines, int lineLength, const ColTrans& tint);
+		typedef	void(*TransformOp_p)(const SoftSurface * pSrcSurf, CoordF pos, const float matrix[2][2], uint8_t * pDst, int dstPitchX, int dstPitchY, int nLines, int lineLength, const ColTrans& tint);
 
 
+
+		void	_onePassStraightBlit(BlitOp_p, const SoftSurface * pSource, const Rect& srcrect, Coord dest, const ColTrans& tint);
+		void	_onePassTransformBlit(TransformOp_p, const SoftSurface * pSource, CoordF pos, const float matrix[2][2], const Rect& dest, const ColTrans& tint);
+
+		void	_twoPassStraightBlit(BlitOp_p, BlitOp_p, const SoftSurface * pSource, const Rect& srcrect, Coord dest, const ColTrans& tint);
+		void	_twoPassTransformBlit(TransformOp_p, BlitOp_p, const SoftSurface * pSource, CoordF pos, const float matrix[2][2], const Rect& dest, const ColTrans& tint);
 
 		//
+
+
+		static PlotOp_p			s_plotOpTab[BlendMode_size][PixelFormat_size];
+		static LineOp_p			s_LineOpTab[BlendMode_size][PixelFormat_size];
+		static ClipLineOp_p		s_clipLineOpTab[BlendMode_size][PixelFormat_size];
+		static FillOp_p			s_fillOpTab[BlendMode_size][PixelFormat_size];
+		static PlotListOp_p		s_plotListOpTab[BlendMode_size][PixelFormat_size];
+		static WaveOp_p			s_waveOpTab[BlendMode_size][PixelFormat_size];
+
+		static BlitOp_p			s_pass2OpTab[BlendMode_size][PixelFormat_size];
+
+		static BlitOp_p			s_moveTo_BGRA_8_OpTab[PixelFormat_size][2];			// [SourceFormat][TintMode]
+		static BlitOp_p			s_moveTo_BGR_8_OpTab[PixelFormat_size][2];			// [SourceFormat][TintMode]
+
+		static BlitOp_p			s_blendTo_BGRA_8_OpTab[PixelFormat_size][2];		// [SourceFormat][TintMode]
+		static BlitOp_p			s_blendTo_BGR_8_OpTab[PixelFormat_size][2];			// [SourceFormat][TintMode]
+
+		static TransformOp_p	s_stretchTo_BGRA_8_OpTab[PixelFormat_size][2];			// [SourceFormat][TintMode]
+		static TransformOp_p	s_stretchTo_BGR_8_OpTab[PixelFormat_size][2];			// [SourceFormat][TintMode]
+
+		static TransformOp_p	s_stretchBlendTo_BGRA_8_OpTab[PixelFormat_size][2];		// [SourceFormat][TintMode]
+		static TransformOp_p	s_stretchBlendTo_BGR_8_OpTab[PixelFormat_size][2];			// [SourceFormat][TintMode]
+
 
 		SurfaceFactory_p	m_pSurfaceFactory;
 
 		int				m_lineThicknessTable[17];
-		uint8_t *		m_pDivTab;
-
-		static int s_mulTab[256];
 		
 		uint8_t *		m_pCanvasPixels;	// Pixels of m_pCanvas when locked 
 		int				m_canvasPixelBits;	// PixelBits of m_pCanvas when locked
@@ -317,5 +266,5 @@ namespace wg
 	
 
 } // namespace wg
-#endif //WG_SOFTGFXDEVICE_DOT_H
+#endif //WG3_SOFTGFXDEVICE_DOT_H
 

@@ -150,5 +150,5 @@ protected:
 	
 
 } // namespace wg
-#endif //WG_STRONGINTERFACEPTR_DOT_H
+#endif //WG3_STRONGINTERFACEPTR_DOT_H
 

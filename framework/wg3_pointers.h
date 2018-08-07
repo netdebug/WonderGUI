@@ -29,5 +29,5 @@
 #include <wg3_weakinterfaceptr.h>
 
 
-#endif //WG_POINTERS_DOT_H
+#endif //WG3_POINTERS_DOT_H
 

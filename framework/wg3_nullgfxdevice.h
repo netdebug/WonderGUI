@@ -89,5 +89,5 @@ namespace wg
 	
 
 } // namespace wg
-#endif //WG_NULLGFXDEVICE_DOT_H
+#endif //WG3_NULLGFXDEVICE_DOT_H
 

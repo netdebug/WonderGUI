@@ -7,6 +7,8 @@ cp ../../WonderGUI/src/base/wg_blob.cpp imports/wg3_blob.cpp
 cp ../../WonderGUI/src/base/wg_blob.h imports/wg3_blob.h							
 cp ../../WonderGUI/src/base/wg_color.cpp imports/wg3_color.cpp						
 cp ../../WonderGUI/src/base/wg_color.h imports/wg3_color.h							
+cp ../../WonderGUI/src/base/wg_enumextras.cpp imports/wg3_enumextras.cpp
+cp ../../WonderGUI/src/base/wg_enumextras.h imports/wg3_enumextras.h
 cp ../../WonderGUI/src/base/wg_geo.cpp imports/wg3_geo.cpp							
 cp ../../WonderGUI/src/base/wg_geo.h imports/wg3_geo.h							
 cp ../../WonderGUI/src/base/wg_gfxdevice.cpp imports/wg3_gfxdevice.cpp					

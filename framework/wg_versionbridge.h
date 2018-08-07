@@ -122,45 +122,45 @@ inline WgBlendMode _convert(wg::BlendMode m)
 	}
 }
 
-inline WgPixelType _convert(wg::PixelType t)
+inline WgPixelType _convert(wg::PixelFormat t)
 {
 	switch (t)
 	{
-	case wg::PixelType::Unknown:
+	case wg::PixelFormat::Unknown:
 		return WG_PIXEL_UNKNOWN;
-	case wg::PixelType::Custom:
+	case wg::PixelFormat::Custom:
 		return WG_PIXEL_CUSTOM;
-	case wg::PixelType::BGRA_8:
+	case wg::PixelFormat::BGRA_8:
 		return WG_PIXEL_BGRA_8;
-	case wg::PixelType::BGR_8:
+	case wg::PixelFormat::BGR_8:
 		return WG_PIXEL_BGR_8;
 	}
 	assert(false);									// Should never get here
 	return WG_PIXEL_UNKNOWN;						// Just avoiding compiler warnings
 }
 
-inline wg::PixelType _convert(WgPixelType t)
+inline wg::PixelFormat _convert(WgPixelType t)
 {
 	switch (t)
 	{
 	default:
 	case WG_PIXEL_UNKNOWN:
-		return wg::PixelType::Unknown;
+		return wg::PixelFormat::Unknown;
 	case WG_PIXEL_CUSTOM:
-		return wg::PixelType::Custom;
+		return wg::PixelFormat::Custom;
 	case WG_PIXEL_BGRA_8:
-		return wg::PixelType::BGRA_8;
+		return wg::PixelFormat::BGRA_8;
 	case WG_PIXEL_BGR_8:
-		return wg::PixelType::BGR_8;
+		return wg::PixelFormat::BGR_8;
 	}
 	assert(false);									// Should never get here
-	return wg::PixelType::Unknown;					// Just avoiding compiler warnings
+	return wg::PixelFormat::Unknown;					// Just avoiding compiler warnings
 }
 
-inline void _convert(const wg::PixelFormat& f, WgPixelFormat& out )
+inline void _convert(const wg::PixelDescription& f, WgPixelFormat& out )
 {
 	out.bits = f.bits;
-	out.type = _convert(f.type);
+	out.type = _convert(f.format);
 
 	out.R_mask = f.R_mask;
 	out.R_shift = f.R_shift;
@@ -180,10 +180,10 @@ inline void _convert(const wg::PixelFormat& f, WgPixelFormat& out )
 
 }
 
-inline void _convert(const WgPixelFormat& f, wg::PixelFormat& out )
+inline void _convert(const WgPixelFormat& f, wg::PixelDescription& out )
 {
 	out.bits = f.bits;
-	out.type = _convert(f.type);
+	out.format = _convert(f.type);
 
 	out.R_mask = f.R_mask;
 	out.R_shift = f.R_shift;

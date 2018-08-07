@@ -42,7 +42,7 @@ namespace wg
 
 		bool		markTestStretchRect( Coord ofs, Surface * pSurface, const Rect& source, const Rect& area, int opacityTreshold );
 
-		bool		pixelTypeToFormat( PixelType type, PixelFormat& wFormat );
+		bool		pixelFormatToDescription( PixelFormat format, PixelDescription& wFormat );
 
 		Coord 		origoToOfs( Origo origo, Size base );
 		Rect		origoToRect( Origo origo, Size base, Size rect );
@@ -98,4 +98,4 @@ namespace wg
 
 
 } // namespace wg
-#endif // WG_UTIL_DOT_H
+#endif // WG3_UTIL_DOT_H

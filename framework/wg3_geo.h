@@ -465,7 +465,7 @@ namespace wg
 	
 		bool intersection( const Rect& r1, const Rect& r2 );
 		static Rect getUnion( const Rect& r1, const Rect& r2 );
-	
+
 		void growToContain( int x, int y );
 		void growToContain( const Rect& rect );
 		void growToContain( const Coord& coord );
@@ -1105,4 +1105,4 @@ namespace wg
 	//=======================================================================================
 
 } // namespace wg
-#endif	//WG_GEO_DOT_H
+#endif	//WG3_GEO_DOT_H

@@ -74,4 +74,4 @@ namespace wg
 	
 
 } // namespace wg
-#endif //WG_INTERFACE_DOT_H
+#endif //WG3_INTERFACE_DOT_H

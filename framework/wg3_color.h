@@ -294,4 +294,4 @@ namespace wg
 	
 
 } // namespace wg
-#endif // WG_COLOR_DOT_H
+#endif // WG3_COLOR_DOT_H
