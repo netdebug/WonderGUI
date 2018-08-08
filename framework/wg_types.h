@@ -677,9 +677,14 @@ enum WgPixelType
 {
 	WG_PIXEL_UNKNOWN,			///< Pixelformat is unkown or can't be expressed in a PixelFormat struct.
 	WG_PIXEL_CUSTOM,			///< Pixelformat has no PixelType enum, but is fully specified through the PixelFormat struct.
+    WG_PIXEL_BGR_8,				///< One byte of blue, green and red in exactly that order in memory.
+    WG_PIXEL_BGRX_8,			///< One byte of blue, green, red and padding in exactly that order in memory.
+    WG_PIXEL_BGRA_8,			///< One byte of blue, green, red and alpha in exactly that order in memory.
+    WG_PIXEL_BGRA_4,			///< 4 bits each of blue, green, red and alpha in exactly that order in memory.
+    WG_PIXEL_BGR_565,			///< 5 bits of blue, 6 bits of green and 5 bits of red in exactly that order in memory.
+    WG_PIXEL_I8,				///< 8 bits of index into the CLUT (Color Lookup Table).
+    WG_PIXEL_A8					///< 8 bits of alpha only.
 
-	WG_PIXEL_BGR_8,				///< One byte of blue, green and red respectively in memory in exactly that order.
-	WG_PIXEL_BGRA_8				///< One byte of blue, green, red and alpha respectively in memory in exactly that order.
 };
 
 

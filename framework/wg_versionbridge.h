@@ -134,6 +134,16 @@ inline WgPixelType _convert(wg::PixelFormat t)
 		return WG_PIXEL_BGRA_8;
 	case wg::PixelFormat::BGR_8:
 		return WG_PIXEL_BGR_8;
+    case wg::PixelFormat::BGRX_8:
+        return WG_PIXEL_BGRX_8;
+    case wg::PixelFormat::BGR_565:
+        return WG_PIXEL_BGR_565;
+    case wg::PixelFormat::BGRA_4:
+        return WG_PIXEL_BGRA_4;
+    case wg::PixelFormat::I8:
+        return WG_PIXEL_I8;
+    case wg::PixelFormat::A8:
+        return WG_PIXEL_A8;
 	}
 	assert(false);									// Should never get here
 	return WG_PIXEL_UNKNOWN;						// Just avoiding compiler warnings
@@ -143,7 +153,6 @@ inline wg::PixelFormat _convert(WgPixelType t)
 {
 	switch (t)
 	{
-	default:
 	case WG_PIXEL_UNKNOWN:
 		return wg::PixelFormat::Unknown;
 	case WG_PIXEL_CUSTOM:
@@ -152,7 +161,18 @@ inline wg::PixelFormat _convert(WgPixelType t)
 		return wg::PixelFormat::BGRA_8;
 	case WG_PIXEL_BGR_8:
 		return wg::PixelFormat::BGR_8;
+    case WG_PIXEL_BGRX_8:
+        return wg::PixelFormat::BGRX_8;
+    case WG_PIXEL_BGR_565:
+        return wg::PixelFormat::BGR_565;
+    case WG_PIXEL_BGRA_4:
+        return wg::PixelFormat::BGRA_4;
+    case WG_PIXEL_I8:
+        return wg::PixelFormat::I8;
+    case WG_PIXEL_A8:
+        return wg::PixelFormat::A8;
 	}
+
 	assert(false);									// Should never get here
 	return wg::PixelFormat::Unknown;					// Just avoiding compiler warnings
 }

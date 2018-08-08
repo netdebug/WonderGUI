@@ -63,20 +63,6 @@ WgSize WgSurface::PointSize() const
 }
 
 
-//____ Width() ________________________________________________________________
-
-int WgSurface::Width() const
-{
-	return m_pRealSurface->width();
-}
-
-//____ Height() _______________________________________________________________
-
-int WgSurface::Height() const
-{
-	return m_pRealSurface->height();
-}
-
 //____ setScaleMode() _________________________________________________________
 
 void WgSurface::setScaleMode(WgScaleMode mode)

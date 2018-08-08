@@ -22,74 +22,44 @@
 #ifndef WG_KNOB_DOT_H
 #define WG_KNOB_DOT_H
 
-#ifndef WG_SURFACE_DOT_H
-#	include <wg_surface.h>
-#endif
 
-#ifndef WG_SURFACEFACTORY_DOT_H
-#	include <wg_surfacefactory.h>
-#endif
 #ifndef WG_WIDGET_DOT_H
 #	include <wg_widget.h>
 #endif
 
 #include <math.h>
 
-//____ WgKnob ____________________________________________________________
+//____ WgSimpleKnob ____________________________________________________________
 
 #define WG_KNOB_PIXEL_BUFFER_SIZE 1000
 
-class WgKnob : public WgWidget
+class WgSimpleKnob : public WgWidget
 {
 public:
-	WgKnob();
-    WgKnob(WgSurfaceFactory * pFactory);
-	virtual ~WgKnob();
+	WgSimpleKnob();
+	virtual ~WgSimpleKnob();
 
 	virtual const char *Type( void ) const;
 	static const char * GetClass();
-	virtual WgWidget * NewOfMyType() const { return new WgKnob(); };
+	virtual WgWidget * NewOfMyType() const { return new WgSimpleKnob(); };
 
-    void    SetOversample(int oversample) { m_iOversampleX = oversample; }
     void    SetValue( float value );
     float   GetValue() { return m_fValue; }
-    int     GetValueIndex()
-    {
-        int i = (int)(m_fValue * m_iNumSteps);
-        i = i>=m_iNumSteps?m_iNumSteps-1:i;
-        return i;
-    }
-    void    SetColor( WgColor color )
-    {
-        if( m_lineColor != color )
-        {
-            m_lineColor = color;
-            m_kForeground = color;
-            m_kBackground = color;
-            m_kBackground.a = 64;
-            _requestRender();
-        }
-    };
-    void    SetNumSteps(int steps);
-    void    SetWidth(float width) { m_iWidth = width; }
+    void    SetColor( WgColor color ) { if( m_lineColor != color ) {m_lineColor = color; _requestRender();} };
+    
 	WgSize	PreferredPixelSize() const;
-//    void    SetPreferredPixelSize(WgSize size);
-//    WgSize  PreferredPointSize() { PreferredPixelSize()*m_scale/WG_SCALE_BASE;}
-//    void    SetPreferredPointSize(WgSize size) { SetPreferredPixelSize(size*WG_SCALE_BASE/m_scale); }
+    void    SetPreferredPixelSize(WgSize size);
 
+    
 protected:
 	void	_onCloneContent( const WgWidget * _pOrg );
 	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip);
 	bool	_onAlphaTest( const WgCoord& ofs );
 	void	_onEnable();
 	void	_onDisable();
-    void    _onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler );
 
 
 private:
-    void _downsample(WgSurface* pSurf, int oversample);
-WgColor Blend( const WgColor& start, const WgColor& dest, float grade );
-    
     // Anti-alias
     void drawCircle(const int centerX, const int centerY, const float radX, const float radY);
     void drawLine(const float x0, const float y0, const float x1, const float y1);
@@ -107,26 +77,8 @@ WgColor Blend( const WgColor& start, const WgColor& dest, float grade );
     
     WgSize m_preferredSize;
 
-    class WgSurface* m_pSurf = nullptr;
-    class WgSurfaceFactory* m_pSurfaceFactory = nullptr;
+    
     float m_fValue;
-    
-    
-    // For new knob mode.
-    int m_iOversampleX = 1;
-    bool m_bPressed = false;
-    bool m_bPointerInside = false;
-    
-    WgColor m_kBackground = WgColor( 38,  169, 224, 64 );
-    WgColor m_kForeground = WgColor( 38,  169, 224, 255 );
-    float m_fAngleStart = 0.1f;
-    float m_fAngleEnd = 0.9f;
-    std::vector<float> m_AngleStart;
-    std::vector<float> m_AngleEnd;
-    int m_iNumSteps = 0;
-    float m_iWidth = 0.40f;//20f;
-
-    WgSize m_size = WgSize(0,0);
 };
 
 

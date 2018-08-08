@@ -37,8 +37,8 @@ WgBlockSkinPtr WgBlockSkin::Create()
 WgBlockSkinPtr WgBlockSkin::CreateStatic( WgSurface * pSurface, WgRect block, WgBorders frame )
 {
 	if( !pSurface || frame.Width() >= block.w || frame.Height() >= block.h ||
-		block.x < 0 || pSurface->Width() < block.Right() ||
-		block.y < 0 || pSurface->Height() < block.Bottom() )
+		block.x < 0 || pSurface->PixelSize().w < block.Right() ||
+		block.y < 0 || pSurface->PixelSize().h < block.Bottom() )
 		return 0;
 
 	WgBlockSkin * pSkin = new WgBlockSkin();
@@ -51,10 +51,10 @@ WgBlockSkinPtr WgBlockSkin::CreateStatic( WgSurface * pSurface, WgRect block, Wg
 WgBlockSkinPtr WgBlockSkin::CreateEnable( WgSurface * pSurface, WgSize blockSize, WgCoord ofsEnabled, WgCoord ofsDisabled, WgBorders frame )
 {
 	if( !pSurface || frame.Width() >= blockSize.w || frame.Height() >= blockSize.h ||
-		pSurface->Width() < ofsEnabled.x + blockSize.w ||
-		pSurface->Width() < ofsDisabled.x + blockSize.w ||
-		pSurface->Height() < ofsEnabled.y + blockSize.h ||
-		pSurface->Height() < ofsDisabled.y + blockSize.h )
+		pSurface->PixelSize().w < ofsEnabled.x + blockSize.w ||
+		pSurface->PixelSize().w < ofsDisabled.x + blockSize.w ||
+		pSurface->PixelSize().h < ofsEnabled.y + blockSize.h ||
+		pSurface->PixelSize().h < ofsDisabled.y + blockSize.h )
 		return 0;
 
 	WgBlockSkin * pSkin = new WgBlockSkin();
@@ -68,8 +68,8 @@ WgBlockSkinPtr WgBlockSkin::CreateEnable( WgSurface * pSurface, WgSize blockSize
 WgBlockSkinPtr WgBlockSkin::CreateClickable( WgSurface * pSurface, WgSize blockGeo, WgCoord blockStartOfs, WgSize blockPitch, WgBorders blockFrame )
 {
 	if( !pSurface || blockFrame.Width() >= blockGeo.w || blockFrame.Height() >= blockGeo.h ||
-		pSurface->Width() < blockStartOfs.x + blockGeo.w + blockPitch.w*3 ||
-		pSurface->Height() < blockStartOfs.y + blockGeo.h + blockPitch.h*3 )
+		pSurface->PixelSize().w < blockStartOfs.x + blockGeo.w + blockPitch.w*3 ||
+		pSurface->PixelSize().h < blockStartOfs.y + blockGeo.h + blockPitch.h*3 )
 		return 0;
 
 	WgBlockSkin * pSkin = new WgBlockSkin();
@@ -192,7 +192,7 @@ WgBlockSkinPtr WgBlockSkin::CreateEnableFromSurface( WgSurface * pSurface, int b
 	WgBlockSkin * pSkin = new WgBlockSkin();
 	pSkin->SetSurface( pSurface );
 
-	WgSize	sz = WgSize( (pSurface->Width()-blockSpacing)/2, pSurface->Height() );
+	WgSize	sz = WgSize( (pSurface->PixelSize().w-blockSpacing)/2, pSurface->PixelSize().h );
 
 	pSkin->SetBlockGeo( sz, blockFrame );
 	pSkin->SetAllBlocks( WgCoord(0,0) );
@@ -202,19 +202,19 @@ WgBlockSkinPtr WgBlockSkin::CreateEnableFromSurface( WgSurface * pSurface, int b
 
 WgBlockSkinPtr WgBlockSkin::CreateClickableFromSurface( WgSurface * pSurface, int blockSpacing, WgBorders blockFrame )
 {
-	WgSize	blockSize = WgSize( (pSurface->Width()-blockSpacing*3)/4, pSurface->Height() );
+	WgSize	blockSize = WgSize( (pSurface->PixelSize().w-blockSpacing*3)/4, pSurface->PixelSize().h );
 	return CreateClickable( pSurface, blockSize, WgCoord(0,0), WgSize(blockSize.w+blockSpacing,0), blockFrame );
 }
 
 WgBlockSkinPtr WgBlockSkin::CreateSelectableFromSurface( WgSurface * pSurface, int blockSpacing, WgBorders blockFrame )
 {
-	WgSize	blockSize( (pSurface->Width()-blockSpacing*2)/3, pSurface->Height() );
+	WgSize	blockSize( (pSurface->PixelSize().w-blockSpacing*2)/3, pSurface->PixelSize().h );
 	return CreateSelectable( pSurface, blockSize, WgCoord(0,0), WgSize(blockSize.w+blockSpacing,0), blockFrame );
 }
 
 WgBlockSkinPtr WgBlockSkin::CreateClickSelectableFromSurface( WgSurface * pSurface, int blockSpacing, WgBorders blockFrame )
 {
-	WgSize	blockSize( (pSurface->Width()-blockSpacing*4)/5, pSurface->Height() );
+	WgSize	blockSize( (pSurface->PixelSize().w-blockSpacing*4)/5, pSurface->PixelSize().h );
 	return CreateClickSelectable( pSurface, blockSize, WgCoord(0,0), WgSize(blockSize.w+blockSpacing,0), blockFrame );
 }
 
@@ -734,7 +734,7 @@ bool WgBlockSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgStat
 
 	WgRect center = WgRect(canvasSize) - m_frame.Scale(scale);
 	if( center.Contains(rect) )
-        return ( m_state[index].opaqueSections & (1<<(int)WG_CENTER) ) == true;
+        return ( m_state[index].opaqueSections & (1<<(int)WG_CENTER) ) != 0;
 
 	//
 /*

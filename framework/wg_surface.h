@@ -58,8 +58,10 @@ public:
 	virtual	WgSize		PixelSize() const;
     virtual WgSize      PointSize() const;
     
-	virtual	int			Width() const;
-	virtual	int			Height() const;
+    // Deprecated methods, not retina aware. Use PointSize().w, PointSize().h instead.
+    // virtual	int			Width() const;
+	// virtual	int			Height() const;
+
 	inline bool			IsOpaque() const { return m_pRealSurface->isOpaque(); }
 
     void                SetScaleFactor( int factor ) { m_scaleFactor = factor; }

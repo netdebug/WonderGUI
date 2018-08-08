@@ -77,10 +77,10 @@ public:
         bool quit = false;
         Resize_HQ_4ch(pSrc,
                       src->Pitch()/4,
-                      src->Height(),
+                      src->PixelSize().h,
                       pDest,
                       dest->Pitch()/4,
-                      dest->Height(),
+                      dest->PixelSize().h,
                       &quit );
 
 		src->Unlock();
@@ -456,7 +456,7 @@ public:
                                 unsigned int c = *dsrc2++;//dsrc[y*w1 + x];
                                 
                                 //NO: Check if we're in the padded area:
-                                if(x >= m_pOrgSurface->Width())
+                                if(x >= m_pOrgSurface->PixelSize().w)
                                     c = 0;
                                 
                                 unsigned int r_src = (c    ) & 0xFF;

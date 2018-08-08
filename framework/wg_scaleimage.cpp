@@ -106,8 +106,8 @@ void WgScaleImage::SetImageMaxSize( WgSize max )
 
 void WgScaleImage::_recalcImageRect( WgSize widgetSize )
 {
-	int w = m_pOrgSurface->Width();
-	int h = m_pOrgSurface->Height();
+    int w = m_pOrgSurface->PixelSize().w;
+	int h = m_pOrgSurface->PixelSize().h;
 
 	if( w > 0 && h > 0 )
 	{
