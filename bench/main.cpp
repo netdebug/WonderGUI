@@ -256,11 +256,11 @@ int main ( int argc, char** argv )
 
 
 	// Setup debug overlays
-	
+/*
 	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
 	pOverlaySkin->SetStateColor( WG_STATE_NORMAL, WgColor::transparent, WgColor::red );	
 	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 0 );
-
+	*/
 
 //	WgColor lineColor = WgColor::transparent;
 	WgColor lineColor = WgColor::white;
@@ -880,7 +880,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pMultiSlider->SetParamArray(params, 6, nullptr);
 
-	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin, 0);
+	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin);
 
 	pMultiSlider->AddSlider2D(0, 5, WG_NORTHWEST, 
 						[](WgMultiSlider::SetGeoVisitor& visitor) {

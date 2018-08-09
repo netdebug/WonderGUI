@@ -72,10 +72,11 @@ void WgMultiSlider::SetParamArray(Param * pArray, int size, std::function<void(i
 
 //____ SetDefaults() __________________________________________________________
 
-void WgMultiSlider::SetDefaults(const WgSkinPtr& pSliderBgSkin, const WgSkinPtr& pHandleSkin, WgBorders markExtension)
+void WgMultiSlider::SetDefaults(const WgSkinPtr& pSliderBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot, WgBorders markExtension)
 {
 	m_pDefaultBgSkin = pSliderBgSkin;
 	m_pDefaultHandleSkin = pHandleSkin;
+	m_defaultHandleHotspot = handleHotspot;
 	m_defaultMarkExtension = markExtension;
 }
 
@@ -380,8 +381,10 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 				WgRect sliderGeo = _sliderGeo(slider, PixelSize());
 				WgRect handleGeo = _sliderHandleGeo(slider, sliderGeo);
+				WgCoordF handleHotspot = slider.handleHotspot.x == -1.f ? m_defaultHandleHotspot : slider.handleHotspot;
 
-				WgCoord pos = p->PointerPixelPos() - m_selectPressOfs + WgCoord( (int)(handleGeo.w * slider.handleHotspot.x), (int)(handleGeo.h * slider.handleHotspot.y) );		// New hotspot pos for handle.
+
+				WgCoord pos = p->PointerPixelPos() - m_selectPressOfs + WgCoord( (int)(handleGeo.w * handleHotspot.x), (int)(handleGeo.h * handleHotspot.y) );		// New hotspot pos for handle.
 
 				pos = sliderGeo.Limit(pos);
 
@@ -672,10 +675,12 @@ WgRect  WgMultiSlider::_sliderHandleGeo(Slider& slider, const WgRect& sliderGeo)
 	WgSkinPtr pSkin = slider.pHandleSkin ? slider.pBgSkin : m_pDefaultHandleSkin;
 
 	WgSize sz = pSkin->MinSize(m_scale);
+	WgCoordF handleHotspot = slider.handleHotspot.x == -1.f ? m_defaultHandleHotspot : slider.handleHotspot;
+
 
 	WgCoord pos = { (int)(slider.handlePos.x * sliderGeo.w), (int)(slider.handlePos.y * sliderGeo.h) };
 	pos += sliderGeo.Pos();
-	pos -= { (int)(slider.handleHotspot.x * sz.w), (int)(slider.handleHotspot.y * sz.h) };
+	pos -= { (int)(handleHotspot.x * sz.w), (int)(handleHotspot.y * sz.h) };
 
 	return { pos,sz };
 }
@@ -995,6 +1000,14 @@ int WgMultiSlider::SetGeoVisitor::slidersEnd()
 { 
 	return m_pWidget->m_sliders.size();
 }
+
+//____ SetGeoVisitor::slider() ___________________________________________________
+
+int WgMultiSlider::SetGeoVisitor::slider()
+{
+	return m_pSlider - &m_pWidget->m_sliders.front();
+}
+
 
 //____ SetGeoVisitor::handleGeoPos() ___________________________________________________
 

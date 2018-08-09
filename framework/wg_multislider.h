@@ -105,6 +105,7 @@ public:
 
 		int		slidersBegin();
 		int		slidersEnd();
+		int		slider();
 
 		WgCoordF	handlePos(int slider);
 		WgRectF		geo(int slider);
@@ -121,13 +122,13 @@ public:
 
 	void	SetParamArray(Param * pArray, int size, std::function<void(int paramIdx)> paramModifiedCallback);
 
-	void	SetDefaults(const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgBorders markExtension);
+	void	SetDefaults(const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot = { 0.5f,0.5f }, WgBorders markExtension = WgBorders(0) );
 
 	int		AddSlider(	int paramIdx, WgDirection dir, SetGeoFunc pSetGeoFunc, SetHandlePosFunc pSetHandlePosFunc = nullptr, SetValueFunc pSetValueFunc = nullptr,
-		const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { 0.5f,0.5f }, WgBorders markExtension = WgBorders(0));
+		const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f,-1.f }, WgBorders markExtension = WgBorders(0));
 
 	int		AddSlider2D(int XparamIdx, int YparamIdx, WgOrigo origo, SetGeoFunc pSetGeoFunc, SetHandlePosFunc2D pSetHandlePosFunc = nullptr, SetValueFunc2D pSetValueFunc = nullptr,
-						const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { 0.5f,0.5f }, WgBorders markExtension = WgBorders(0) );
+						const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f, -1.f }, WgBorders markExtension = WgBorders(0) );
 
 	void	ParamModified(int index);
 
@@ -195,6 +196,7 @@ private:
 
 	WgSkinPtr			m_pDefaultBgSkin;
 	WgSkinPtr			m_pDefaultHandleSkin;
+	WgCoordF			m_defaultHandleHotspot = { 0.5f, 0.5f };
 	WgBorders			m_defaultMarkExtension;
 
 	std::vector<Slider>	m_sliders;
