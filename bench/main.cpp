@@ -859,11 +859,11 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	// Multislider widget
 
 	static WgMultiSlider::Param params[] = {	{ 0, 0.00f, -3.5f,2.1f, 5 },
-										{ 0, 0.25f, 0.f,1.f, 0 },
-										{ 0, 0.50f, 0.f,1.f, 0 },
-										{ 0, 0.75f, 0.f,1.f, 0 },
-										{ 0, 1.00f, 0.f,1.f, 0 },
-										{ 0, 0.50f, 0.f, 1.f, 0 } };
+										{ 1, 0.25f, 0.f,1.f, 0 },
+										{ 2, 0.50f, 0.f,1.f, 0 },
+										{ 3, 0.75f, 0.f,1.f, 0 },
+										{ 4, 1.00f, 0.f,1.f, 0 },
+										{ 5, 0.50f, 0.f, 1.f, 0 } };
 
 
 	WgSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::black, 1, WgColor::black);

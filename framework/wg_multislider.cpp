@@ -82,7 +82,7 @@ void WgMultiSlider::SetDefaults(const WgSkinPtr& pSliderBgSkin, const WgSkinPtr&
 
 //____ AddSlider() ____________________________________________________________
 
-int WgMultiSlider::AddSlider(int paramIdx, WgDirection dir, SetGeoFunc pSetGeoFunc, SetHandlePosFunc pSetHandlePosFunc,  SetValueFunc pSetValueFunc,
+int WgMultiSlider::AddSlider(int paramId, WgDirection dir, SetGeoFunc pSetGeoFunc, SetHandlePosFunc pSetHandlePosFunc,  SetValueFunc pSetValueFunc,
 							const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot, WgBorders markExtension)
 {
 	WgOrigo origo;
@@ -107,7 +107,7 @@ int WgMultiSlider::AddSlider(int paramIdx, WgDirection dir, SetGeoFunc pSetGeoFu
 	Slider& s = m_sliders.back();
 
 	s.origo = origo;
-	s.iParam = paramIdx;
+	s.iParam = _paramIdToIndex(paramId);
 	s.iSecondaryParam = -1;
 	s.markExtension = markExtension;
 	s.geoState = 0;
@@ -132,7 +132,7 @@ int WgMultiSlider::AddSlider(int paramIdx, WgDirection dir, SetGeoFunc pSetGeoFu
 
 //____ AddSlider2D() __________________________________________________________
 
-int WgMultiSlider::AddSlider2D(int XparamIdx, int YparamIdx, WgOrigo origo, SetGeoFunc pSetGeoFunc, SetHandlePosFunc2D pSetHandlePosFunc, SetValueFunc2D pSetValueFunc,
+int WgMultiSlider::AddSlider2D(int XparamId, int YparamId, WgOrigo origo, SetGeoFunc pSetGeoFunc, SetHandlePosFunc2D pSetHandlePosFunc, SetValueFunc2D pSetValueFunc,
 							const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot, WgBorders markExtension)
 {
 	if (origo != WG_NORTHWEST && origo != WG_NORTHEAST && origo != WG_SOUTHEAST && origo != WG_SOUTHWEST)
@@ -142,8 +142,8 @@ int WgMultiSlider::AddSlider2D(int XparamIdx, int YparamIdx, WgOrigo origo, SetG
 	Slider& s = m_sliders.back();
 
 	s.origo = origo;
-	s.iParam = XparamIdx;
-	s.iSecondaryParam = YparamIdx;
+	s.iParam = _paramIdToIndex(XparamId);
+	s.iSecondaryParam = _paramIdToIndex(YparamId);
 	s.markExtension = markExtension;
 	s.geoState = 0;
 	s.pBgSkin = pBgSkin;
@@ -166,12 +166,20 @@ int WgMultiSlider::AddSlider2D(int XparamIdx, int YparamIdx, WgOrigo origo, SetG
 	return m_sliders.size() - 1;
 }
 
-//____ ParamModified() ________________________________________________________
+//____ ParamsModified() ________________________________________________________
 
-void WgMultiSlider::ParamModified(int paramIdx)
+void WgMultiSlider::ParamsModified()
 {
 	_refreshSliders();
 }
+
+//____ ParamModified() ________________________________________________________
+
+void WgMultiSlider::ParamModified(int paramId)
+{
+	_refreshSliders();
+}
+
 
 //____ MarkTest() _____________________________________________________________
 
@@ -693,15 +701,26 @@ float WgMultiSlider::_setValue(Param& param, float value, Slider * pBySlider )
 
 	param.value = value;
 
+	// Callback
+
+	if (m_paramModifiedCallback)
+		m_paramModifiedCallback(param.id);
+
+	// Send event
+
 	WgEventHandler * pHandler = _eventHandler();
 	if (pHandler)
 		pHandler->QueueEvent(new WgEvent::ParamChanged(this,&param - m_pParams, param.id));
+
+	// Update slider positions in case some (other) slider is affected
 
 	for (auto& slider : m_sliders)
 	{
 		if( &slider != pBySlider )
 			_updateHandlePos(slider);
 	}
+
+	// Update geo in case some sliders geo is affected
 
 	_refreshSliderGeo();
 
@@ -880,6 +899,18 @@ void WgMultiSlider::_refreshSliderGeo()
 	}
 }
 
+//____ _paramIdToIndex() ______________________________________________________
+
+int WgMultiSlider::_paramIdToIndex(int paramId)
+{
+	for (int i = 0; i < m_nParams; i++)
+		if (m_pParams[i].id == paramId)
+			return i;
+
+	return -1;
+}
+
+
 
 //____ Visitor::paramBegin() ___________________________________________________
 
@@ -897,9 +928,11 @@ const WgMultiSlider::Param * WgMultiSlider::Visitor::paramEnd()
 
 //____ Visitor::param() ___________________________________________________
 
-const WgMultiSlider::Param * WgMultiSlider::Visitor::param(int idx)
+const WgMultiSlider::Param * WgMultiSlider::Visitor::param(int id)
 {
-	if (idx < 0 || idx >= m_pWidget->m_nParams)
+	int idx = m_pWidget->_paramIdToIndex(id);
+
+	if (idx < 0 )
 		return nullptr;
 
 	return &m_pWidget->m_pParams[idx];
