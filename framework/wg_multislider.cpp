@@ -82,7 +82,7 @@ void WgMultiSlider::SetDefaults(const WgSkinPtr& pSliderBgSkin, const WgSkinPtr&
 
 //____ AddSlider() ____________________________________________________________
 
-int WgMultiSlider::AddSlider(int paramIdx, WgDirection dir, SetGeoFunc pSetGeoFunc, SetHandlePosFunc pSetHandlePosFunc,  SetValueFunc pSetValueFunc,
+int WgMultiSlider::AddSlider(int paramId, WgDirection dir, SetGeoFunc pSetGeoFunc, SetHandlePosFunc pSetHandlePosFunc,  SetValueFunc pSetValueFunc,
 							const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot, WgBorders markExtension)
 {
 	WgOrigo origo;
@@ -107,7 +107,7 @@ int WgMultiSlider::AddSlider(int paramIdx, WgDirection dir, SetGeoFunc pSetGeoFu
 	Slider& s = m_sliders.back();
 
 	s.origo = origo;
-	s.iParam = paramIdx;
+	s.iParam = _paramIdToIndex(paramId);
 	s.iSecondaryParam = -1;
 	s.markExtension = markExtension;
 	s.geoState = 0;
@@ -132,7 +132,7 @@ int WgMultiSlider::AddSlider(int paramIdx, WgDirection dir, SetGeoFunc pSetGeoFu
 
 //____ AddSlider2D() __________________________________________________________
 
-int WgMultiSlider::AddSlider2D(int XparamIdx, int YparamIdx, WgOrigo origo, SetGeoFunc pSetGeoFunc, SetHandlePosFunc2D pSetHandlePosFunc, SetValueFunc2D pSetValueFunc,
+int WgMultiSlider::AddSlider2D(int XparamId, int YparamId, WgOrigo origo, SetGeoFunc pSetGeoFunc, SetHandlePosFunc2D pSetHandlePosFunc, SetValueFunc2D pSetValueFunc,
 							const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot, WgBorders markExtension)
 {
 	if (origo != WG_NORTHWEST && origo != WG_NORTHEAST && origo != WG_SOUTHEAST && origo != WG_SOUTHWEST)
@@ -142,8 +142,8 @@ int WgMultiSlider::AddSlider2D(int XparamIdx, int YparamIdx, WgOrigo origo, SetG
 	Slider& s = m_sliders.back();
 
 	s.origo = origo;
-	s.iParam = XparamIdx;
-	s.iSecondaryParam = YparamIdx;
+	s.iParam = _paramIdToIndex(XparamId);
+	s.iSecondaryParam = _paramIdToIndex(YparamId);
 	s.markExtension = markExtension;
 	s.geoState = 0;
 	s.pBgSkin = pBgSkin;
@@ -166,12 +166,20 @@ int WgMultiSlider::AddSlider2D(int XparamIdx, int YparamIdx, WgOrigo origo, SetG
 	return m_sliders.size() - 1;
 }
 
-//____ ParamModified() ________________________________________________________
+//____ ParamsModified() ________________________________________________________
 
-void WgMultiSlider::ParamModified(int paramIdx)
+void WgMultiSlider::ParamsModified()
 {
 	_refreshSliders();
 }
+
+//____ ParamModified() ________________________________________________________
+
+void WgMultiSlider::ParamModified(int paramId)
+{
+	_refreshSliders();
+}
+
 
 //____ MarkTest() _____________________________________________________________
 
@@ -210,7 +218,11 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSlider(WgCoord ofs, WgCoord * pOfs
 {
 	//TODO: Check distance for slightly marked and keep the closest one.
 
-	Slider * pSlightlyMarked = nullptr;
+	Slider *	pSlightlyMarked = nullptr;
+	WgRect		slightlyMarkedOfs;
+
+	Slider *	pFullyMarked = nullptr;
+	WgRect		fullyMarkedOfs;
 
 	if (ofs.x == 0 && ofs.y == 0)
 		return nullptr;
@@ -225,9 +237,8 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSlider(WgCoord ofs, WgCoord * pOfs
 
 			if (handleGeo.Contains(ofs) && pHandleSkin->MarkTest(ofs - handleGeo.Pos(), handleGeo.Size(), slider.handleState, m_markOpacity, m_scale))
 			{
-				if (pOfsOutput)
-					* pOfsOutput = ofs - handleGeo.Pos();
-				return &slider;
+				fullyMarkedOfs = ofs - handleGeo.Pos();
+				pFullyMarked = &slider;
 			}
 
 			WgBorders markExtension = slider.markExtension.IsEmpty() ? m_defaultMarkExtension : slider.markExtension;
@@ -238,14 +249,25 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSlider(WgCoord ofs, WgCoord * pOfs
 
 				if (extendedGeo.Contains(ofs))
 				{
-					if (pOfsOutput)
-						* pOfsOutput = ofs - handleGeo.Pos();
+					slightlyMarkedOfs = ofs - handleGeo.Pos();
 					pSlightlyMarked = &slider;
 				}
 			}
 		}
 	}
-	return pSlightlyMarked;
+
+	if (pFullyMarked)
+	{
+		if (pOfsOutput)
+			*pOfsOutput = fullyMarkedOfs;
+		return pFullyMarked;
+	}
+	else
+	{
+		if (pOfsOutput)
+			*pOfsOutput = slightlyMarkedOfs;
+		return pSlightlyMarked;
+	}
 }
 
 //____ _markSlider() __________________________________________________________
@@ -277,8 +299,24 @@ void WgMultiSlider::_markSlider(Slider * pSlider)
 		//		WgState oldState = pSlider->handleState;
 		pSlider->handleState.setHovered(true);
 
+		switch(pSlider->origo)
+		{
+		case WG_NORTH:
+		case WG_SOUTH:
+			m_pointerStyle = WG_POINTER_SIZE_N_S;
+			break;
+		case WG_WEST:
+		case WG_EAST:
+			m_pointerStyle = WG_POINTER_SIZE_W_E;
+			break;
+		default:
+			m_pointerStyle = WG_POINTER_SIZE_ALL;
+			break;
+		}
 		_requestRenderHandle(pSlider);
 	}
+	else
+		m_pointerStyle = WG_POINTER_DEFAULT;
 }
 
 //____ _selectSlider() ________________________________________________________
@@ -693,15 +731,26 @@ float WgMultiSlider::_setValue(Param& param, float value, Slider * pBySlider )
 
 	param.value = value;
 
+	// Callback
+
+	if (m_paramModifiedCallback)
+		m_paramModifiedCallback(param.id);
+
+	// Send event
+
 	WgEventHandler * pHandler = _eventHandler();
 	if (pHandler)
 		pHandler->QueueEvent(new WgEvent::ParamChanged(this,&param - m_pParams, param.id));
+
+	// Update slider positions in case some (other) slider is affected
 
 	for (auto& slider : m_sliders)
 	{
 		if( &slider != pBySlider )
 			_updateHandlePos(slider);
 	}
+
+	// Update geo in case some sliders geo is affected
 
 	_refreshSliderGeo();
 
@@ -880,6 +929,18 @@ void WgMultiSlider::_refreshSliderGeo()
 	}
 }
 
+//____ _paramIdToIndex() ______________________________________________________
+
+int WgMultiSlider::_paramIdToIndex(int paramId)
+{
+	for (int i = 0; i < m_nParams; i++)
+		if (m_pParams[i].id == paramId)
+			return i;
+
+	return -1;
+}
+
+
 
 //____ Visitor::paramBegin() ___________________________________________________
 
@@ -897,9 +958,11 @@ const WgMultiSlider::Param * WgMultiSlider::Visitor::paramEnd()
 
 //____ Visitor::param() ___________________________________________________
 
-const WgMultiSlider::Param * WgMultiSlider::Visitor::param(int idx)
+const WgMultiSlider::Param * WgMultiSlider::Visitor::param(int id)
 {
-	if (idx < 0 || idx >= m_pWidget->m_nParams)
+	int idx = m_pWidget->_paramIdToIndex(id);
+
+	if (idx < 0 )
 		return nullptr;
 
 	return &m_pWidget->m_pParams[idx];

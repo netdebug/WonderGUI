@@ -64,7 +64,7 @@ public:
 	public:
 		const Param * paramBegin();
 		const Param * paramEnd();
-		const Param * param(int idx);
+		const Param * param(int id);
 
 	protected:
 		WgMultiSlider * m_pWidget;
@@ -124,13 +124,14 @@ public:
 
 	void	SetDefaults(const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot = { 0.5f,0.5f }, WgBorders markExtension = WgBorders(0) );
 
-	int		AddSlider(	int paramIdx, WgDirection dir, SetGeoFunc pSetGeoFunc, SetHandlePosFunc pSetHandlePosFunc = nullptr, SetValueFunc pSetValueFunc = nullptr,
+	int		AddSlider(	int paramId, WgDirection dir, SetGeoFunc pSetGeoFunc, SetHandlePosFunc pSetHandlePosFunc = nullptr, SetValueFunc pSetValueFunc = nullptr,
 		const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f,-1.f }, WgBorders markExtension = WgBorders(0));
 
-	int		AddSlider2D(int XparamIdx, int YparamIdx, WgOrigo origo, SetGeoFunc pSetGeoFunc, SetHandlePosFunc2D pSetHandlePosFunc = nullptr, SetValueFunc2D pSetValueFunc = nullptr,
+	int		AddSlider2D(int XparamId, int YparamId, WgOrigo origo, SetGeoFunc pSetGeoFunc, SetHandlePosFunc2D pSetHandlePosFunc = nullptr, SetValueFunc2D pSetValueFunc = nullptr,
 						const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f, -1.f }, WgBorders markExtension = WgBorders(0) );
 
-	void	ParamModified(int index);
+	void	ParamsModified();
+	void	ParamModified(int id);
 
 	bool	MarkTest(const WgCoord& ofs) override;
 
@@ -154,7 +155,7 @@ protected:
 		WgSkinPtr		pBgSkin;
 		WgSkinPtr		pHandleSkin;
 		WgBorders		markExtension;		// Frame surrounding slider that also marks the slider. Measured in points, not pixels.
-		
+
 		SetHandlePosFunc	pSetHandlePosFunc;
 		SetHandlePosFunc2D	pSetHandlePosFunc2D;
 
@@ -190,7 +191,7 @@ protected:
 	void		_refreshSliders();
 	void		_refreshSliderGeo();
 
-
+	int			_paramIdToIndex(int paramId);
 
 private:
 
@@ -206,7 +207,7 @@ private:
 
 	Param *				m_pParams = nullptr;
 	int					m_nParams = 0;
-	std::function<void(int paramIdx)>	m_paramModifiedCallback = nullptr;
+	std::function<void(int paramId)>	m_paramModifiedCallback = nullptr;
 
 };
 

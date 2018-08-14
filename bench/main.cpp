@@ -859,11 +859,11 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	// Multislider widget
 
 	static WgMultiSlider::Param params[] = {	{ 0, 0.00f, -3.5f,2.1f, 5 },
-										{ 0, 0.25f, 0.f,1.f, 0 },
-										{ 0, 0.50f, 0.f,1.f, 0 },
-										{ 0, 0.75f, 0.f,1.f, 0 },
-										{ 0, 1.00f, 0.f,1.f, 0 },
-										{ 0, 0.50f, 0.f, 1.f, 0 } };
+										{ 1, 0.25f, 0.f,1.f, 0 },
+										{ 2, 0.25f, 0.f,1.f, 0 },
+										{ 3, 0.75f, 0.f,1.f, 0 },
+										{ 4, 1.00f, 0.f,1.f, 0 },
+										{ 5, 0.50f, 0.f, 1.f, 0 } };
 
 
 	WgSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::black, 1, WgColor::black);
@@ -882,6 +882,34 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin);
 
+	pMultiSlider->AddSlider(1, WG_RIGHT,
+		[](WgMultiSlider::SetGeoVisitor& visitor) {
+
+		return WgRectF(0.0f, 0.0f, 0.5f, 0.0f);
+	},
+		[](const WgMultiSlider::Param& param) {
+		return param.value;
+	},
+		[](WgMultiSlider::SetValueVisitor& visitor) {
+		return visitor.handleValue();
+	});
+
+	pMultiSlider->AddSlider(2, WG_RIGHT,
+		[](WgMultiSlider::SetGeoVisitor& visitor) {
+
+		return WgRectF(0.5f, 0.0f, 1.0f, 0.0f);
+	},
+		nullptr,nullptr
+//		[](const WgMultiSlider::Param& param) {
+//		return param.value;
+//	},
+//		[](WgMultiSlider::SetValueVisitor& visitor) {
+//		return visitor.handleValue();
+//	}
+);
+	
+	
+/*
 	pMultiSlider->AddSlider2D(0, 5, WG_NORTHWEST, 
 						[](WgMultiSlider::SetGeoVisitor& visitor) {
 							return WgRectF( 0.1f, 0.1f, 0.8f, 0.1f ); 
@@ -951,7 +979,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 						[](WgMultiSlider::SetValueVisitor& visitor) { 
 							return visitor.handleValue(); 
 						}, nullptr, nullptr, { 1.f,1.f }, WgBorders(10) );
-
+*/
 
 	pHook = pFlex->AddChild(pMultiSlider, WgRect(0, 0, 500, 300));
 
