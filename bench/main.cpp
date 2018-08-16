@@ -858,13 +858,6 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	// Multislider widget
 
-	static WgMultiSlider::Param params[] = {	{ 0, 0.00f, -3.5f,2.1f, 5 },
-										{ 1, 0.25f, 0.f,1.f, 0 },
-										{ 2, 0.25f, 0.f,1.f, 0 },
-										{ 3, 0.75f, 0.f,1.f, 0 },
-										{ 4, 1.00f, 0.f,1.f, 0 },
-										{ 5, 0.50f, 0.f, 1.f, 0 } };
-
 
 	WgSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::black, 1, WgColor::black);
 
@@ -878,42 +871,15 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pMultiSlider->SetSkin(WgBoxSkin::Create(WgColor::white, { 1 }, WgColor::black));
 
-	pMultiSlider->SetParamArray(params, 6, nullptr);
-
 	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin);
 
-	pMultiSlider->AddSlider(1, WG_RIGHT,
-		[](WgMultiSlider::SetGeoVisitor& visitor) {
-
-		return WgRectF(0.0f, 0.0f, 0.5f, 0.0f);
-	},
-		[](const WgMultiSlider::Param& param) {
-		return param.value;
-	},
-		[](WgMultiSlider::SetValueVisitor& visitor) {
-		return visitor.handleValue();
-	});
-
-	pMultiSlider->AddSlider(2, WG_RIGHT,
-		[](WgMultiSlider::SetGeoVisitor& visitor) {
-
-		return WgRectF(0.5f, 0.0f, 1.0f, 0.0f);
-	},
-		nullptr,nullptr
-//		[](const WgMultiSlider::Param& param) {
-//		return param.value;
-//	},
-//		[](WgMultiSlider::SetValueVisitor& visitor) {
-//		return visitor.handleValue();
-//	}
-);
 	
-	
-/*
-	pMultiSlider->AddSlider2D(0, 5, WG_NORTHWEST, 
+
+	pMultiSlider->AddSlider2D(0, WG_NORTHWEST, 
 						[](WgMultiSlider::SetGeoVisitor& visitor) {
 							return WgRectF( 0.1f, 0.1f, 0.8f, 0.1f ); 
 						},
+						0.00f, 0.50f, -3.5f, 2.1f, 5, 0.f, 1.f, 0,
 						nullptr,
 						nullptr
 						);
@@ -925,33 +891,30 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 							WgCoordF c = visitor.handlePos(0);
 							return WgRectF( r.x + r.w*c.x, r.y + r.h*c.y + 0.1f, 0.0f, 1.f - r.y -0.2f ); 
 						},
-						[](const WgMultiSlider::Param& param) {
-							return param.value;
+						0.25f, 0.f, 1.f, 0,
+						[](WgMultiSlider::SetHandleVisitor& visitor) {
+							return visitor.value();
 						},
-							[](WgMultiSlider::SetValueVisitor& visitor) {
+						[](WgMultiSlider::SetValueVisitor& visitor) {
 
 							static float prevValue = -1.f;
 
-							float	value = visitor.handleValue();
+							float	value = visitor.handleFactor();
 							if (value < 0.001f)
 								value = 0.001f;
 
 							if (prevValue == -1.f)
-								prevValue = visitor.handleValue();
+								prevValue = visitor.handleFactor();
 
 							float	scaleFactor = value/prevValue;
 
 
 							prevValue = value;
 
-							auto * p2 = visitor.param(2);
+							visitor.setHandleFactor(2, visitor.handleFactor(2)*scaleFactor);
+							visitor.setHandleFactor(3, visitor.handleFactor(3)*scaleFactor);
 
-							visitor.setParamValue(p2, p2->value*scaleFactor);
-
-							auto * p3 = visitor.param(3);
-							visitor.setParamValue(p3, p3->value*scaleFactor);
-
-							return visitor.handleValue();
+							return visitor.handleFactor();
 						});
 
 	pMultiSlider->AddSlider(2, WG_UP,
@@ -960,11 +923,12 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 							WgRectF r = visitor.geo(1);
 							return WgRectF(r.x-0.1f, r.y + 0.1f, r.w, r.h - 0.2f); 
 						},
-						[](const WgMultiSlider::Param& param) {
-							return param.value;
+						0.25f, 0.f, 1.f, 0,
+						[](WgMultiSlider::SetHandleVisitor& visitor) {
+							return visitor.value();
 						},
-							[](WgMultiSlider::SetValueVisitor& visitor) {
-							return visitor.handleValue(); 
+						[](WgMultiSlider::SetValueVisitor& visitor) {
+							return visitor.handleFactor(); 
 						});
 	
 	pMultiSlider->AddSlider(3, WG_UP,
@@ -973,13 +937,14 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 							WgRectF r = visitor.geo(1);
 							return WgRectF(r.x + 0.1f, r.y + 0.1f, r.w, r.h - 0.2f );
 						},
-						[](const WgMultiSlider::Param& param) {						
-							return param.value;
+						0.75f, 0.f, 1.f, 0,
+						[](WgMultiSlider::SetHandleVisitor& visitor) {						
+							return visitor.value();
 						},
 						[](WgMultiSlider::SetValueVisitor& visitor) { 
-							return visitor.handleValue(); 
+							return visitor.handleFactor(); 
 						}, nullptr, nullptr, { 1.f,1.f }, WgBorders(10) );
-*/
+
 
 	pHook = pFlex->AddChild(pMultiSlider, WgRect(0, 0, 500, 300));
 

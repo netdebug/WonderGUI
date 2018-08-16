@@ -911,12 +911,13 @@ namespace WgEvent
 
 	//____ MultiSlider event methods __________________________________________
 
-	ParamChanged::ParamChanged(WgMultiSlider * pSlider, int paramIndex, int paramId)
+	SliderMoved::SliderMoved(WgMultiSlider * pSlider, int sliderId, float value, float value2)
 	{
-		m_type		= WG_EVENT_PARAM_CHANGED;
+		m_type		= WG_EVENT_SLIDER_MOVED;
 		m_pWidget	= pSlider;
-		m_index		= paramIndex;
-		m_id		= paramId;
+		m_id		= sliderId;
+		m_value		= value;
+		m_value2	= value2;
 	}
 
 	//____ Link event methods __________________________________________________

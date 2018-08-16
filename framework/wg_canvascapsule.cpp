@@ -133,6 +133,16 @@ void WgCanvasCapsule::StopFade()
     _stopReceiveTicks();
 }
 
+//____ FindWidget() ___________________________________________________________
+
+WgWidget * WgCanvasCapsule::FindWidget(const WgCoord& ofs, WgSearchMode mode)
+{
+	if (mode == WG_SEARCH_GEOMETRY || m_tintColor.a > 0 || m_blendMode == WG_BLENDMODE_OPAQUE)
+		return WgCapsule::FindWidget(ofs, mode);
+
+	return nullptr;
+}
+
 //____ _onEvent() _____________________________________________________________
 
 void WgCanvasCapsule::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHandler)
@@ -348,13 +358,23 @@ void WgCanvasCapsule::_onRenderRequested(const WgRect& rect)
     _requestRender();
 }
 
+//____ _onCollectPatches() ____________________________________________________
 
 void WgCanvasCapsule::_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip )
 {
-    container.Add( WgRect( geo, clip ) );
+	if (m_tintColor.a > 0 || m_blendMode == WG_BLENDMODE_OPAQUE)
+		container.Add( WgRect( geo, clip ) );
 }
+
+//____ _onMaskPatches() _______________________________________________________
 
 void WgCanvasCapsule::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode )
 {
+	//TODO: Support recursive masking.
+
+	if( (m_tintColor.a == 255 && m_pCanvas->PixelFormat()->A_bits == 0) || m_blendMode == WG_BLENDMODE_OPAQUE)
+		patches.Sub(WgRect(geo, clip));
+
     return;
 }
+ 

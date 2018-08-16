@@ -618,18 +618,21 @@ namespace WgEvent
 
 	//____ WgMultiSlider events _______________________________________________
 
-	class ParamChanged : public Event
+	class SliderMoved : public Event
 	{
 		friend class ::WgMultiSlider;
 	public:
 		int id() const { return m_id; }
-		int index() const { return m_index; }
+
+		float value() { return m_value; }
+		float value2() { return m_value2; }
 
 	protected:
-		ParamChanged(WgMultiSlider * pSlider, int paramIndex, int paramId);
+		SliderMoved(WgMultiSlider * pSlider, int sliderId, float value, float value2 = NAN);
 
-		int	m_index;
-		int m_id;
+		int		m_id;
+		float	m_value;
+		float	m_value2;
 	};
 
 

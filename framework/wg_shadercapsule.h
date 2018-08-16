@@ -46,9 +46,14 @@ public:
 	inline WgBlendMode	BlendMode() { return m_blendMode; }
 	inline WgTintMode	TintMode() { return m_tintMode; }
 
+	WgWidget * 	FindWidget(const WgCoord& ofs, WgSearchMode mode);
 
 protected:
 	void		_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches );
+
+	void		_onCollectPatches(WgPatches& container, const WgRect& geo, const WgRect& clip);
+	void		_onMaskPatches(WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode);
+
 	void		_onCloneContent( const WgWidget * _pOrg );
 	WgBlendMode _getBlendMode() const;
 

@@ -84,6 +84,15 @@ void WgShaderCapsule::SetBlendMode( WgBlendMode mode )
 	}
 }
 
+//____ FindWidget() ___________________________________________________________
+
+WgWidget * WgShaderCapsule::FindWidget(const WgCoord& ofs, WgSearchMode mode)
+{
+	if (mode == WG_SEARCH_GEOMETRY || m_tintColor.a > 0 || m_blendMode == WG_BLENDMODE_OPAQUE)
+		return WgCapsule::FindWidget(ofs, mode);
+
+	return nullptr;
+}
 
 //____ _getBlendMode() _________________________________________________________
 
@@ -127,6 +136,26 @@ void WgShaderCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
 		pDevice->SetBlendMode(oldBM);
 		pDevice->SetTintColor(oldTC);
 	}
+}
+
+//____ _onCollectPatches() _____________________________________________________
+
+void WgShaderCapsule::_onCollectPatches(WgPatches& container, const WgRect& geo, const WgRect& clip)
+{
+	//TODO: This causes trouble if another shader capsule further down the hierarchy undo the shading.
+
+	if (m_tintColor.a > 0 || m_blendMode == WG_BLENDMODE_OPAQUE)
+		WgCapsule::_onCollectPatches(container, geo, clip);
+}
+
+//____ _onMaskPatches() ________________________________________________________
+
+void WgShaderCapsule::_onMaskPatches(WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode)
+{
+	//TODO: This causes trouble if another shader capsule further down the hierarchy undo the shading.
+
+	if (m_tintColor.a == 255 || m_blendMode == WG_BLENDMODE_OPAQUE)
+		WgCapsule::_onMaskPatches(patches, geo, clip, blendMode);		
 }
 
 //____ _onCloneContent() _______________________________________________________

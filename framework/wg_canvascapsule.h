@@ -57,10 +57,11 @@ public:
     void                SetTintMode( WgTintMode mode );
     void                SetBlendMode( WgBlendMode mode );
 
-    inline WgColor       Color() { return m_tintColor; }
-    inline WgBlendMode   BlendMode() { return m_blendMode; }
-    inline WgTintMode    TintMode() { return m_tintMode; }
+    inline WgColor      Color() { return m_tintColor; }
+    inline WgBlendMode  BlendMode() { return m_blendMode; }
+    inline WgTintMode   TintMode() { return m_tintMode; }
 
+	WgWidget * 			FindWidget(const WgCoord& ofs, WgSearchMode mode);
 
 protected:
     void            _onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHandler);

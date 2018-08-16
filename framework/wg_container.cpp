@@ -155,7 +155,7 @@ WgWidget * WgContainer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 			}
 			else if( mode == WG_SEARCH_GEOMETRY || pHook->Widget()->MarkTest( ofs - childGeo.Pos() ) )
 			{
-					pResult = pHook->Widget();
+				pResult = pHook->Widget();
 			}
 		}
 		pHook = _prevHookWithGeo( childGeo, pHook );
