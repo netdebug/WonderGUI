@@ -1169,12 +1169,14 @@ void WgEventHandler::_updateMarkedWidget(bool bPostMouseMoveEvents)
 	// Update PointerStyle
 	
 	WgPointerStyle newStyle;
-	
-	if( pNowMarked && pNowMarked->IsEnabled() )
+
+	WgWidget * p = m_latestPressWidgets[button].GetRealPtr();
+
+	if (button != 0 && p)
+		newStyle = p->GetPointerStyle();
+	else if (pNowMarked && pNowMarked->IsEnabled())
 		newStyle = pNowMarked->GetPointerStyle();
-	else if( button != 0 )
-		newStyle = m_pointerStyle;
-	else
+	else 
 		newStyle = WG_POINTER_DEFAULT;
 
 	if( newStyle != m_pointerStyle )
