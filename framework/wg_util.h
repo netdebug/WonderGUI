@@ -33,9 +33,27 @@ namespace WgUtil
 
     inline WgOrientation DirToOrient( WgDirection dir ) { return (dir == WG_UP || dir == WG_DOWN) ? WG_VERTICAL : WG_HORIZONTAL; }
     
+	WgState		FallbackState(WgState state, int step = 0);
 
 	template <class T> inline T Max (T a, T b) {return (a>b?a:b); }
 	template <class T> inline T Min (T a, T b) {return (a<b?a:b); }
+
+
+	inline int _stateToIndex(WgStateEnum state)
+	{
+		static int	s_stateToIndexTable[WG_MAX_STATE_VALUE + 1] = { 0, 1, 0, 0, 2, 3, 4, 5, 6, 7, 0, 0, 8, 9, 10, 11, 12, 0, 0, 0, 0, 0, 0, 0, 13 };
+		return s_stateToIndexTable[(uint8_t)state];
+	}
+
+	inline WgStateEnum _indexToState(int index)
+	{
+		static WgStateEnum	s_indexToStateTable[WG_NB_STATES] = { WG_STATE_NORMAL, WG_STATE_FOCUSED, WG_STATE_HOVERED, WG_STATE_HOVERED_FOCUSED, WG_STATE_PRESSED,
+			WG_STATE_PRESSED_FOCUSED, WG_STATE_SELECTED, WG_STATE_SELECTED_FOCUSED, WG_STATE_SELECTED_HOVERED, WG_STATE_SELECTED_HOVERED_FOCUSED,
+			WG_STATE_SELECTED_PRESSED, WG_STATE_SELECTED_PRESSED_FOCUSED, WG_STATE_DISABLED, WG_STATE_DISABLED_SELECTED };
+
+		return s_indexToStateTable[index];
+	}
+
 
 
 	// A simple checksum algorithm that just performs a long division

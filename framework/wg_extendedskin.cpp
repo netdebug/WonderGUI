@@ -21,6 +21,7 @@
 =========================================================================*/
 
 #include <wg_extendedskin.h>
+#include <wg_util.h>
 
 
 //____ SetContentPadding() ____________________________________________________
@@ -35,7 +36,7 @@ void WgExtendedSkin::SetContentPadding( WgBorders padding )
 
 void WgExtendedSkin::SetContentShift( WgStateEnum state, WgCoord shift )
 {
-	int index = _stateToIndex(state);
+	int index = WgUtil::_stateToIndex(state);
 	m_contentShift[index] = shift;
 }
 
@@ -43,49 +44,49 @@ void WgExtendedSkin::SetContentShift( WgStateEnum state, WgCoord shift )
 
 void WgExtendedSkin::SetHoveredContentShift( WgCoord shift )
 {
-	m_contentShift[_stateToIndex(WG_STATE_HOVERED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_HOVERED_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_HOVERED_FOCUSED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_HOVERED_FOCUSED_SELECTED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_HOVERED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_HOVERED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_HOVERED_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_HOVERED_FOCUSED)] = shift;
 
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_FOCUSED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_FOCUSED_SELECTED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_PRESSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_PRESSED_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED_FOCUSED)] = shift;
 }
 
 //____ SetPressedContentShift() _______________________________________________
 
 void WgExtendedSkin::SetPressedContentShift( WgCoord shift )
 {
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_FOCUSED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_FOCUSED_SELECTED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_PRESSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_PRESSED_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED_FOCUSED)] = shift;
 }
 
 //____ SetSelectedContentShift() ______________________________________________
 
 void WgExtendedSkin::SetSelectedContentShift( WgCoord shift )
 {
-	m_contentShift[_stateToIndex(WG_STATE_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_FOCUSED_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_HOVERED_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_HOVERED_FOCUSED_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_FOCUSED_SELECTED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_HOVERED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_HOVERED_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED_FOCUSED)] = shift;
 }
 
 //____ SetFocusedContentShift() _______________________________________________
 
 void WgExtendedSkin::SetFocusedContentShift( WgCoord shift )
 {
-	m_contentShift[_stateToIndex(WG_STATE_FOCUSED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_FOCUSED_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_HOVERED_FOCUSED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_HOVERED_FOCUSED_SELECTED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_FOCUSED)] = shift;
-	m_contentShift[_stateToIndex(WG_STATE_PRESSED_FOCUSED_SELECTED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_HOVERED_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_HOVERED_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_PRESSED_FOCUSED)] = shift;
+	m_contentShift[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED_FOCUSED)] = shift;
 }
 
 //____ MinSize() ______________________________________________________________
@@ -125,7 +126,7 @@ WgSize WgExtendedSkin::ContentPadding(int scale) const
 
 WgCoord	WgExtendedSkin::ContentOfs(WgState state, int scale) const
 {
-	WgCoord shift = m_contentShift[_stateToIndex(state)];
+	WgCoord shift = m_contentShift[WgUtil::_stateToIndex(state)];
 	shift.x = shift.x * scale >> WG_SCALE_BINALS;
 	shift.y = shift.y * scale >> WG_SCALE_BINALS;
 
@@ -137,7 +138,7 @@ WgCoord	WgExtendedSkin::ContentOfs(WgState state, int scale) const
 
 WgRect WgExtendedSkin::ContentRect( const WgRect& canvas, WgState state, int scale ) const
 {
-	WgCoord shift = m_contentShift[_stateToIndex(state)];
+	WgCoord shift = m_contentShift[WgUtil::_stateToIndex(state)];
 	shift.x = shift.x * scale >> WG_SCALE_BINALS;
 	shift.y = shift.y * scale >> WG_SCALE_BINALS;
 

@@ -23,6 +23,7 @@
 #include <wg_boxskin.h>
 #include <wg_gfxdevice.h>
 #include <wg_geo.h>
+#include <wg_util.h>
 
 #ifdef SOFTUBE_USE_PACE_FUSION
 #include "PaceFusion.h"
@@ -124,7 +125,7 @@ void WgBoxSkin::SetFrame( WgBorders frame, WgColor color )
 
 void WgBoxSkin::SetStateColor( WgStateEnum state, WgColor color )
 {
-	int i = _stateToIndex(state);
+	int i = WgUtil::_stateToIndex(state);
 
 	Uint8	oldAlpha = m_color[i].a;
 	m_color[i] = color;
@@ -134,7 +135,7 @@ void WgBoxSkin::SetStateColor( WgStateEnum state, WgColor color )
 
 void WgBoxSkin::SetStateColor( WgStateEnum state, WgColor color, WgColor frameColor )
 {
-	int i = _stateToIndex(state);
+	int i = WgUtil::_stateToIndex(state);
 
 	int		oldCombAlpha = ((int)m_color[i].a) + ((int)m_frameColor[i].a);
 	int		newCombAlpha = ((int)color.a) + ((int)frameColor.a);
@@ -153,7 +154,7 @@ PACE_FUSION_NO_USER_CALLBACK
 #endif
 void WgBoxSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip, int scale ) const
 {
-	int i = _stateToIndex(state);
+	int i = WgUtil::_stateToIndex(state);
 	if( m_frame.Width() + m_frame.Height() == 0 )
 	{
 		pDevice->Fill( _clip, m_color[i] );
@@ -215,7 +216,7 @@ bool WgBoxSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState 
 	if( m_bOpaque )
 		return true;
 
-	int i = _stateToIndex(state);
+	int i = WgUtil::_stateToIndex(state);
 
 	WgRect center = ContentRect(WgRect(canvasSize), state, scale);
 	if( center.Contains(ofs) )
@@ -237,7 +238,7 @@ bool WgBoxSkin::IsOpaque() const
 
 bool WgBoxSkin::IsOpaque( WgState state ) const
 {
-	int i = _stateToIndex(state);
+	int i = WgUtil::_stateToIndex(state);
 	if( m_bOpaque || (m_color[i].a == 255 && (m_frameColor[i] == 255 || (m_frame.Width() + m_frame.Height() == 0))) )
 		return true;
 
@@ -250,7 +251,7 @@ bool WgBoxSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState 
 		return true;
 
 	WgRect center = ContentRect(WgRect(canvasSize), state, scale);
-	int i = _stateToIndex(state);
+	int i = WgUtil::_stateToIndex(state);
 	if( center.Contains(rect) )
 		return m_color[i].a == 255;
 	else if( !center.IntersectsWith(rect) )

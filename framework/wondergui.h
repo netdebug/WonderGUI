@@ -305,4 +305,8 @@
 #	include <wg_listpanel.h>
 #endif
 
+#ifndef WG_MULTIBLOCKSKIN2_DOT_H
+#	include <wg_multiblockskin.h>
+#endif
+
 #endif //WONDERGUI_DOT_H

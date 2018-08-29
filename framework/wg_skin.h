@@ -64,10 +64,6 @@ public:
 protected:
 	WgSkin() {};
 	
-	static int	s_stateToIndexTable[WG_MAX_STATE_VALUE+1];
-
-	inline int _stateToIndex(WgStateEnum state) const { return s_stateToIndexTable[state]; }
-
 };
 
 #endif //WG_SKIN_DOT_H
