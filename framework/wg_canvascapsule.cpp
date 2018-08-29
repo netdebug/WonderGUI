@@ -372,7 +372,7 @@ void WgCanvasCapsule::_onMaskPatches( WgPatches& patches, const WgRect& geo, con
 {
 	//TODO: Support recursive masking.
 
-	if( (m_tintColor.a == 255 && m_pCanvas->PixelFormat()->A_bits == 0) || m_blendMode == WG_BLENDMODE_OPAQUE)
+	if( m_pCanvas && ((m_tintColor.a == 255 && m_pCanvas->PixelFormat()->A_bits == 0) || m_blendMode == WG_BLENDMODE_OPAQUE) )
 		patches.Sub(WgRect(geo, clip));
 
     return;

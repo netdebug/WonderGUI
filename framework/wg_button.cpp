@@ -246,25 +246,36 @@ void WgButton::_setScale( int scale )
 
 void WgButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
-
-	WgRect cli = _clip;
-	WgRect can = _canvas;
-	WgRect win = _window;
-
-	WgBlock	block;
-
-	WgRect contentRect = _canvas;
-
 	if (m_pSkin)
-	{
-		WgState	state;
-		state.setFocused(m_bFocused);
-		state.setSelected(m_bSelected);
-		state.setPressed(m_bPressed);
-		state.setEnabled(m_bEnabled);
-		contentRect = m_pSkin->ContentRect(_canvas, state, m_scale);
-	}
+    {
+        WgState    state;
+        state.setFocused(m_bFocused);
+        state.setSelected(m_bSelected);
+        state.setHovered(m_bPointerInside);
+        state.setPressed(m_bPressed);
+        state.setEnabled(m_bEnabled);
+
+        m_pSkin->Render(pDevice, state, _canvas, _clip, m_scale);
+    }
+
+    WgRect cli = _clip;
+    WgRect can = _canvas;
+    WgRect win = _window;
+
+    WgBlock    block;
+
+    WgRect contentRect = _canvas;
+
+    if (m_pSkin)
+    {
+        WgState    state;
+        state.setFocused(m_bFocused);
+        state.setSelected(m_bSelected);
+        state.setHovered(m_bPointerInside);
+        state.setPressed(m_bPressed);
+        state.setEnabled(m_bEnabled);
+        contentRect = m_pSkin->ContentRect(_canvas, state, m_scale);
+    }
 	else if (m_pBgGfx)
 	{
 		block = m_pBgGfx->GetBlock(m_mode, m_scale);

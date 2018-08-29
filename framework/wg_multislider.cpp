@@ -471,9 +471,11 @@ void WgMultiSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 {
 	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
 
+	WgRect contentCanvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
+
 	for (auto& slider : m_sliders)
 	{
-		WgRect sliderGeo = _sliderGeo(slider, _canvas);
+		WgRect sliderGeo = _sliderGeo(slider, contentCanvas);
 
 		WgSkinPtr pBgSkin = slider.pBgSkin ? slider.pBgSkin : m_pDefaultBgSkin;
 		if (pBgSkin)
