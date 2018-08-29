@@ -39,7 +39,7 @@ WgMultiBlockSkinPtr WgMultiBlockSkin::Create(WgSize blockSize, WgBorders frame)
 
 WgMultiBlockSkin::WgMultiBlockSkin(WgSize blockSize, WgBorders frame)
 {
-	m_blockSize = blockSize;
+	m_blockSizePoints = blockSize;
 	m_frame = frame;
 	m_bIsOpaque = false;
 
@@ -52,6 +52,13 @@ WgMultiBlockSkin::WgMultiBlockSkin(WgSize blockSize, WgBorders frame)
 
 int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord ofs)
 {
+	// HACK!
+
+	m_scale = pSurf->ScaleFactor();
+	m_blockSize = (m_blockSizePoints*m_scale) / WG_SCALE_BASE;
+
+	//
+
 	m_layers.emplace_back();
 	auto& layer = m_layers.back();
 
@@ -76,6 +83,13 @@ int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord ofs)
 
 int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord blockStartOfs, WgSize blockPitch, std::initializer_list<WgState> stateBlocks)
 {
+	// HACK!
+
+	m_scale = pSurf->ScaleFactor();
+	m_blockSize = (m_blockSizePoints*m_scale) / WG_SCALE_BASE;
+
+	//
+
 	m_layers.emplace_back();
 	auto& layer = m_layers.back();
 
