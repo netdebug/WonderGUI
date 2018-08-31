@@ -180,6 +180,8 @@ void WgTextDisplay::_onRefresh( void )
 
 void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler )
 {
+	bool bSwallowed = false;
+
 	int type 				= pEvent->Type();
 	WgModifierKeys modKeys 	= pEvent->ModKeys();
 
@@ -214,15 +216,21 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 			m_pText->clearSelection();
 			m_pText->setSelectionMode(true);
 		}
+
+		bSwallowed = true;
 	}
 	else if( type == WG_EVENT_MOUSEBUTTON_RELEASE  )
 	{
-		if(m_bFocused && ((const WgEvent::MouseButtonEvent*)(pEvent))->Button() == 1)
+		if (m_bFocused && ((const WgEvent::MouseButtonEvent*)(pEvent))->Button() == 1)
+		{
 			m_pText->setSelectionMode(false);
+			bSwallowed = true;
+		}
 	}
 	else if( !m_bFocused && IsEditable() && type == WG_EVENT_MOUSEBUTTON_PRESS && ((const WgEvent::MouseButtonEvent*)(pEvent))->Button() == 1 )
 	{
 		GrabFocus();
+		bSwallowed = true;
 	}
 
 
@@ -244,6 +252,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 			{
 				_insertCharAtCursor( '\t' );
 			}
+			bSwallowed = true;
 		}
 	}
 
@@ -254,7 +263,8 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 			case WG_KEY_SHIFT:
 				if(!pHandler->IsMouseButtonPressed(1))
 					m_pText->setSelectionMode(false);
-			break;
+				bSwallowed = true;
+				break;
 		}
 	}
 
@@ -270,6 +280,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 					m_pText->gotoPrevWord();
 				else
 					m_pText->goLeft();
+				bSwallowed = true;
 				break;
 			case WG_KEY_RIGHT:
 				if( modKeys & WG_MODKEY_SHIFT )
@@ -279,6 +290,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 					m_pText->gotoNextWord();
 				else
 					m_pText->goRight();
+				bSwallowed = true;
 				break;
 
 			case WG_KEY_UP:
@@ -286,6 +298,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 					m_pText->setSelectionMode(true);
 
 				m_pText->CursorGoUp( 1, ScreenPixelGeo() );
+				bSwallowed = true;
 				break;
 
 			case WG_KEY_DOWN:
@@ -293,6 +306,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 					m_pText->setSelectionMode(true);
 
 				m_pText->CursorGoDown( 1, ScreenPixelGeo() );
+				bSwallowed = true;
 				break;
 
 			case WG_KEY_BACKSPACE:
@@ -302,6 +316,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 					m_pText->delPrevWord();
 				else
 					m_pText->delPrevChar();
+				bSwallowed = true;
 				break;
 
 			case WG_KEY_DELETE:
@@ -311,6 +326,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 					m_pText->delNextWord();
 				else
 					m_pText->delNextChar();
+				bSwallowed = true;
 				break;
 
 			case WG_KEY_HOME:
@@ -321,6 +337,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 					m_pText->goBOF();
 				else
 					m_pText->goBOL();
+				bSwallowed = true;
 				break;
 
 			case WG_KEY_END:
@@ -331,6 +348,7 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 					m_pText->goEOF();
 				else
 					m_pText->goEOL();
+				bSwallowed = true;
 				break;
 
 			default:
@@ -347,23 +365,10 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 
 	// Forward event depending on rules.
 
-	if( pEvent->IsMouseButtonEvent() )
+	if (!bSwallowed)
 	{
-		if( static_cast<const WgEvent::MouseButtonEvent*>(pEvent)->Button() != 1 )
-			pHandler->ForwardEvent( pEvent );
+		pHandler->ForwardEvent(pEvent);
 	}
-	else if( pEvent->IsKeyEvent() )
-	{
-		int key = static_cast<const WgEvent::KeyEvent*>(pEvent)->TranslatedKeyCode();
-		if( static_cast<const WgEvent::KeyEvent*>(pEvent)->IsMovementKey() == false &&
-			key != WG_KEY_DELETE && key != WG_KEY_BACKSPACE && key != WG_KEY_RETURN && (key != WG_KEY_TAB || !m_bTabLock) )
-				pHandler->ForwardEvent( pEvent );
-
-		//TODO: Would be good if we didn't forward any character-creating keys either...
-	}
-	else if( type != WG_EVENT_CHARACTER )
-		pHandler->ForwardEvent( pEvent );
-
 }
 
 

@@ -505,6 +505,7 @@ enum	WgEventType
 	WG_EVENT_CHARACTER,
 	WG_EVENT_MOUSEWHEEL_ROLL,
 
+	WG_EVENT_SELECTED,						// Posted every time a popup menu entry is selected. Should be used by more widgets in the future.
 	WG_EVENT_BUTTON_PRESS,					// Posted every time a button is pressed, either by left mouse button or enter key.
 
 	WG_EVENT_CHECKBOX_CHECK,
@@ -537,7 +538,7 @@ enum	WgEventType
 	WG_EVENT_MENUITEM_CHECK,				// Posted when a WgMenuCheckBox is checked.
 	WG_EVENT_MENUITEM_UNCHECK,				// Posted when a WgMenuCheckBox is unchecked.
 
-	WG_EVENT_MENU_CLOSED,
+	WG_EVENT_POPUP_CLOSED,
 
 	WG_EVENT_MODAL_MOVE_OUTSIDE,
 	WG_EVENT_MODAL_BLOCKED_PRESS,

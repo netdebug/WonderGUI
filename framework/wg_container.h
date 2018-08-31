@@ -54,6 +54,7 @@ class WgContainer : public WgWidgetHolder, public WgWidget
 	friend class WgVectorPanel;
 	friend class WgListPanel;
 	friend class WgCapsule;
+	friend class WgPopupOpener;
 
 	public:
 
@@ -108,7 +109,7 @@ class WgContainer : public WgWidgetHolder, public WgWidget
 		bool 			_focusReleased( WgHook * pBranch, WgWidget * pWidgetReleasing );		// Needed until WgPanel inherits from WgWidget
 
 		virtual WgModalLayer *	_getModalLayer() const;
-		virtual WgMenuLayer*	_getMenuLayer() const;
+		virtual WgPopupLayer*	_getPopupLayer() const;
 
 		virtual void	_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode );
 		virtual void	_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip );

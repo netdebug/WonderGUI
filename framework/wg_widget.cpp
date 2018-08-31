@@ -277,6 +277,14 @@ bool WgWidget::SetNormal()
 		return false;
 }
 
+//____ SetSelectable() ________________________________________________________
+
+void WgWidget::SetSelectable(bool bSelectable)
+{
+	m_bSelectable = bSelectable;
+}
+
+
 //____ Mode() _________________________________________________________________
 
 WgMode WgWidget::Mode() const

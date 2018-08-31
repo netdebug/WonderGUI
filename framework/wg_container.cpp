@@ -211,6 +211,7 @@ bool WgContainer::_focusReleased( WgHook * pBranch, WgWidget * pWidgetReleasing 
 		return false;
 }
 
+//____ _getModalLayer() _______________________________________________________
 
 WgModalLayer *  WgContainer::_getModalLayer() const
 {
@@ -220,14 +221,16 @@ WgModalLayer *  WgContainer::_getModalLayer() const
 		return p->_getModalLayer();
 	else
 		return 0;
-}
+} 
 
-WgMenuLayer * WgContainer::_getMenuLayer() const
+//____ _getPopupLayer() _______________________________________________________
+
+WgPopupLayer *  WgContainer::_getPopupLayer() const
 {
 	const WgContainer * p = Parent();
 
-	if( p )
-		return p->_getMenuLayer();
+	if (p)
+		return p->_getPopupLayer();
 	else
 		return 0;
 }

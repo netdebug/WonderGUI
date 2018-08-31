@@ -45,6 +45,9 @@
 #include <wg_scrollchart.h>
 #include <wg_canvascapsule.h>
 
+#include <wg_popupopener.h>
+#include <wg_popuplayer.h>
+
 #include "testwidget.h"
 
 #define USE_OPEN_GL
@@ -170,7 +173,7 @@ int main ( int argc, char** argv )
 	sdl_wglib::MapKeys();
 
 
-//	WgBase::InitFreeType();
+	WgBase::InitFreeType();
 
 	// Setup gfxdevice and gui
 
@@ -199,21 +202,21 @@ int main ( int argc, char** argv )
 
 
 	// Load TTF-font
-/*
-	WgVectorGlyphs::SetSurfaceFactory( * pSurfaceFactory );
 
-	char	ttfname[] = { "a.ttf" };
+	WgVectorGlyphs::SetSurfaceFactory( g_pSurfaceFactory );
 
-	int size = fileSize( ttfname );
-	char * pFontFile = (char*) loadFile( ttfname );
+	char	ttfname[] = { "../resources/DroidSans.ttf" };
+
+	int size = sdl_wglib::FileSize( ttfname );
+	char * pFontFile = (char*) sdl_wglib::LoadFile( ttfname );
 	WgVectorGlyphs * pGlyphs = new WgVectorGlyphs( pFontFile , size, 0 );
 
 	WgFont * pFont = new WgFont();
 	pFont->SetDefaultVectorGlyphs( pGlyphs );
-*/
+
 	// Load bitmap font
 
-	WgFont * pFont = sdl_wglib::LoadBitmapFont( "../resources/anuvverbubbla_8x8.png", "../resources/anuvverbubbla_8x8.fnt", * g_pSurfaceFactory );
+//	WgFont * pFont = sdl_wglib::LoadBitmapFont( "../resources/anuvverbubbla_8x8.png", "../resources/anuvverbubbla_8x8.fnt", * g_pSurfaceFactory );
 
 	// Load and setup cursor
 
@@ -244,8 +247,8 @@ int main ( int argc, char** argv )
 	WgTextprop prop;
 
 	prop.SetFont(pFont);
-	prop.SetColor( WgColor::white );
-	prop.SetSize(8);
+	prop.SetColor( WgColor::black );
+	prop.SetSize(16);
 
 	WgBase::SetDefaultTextprop( prop.Register() );
 
@@ -253,7 +256,6 @@ int main ( int argc, char** argv )
 	WgRootPanel * pRoot = setupGUI( g_pGfxDevice );
 	
 	
-
 
 	// Setup debug overlays
 /*
@@ -559,17 +561,25 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	WgSurface * pAnimSurf = sdl_wglib::LoadSurface("../resources/dummy_anim.png", *g_pSurfaceFactory);
 
+	WgSurface * pPlateImg_x2 = sdl_wglib::LoadSurface("../resources/grey_pressable_plate_x2.bmp", *g_pSurfaceFactory);
+	pPlateImg_x2->SetScaleFactor(4096 * 2);
+
+	auto pPressablePlateSkin = WgBlockSkin::CreateClickableFromSurface(pPlateImg, 0, WgBorders(3));
+
 
 //	WgBlockSkinPtr pTagSkin = WgBlockSkin::Create();
 
 
+	// Popup Layer
 
-
+	WgPopupLayer * pPopupLayer = new WgPopupLayer();
+	pRoot->SetChild(pPopupLayer);
 
 	// Bottom Flex
 
 	WgFlexPanel * pBottom = new WgFlexPanel();
-	pRoot->SetChild(pBottom);
+	pPopupLayer->SetBase(pBottom); 
+//	pRoot->SetChild(pBottom);
 	pBottom->SetSkin(WgColorSkin::Create(WgColor::black));
 
 	// Main Flex
@@ -751,26 +761,122 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pFlex->AddChild(p, { 10 + i * 110, 10, 100, 100 });
 	}
 */
+
+	// Popup Layer Test
+	
+	{
+		auto pOpener = new WgPopupOpener();
+
+		pOpener->SetSkin(pPressablePlateSkin);
+		pOpener->SetText("OPEN");
+//		pOpener->setPointerStyle(PointerStyle::Crosshair);
+
+		pFlex->AddChild(pOpener, WgRect(30, 30, 100, 100) );
+
+
+
+		auto pMenu = new WgPackPanel();
+		pMenu->SetOrientation(WG_VERTICAL);
+//		pMenu->setSelectable(false);
+
+		auto pSkin = WgBoxSkin::Create(WgColor::red, WgBorders(0), WgColor::red );
+		pSkin->SetContentPadding(12);
+		pMenu->SetSkin(pSkin);
+
+		auto pEntry1 = new WgTextDisplay();
+		pEntry1->SetText("Entry One");
+		pEntry1->SetSkin(pPressablePlateSkin);
+		pMenu->AddChild(pEntry1);
+
+		auto pEntry2 = new WgTextDisplay();
+		pEntry2->SetText("Entry Two");
+		pEntry2->SetSkin(pPressablePlateSkin);
+		pMenu->AddChild(pEntry2);
+
+		auto pEntry3 = new WgTextDisplay();
+		pEntry3->SetText("Entry Three");
+		pEntry3->SetSkin(pPressablePlateSkin);
+		pMenu->AddChild(pEntry3);
+
+		auto pSubMenuOpener = new WgPopupOpener();
+		pSubMenuOpener->SetText("Sub Menu");
+		pSubMenuOpener->SetSkin(pPressablePlateSkin);
+		pSubMenuOpener->SetOpenOnHover(true);
+		pMenu->AddChild(pSubMenuOpener);
+
+
+		auto pSubMenu = new WgPackPanel();
+		pSubMenu->SetOrientation(WG_VERTICAL);
+		pSubMenu->SetSkin(pSkin);
+
+		auto pSubEntry1 = new WgTextDisplay();
+		pSubEntry1->SetText("Subentry One");
+		pSubEntry1->SetSkin(pPressablePlateSkin);
+		pSubMenu->AddChild(pSubEntry1);
+
+		auto pSubEntry2 = new WgTextDisplay();
+		pSubEntry2->SetText("Subentry Two");
+		pSubEntry2->SetSkin(pPressablePlateSkin);
+		pSubMenu->AddChild(pSubEntry2);
+
+		auto pSubEntry3 = new WgTextDisplay();
+		pSubEntry3->SetText("Subentry Three");
+		pSubEntry3->SetSkin(pPressablePlateSkin);
+		pSubMenu->AddChild(pSubEntry3);
+
+		pSubMenuOpener->SetPopup(pSubMenu);
+
+		auto pButtons = new WgPackPanel();
+		
+		auto pBtn1 = new WgButton();
+		pBtn1->SetSkin(pPressablePlateSkin);
+		pBtn1->SetText("Button 1");
+		pButtons->AddChild(pBtn1);
+
+		auto pBtn2 = new WgButton();
+		pBtn2->SetSkin(pPressablePlateSkin);
+		pBtn2->SetText("Button 2");
+		pButtons->AddChild(pBtn2);
+
+		pMenu->AddChild(pButtons);
+
+		pOpener->SetPopup( pMenu );
+
+	}
+
+
+
 	// Button skin test
 /*
-	auto pSkin = WgBoxSkin::Create(WgColor::cornsilk, 2, WgColor::deeppink );
-	pSkin->SetContentPadding(3);
-	pSkin->SetContentShift(WG_STATE_PRESSED, { 2,2 });
+	pFlex->SetScale(4096 * 8);
+
+	auto pSkin = WgMultiBlockSkin::Create({ 10,10 }, WgBorders(2));
+
+	int hLayer = pSkin->AddLayer(pPlateImg_x2, { 0,0 }, { 10,0 }, { WG_STATE_NORMAL } );
+	pSkin->SetLayerTint(hLayer, { { WG_STATE_HOVERED, WgColor::red}, { WG_STATE_PRESSED, WgColor( 0,255,0,128 ) } } );
+
+	hLayer = pSkin->AddLayer(pPlateImg_x2, { 5,0 } );
+	pSkin->SetLayerTint(hLayer, { { WG_STATE_NORMAL, WgColor::transparent },{ WG_STATE_PRESSED, WgColor(255,0,0,128) } });
+	pSkin->SetLayerBlendMode(hLayer, WgBlendMode::WG_BLENDMODE_ADD);
+
+	auto pSkin2 = WgBlockSkin::CreateClickable( pPlateImg_x2, { 10,10 }, { 0,0 }, { 10,0 }, WgBorders(2) );
+//	pSkin->SetContentPadding(3);
+//	pSkin->SetContentShift(WG_STATE_PRESSED, { 2,2 });
 
 	auto pButton = new WgButton();
 	pButton->SetSkin(pSkin);
-	pButton->SetText("TEST");
-	pFlex->AddChild(pButton);
-
+//	pButton->SetText("    ");
+	pFlex->AddChild(pButton, WgCoord(20,20) );
+*/
 	// TextDisplay skin test
 
-	auto pText = new WgTextDisplay();
-	pText->SetSkin(pSkin);
-	pText->SetText("THIS IS THE TEST TEXT");
-	pFlex->AddChild(pText, WgCoord(100,100));
-*/
+//	auto pText = new WgTextDisplay();
+//	pText->SetSkin(pSkin);
+//	pText->SetText("THIS IS THE TEST TEXT");
+//	pFlex->AddChild(pText, WgCoord(100,100));
 
-	// PackPanel Scale Test
+
+// PackPanel Scale Test
 /*
 	auto pMyFlex = new WgFlexPanel();
 	pFlex->AddChild(pMyFlex, WG_NORTHWEST, WG_SOUTHEAST );
@@ -798,7 +904,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 
-	// Text InputFocus test
+// Text InputFocus test
 
 /*
 	WgBlockSkinPtr pSkin = WgBlockSkin::CreateStatic(pPlateImg, { 0,0,10,10 }, 3);
@@ -856,8 +962,13 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 //	pFlex->SetScale(WG_SCALE_BASE * 2);
 
 
-	// Multislider widget
+	// Cursor belong to widget as long as button pressed
 
+
+
+
+	// Multislider widget
+/*
 
 	WgSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::black, 1, WgColor::black);
 
@@ -869,11 +980,10 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	auto pMultiSlider = new WgMultiSlider();
 
-	pMultiSlider->SetSkin(WgBoxSkin::Create(WgColor::white, { 1 }, WgColor::black));
+	pMultiSlider->SetSkin(WgBoxSkin::Create(WgColor::white, { 1 }, WgColor::green));
 
 	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin);
 
-	
 
 	pMultiSlider->AddSlider2D(0, WG_NORTHWEST, 
 						[](WgMultiSlider::SetGeoVisitor& visitor) {
@@ -946,10 +1056,10 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 						}, nullptr, nullptr, { 1.f,1.f }, WgBorders(10) );
 
 
-	pHook = pFlex->AddChild(pMultiSlider, WgRect(0, 0, 500, 300));
+	pHook = pFlex->AddChild(pMultiSlider, WgRect(0, 0, 450, 300));
 
 	pFlex->SetScale(WG_SCALE_BASE * 2);
-
+*/
 	// Scroll chart widget
 
 /*

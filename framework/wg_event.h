@@ -54,7 +54,7 @@ class WgValueDisplay;
 class WgValueEditor;
 class WgWidgetSlider;
 class WgMenu;
-class WgMenuLayer;
+class WgPopupLayer;
 class WgModalLayer;
 class WgTablePanel;
 class WgInterfaceEditText;
@@ -291,6 +291,17 @@ namespace WgEvent
 		ButtonPress( WgButton * pWidget );
 		WgButton *	Button() const;
 	};
+
+	//____ Generic events _____________________________________________________
+
+	class Selected : public Event
+	{
+	public:
+		Selected(WgWidget * pWidget);
+	};
+
+
+
 
 	//____ WgCheckBox events ______________________________________________
 
@@ -542,14 +553,14 @@ namespace WgEvent
 		MenuitemUncheck( WgMenu * pMenu, int menuItemId );
 	};
 
-	//____ WgMenuLayer events __________________________________________________
+	//____ WgPopupLayer events __________________________________________________
 
-	class MenuClosed : public Event
+	class PopupClosed : public Event
 	{
-		friend class ::WgMenuLayer;
+		friend class ::WgPopupLayer;
 	public:
-		WgWidget *		Menu() const;									// Inlining this would demand include of wg_widget.h.
-		WgWidgetWeakPtr	MenuWeakPtr() const { return m_pMenu; }
+		WgWidget *		Popup() const;									// Inlining this would demand include of wg_widget.h.
+		WgWidgetWeakPtr	PopupWeakPtr() const { return m_pPopup; }
 
 		// Caller is the same as m_pWidget, since m_pWidget should receive
 		// the event.
@@ -558,10 +569,11 @@ namespace WgEvent
 		WgWidgetWeakPtr	CallerWeakPtr() const { return m_pWidget; }
 
 	protected:
-		MenuClosed( WgWidget * pMenu, const WgWidgetWeakPtr& pCaller );
+		PopupClosed( WgWidget * pMenu, const WgWidgetWeakPtr& pCaller );
 
-		WgWidgetWeakPtr m_pMenu;
+		WgWidgetWeakPtr m_pPopup;
 	};
+
 
 	//____ WgWidgetModalLayer events _________________________________________________
 

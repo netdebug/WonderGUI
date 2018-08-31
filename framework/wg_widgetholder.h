@@ -36,7 +36,7 @@ class WgPanel;
 class WgCapsule;
 class WgLayer;
 class WgModalLayer;
-class WgMenuLayer;
+class WgPopupLayer;
 class WgCoord;
 
 class WgWidgetHolder

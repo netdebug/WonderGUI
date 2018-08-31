@@ -219,7 +219,7 @@ void WgCombobox::_closeMenu()
 {
 	if( Parent() )
 	{
-		WgMenuLayer * pLayer = Parent()->_getMenuLayer();
+		WgMenuLayer * pLayer = Parent()->_getPopupLayer();
 		if( pLayer )
 			pLayer->CloseMenu( m_pMenu );
 
@@ -342,7 +342,7 @@ void WgCombobox::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHan
 
 					if( Parent() )
 					{
-						WgMenuLayer * pLayer = Parent()->_getMenuLayer();
+						WgMenuLayer * pLayer = Parent()->_getPopupLayer();
 						if( pLayer )
 						{
 							pLayer->OpenMenu( m_pMenu, this, m_pHook->ScreenPixelGeo() - pLayer->ScreenPixelPos(), WG_SOUTHWEST );

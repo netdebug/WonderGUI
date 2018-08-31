@@ -493,6 +493,15 @@ namespace WgEvent
 			return 0;
 	}
 
+	//____ Selected _________________________________________________________
+
+	Selected::Selected(WgWidget * pWidget)
+	{
+		m_type = WG_EVENT_SELECTED;
+		m_pWidget = pWidget;
+	}
+
+
 
 	//____ Checkbox event methods ______________________________________________
 
@@ -820,27 +829,28 @@ namespace WgEvent
 		m_pWidget	= pMenu;
 		m_itemId	= menuItemId;
 	}
+	*/
 
-	//____ MenuLayer event methods ____________________________________________
+	//____ PopupLayer event methods ____________________________________________
 
-	MenuClosed::MenuClosed( WgWidget * pMenu, const WgWidgetWeakPtr& pCaller )
+	PopupClosed::PopupClosed( WgWidget * pPopup, const WgWidgetWeakPtr& pCaller )
 	{
-		m_type		= WG_EVENT_MENU_CLOSED;
+		m_type		= WG_EVENT_POPUP_CLOSED;
 		m_pWidget	= pCaller;
 		m_bIsForWidget	= true;
-		m_pMenu		= pMenu;
+		m_pPopup	= pPopup;
 	}
 
-	WgWidget * MenuClosed::Menu() const
+	WgWidget * PopupClosed::Popup() const
 	{
-		return m_pMenu.GetRealPtr();
+		return m_pPopup.GetRealPtr();
 	}
 
-	WgWidget * MenuClosed::Caller() const
+	WgWidget * PopupClosed::Caller() const
 	{
 		return m_pWidget.GetRealPtr();
 	}
-  */
+  
 	//____ Modal event methods ___________________________________________________
 
 	ModalMoveOutside::ModalMoveOutside( WgWidget * pWidget )

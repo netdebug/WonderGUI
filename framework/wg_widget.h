@@ -80,7 +80,7 @@ friend class WgPanel;
 friend class WgPackPanel;
 friend class WgShaderCapsule;
 friend class WgCanvasCapsule;
-friend class WgMenuLayer;
+friend class WgPopupLayer;
 friend class WgFlowPanel;
 
 friend class WgTableRow;
@@ -183,7 +183,17 @@ public:
 	virtual bool	SetMarked();					// Switch to WG_MODE_MARKED unless we are disabled or widget controls mode itself.
 	virtual bool	SetSelected();					// Switch to WG_MODE_SELECTED unless we are disabled or widget controls mode itself.
 	virtual bool	SetNormal();					// Switch to WG_MODE_NORMAL unless we are disabled or widget controls mode itself.
+
+	inline bool		IsSelected() { return m_bSelected; }
+
+	void			SetSelectable(bool bSelectable);
+	inline bool		IsSelectable() const { return m_bSelectable; };
+
+
 	virtual WgMode	Mode() const;
+
+
+
 #ifdef WG_DEBUG_DIRTY_RECTS
     bool update;
 #endif
@@ -249,6 +259,9 @@ protected:
 	bool			m_bEnabled;		// Set when object is not disabled
 	bool			m_bFocused;		// Set when object is enabled and has keyboard focus
 	bool			m_bSelected;	
+
+	bool			m_bSelectable = true;	// Set if widget is allowed to be selected.
+
 };
 
 typedef class WgWeakPtr<WgWidget> WgWidgetWeakPtr;
