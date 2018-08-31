@@ -21,8 +21,6 @@
     <ClCompile Include="framework\wg_color.cpp" />
     <ClCompile Include="framework\wg_colorset.cpp" />
     <ClCompile Include="framework\wg_colorskin.cpp" />
-    <ClCompile Include="framework\wg_combobox.cpp" />
-    <ClCompile Include="framework\wg_container.cpp" />
     <ClCompile Include="framework\wg_cursor.cpp" />
     <ClCompile Include="framework\wg_cursorinstance.cpp" />
     <ClCompile Include="framework\wg_event.cpp" />
@@ -52,10 +50,6 @@
     <ClCompile Include="framework\wg_listpanel.cpp" />
     <ClCompile Include="framework\wg_mempool.cpp" />
     <ClCompile Include="framework\wg_memstack.cpp" />
-    <ClCompile Include="framework\wg_menu.cpp" />
-    <ClCompile Include="framework\wg_menubar.cpp" />
-    <ClCompile Include="framework\wg_menuitem.cpp" />
-    <ClCompile Include="framework\wg_menulayer.cpp" />
     <ClCompile Include="framework\wg_modallayer.cpp" />
     <ClCompile Include="framework\wg_orderedselectable.cpp" />
     <ClCompile Include="framework\wg_oscilloscope.cpp" />
@@ -118,6 +112,9 @@
     <ClCompile Include="framework\wg3_nullgfxdevice.cpp" />
     <ClCompile Include="framework\wg_multislider.cpp" />
     <ClCompile Include="framework\wg3_enumextras.cpp" />
+    <ClCompile Include="framework\wg_multiblockskin.cpp" />
+    <ClCompile Include="framework\wg_popuplayer.cpp" />
+    <ClCompile Include="framework\wg_container.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h" />
@@ -141,7 +138,6 @@
     <ClInclude Include="framework\wg_color.h" />
     <ClInclude Include="framework\wg_colorset.h" />
     <ClInclude Include="framework\wg_colorskin.h" />
-    <ClInclude Include="framework\wg_combobox.h" />
     <ClInclude Include="framework\wg_container.h" />
     <ClInclude Include="framework\wg_cursor.h" />
     <ClInclude Include="framework\wg_cursorinstance.h" />
@@ -152,7 +148,6 @@
     <ClInclude Include="framework\wg_eventlogger.h" />
     <ClInclude Include="framework\wg_extendedskin.h" />
     <ClInclude Include="framework\wg_filler.h" />
-    <ClInclude Include="framework\wg_flexpanel.h" />
     <ClInclude Include="framework\wg_flowpanel.h" />
     <ClInclude Include="framework\wg_font.h" />
     <ClInclude Include="framework\wg_fpsdisplay.h" />
@@ -174,10 +169,6 @@
     <ClInclude Include="framework\wg_listpanel.h" />
     <ClInclude Include="framework\wg_mempool.h" />
     <ClInclude Include="framework\wg_memstack.h" />
-    <ClInclude Include="framework\wg_menu.h" />
-    <ClInclude Include="framework\wg_menubar.h" />
-    <ClInclude Include="framework\wg_menuitem.h" />
-    <ClInclude Include="framework\wg_menulayer.h" />
     <ClInclude Include="framework\wg_modallayer.h" />
     <ClInclude Include="framework\wg_orderedselectable.h" />
     <ClInclude Include="framework\wg_oscilloscope.h" />
@@ -256,5 +247,7 @@
     <ClInclude Include="framework\wg3_base.h" />
     <ClInclude Include="framework\wg_multislider.h" />
     <ClInclude Include="framework\wg3_enumextras.h" />
+    <ClInclude Include="framework\wg_multiblockskin.h" />
+    <ClInclude Include="framework\wg_popuplayer.h" />
   </ItemGroup>
 </Project>
