@@ -33,7 +33,6 @@
 #include <wg_slider.h>
 #include <wg_textdisplay.h>
 #include <wg_lineeditor.h>
-//#include <wg_menu.h>
 #include <wg_tablepanel.h>
 #include <wg_multislider.h>
 

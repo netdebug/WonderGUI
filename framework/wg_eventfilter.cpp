@@ -31,7 +31,6 @@
 #include <wg_animplayer.h>
 #include <wg_tablist.h>
 #include <wg_valueeditor.h>
-//#include <wg_menu.h>
 
 #ifdef SOFTUBE_USE_PACE_FUSION
 #include "PaceFusion.h"
