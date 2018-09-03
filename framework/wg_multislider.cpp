@@ -73,7 +73,7 @@ void WgMultiSlider::SetDefaults(const WgSkinPtr& pSliderBgSkin, const WgSkinPtr&
 
 //____ SetCallback() __________________________________________________________
 
-void WgMultiSlider::SetCallback(std::function<void(int sliderId, float value, float value2 )>& callback)
+void WgMultiSlider::SetCallback(const std::function<void(int sliderId, float value, float value2 )>& callback)
 {
 	m_callback = callback;
 }
@@ -188,18 +188,60 @@ int WgMultiSlider::AddSlider2D( int id, WgOrigo origo, SetGeoFunc pSetGeoFunc, f
 	return m_sliders.size() - 1;
 }
 
+//____ RemoveAllSliders() _______________________________________________________
+
+void WgMultiSlider::RemoveAllSliders()
+{
+    m_sliders.clear();
+    m_selectedSlider = -1;
+
+    _requestRender();
+}
+
+
 //____ SetSliderValue() _______________________________________________________
 
 float WgMultiSlider::SetSliderValue(int id, float value, float value2)
 {
 	Slider * p = _findSlider(id);
-	if (!p || p->is2D)
+	if (!p || (p->is2D == isnan(value2)) )
 		return NAN;
 
 	return _setValue(*p, value, value2);
 }
 
+//____ HandlePointPos() ________________________________________________________
 
+WgCoord WgMultiSlider::HandlePointPos( int sliderId )
+{
+    WgCoord pixelPos = HandlePixelPos(sliderId);
+
+    if(pixelPos.x == -1 && pixelPos.y == -1 )
+        return pixelPos;
+
+    return pixelPos*WG_SCALE_BASE / m_scale;
+}
+
+//____ HandlePixelPos() ________________________________________________________
+
+WgCoord WgMultiSlider::HandlePixelPos( int sliderId )
+{
+    WgCoord pos(-1,-1);
+
+    Slider * p = _findSlider(sliderId);
+    if( p )
+    {
+        WgRect canvas = m_pSkin ? m_pSkin->ContentRect( PixelSize(), WG_STATE_NORMAL, m_scale ) : WgRect(PixelSize());
+        WgRect sliderGeo = _sliderGeo(*p, canvas);
+
+        pos.x = sliderGeo.x + sliderGeo.w * p->handlePos.x;
+        pos.y = sliderGeo.y + sliderGeo.h * p->handlePos.y;
+
+        if( m_pSkin )
+            pos += m_pSkin->ContentOfs( WG_STATE_NORMAL, m_scale );
+    }
+    return pos;
+}
 
 //____ MarkTest() _____________________________________________________________
 
@@ -453,7 +495,8 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 			}
 			break;
 		}
-
+        default:
+            break;
 	}
 }
 
@@ -550,7 +593,10 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 		WgCoordF values;
 
 		if (slider.pSetHandleFunc2D)
-			values = slider.pSetHandleFunc2D(SetHandleVisitor2D(this, &slider));
+        {
+            auto v = SetHandleVisitor2D(this, &slider);
+            values = slider.pSetHandleFunc2D(v);
+        }
 		else
 		{
 			values.x = (slider.value[0] - slider.bounds[0].min) / (slider.bounds[0].max - slider.bounds[0].min);
@@ -574,6 +620,8 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 			handlePos.x = values.x;
 			handlePos.y = 1.f - values.y;
 			break;
+        default:
+            assert(false);   // Should never get here!
 		}
 	}
 	else
@@ -581,7 +629,10 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 		float value;
 			
 		if (slider.pSetHandleFunc)
-			value = slider.pSetHandleFunc(SetHandleVisitor(this, &slider));
+        {
+            auto v = SetHandleVisitor(this, &slider);
+			value = slider.pSetHandleFunc(v);
+        }
 		else
 			value = (slider.value[0] - slider.bounds[0].min) / (slider.bounds[0].max - slider.bounds[0].min);
 
@@ -603,6 +654,8 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 			handlePos.y = 1.f - value;
 			y = 0;
 			break;
+        default:
+            assert(false);   // Should never get here!
 		}
 	}
 
@@ -689,7 +742,7 @@ void WgMultiSlider::_updateGeo(Slider& slider)
 
 			// If we have background we just merge that into the geometries
 
-			if (slider.pHandleSkin || m_pDefaultBgSkin)
+			if (slider.pBgSkin || m_pDefaultBgSkin)
 			{
 				oldGeo.GrowToContain(_sliderSkinGeo(slider, oldSliderGeo));
 				newGeo.GrowToContain(_sliderSkinGeo(slider, newSliderGeo));
@@ -708,7 +761,9 @@ void WgMultiSlider::_updateGeo(Slider& slider)
 
 WgRect  WgMultiSlider::_sliderGeo(Slider& slider, const WgRect& _canvas )
 {
-	return { _canvas.x + (int)(slider.geo.x * _canvas.w), _canvas.y + (int)(slider.geo.y * _canvas.h), (int)(_canvas.w * slider.geo.w), (int)(_canvas.h * slider.geo.h) };
+    WgRect canvas = m_pSkin ? m_pSkin->ContentRect( _canvas, WG_STATE_NORMAL, m_scale ) : _canvas;
+
+	return { canvas.x + (int)(slider.geo.x * canvas.w), canvas.y + (int)(slider.geo.y * canvas.h), (int)(canvas.w * slider.geo.w), (int)(canvas.h * slider.geo.h) };
 }
 
 //____ _sliderSkinGeo() _______________________________________________________
@@ -717,22 +772,28 @@ WgRect  WgMultiSlider::_sliderSkinGeo(Slider& slider, const WgRect& sliderGeo)
 {
 	WgSkinPtr pSkin = slider.pBgSkin ? slider.pBgSkin : m_pDefaultBgSkin;
 
-	WgRect bgGeo = sliderGeo;
-	bgGeo -= pSkin->ContentOfs(WG_STATE_NORMAL, m_scale);
-	bgGeo += pSkin->ContentPadding(m_scale);
+    if(pSkin)
+    {
+        WgRect bgGeo = sliderGeo;
+        bgGeo -= pSkin->ContentOfs(WG_STATE_NORMAL, m_scale);
+        bgGeo += pSkin->ContentPadding(m_scale);
 
-	WgSize min = pSkin->MinSize(m_scale);
+        WgSize min = pSkin->PreferredSize(m_scale);
 
-	return { bgGeo.Pos(),std::max(bgGeo.w,min.w), std::max(bgGeo.h,min.h) };
+        return { bgGeo.Pos(),std::max(bgGeo.w,min.w), std::max(bgGeo.h,min.h) };
+    }
+    else
+        return sliderGeo;
+
 }
 
 //____ _sliderHandleGeo() _____________________________________________________
 
 WgRect  WgMultiSlider::_sliderHandleGeo(Slider& slider, const WgRect& sliderGeo)
 {
-	WgSkinPtr pSkin = slider.pHandleSkin ? slider.pBgSkin : m_pDefaultHandleSkin;
+	WgSkinPtr pSkin = slider.pHandleSkin ? slider.pHandleSkin : m_pDefaultHandleSkin;
 
-	WgSize sz = pSkin->MinSize(m_scale);
+	WgSize sz = pSkin->PreferredSize(m_scale);
 	WgCoordF handleHotspot = slider.handleHotspot.x == -1.f ? m_defaultHandleHotspot : slider.handleHotspot;
 
 
@@ -747,42 +808,51 @@ WgRect  WgMultiSlider::_sliderHandleGeo(Slider& slider, const WgRect& sliderGeo)
 
 float WgMultiSlider::_setValue(Slider& slider, float value, float value2 )
 {
-	WG_LIMIT(value, slider.bounds[0].max, slider.bounds[0].max);
-	slider.value[0] = value;
+    bool bUpdate = false;
+
+    WG_LIMIT(value, slider.bounds[0].min, slider.bounds[0].max);
+
+    if(value != slider.value[0] )
+    {
+        slider.value[0] = value;
+        bUpdate = true;
+    }
 
 	if ( !isnan(value2) )
 	{
-		WG_LIMIT(value2, slider.bounds[1].max, slider.bounds[1].max);
-		slider.value[1] = value2;
+		WG_LIMIT(value2, slider.bounds[1].min, slider.bounds[1].max);
+
+        if(value2 != slider.value[1] )
+        {
+            slider.value[1] = value2;
+            bUpdate = true;
+        }
 	}
 
-	// Callback
+    if( bUpdate )
+    {
+        // Update handle position
 
-	if (m_callback)
-		m_callback(slider.id, value, value2);
+        _updateHandlePos(slider);
 
-	// Send event
+        // Update geo in case some sliders geo is affected
 
-	WgEventHandler * pHandler = _eventHandler();
-	if (pHandler)
-		pHandler->QueueEvent(new WgEvent::SliderMoved(this,slider.id, value, value2));
+        _refreshSliderGeo();
 
-	// Update slider positions in case some (other) slider is affected
-/*
-	for (auto& s : m_sliders)
-	{
-		if( &s != &slider )
-			_updateHandlePos(s);
-	}
-*/
-	// Update geo in case some sliders geo is affected
+        // Callback
 
-	_refreshSliderGeo();
+        if (m_callback)
+            m_callback(slider.id, value, value2);
 
+        // Send event
+
+        WgEventHandler * pHandler = _eventHandler();
+        if (pHandler)
+            pHandler->QueueEvent(new WgEvent::SliderMoved(this,slider.id, value, value2));
+        
+    }
 	return value;
 }
-
-
 
 
 //____ _setHandlePosition() ______________________________________________
@@ -813,6 +883,8 @@ WgCoordF WgMultiSlider::_setHandlePosition(Slider& slider, WgCoordF pos)
 		x = 0;
 		y = 1;
 		break;
+    default:
+        assert(false);   // Should never get here!
 	}
 
 	// Align position to even step sizes.
@@ -939,6 +1011,8 @@ WgCoordF WgMultiSlider::_convertFactorPos(WgCoordF in, WgOrigo origo)
 	case WG_SOUTHWEST:
 		pos.y = 1.f - pos.y;
 		break;
+    default:
+        assert(false);   // Should never get here!
 	}
 
 	return pos;

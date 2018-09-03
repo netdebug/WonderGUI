@@ -139,7 +139,7 @@ public:
 	
 
 	void	SetDefaults(const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot = { 0.5f,0.5f }, WgBorders markExtension = WgBorders(0) );
-	void	SetCallback(std::function<void(int sliderId, float value, float value2)>& callback);
+	void	SetCallback(const std::function<void(int sliderId, float value, float value2)>& callback);
 
 
 	int		AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, float startValue = 0.f, float minValue = 0.f, float maxValue = 1.f, int steps = 0,
@@ -151,8 +151,12 @@ public:
 						SetHandleFunc2D pSetHandleFunc = nullptr, SetValueFunc2D pSetValueFunc = nullptr,
 						const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f, -1.f }, WgBorders markExtension = WgBorders(0) );
 
+    void    RemoveAllSliders();
+
 	float	SetSliderValue(int id, float value, float value2 = NAN);
 
+    WgCoord HandlePointPos( int sliderId );
+    WgCoord HandlePixelPos( int sliderId );
 
 	bool	MarkTest(const WgCoord& ofs) override;
 

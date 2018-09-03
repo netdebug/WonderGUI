@@ -954,11 +954,11 @@ namespace wg
 		int srcPixelBytes = pSrcSurf->m_pixelDescription.bits / 8;
 		int	srcPitch = pSrcSurf->m_pitch;
 
-		int pixelIncX = (int)(matrix[0][0] * 32768);
-		int pixelIncY = (int)(matrix[0][1] * 32768);
+		int pixelIncX = ((int)(matrix[0][0] * 32768))-1;
+		int pixelIncY = ((int)(matrix[0][1] * 32768))-1;
 
-		int lineIncX = (int)(matrix[1][0] * 32768);
-		int lineIncY = (int)(matrix[1][1] * 32768);
+		int lineIncX = ((int)(matrix[1][0] * 32768))-1;
+		int lineIncY = ((int)(matrix[1][1] * 32768))-1;
 
 
 		int tintB, tintG, tintR, tintA;
@@ -1053,8 +1053,8 @@ namespace wg
 		int srcPixelBytes = pSrcSurf->m_pixelDescription.bits / 8;
 		int	srcPitch = pSrcSurf->m_pitch;
 
-		int pixelIncX = (int)(matrix[0][0] * 32768);
-		int lineIncY = (int)(matrix[1][1] * 32768);
+		int pixelIncX = ((int)(matrix[0][0] * 32768)-1);
+		int lineIncY = ((int)(matrix[1][1] * 32768)-1);
 
 		int tintB, tintG, tintR, tintA;
 
@@ -1352,7 +1352,7 @@ namespace wg
 			return;
 
 		Color fillColor = col * m_tintColor;
-		ColTrans	colTrans{ Color::White, nullptr, nullptr };
+		ColTrans	colTrans = { Color::White, nullptr, nullptr };
 
 		// Skip calls that won't affect destination
 
@@ -1384,7 +1384,7 @@ namespace wg
 			return;
 
 		Color fillColor = col * m_tintColor;
-		ColTrans	colTrans{ Color::White, nullptr, nullptr };
+		ColTrans	colTrans = { Color::White, nullptr, nullptr };
 
 
 		// Skip calls that won't affect destination
@@ -1521,7 +1521,7 @@ namespace wg
 			return;
 	
 		Color fillColor = color * m_tintColor;
-		ColTrans	colTrans{ Color::White, nullptr, nullptr };
+		ColTrans	colTrans = { Color::White, nullptr, nullptr };
 
 		// Skip calls that won't affect destination
 	
@@ -1588,7 +1588,7 @@ namespace wg
 			return;
 
 		_col = _col * m_tintColor;
-		ColTrans	colTrans{ Color::White, nullptr, nullptr };
+		ColTrans	colTrans = { Color::White, nullptr, nullptr };
 
 
 		int pixelBytes = m_canvasPixelBits / 8;
@@ -1679,7 +1679,7 @@ namespace wg
 			return;
 	
 		Color fillColor = color * m_tintColor;
-		ColTrans	colTrans{ Color::White, nullptr, nullptr };
+		ColTrans	colTrans = { Color::White, nullptr, nullptr };
 
 		// Skip calls that won't affect destination
 	
@@ -1787,7 +1787,7 @@ namespace wg
 			return;
 
 		_col = _col * m_tintColor;
-		ColTrans	colTrans{ Color::White, nullptr, nullptr };
+		ColTrans	colTrans = { Color::White, nullptr, nullptr };
 
 		int pixelBytes = m_canvasPixelBits / 8;
 		FillOp_p	pOp = s_fillOpTab[(int)m_blendMode][(int)m_pCanvas->pixelFormat()];
@@ -3016,7 +3016,7 @@ namespace wg
 		const int pitch =m_canvasPitch;
 		const int pixelBytes = m_canvasPixelBits/8;
 
-		ColTrans	colTrans{ Color::White, nullptr, nullptr };
+		ColTrans	colTrans = { Color::White, nullptr, nullptr };
 
 		PlotListOp_p pOp = s_plotListOpTab[(int)m_blendMode][(int)m_pCanvas->pixelFormat()];
 
@@ -3045,7 +3045,7 @@ namespace wg
 		if (!m_pCanvasPixels || !pSrcSurf->m_pData)
 			return;
 
-		ColTrans			colTrans{ m_tintColor, nullptr, nullptr };
+		ColTrans			colTrans = { m_tintColor, nullptr, nullptr };
 
 		int				tintMode = m_tintColor == Color::White ? 0 : 1;
 		PixelFormat		srcFormat = pSrcSurf->m_pixelDescription.format;
@@ -3224,6 +3224,12 @@ namespace wg
 
 	void SoftGfxDevice::stretchBlit(Surface * _pSrcSurf, const RectF& source, const Rect& dest)
 	{
+	        if(source.w == (float)dest.w && source.h == (float)dest.h)
+        	{
+        		blit(_pSrcSurf, Rect((int)source.x,(int)source.y,dest.w,dest.h), {dest.x,dest.y} );
+        		return;
+        	}
+
 		if (!_pSrcSurf || !m_pCanvas || !_pSrcSurf->isInstanceOf(SoftSurface::CLASSNAME))
 			return;
 
@@ -3232,7 +3238,7 @@ namespace wg
 		if (!m_pCanvasPixels || !pSrcSurf->m_pData)
 			return;
 
-		ColTrans			colTrans{ m_tintColor, nullptr, nullptr };
+		ColTrans			colTrans = { m_tintColor, nullptr, nullptr };
 
 		int				tintMode = m_tintColor == Color::White ? 0 : 1;
 		PixelFormat		srcFormat = pSrcSurf->m_pixelDescription.format;

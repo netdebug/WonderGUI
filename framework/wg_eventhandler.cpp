@@ -602,7 +602,7 @@ bool WgEventHandler::ForwardEvent( const WgEvent::Event * _pEvent, WgWidget * pR
 	switch( _pEvent->Type() ) 
 	{
         case WG_EVENT_MOUSE_ENTER:
-            pEvent = new WgEvent::MouseEnter({ 0, 0 });
+            pEvent = new WgEvent::MouseEnter(WgCoord());
             pEvent->_cloneContentFrom( static_cast<const WgEvent::MouseEnter*>(_pEvent) );
             break;
         case WG_EVENT_MOUSE_LEAVE:

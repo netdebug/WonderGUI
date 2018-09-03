@@ -200,10 +200,6 @@
 #	include <wg_colorskin.h>
 #endif
 
-#ifndef WG_COMBOBOX_DOT_H
-#	include <wg_combobox.h>
-#endif
-
 #ifndef WG_LINEEDITOR_DOT_H
 #	include <wg_lineeditor.h>
 #endif
@@ -228,18 +224,6 @@
 #	include <wg_image.h>
 #endif
 
-#ifndef WG_MENU_DOT_H
-#	include <wg_menu.h>
-#endif
-
-#ifndef WG_MENUBAR_DOT_H
-#	include <wg_menubar.h>
-#endif
-
-#ifndef WG_MENULAYER_DOT_H
-#	include <wg_menulayer.h>
-#endif
-
 #ifndef WG_MODAL_LAYER_DOT_H
 #	include <wg_modallayer.h>
 #endif
@@ -247,7 +231,6 @@
 #ifndef WG_MODAL_LAYER_DOT_H
 #	include <wg_multislider.h>
 #endif
-
 
 #ifndef WG_OSCILLOSCOPE_DOT_H
 #	include <wg_oscilloscope.h>

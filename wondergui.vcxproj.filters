@@ -50,7 +50,6 @@
     <ClCompile Include="framework\wg_listpanel.cpp" />
     <ClCompile Include="framework\wg_mempool.cpp" />
     <ClCompile Include="framework\wg_memstack.cpp" />
-    <ClCompile Include="framework\wg_modallayer.cpp" />
     <ClCompile Include="framework\wg_orderedselectable.cpp" />
     <ClCompile Include="framework\wg_oscilloscope.cpp" />
     <ClCompile Include="framework\wg_packpanel.cpp" />
@@ -115,6 +114,8 @@
     <ClCompile Include="framework\wg_multiblockskin.cpp" />
     <ClCompile Include="framework\wg_popuplayer.cpp" />
     <ClCompile Include="framework\wg_container.cpp" />
+    <ClCompile Include="framework\wg_popupopener.cpp" />
+    <ClCompile Include="framework\wg_modallayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h" />
@@ -169,7 +170,6 @@
     <ClInclude Include="framework\wg_listpanel.h" />
     <ClInclude Include="framework\wg_mempool.h" />
     <ClInclude Include="framework\wg_memstack.h" />
-    <ClInclude Include="framework\wg_modallayer.h" />
     <ClInclude Include="framework\wg_orderedselectable.h" />
     <ClInclude Include="framework\wg_oscilloscope.h" />
     <ClInclude Include="framework\wg_packpanel.h" />
@@ -249,5 +249,6 @@
     <ClInclude Include="framework\wg3_enumextras.h" />
     <ClInclude Include="framework\wg_multiblockskin.h" />
     <ClInclude Include="framework\wg_popuplayer.h" />
+    <ClInclude Include="framework\wg_popupopener.h" />
   </ItemGroup>
 </Project>

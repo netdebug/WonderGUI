@@ -52,6 +52,8 @@ WgPopupOpener::WgPopupOpener() : m_attachPoint(WG_SOUTHWEST), m_bOpenOnHover(fal
 
 WgPopupOpener::~WgPopupOpener()
 {
+	if (m_pPopup)
+		delete m_pPopup;
 }
 
 //____ Type() _________________________________________________________________
@@ -514,7 +516,7 @@ void WgPopupOpener::_open()
 	auto pLayer = Parent()->_getPopupLayer();
 	if (pLayer && m_pPopup)
 	{
-		pLayer->Push(m_pPopup.GetRealPtr(), this, ScreenPixelGeo(), m_attachPoint, m_bOpenOnHover);
+		pLayer->Push(m_pPopup, this, ScreenPixelGeo(), m_attachPoint, m_bOpenOnHover);
 		m_bOpen = true;
 		m_closeState = m_state;
 	}
@@ -527,6 +529,6 @@ void WgPopupOpener::_close()
 	auto pLayer = Parent()->_getPopupLayer();
 	if (pLayer && m_pPopup)
 	{
-		pLayer->Pop(m_pPopup.GetRealPtr());
+		pLayer->Pop(m_pPopup);
 	}
 }

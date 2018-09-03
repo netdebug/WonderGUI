@@ -259,6 +259,11 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 			geo.y = pSlot->launcherGeo.Top() + pSlot->launcherGeo.h/2 - geo.h/2;
 			break;
 		}
+
+        default:
+        {
+            assert(false);
+        }
 	
 		case WgOrigo::WG_SOUTH:						// Centered below launcherGeo.
 		{
@@ -354,14 +359,14 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 	
 	// Update geometry if it has changed.
 	
-	if( geo != pSlot->m_geo )
+	if( bInitialUpdate || geo != pSlot->m_geo )
 	{
 		if( !bInitialUpdate )
 			_onRequestRender(pSlot->m_geo,pSlot);	
 		pSlot->m_geo = geo;
 		_onRequestRender(pSlot->m_geo,pSlot);	
 
-		if( pSlot->m_pWidget->PixelSize() != geo.Size() )
+//		if( pSlot->m_pWidget->PixelSize() != geo.Size() ) This check doesn't work in WG2, since it asks the Hook for the size... 
 			pSlot->m_pWidget->_onNewSize(geo.Size());
 
 		return true;
@@ -756,7 +761,7 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 						p->state = WgPopupHook::State::ClosingDelay;
 						p->stateCounter = 0;
 					}
-					p--;
+					p = p->_next();
 				}
 			}
 

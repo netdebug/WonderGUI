@@ -283,23 +283,22 @@ void WgMultiBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRec
 		if (src.w == _canvas.w && src.h == _canvas.h && scale == m_scale)
 		{ 
 			pDevice->ClipBlit(_clip, layer.pSurface, src, _canvas.Pos().x, _canvas.Pos().y);
-			goto exit;
+			continue;
 		}
 
 		if (m_frame.left + m_frame.top + m_frame.right + m_frame.bottom == 0)
 		{
 			pDevice->ClipStretchBlit(_clip, layer.pSurface, src, _canvas);
-			goto exit;
+			continue;
 		}
 
 		const WgBorders&    sourceBorders = m_frame.Scale(m_scale);
 		const WgBorders     canvasBorders = m_frame.Scale(scale);
 
-
 		if (src.w == _canvas.w)
 		{
 			pDevice->ClipBlitVertStretchBar(_clip, layer.pSurface, src, sourceBorders, _canvas, canvasBorders);
-			goto exit;
+			continue;
 		}
 
 		// Render upper row (top-left corner, top stretch area and top-right corner)
@@ -334,7 +333,6 @@ void WgMultiBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRec
 
 	}
 
-exit:
 	if (mixedTint != orgTintColor)
 		pDevice->SetTintColor(orgTintColor);
 

@@ -1798,14 +1798,14 @@ void cbDragWidget( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 
 void cbOpenModal( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 {
-	g_pModal->AddModal( pWidget, WgCoord(), WG_SOUTHEAST );
+//	g_pModal->AddModal( pWidget, WgCoord(), WG_SOUTHEAST );
 }
 
 //____ cbCloseModal() __________________________________________________________
 
 void cbCloseModal( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 {
-	g_pModal->ReleaseChild(pWidget);
+//	g_pModal->ReleaseChild(pWidget);
 }
 
 //____ cbResizeWidget() _________________________________________________________

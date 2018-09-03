@@ -152,7 +152,6 @@
     <ClInclude Include="framework\wg_listpanel.h" />
     <ClInclude Include="framework\wg_mempool.h" />
     <ClInclude Include="framework\wg_memstack.h" />
-    <ClInclude Include="framework\wg_modallayer.h" />
     <ClInclude Include="framework\wg_multiblockskin.h" />
     <ClInclude Include="framework\wg_orderedselectable.h" />
     <ClInclude Include="framework\wg_oscilloscope.h" />

@@ -64,7 +64,7 @@ public:
 	//.____ Behavior ____________________________________________
 
 	void		SetPopup(WgWidget * pPopup);
-	WgWidget*   Popup() const { return m_pPopup.GetRealPtr(); }
+	WgWidget*   Popup() const { return m_pPopup; }
 
 	void		SetOpenOnHover(bool bOpen);
 	bool		OpenOnHover() const { return m_bOpenOnHover; }
@@ -116,7 +116,7 @@ protected:
 
 	bool			m_bReturnPressed;
 
-	WgWidgetWeakPtr	m_pPopup;
+	WgWidget *		m_pPopup = nullptr;
 
 	WgOrigo			m_attachPoint;
 	bool			m_bOpenOnHover;

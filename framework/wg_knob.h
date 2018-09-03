@@ -42,13 +42,13 @@
 class WgKnob : public WgWidget
 {
 public:
-	WgKnob();
+    WgKnob();
     WgKnob(WgSurfaceFactory * pFactory);
-	virtual ~WgKnob();
+    virtual ~WgKnob();
 
-	virtual const char *Type( void ) const;
-	static const char * GetClass();
-	virtual WgWidget * NewOfMyType() const { return new WgKnob(); };
+    virtual const char *Type( void ) const;
+    static const char * GetClass();
+    virtual WgWidget * NewOfMyType() const { return new WgKnob(); };
 
     void    SetOversample(int oversample) { m_iOversampleX = oversample; }
     void    SetValue( float value );
@@ -70,53 +70,94 @@ public:
             _requestRender();
         }
     };
+
+    void    SetForegroundColor(WgColor color)
+    {
+        if(m_kForeground != color)
+        {
+            m_kForeground = color;
+            _requestRender();
+        }
+    };
+
+    void    SetBackgroundColor(WgColor color)
+    {
+        if(m_kBackground != color)
+        {
+            m_kBackground = color;
+            _requestRender();
+        }
+    };
+
+    void    SetLineColor(WgColor color)
+    {
+        if(m_lineColor != color)
+        {
+            m_lineColor = color;
+            _requestRender();
+        }
+    };
+
     void    SetNumSteps(int steps);
     void    SetWidth(float width) { m_iWidth = width; }
-	WgSize	PreferredPixelSize() const;
-//    void    SetPreferredPixelSize(WgSize size);
-//    WgSize  PreferredPointSize() { PreferredPixelSize()*m_scale/WG_SCALE_BASE;}
-//    void    SetPreferredPointSize(WgSize size) { SetPreferredPixelSize(size*WG_SCALE_BASE/m_scale); }
+    void    SetAngles(float angleStart, float angleEnd);
+    void    SetAngleOffset(float offset) { m_fAngleOffset = offset; }
+
+    WgSize    PreferredPixelSize() const;
+    //    void    SetPreferredPixelSize(WgSize size);
+    //    WgSize  PreferredPointSize() { PreferredPixelSize()*m_scale/WG_SCALE_BASE;}
+    //    void    SetPreferredPointSize(WgSize size) { SetPreferredPixelSize(size*WG_SCALE_BASE/m_scale); }
 
 protected:
-	void	_onCloneContent( const WgWidget * _pOrg );
-	void	_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip);
-	bool	_onAlphaTest( const WgCoord& ofs );
-	void	_onEnable();
-	void	_onDisable();
+    void    _onCloneContent( const WgWidget * _pOrg );
+    void    _onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip);
+    bool    _onAlphaTest( const WgCoord& ofs );
+    void    _onEnable();
+    void    _onDisable();
     void    _onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler );
 
-
 private:
+
+    enum DrawState
+    {
+        eDrawNothing,
+        eDrawForegroundAABegin,
+        eDrawForeground,
+        eDrawForegroundAAEnd,
+        eDrawBackgroundAABegin,
+        eDrawBackground,
+        eDrawBackgroundAAEnd,
+    };
+
     void _downsample(WgSurface* pSurf, int oversample);
-WgColor Blend( const WgColor& start, const WgColor& dest, float grade );
-    
+    WgColor Blend( const WgColor& start, const WgColor& dest, float grade );
+
     // Anti-alias
     void drawCircle(const int centerX, const int centerY, const float radX, const float radY);
     void drawLine(const float x0, const float y0, const float x1, const float y1);
-	void plot(const int x, const int y, const float alpha);
+    void plot(const int x, const int y, const float alpha);
     void plot4(const int centerX, const int centerY, const int deltaX, const int deltaY, const float alpha);
-	static inline int ipart(double x) { return (int)floor(x); }
-	static inline float fpart(float x) { return fabsf(x) - ipart(x); }
-	static inline float rfpart(float x) { return 1.0f - fpart(x); }
-    
-	// Anti-alias
-	int m_iNextPixel;
-	WgCoord m_pAAPix[WG_KNOB_PIXEL_BUFFER_SIZE];
-	WgColor m_pAACol[WG_KNOB_PIXEL_BUFFER_SIZE];
-    WgColor	m_lineColor;
-    
+    static inline int ipart(double x) { return (int)floor(x); }
+    static inline float fpart(float x) { return fabsf(x) - ipart(x); }
+    static inline float rfpart(float x) { return 1.0f - fpart(x); }
+
+    // Anti-alias
+    int m_iNextPixel;
+    WgCoord m_pAAPix[WG_KNOB_PIXEL_BUFFER_SIZE];
+    WgColor m_pAACol[WG_KNOB_PIXEL_BUFFER_SIZE];
+    WgColor m_lineColor;
+
     WgSize m_preferredSize;
 
     class WgSurface* m_pSurf = nullptr;
     class WgSurfaceFactory* m_pSurfaceFactory = nullptr;
     float m_fValue;
-    
-    
+
     // For new knob mode.
     int m_iOversampleX = 1;
     bool m_bPressed = false;
     bool m_bPointerInside = false;
-    
+
     WgColor m_kBackground = WgColor( 38,  169, 224, 64 );
     WgColor m_kForeground = WgColor( 38,  169, 224, 255 );
     float m_fAngleStart = 0.1f;
@@ -124,7 +165,8 @@ WgColor Blend( const WgColor& start, const WgColor& dest, float grade );
     std::vector<float> m_AngleStart;
     std::vector<float> m_AngleEnd;
     int m_iNumSteps = 0;
-    float m_iWidth = 0.40f;//20f;
+    float m_iWidth = 0.40f;
+    float m_fAngleOffset = 0.0f;
 
     WgSize m_size = WgSize(0,0);
 };
