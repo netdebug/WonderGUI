@@ -72,6 +72,8 @@ public:
 	void		SetAttachPoint(WgOrigo attachPoint);
 	WgOrigo		AttachPoint() const { return m_attachPoint; }
 
+	void		SetPopupOffset(WgCoord offset);					// Offset in points for attachPoint.
+	WgCoord		PopupOffset() const { return m_popupOfs; }
 
 	Uint32			GetTextAreaWidth();
 
@@ -119,6 +121,7 @@ protected:
 	WgWidget *		m_pPopup = nullptr;
 
 	WgOrigo			m_attachPoint;
+	WgCoord			m_popupOfs;
 	bool			m_bOpenOnHover;
 	bool			m_bOpen;
 	WgState			m_closeState;

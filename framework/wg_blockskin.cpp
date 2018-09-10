@@ -182,7 +182,7 @@ WgBlockSkinPtr WgBlockSkin::CreateStaticFromSurface( WgSurface * pSurface, WgBor
 {
 	WgBlockSkin * pSkin = new WgBlockSkin();
 	pSkin->SetSurface( pSurface );
-	pSkin->SetBlockGeo( pSurface->PixelSize(), frame );
+	pSkin->SetBlockGeo( pSurface->PointSize(), frame );
 	pSkin->SetAllBlocks( WgCoord(0,0) );
 	return WgBlockSkinPtr(pSkin);
 }
@@ -192,7 +192,7 @@ WgBlockSkinPtr WgBlockSkin::CreateEnableFromSurface( WgSurface * pSurface, int b
 	WgBlockSkin * pSkin = new WgBlockSkin();
 	pSkin->SetSurface( pSurface );
 
-	WgSize	sz = WgSize( (pSurface->PixelSize().w-blockSpacing)/2, pSurface->PixelSize().h );
+	WgSize	sz = WgSize( (pSurface->PointSize().w-blockSpacing)/2, pSurface->PointSize().h );
 
 	pSkin->SetBlockGeo( sz, blockFrame );
 	pSkin->SetAllBlocks( WgCoord(0,0) );
@@ -799,16 +799,16 @@ bool WgBlockSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgStat
 	return false;
 }
 
-//____ isStateIdentical() _____________________________________________________
-/*
+//____ IsStateIdentical() _____________________________________________________
+
 bool WgBlockSkin::IsStateIdentical( WgState state, WgState comparedTo ) const
 {
-	int i1 = _stateToIndex(state);
-	int i2 = _stateToIndex(comparedTo);
+	int i1 = WgUtil::_stateToIndex(state);
+	int i2 = WgUtil::_stateToIndex(comparedTo);
 
 	return ( m_state[i1].ofs == m_state[i2].ofs && WgExtendedSkin::IsStateIdentical(state,comparedTo) );
 }
-*/
+
 
 //____ _setBitFlag() __________________________________________________________
 

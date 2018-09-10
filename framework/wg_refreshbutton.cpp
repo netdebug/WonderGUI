@@ -322,7 +322,7 @@ void WgRefreshButton::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, c
 	else if( m_animTarget == ICON && m_pRefreshAnim )
 		iconSize = m_pRefreshAnim->Size(m_scale);
 
-	WgRect iconRect = _getIconRect( contentRect, iconSize );
+	WgRect iconRect = _getIconRect( contentRect, iconSize, m_scale );
 	WgRect textRect = _getTextRect( contentRect, iconRect );
 
 

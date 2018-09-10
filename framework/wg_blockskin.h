@@ -94,7 +94,7 @@ public:
 	bool	IsOpaque( WgState state ) const override;
 	bool	IsOpaque( const WgRect& WgRect, const WgSize& canvasSize, WgState state, int scale ) const override;
 	
-//	bool	IsStateIdentical( WgState state, WgState comparedTo ) const;
+	bool	IsStateIdentical( WgState state, WgState comparedTo ) const;
 	
 	void	OptimizeRenderMethods();
 

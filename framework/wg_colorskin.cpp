@@ -94,3 +94,8 @@ bool WgColorSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgStat
 {
 	return m_color.a >= opacityTreshold ? true : false;
 }
+
+bool WgColorSkin::IsStateIdentical(WgState state, WgState comparedTo) const
+{
+	return true;
+}

@@ -84,8 +84,9 @@ protected:
 		Closing,				// Popup is closing (fading out).
 	};
 
-	WgRect		launcherGeo;		// Launcher geo relative sibling or parent.
+	WgRect		launcherGeo;		// Launcher geo relative sibling or parent, measured in pixels.
 	WgOrigo		attachPoint;
+	WgCoord		attachOfs;			// Offset in points from attachPoint.
 	bool		bAutoClose;			// Has been opened in auto-close mode.
 	State		state;
 	int			stateCounter;		// Counts millisec the slot has been in a transitative state (Delay, Opening, Coundown and Closing).
@@ -113,7 +114,7 @@ public:
 
 
 	int				NbPopups() const;
-	void			Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint = WgOrigo::WG_NORTHEAST, bool bAutoClose = false, WgSize maxSize = WgSize(INT_MAX, INT_MAX));
+	void			Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint = WgOrigo::WG_NORTHEAST, WgCoord attachOffset = { 0,0 }, bool bAutoClose = false, WgSize maxSize = WgSize(INT_MAX, INT_MAX));
 	void			Pop(int nb = 1);
 	void			Pop(WgWidget * pPopup);
 	void			Clear();
@@ -135,8 +136,14 @@ protected:
 	void			_stealKeyboardFocus();
 	void			_restoreKeyboardFocus();
 	bool			_updateGeo(WgPopupHook * pSlot, bool bInitialUpdate = false );
+
 	void			_removeSlots(int nb);
-	void			_addSlot(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, bool bAutoClose, WgSize maxSize);
+	void			_removeSlot(WgPopupHook * p);
+
+	void			_addSlot(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, WgCoord attachOfs, bool bAutoClose, WgSize maxSize);
+
+	void			_closeAutoOpenedUntil(WgWidget * pStayOpen);
+
 
 	// Overloaded from Panel
 
@@ -178,10 +185,10 @@ protected:
 	Widget_wp				m_pKeyFocus;	// Pointer at child that held focus before any menu was opened.
 
 
-	int				m_openingDelayMs = 100;
+	int				m_openingDelayMs = 200;
 	int				m_openingFadeMs = 100;
 	int				m_closingDelayMs = 200;
-	int				m_closingFadeMs = 200;
+	int				m_closingFadeMs = 100;
 };
 	
 

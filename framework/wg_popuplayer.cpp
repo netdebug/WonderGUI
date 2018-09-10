@@ -27,6 +27,7 @@
 #include <wg_base.h>
 #include <wg_gfxdevice.h>
 #include <wg_eventhandler.h>
+#include <wg_popupopener.h>
 
 #include <algorithm>
 
@@ -151,9 +152,12 @@ int WgPopupLayer::NbPopups() const
 
 //____ Push() _________________________________________________________________
 
-void WgPopupLayer::Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, bool bAutoClose, WgSize maxSize)
+void WgPopupLayer::Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, WgCoord attachOfs, bool bAutoClose, WgSize maxSize)
 {
-	_addSlot(pPopup, pOpener, launcherGeo, attachPoint, bAutoClose, maxSize);
+	if (bAutoClose && !m_popupHooks.IsEmpty())
+		_closeAutoOpenedUntil(pOpener);
+
+	_addSlot(pPopup, pOpener, launcherGeo, attachPoint, attachOfs, bAutoClose, maxSize);
 }
 
 //____ Pop() __________________________________________________________________
@@ -273,6 +277,11 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 		}
 	
 	}
+
+	// Adjust with offset.
+
+	geo.x += pSlot->attachOfs.x * m_scale / WG_SCALE_BASE;
+	geo.y += pSlot->attachOfs.y * m_scale / WG_SCALE_BASE;
 	
 	// Adjust geometry to fit inside parent.
 	
@@ -625,6 +634,8 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 			WgPopupHook * pHook = m_popupHooks.First();
 			while (pHook)
 			{
+				WgPopupHook * pNext = pHook->_next();
+
 				switch (pHook->state)
 				{
 				case WgPopupHook::State::OpeningDelay:
@@ -664,19 +675,21 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 				case WgPopupHook::State::Closing:
 					pHook->stateCounter += ms;
 					_requestRender(pHook->m_geo);
-					// Removing any closed popups is done in next loop
+
+					if (pHook->stateCounter >= m_closingFadeMs)
+						_removeSlot(pHook);
 					break;
 				default:
 					break;
 				}
 
-				pHook = pHook->_next();
+				pHook = pNext;
 			}
 
 			// Close any popup that is due for closing.
 
-			while (!m_popupHooks.IsEmpty() && m_popupHooks.First()->state == WgPopupHook::State::Closing && m_popupHooks.First()->stateCounter >= m_closingFadeMs)
-				_removeSlots(1);
+//			while (!m_popupHooks.IsEmpty() && m_popupHooks.First()->state == WgPopupHook::State::Closing && m_popupHooks.First()->stateCounter >= m_closingFadeMs)
+//				_removeSlots(1);
 		}
 		break;
 
@@ -736,35 +749,14 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 				pHook = pHook->_next();
 			}
 
-			// If pointer has entered a selectable widget of a popup that isn't the top one
+			// If pointer has entered a selectable widget 
 			// and all widgets between them have bAutoClose=true, they should all enter
 			// state ClosingDelay (unless already in state Closing).
 
-
-			WgWidget * pTop = m_popupHooks.First()->m_pWidget;
 			WgWidget * pMarked = FindWidget(pointerPos, WgSearchMode::WG_SEARCH_ACTION_TARGET);
 
-			if (pMarked != this && pMarked->IsSelectable() && m_popupHooks.First()->bAutoClose)
-			{
-				// Trace hierarchy from marked to one of our children.
-
-				while (pMarked->Parent() != this)
-					pMarked = pMarked->Parent();
-
-				//
-
-				auto p = m_popupHooks.First();
-				while (p->bAutoClose && p->m_pWidget != pMarked)
-				{
-					if (p->state != WgPopupHook::State::Closing && p->state != WgPopupHook::State::ClosingDelay)
-					{
-						p->state = WgPopupHook::State::ClosingDelay;
-						p->stateCounter = 0;
-					}
-					p = p->_next();
-				}
-			}
-
+			if (pMarked != this && (pMarked->IsSelectable() && m_popupHooks.First()->bAutoClose))
+				_closeAutoOpenedUntil(pMarked);
 
 		}				
 		break;
@@ -849,6 +841,31 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 
 }
 	
+//____ _closeAutoOpenedUntil() _________________________________________________
+
+void WgPopupLayer::_closeAutoOpenedUntil(WgWidget * pStayOpen)
+{
+	// Follow pStayOpen up the hierarchy to one of our popups or null.
+
+	while (pStayOpen != nullptr && pStayOpen->Parent() != this)
+		pStayOpen = pStayOpen->Parent();
+
+	// Remove all children ontop of pStayOpen, which is now either a child of ours or null, in which case
+	// all will be removed.
+
+	auto p = m_popupHooks.First();
+	while (p->bAutoClose && p->m_pWidget != pStayOpen)
+	{
+		if (p->state != WgPopupHook::State::Closing && p->state != WgPopupHook::State::Closing)
+		{
+			p->state = WgPopupHook::State::Closing;
+			p->stateCounter = 0;
+		}
+		p = p->_next();
+	}
+
+}
+
 //____ _stealKeyboardFocus() _________________________________________________
 	
 void WgPopupLayer::_stealKeyboardFocus()
@@ -908,7 +925,7 @@ void WgPopupLayer::_childRequestResize(WgPopupHook * pHook)
 
 //____ _addSlot() ____________________________________________________________
 
-void WgPopupLayer::_addSlot(WgWidget * _pPopup, WgWidget * _pOpener, const WgRect& _launcherGeo, WgOrigo _attachPoint, bool _bAutoClose, WgSize _maxSize)
+void WgPopupLayer::_addSlot(WgWidget * _pPopup, WgWidget * _pOpener, const WgRect& _launcherGeo, WgOrigo _attachPoint, WgCoord _attachOfs, bool _bAutoClose, WgSize _maxSize)
 {
 	WgPopupHook * pHook = new WgPopupHook(this);
 	pHook->_attachWidget(_pPopup);
@@ -917,6 +934,7 @@ void WgPopupLayer::_addSlot(WgWidget * _pPopup, WgWidget * _pOpener, const WgRec
 	pHook->pOpener = _pOpener;
 	pHook->launcherGeo = _launcherGeo;
 	pHook->attachPoint = _attachPoint;
+	pHook->attachOfs = _attachOfs;
 	pHook->bAutoClose = _bAutoClose;
 	pHook->state = WgPopupHook::State::OpeningDelay;
 	pHook->stateCounter = 0;
@@ -956,6 +974,26 @@ void WgPopupLayer::_removeSlots(int nb)
 	_restoreKeyboardFocus();
 
 	if (m_popupHooks.IsEmpty() )
+		_stopReceiveTicks();
+}
+
+
+//____ _removeSlot() __________________________________________________
+
+void WgPopupLayer::_removeSlot(WgPopupHook * p)
+{
+	WgEventHandler * pEH = _eventHandler();
+
+	if (pEH)
+		pEH->QueueEvent(new WgEvent::PopupClosed(p->Widget(), p->pOpener));
+
+	p->_requestRender();
+	p->_releaseWidget();
+	delete p;
+
+	_restoreKeyboardFocus();
+
+	if (m_popupHooks.IsEmpty())
 		_stopReceiveTicks();
 }
 

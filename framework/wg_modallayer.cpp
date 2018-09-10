@@ -27,7 +27,6 @@
 
 static const char	c_widgetType[] = {"ModalLayer"};
 static const char	c_hookType[] = {"ModalHook"};
-static const char	c_basehookType[] = {"ModalLayerBasehook"};
 
 // Improve WgModalHook geometry handling, should be able to run on PreferredSize by default, answering to resize-requests.
 
@@ -673,15 +672,5 @@ WgHook * WgModalLayer::_prevHookWithGeo( WgRect& geo, WgHook * pHook ) const
 	return p;
 }
 
-//_____________________________________________________________________________
-const char * WgModalLayer::BaseHook::Type( void ) const
-{
-	return ClassType();
-}
 
-//_____________________________________________________________________________
-const char * WgModalLayer::BaseHook::ClassType()
-{
-	return c_basehookType;
-}
 

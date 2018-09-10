@@ -61,6 +61,8 @@ public:
 	bool	IsOpaque( WgState state ) const;
 	bool	IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state, int scale ) const;
 
+	bool	IsStateIdentical(WgState state, WgState comparedTo) const;
+
 
 private:
 	WgBoxSkin();

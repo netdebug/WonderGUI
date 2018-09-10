@@ -204,6 +204,7 @@ inline void _convert(const WgPixelFormat& f, wg::PixelDescription& out )
 {
 	out.bits = f.bits;
 	out.format = _convert(f.type);
+	out.bIndexed = false;
 
 	out.R_mask = f.R_mask;
 	out.R_shift = f.R_shift;

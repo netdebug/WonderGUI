@@ -70,53 +70,38 @@ public:
 	public:
 		SetValueVisitorBase(WgMultiSlider * pWidget, Slider * pSlider);
 
-		float		handleFactor(int sliderId);
-		float		setHandleFactor(int sliderId, float value);
+		float		value(int sliderId);
+		float		setValue(int sliderId, float value);
 
-		WgCoordF	handleFactor2D(int sliderId);
-		WgCoordF	setHandleFactor2D(int sliderId, WgCoordF value);
+		WgCoordF	value2D(int sliderId);
+		WgCoordF	setValue2D(int sliderId, WgCoordF value);
 	};
 
 	class SetValueVisitor : public SetValueVisitorBase
 	{
 	public:
-		using SetValueVisitorBase::handleFactor;
-		SetValueVisitor(WgMultiSlider * pWidget, Slider * pSlider);
+		using SetValueVisitorBase::value;
+		SetValueVisitor(WgMultiSlider * pWidget, Slider * pSlider, float value);
 
-		float		handleFactor();
+		float		value();
 		Bounds		valueBounds();
+
+		float		m_value;
 	};
 
 	class SetValueVisitor2D : public SetValueVisitorBase
 	{
 	public:
-		using SetValueVisitorBase::handleFactor2D;
-		SetValueVisitor2D(WgMultiSlider * pWidget, Slider * pSlider);
+		using SetValueVisitorBase::value2D;
+		SetValueVisitor2D(WgMultiSlider * pWidget, Slider * pSlider, WgCoordF value );
 
-		WgCoordF	handleFactor2D();
+		WgCoordF	value2D();
 		Bounds		valueBoundsX();
 		Bounds		valueBoundsY();
+
+		WgCoordF	m_value;
 	};
 
-	class SetHandleVisitor : public Visitor
-	{
-	public:
-		SetHandleVisitor(WgMultiSlider * pWidget, Slider * pSlider);
-
-		float		value();
-		Bounds		valueBounds();
-	};
-
-	class SetHandleVisitor2D : public Visitor
-	{
-	public:
-		SetHandleVisitor2D(WgMultiSlider * pWidget, Slider * pSlider);
-
-		float		valueX();
-		float		valueY();
-		Bounds		valueBoundsX();
-		Bounds		valueBoundsY();
-	};
 
 
 
@@ -129,9 +114,6 @@ public:
 		WgRectF		geo(int sliderId);
 	}; 
 
-	typedef std::function<float(SetHandleVisitor& visitor)>		SetHandleFunc;
-	typedef std::function<WgCoordF(SetHandleVisitor2D& visitor)>	SetHandleFunc2D;
-
 	typedef std::function<float(SetValueVisitor& visitor)>			SetValueFunc;
 	typedef std::function<WgCoordF(SetValueVisitor2D& visitor)>		SetValueFunc2D;
 
@@ -141,14 +123,20 @@ public:
 	void	SetDefaults(const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot = { 0.5f,0.5f }, WgBorders markExtension = WgBorders(0) );
 	void	SetCallback(const std::function<void(int sliderId, float value, float value2)>& callback);
 
+	void	SetPassive(bool bPassive);
+	bool	IsPassive() const { return m_bPassive; }
+
+	void	SetDeltaDrag(bool bDelta);
+	bool	IsDeltaDrag() const { return m_bDeltaDrag;  }
+
 
 	int		AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, float startValue = 0.f, float minValue = 0.f, float maxValue = 1.f, int steps = 0,
-						 SetHandleFunc pSetHandleFunc = nullptr, SetValueFunc pSetValueFunc = nullptr, const WgSkinPtr& pBgSkin = nullptr, 
+						SetValueFunc pSetValueFunc = nullptr, const WgSkinPtr& pBgSkin = nullptr, 
 						const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f,-1.f }, WgBorders markExtension = WgBorders(0));
 
 	int		AddSlider2D( int id, WgOrigo origo, SetGeoFunc pSetGeoFunc, float startValueX = 0.f, float startValueY = 0.f, 
 						float minValueX = 0.f,  float maxValueX = 1.f, int stepsX = 0, float minValueY = 0.f, float maxValueY = 1.f, int stepsY = 0,
-						SetHandleFunc2D pSetHandleFunc = nullptr, SetValueFunc2D pSetValueFunc = nullptr,
+						SetValueFunc2D pSetValueFunc = nullptr,
 						const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f, -1.f }, WgBorders markExtension = WgBorders(0) );
 
     void    RemoveAllSliders();
@@ -186,9 +174,6 @@ protected:
 		WgSkinPtr		pHandleSkin;
 		WgBorders		markExtension;		// Frame surrounding slider that also marks the slider. Measured in points, not pixels.
 
-		SetHandleFunc	pSetHandleFunc;
-		SetHandleFunc2D	pSetHandleFunc2D;
-
 		SetValueFunc	pSetValueFunc;
 		SetValueFunc2D	pSetValueFunc2D;
 
@@ -215,13 +200,15 @@ protected:
 
 
 	WgCoordF	_setHandlePosition(Slider& slider, WgCoordF pos);					// Set handlePos and update value(s).
-	WgCoordF	_setHandleFactor(Slider& slider, WgCoordF factor);					// Convert handleFactor to handlePos and update handlePos and value(s).
+	WgCoordF	_calcSendValue(Slider& slider, WgCoordF pos);						// Like _setHandlePosition(), but only calculates and sends the value (no internal update).
 
-	float		_setValue(Slider& slider, float valueX, float valueY = NAN);			// Set value(s) and update handlePos.
+	void		_invokeSetValueCallback(Slider& slider, float& value, float& value2);
 
-	WgCoordF	_handleFactor(Slider& slider);										// Get the factor (0.f-1.f) for current handle position & origo.
 
-	WgCoordF	_convertFactorPos(WgCoordF in, WgOrigo origo);
+	float		_setValue(Slider& slider, float valueX, float valueY, bool bSendOnUpdate );			// Set value(s) and update handlePos.
+	void		_sendValue(Slider& slider, float value, float value2);
+
+	WgCoordF	_convertFactorPos(WgCoordF in, WgOrigo origo);						// Convert between sliderFactor and sliderPosition.
 
 
 	void		_refreshSliders();
@@ -241,6 +228,13 @@ private:
 
 	int					m_selectedSlider = -1;
 	WgCoord				m_selectPressOfs;
+
+	bool				m_bPassive = false;
+
+	bool				m_bDeltaDrag = false;
+	WgCoord				m_totalDrag;
+	WgCoord				m_finetuneFraction;
+	const static int	c_finetuneResolution = 5;
 
 	std::function<void(int sliderId, float value, float value2 )>	m_callback = nullptr;
 

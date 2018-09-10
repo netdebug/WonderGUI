@@ -260,6 +260,20 @@ bool WgBoxSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState 
 	return m_color[i].a == 255 && m_frameColor[i].a == 255;
 }
 
+//____ IsStateIdentical() _____________________________________________________
+
+bool WgBoxSkin::IsStateIdentical(WgState state, WgState comparedTo) const
+{
+	int i1 = WgUtil::_stateToIndex(state);
+	int i2 = WgUtil::_stateToIndex(comparedTo);
+
+	if (m_color[i1] == m_color[i2] && m_frameColor[i1] == m_frameColor[i2] && WgExtendedSkin::IsStateIdentical(state, comparedTo))
+		return true;
+
+	return false;
+}
+
+
 //____ _updateOpaqueFlag() ____________________________________________________
 
 void WgBoxSkin::_updateOpaqueFlag()

@@ -85,6 +85,7 @@ protected:
 		friend class WgLayer;
 
 	public:
+        BaseHook() : WgHook() {};
 
 		const char *Type( void ) const;
 		static const char * ClassType();

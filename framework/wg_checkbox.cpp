@@ -287,7 +287,7 @@ Uint32 WgCheckBox::GetTextAreaWidth()
 	else if( m_pIconChecked )
 		iconSize = m_pIconChecked->Size(m_scale);
 
-	return _getTextRect( widgetSize, _getIconRect( WgRect(0,0,widgetSize), iconSize ) ).w;
+	return _getTextRect( widgetSize, _getIconRect( WgRect(0,0,widgetSize), iconSize, m_scale ) ).w;
 }
 
 

@@ -57,6 +57,7 @@ public:
 
 	bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const;
 
+	bool	IsStateIdentical(WgState state, WgState comparedTo) const;
 
 
 private:

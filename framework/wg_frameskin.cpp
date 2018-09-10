@@ -109,3 +109,8 @@ bool WgFrameSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgStat
 		
 	return false;
 }
+
+bool WgFrameSkin::IsStateIdentical(WgState state, WgState comparedTo) const
+{
+	return true;
+}

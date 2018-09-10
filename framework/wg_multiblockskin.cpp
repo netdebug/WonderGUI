@@ -493,7 +493,7 @@ bool WgMultiBlockSkin::IsStateIdentical( WgState state, WgState comparedTo ) con
 			return false;
 	}
 
-	return true;
+	return WgExtendedSkin::IsStateIdentical(state, comparedTo);
 }
 
 //____ _updateStateOpacity() __________________________________________________

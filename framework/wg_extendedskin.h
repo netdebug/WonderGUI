@@ -48,6 +48,9 @@ public:
 	virtual WgCoord	ContentOfs(WgState state, int scale) const;
 	virtual WgRect	ContentRect( const WgRect& canvas, WgState state, int scale ) const;
 
+	bool	IsStateIdentical(WgState state, WgState comparedTo) const;
+
+
 protected:
 
 	inline WgSize _scaledContentPadding(int scale) const { return WgSize((m_contentPadding.Width()*scale) >> WG_SCALE_BINALS, (m_contentPadding.Height()*scale) >> WG_SCALE_BINALS); }

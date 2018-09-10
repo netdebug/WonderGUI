@@ -52,7 +52,10 @@ public:
 	WgRect	ContentRect( const WgRect& canvas, WgState state, int scale ) const;
 
 	bool	MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState state, int opacityTreshold, int scale ) const;
-	
+
+	bool	IsStateIdentical(WgState state, WgState comparedTo) const;
+
+
 private:
 	WgFrameSkin( int thickness, WgColor col );
 

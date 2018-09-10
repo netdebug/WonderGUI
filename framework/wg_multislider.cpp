@@ -78,11 +78,25 @@ void WgMultiSlider::SetCallback(const std::function<void(int sliderId, float val
 	m_callback = callback;
 }
 
+//____ SetPassive() ___________________________________________________________
+
+void WgMultiSlider::SetPassive(bool bPassive)
+{
+	m_bPassive = bPassive;
+}
+
+//____ SetDeltaDrag() ___________________________________________________________
+
+void WgMultiSlider::SetDeltaDrag(bool bDeltaDrag)
+{
+	m_bDeltaDrag = bDeltaDrag;
+}
+
 
 //____ AddSlider() ____________________________________________________________
 
 int WgMultiSlider::AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, float startValue, float minValue, float maxValue, int steps,
-								SetHandleFunc pSetHandleFunc, SetValueFunc pSetValueFunc, const WgSkinPtr& pBgSkin,
+								SetValueFunc pSetValueFunc, const WgSkinPtr& pBgSkin,
 								const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot, WgBorders markExtension )
 {
 	WgOrigo origo;
@@ -121,10 +135,8 @@ int WgMultiSlider::AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, f
 	s.geoState = 0;
 	s.pBgSkin = pBgSkin;
 	s.pHandleSkin = pHandleSkin;
-	s.pSetHandleFunc = pSetHandleFunc;
 	s.pSetValueFunc = pSetValueFunc;
 
-	s.pSetHandleFunc2D = nullptr;
 	s.pSetValueFunc2D = nullptr;
 
 	s.pSetGeoFunc = pSetGeoFunc;
@@ -142,7 +154,7 @@ int WgMultiSlider::AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, f
 
 int WgMultiSlider::AddSlider2D( int id, WgOrigo origo, SetGeoFunc pSetGeoFunc, float startValueX, float startValueY,
 								float minValueX, float maxValueX, int stepsX, float minValueY, float maxValueY, int stepsY,
-								SetHandleFunc2D pSetHandleFunc, SetValueFunc2D pSetValueFunc,
+								SetValueFunc2D pSetValueFunc,
 								const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot, WgBorders markExtension )
 {
 	if (origo != WG_NORTHWEST && origo != WG_NORTHEAST && origo != WG_SOUTHEAST && origo != WG_SOUTHWEST)
@@ -171,10 +183,8 @@ int WgMultiSlider::AddSlider2D( int id, WgOrigo origo, SetGeoFunc pSetGeoFunc, f
 	s.pBgSkin = pBgSkin;
 	s.pHandleSkin = pHandleSkin;
 
-	s.pSetHandleFunc = nullptr;
 	s.pSetValueFunc = nullptr;
 
-	s.pSetHandleFunc2D = pSetHandleFunc;
 	s.pSetValueFunc2D = pSetValueFunc;
 
 	s.pSetGeoFunc = pSetGeoFunc;
@@ -207,7 +217,9 @@ float WgMultiSlider::SetSliderValue(int id, float value, float value2)
 	if (!p || (p->is2D == isnan(value2)) )
 		return NAN;
 
-	return _setValue(*p, value, value2);
+	_invokeSetValueCallback(*p, value, value2);
+
+	return _setValue(*p, value, value2, false);
 }
 
 //____ HandlePointPos() ________________________________________________________
@@ -234,8 +246,8 @@ WgCoord WgMultiSlider::HandlePixelPos( int sliderId )
         WgRect canvas = m_pSkin ? m_pSkin->ContentRect( PixelSize(), WG_STATE_NORMAL, m_scale ) : WgRect(PixelSize());
         WgRect sliderGeo = _sliderGeo(*p, canvas);
 
-        pos.x = sliderGeo.x + sliderGeo.w * p->handlePos.x;
-        pos.y = sliderGeo.y + sliderGeo.h * p->handlePos.y;
+        pos.x = sliderGeo.x + (int)(sliderGeo.w * p->handlePos.x);
+        pos.y = sliderGeo.y + (int)(sliderGeo.h * p->handlePos.y);
 
         if( m_pSkin )
             pos += m_pSkin->ContentOfs( WG_STATE_NORMAL, m_scale );
@@ -419,6 +431,14 @@ void WgMultiSlider::_requestRenderHandle(Slider * pSlider)
 	WgRect sliderGeo = _sliderGeo(*pSlider, PixelSize());
 	WgRect handleGeo = _sliderHandleGeo(*pSlider, sliderGeo);
 
+	WgSkinPtr	pBgSkin = pSlider->pBgSkin ? pSlider->pBgSkin : m_pDefaultBgSkin;
+
+	if (pBgSkin && !pBgSkin->IsStateIdentical(WG_STATE_NORMAL, WG_STATE_SELECTED))
+	{
+		WgRect sliderSkinGeo = _sliderSkinGeo(*pSlider, sliderGeo);
+		handleGeo.GrowToContain(sliderSkinGeo);
+	}
+
 	_requestRender(handleGeo);
 }
 
@@ -453,7 +473,10 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 			{
 				Slider * p = _markedSlider(pEvent->PointerPixelPos(), &m_selectPressOfs );
 				if (p)
+				{
+					m_totalDrag = { 0,0 };
 					_selectSlider(p);
+				}
 			}
 			break;
 		}
@@ -475,7 +498,10 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 		{
 			const WgEvent::MouseButtonDrag * p = static_cast<const WgEvent::MouseButtonDrag*>(pEvent);
 
-			if (p->Button() == 1 && m_selectedSlider >=0 )
+			if (p->ModKeys() & WG_MODKEY_CTRL)
+				int l = 0;
+
+			if (p->Button() == 1 && m_selectedSlider >= 0)
 			{
 				Slider& slider = m_sliders[m_selectedSlider];
 
@@ -483,15 +509,35 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				WgRect handleGeo = _sliderHandleGeo(slider, sliderGeo);
 				WgCoordF handleHotspot = slider.handleHotspot.x == -1.f ? m_defaultHandleHotspot : slider.handleHotspot;
 
+				WgCoord movement = p->DraggedNowPixels();
 
-				WgCoord pos = p->PointerPixelPos() - m_selectPressOfs + WgCoord( (int)(handleGeo.w * handleHotspot.x), (int)(handleGeo.h * handleHotspot.y) );		// New hotspot pos for handle.
+				if (p->ModKeys() == WG_MODKEY_CTRL)
+				{
+					movement = movement + m_finetuneFraction;
+					m_finetuneFraction = { movement.x % c_finetuneResolution, movement.y % c_finetuneResolution };
+					movement /= c_finetuneResolution;
+				}
+				else
+					m_finetuneFraction = { 0,0 };
 
-				pos = sliderGeo.Limit(pos);
+				m_totalDrag += movement;
+
+				WgCoord unlimitedPos = p->StartPixelPos() + m_totalDrag - m_selectPressOfs + WgCoord((int)(handleGeo.w * handleHotspot.x), (int)(handleGeo.h * handleHotspot.y));
+
+				WgCoord pos = sliderGeo.Limit(unlimitedPos);
+
+				if (m_bDeltaDrag)
+					m_totalDrag -= unlimitedPos - pos;
+
 
 				float relX = sliderGeo.w == 0 ? 0 : (pos.x - sliderGeo.x) / (float) sliderGeo.w;
 				float relY = sliderGeo.h == 0 ? 0 : (pos.y - sliderGeo.y) / (float)sliderGeo.h;
 
-				_setHandlePosition(slider, { relX,relY } );
+				if (m_bPassive)
+					_calcSendValue(slider, { relX,relY });
+				else
+					_setHandlePosition(slider, { relX,relY });
+
 			}
 			break;
 		}
@@ -524,7 +570,60 @@ void WgMultiSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 		if (pBgSkin)
 		{
 			WgRect bgGeo = _sliderSkinGeo(slider, sliderGeo);
-			pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, _clip, m_scale);
+
+			if (bgGeo.IntersectsWith(_clip))
+			{
+				if (pBgSkin->IsStateIdentical(WG_STATE_NORMAL, WG_STATE_SELECTED))
+					pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, _clip, m_scale);
+				else
+				{
+					WgCoord divider = { sliderGeo.x + (int)(slider.handlePos.x*sliderGeo.w), sliderGeo.y + (int)(slider.handlePos.y*sliderGeo.h) };
+
+					switch (slider.origo)
+					{
+					case WG_NORTHWEST:
+						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						break;
+					case WG_NORTH:
+						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w,divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x, divider.y, bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						break;
+					case WG_NORTHEAST:
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						break;
+					case WG_EAST:
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,bgGeo.h }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.h }), m_scale);
+						break;
+					case WG_SOUTHEAST:
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w, divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,divider.x - bgGeo.x,bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { divider.x, divider.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						break;
+					case WG_SOUTH:
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w,divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x, divider.y, bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						break;
+					case WG_SOUTHWEST:
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w, divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,divider.x - bgGeo.x,bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { divider.x, divider.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						break;
+					case WG_WEST:
+						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,bgGeo.h }), m_scale);
+						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.h }), m_scale);
+						break;
+
+					default:
+						assert(0);
+					}
+				}
+
+			}
 		}
 
 		WgSkinPtr pHandleSkin = slider.pHandleSkin ? slider.pHandleSkin : m_pDefaultHandleSkin;
@@ -592,16 +691,8 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 
 		WgCoordF values;
 
-		if (slider.pSetHandleFunc2D)
-        {
-            auto v = SetHandleVisitor2D(this, &slider);
-            values = slider.pSetHandleFunc2D(v);
-        }
-		else
-		{
-			values.x = (slider.value[0] - slider.bounds[0].min) / (slider.bounds[0].max - slider.bounds[0].min);
-			values.y = (slider.value[1] - slider.bounds[1].min) / (slider.bounds[1].max - slider.bounds[1].min);
-		}
+		values.x = (slider.value[0] - slider.bounds[0].min) / (slider.bounds[0].max - slider.bounds[0].min);
+		values.y = (slider.value[1] - slider.bounds[1].min) / (slider.bounds[1].max - slider.bounds[1].min);
 
 		switch (slider.origo)
 		{
@@ -628,13 +719,7 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 	{
 		float value;
 			
-		if (slider.pSetHandleFunc)
-        {
-            auto v = SetHandleVisitor(this, &slider);
-			value = slider.pSetHandleFunc(v);
-        }
-		else
-			value = (slider.value[0] - slider.bounds[0].min) / (slider.bounds[0].max - slider.bounds[0].min);
+		value = (slider.value[0] - slider.bounds[0].min) / (slider.bounds[0].max - slider.bounds[0].min);
 
 		switch (slider.origo)
 		{
@@ -695,6 +780,7 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 	// Render what needs to be rendered
 
 	WgRect sliderGeo = _sliderGeo(slider, PixelSize());
+
 	WgRect oldHandleGeo = _sliderHandleGeo(slider, sliderGeo);
 
 	slider.handlePos = handlePos;
@@ -706,6 +792,14 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 		_requestRender(oldHandleGeo);
 		_requestRender(newHandleGeo);
 	}
+
+	WgSkinPtr pBgSkin = slider.pBgSkin ? slider.pBgSkin : m_pDefaultBgSkin;
+	if (pBgSkin && !pBgSkin->IsStateIdentical(WG_STATE_NORMAL, WG_STATE_SELECTED))
+	{
+		WgRect sliderSkinGeo = _sliderSkinGeo(slider, sliderGeo);
+		_requestRender(sliderSkinGeo);
+	}
+
 
 	return;
 }
@@ -804,13 +898,35 @@ WgRect  WgMultiSlider::_sliderHandleGeo(Slider& slider, const WgRect& sliderGeo)
 	return { pos,sz };
 }
 
+
+//____ invokeSetValueCallback() _____________________________________________
+
+void WgMultiSlider::_invokeSetValueCallback(Slider& slider, float& value, float& value2)
+{
+	if (slider.pSetValueFunc)
+	{
+		SetValueVisitor v(this, &slider, value);
+		value = slider.pSetValueFunc(v);
+		value2 = NAN;
+	}
+	else if (slider.pSetValueFunc2D)
+	{
+		SetValueVisitor2D v(this, &slider, { value, value2 });
+		WgCoordF values = slider.pSetValueFunc2D(v);
+		value = values.x;
+		value2 = values.y;
+	}
+}
+
+
+
 //____ _setValue() ____________________________________________________________
 
-float WgMultiSlider::_setValue(Slider& slider, float value, float value2 )
+float WgMultiSlider::_setValue(Slider& slider, float value, float value2, bool bSendOnUpdate )
 {
-    bool bUpdate = false;
+	WG_LIMIT(value, slider.bounds[0].min, slider.bounds[0].max);
 
-    WG_LIMIT(value, slider.bounds[0].min, slider.bounds[0].max);
+	bool bUpdate = false;
 
     if(value != slider.value[0] )
     {
@@ -839,19 +955,132 @@ float WgMultiSlider::_setValue(Slider& slider, float value, float value2 )
 
         _refreshSliderGeo();
 
-        // Callback
+		// Send values
 
-        if (m_callback)
-            m_callback(slider.id, value, value2);
-
-        // Send event
-
-        WgEventHandler * pHandler = _eventHandler();
-        if (pHandler)
-            pHandler->QueueEvent(new WgEvent::SliderMoved(this,slider.id, value, value2));
-        
+		if( bSendOnUpdate )
+			_sendValue(slider, value, value2);
+ 
     }
 	return value;
+}
+
+
+//____ _calcSendValue() _______________________________________________________
+
+WgCoordF WgMultiSlider::_calcSendValue(Slider& slider, WgCoordF pos)
+{
+	// Get parameters controlled by X and Y axies.
+
+	int x = -1;
+	int y = -1;
+
+	switch (slider.origo)
+	{
+	case WG_WEST:
+	case WG_EAST:
+		x = 0;
+		break;
+
+	case WG_NORTH:
+	case WG_SOUTH:
+		y = 0;
+		break;
+
+	case WG_NORTHWEST:
+	case WG_NORTHEAST:
+	case WG_SOUTHEAST:
+	case WG_SOUTHWEST:
+		x = 0;
+		y = 1;
+		break;
+	default:
+		assert(false);   // Should never get here!
+	}
+
+	// Align position to even step sizes.
+
+	if (x >= 0)
+	{
+		if (slider.bounds[x].steps != 0)
+		{
+			float stepSize = 1.f / (slider.bounds[x].steps - 1);
+			pos.x += stepSize / 2;
+			pos.x -= fmod(pos.x, stepSize);
+		}
+	}
+
+	if (y >= 0)
+	{
+		if (slider.bounds[y].steps != 0)
+		{
+			float stepSize = 1.f / (slider.bounds[y].steps / 1);
+			pos.y += stepSize / 2;
+			pos.y -= fmod(pos.y, stepSize);
+		}
+	}
+
+	// Limit range
+
+	WG_LIMIT(pos.x, 0.f, 1.f);
+	WG_LIMIT(pos.y, 0.f, 1.f);
+
+	// Early out if nothing has changed
+
+	if (pos == slider.handlePos)
+		return pos;
+
+	// Set handle position and handle re-rendering.
+
+//	_requestRenderHandle(&slider);
+//	slider.handlePos = pos;
+//	_requestRenderHandle(&slider);
+
+	// Calculate values from handle position
+
+	float	value;
+	float	value2;
+
+
+	WgCoordF	handleFactor = _convertFactorPos(pos, slider.origo);
+
+	if (slider.is2D)
+	{
+		value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.x;
+		value2 = slider.bounds[1].min + (slider.bounds[1].max - slider.bounds[1].min)*handleFactor.y;
+	}
+	else
+	{
+		if (x >= 0)
+			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.x;
+		else
+			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.y;
+		value2 = NAN;
+	}
+
+	// Set values and possibly update any other affected sliders
+
+	_sendValue(slider, value, value2);
+	return pos;
+}
+
+
+
+
+//____ _sendValue() ____________________________________________________________
+
+void WgMultiSlider::_sendValue(Slider& slider, float value, float value2)
+{
+	// Callback
+
+	if (m_callback)
+		m_callback(slider.id, value, value2);
+
+	// Send event
+
+	WgEventHandler * pHandler = _eventHandler();
+	if (pHandler)
+		pHandler->QueueEvent(new WgEvent::SliderMoved(this, slider.id, value, value2));
+
 }
 
 
@@ -930,59 +1159,29 @@ WgCoordF WgMultiSlider::_setHandlePosition(Slider& slider, WgCoordF pos)
 	float	value;
 	float	value2;
 
-	if (slider.pSetValueFunc)
+	WgCoordF	handleFactor = _convertFactorPos(slider.handlePos, slider.origo);
+
+	if (slider.is2D)
 	{
-		SetValueVisitor v(this, &slider);
-		value = slider.pSetValueFunc(v);
-		value2 = NAN;
-	}
-	else if (slider.pSetValueFunc2D)
-	{
-		SetValueVisitor2D v(this, &slider);
-		WgCoordF values = slider.pSetValueFunc2D(v);
-		value = values.x;
-		value2 = values.y;
+		value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.x;
+		value2 = slider.bounds[1].min + (slider.bounds[1].max - slider.bounds[1].min)*handleFactor.x;
 	}
 	else
 	{
-		WgCoordF	handleFactor = _handleFactor(slider);
-
-		if (slider.is2D)
-		{
+		if (x >= 0)
 			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.x;
-			value2 = slider.bounds[1].min + (slider.bounds[1].max - slider.bounds[1].min)*handleFactor.x;
-		}
 		else
-		{
-			if (x >= 0)
-				value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.x;
-			else
-				value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.y;
-			value2 = NAN;
-		}
+			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.y;
+		value2 = NAN;
 	}
 
 	// Set values and possibly update any other affected sliders
 
-	_setValue(slider, value, value2);
+	_invokeSetValueCallback(slider, value, value2);
+	_setValue(slider, value, value2, true);
 	return pos;
 }
 
-
-//____ _setHandleFactor() _____________________________________________________
-
-WgCoordF WgMultiSlider::_setHandleFactor(Slider& slider, WgCoordF factor)
-{
-	return _setHandlePosition(slider, _convertFactorPos(factor, slider.origo));
-}
-
-
-//____ _handleFactor() ________________________________________________________
-
-WgCoordF WgMultiSlider::_handleFactor(Slider& slider)
-{
-	return _convertFactorPos(slider.handlePos, slider.origo);
-}
 
 //____ _convertFactorPos() ________________________________________________________
 
@@ -1068,73 +1267,67 @@ WgMultiSlider::SetValueVisitorBase::SetValueVisitorBase(WgMultiSlider * pWidget,
 {
 }
 
-//____ SetValueVisitorBase::handleFactor() _______________________________________
+//____ SetValueVisitorBase::value() _______________________________________
 
-float WgMultiSlider::SetValueVisitorBase::handleFactor(int sliderId)
+float WgMultiSlider::SetValueVisitorBase::value(int sliderId)
 {
 	Slider * p = m_pWidget->_findSlider(sliderId);
 	if (!p || p->is2D)
 		return NAN;
 
-	WgCoordF pos = m_pWidget->_handleFactor(*p);
-
-	return (p->origo == WG_WEST || p->origo == WG_EAST) ? pos.x : pos.y;
+	return p->value[0];
 }
 
-//____ SetValueVisitorBase::setHandleFactor() _______________________________________
+//____ SetValueVisitorBase::setValue() _______________________________________
 
-float WgMultiSlider::SetValueVisitorBase::setHandleFactor(int sliderId, float value)
+float WgMultiSlider::SetValueVisitorBase::setValue(int sliderId, float value)
 {
 	Slider * p = m_pWidget->_findSlider(sliderId);
 	if (!p || p->is2D)
 		return NAN;
 
-	WgCoordF pos;
-	if (p->origo == WG_WEST || p->origo == WG_EAST)
-		pos.x = value;
-	else
-		pos.y = value;
-
-	pos = m_pWidget->_setHandleFactor(*p, pos);
-	return (p->origo == WG_WEST || p->origo == WG_EAST) ? pos.x : pos.y;
+	bool bSendOnUpdate = (p == m_pSlider) ? false : true;
+	return m_pWidget->_setValue(*p, value, NAN, bSendOnUpdate);
 }
 
-//____ SetValueVisitorBase::handleFactor2D() _______________________________________
+//____ SetValueVisitorBase::value2D() _______________________________________
 
-WgCoordF WgMultiSlider::SetValueVisitorBase::handleFactor2D(int sliderId)
+WgCoordF WgMultiSlider::SetValueVisitorBase::value2D(int sliderId)
 {
 	Slider * p = m_pWidget->_findSlider(sliderId);
 	if (!p || !p->is2D)
 		return WgCoordF(NAN,NAN);
 
-	return m_pWidget->_handleFactor(*p); 
+	return { p->value[0], p->value[0] };
 }
 
-//____ SetValueVisitorBase::setHandleFactor2D() _______________________________________
+//____ SetValueVisitorBase::setValue2D() _______________________________________
 
-WgCoordF WgMultiSlider::SetValueVisitorBase::setHandleFactor2D(int sliderId, WgCoordF value)
+WgCoordF WgMultiSlider::SetValueVisitorBase::setValue2D(int sliderId, WgCoordF value)
 {
 	Slider * p = m_pWidget->_findSlider(sliderId);
 	if (!p || !p->is2D)
-		return WgCoordF(NAN,NAN);
+		return WgCoordF(NAN, NAN);
 
-	return  m_pWidget->_setHandleFactor(*p, value);
+	bool bSendOnUpdate = (p == m_pSlider) ? false : true;
+	m_pWidget->_setValue(*p, value.x, value.y, bSendOnUpdate);
+
+	return { p->value[0], p->value[1] };
 }
 
 
 //____ SetValueVisitor::Constructor ___________________________________________
 
-WgMultiSlider::SetValueVisitor::SetValueVisitor(WgMultiSlider * pWidget, WgMultiSlider::Slider * pSlider) : SetValueVisitorBase(pWidget,pSlider) 
+WgMultiSlider::SetValueVisitor::SetValueVisitor(WgMultiSlider * pWidget, WgMultiSlider::Slider * pSlider, float value) : SetValueVisitorBase(pWidget,pSlider) 
 {
+	m_value = value;
 }
 
-//____ SetValueVisitor::handleFactor() ___________________________________________
+//____ SetValueVisitor::value() ___________________________________________
 
-float WgMultiSlider::SetValueVisitor::handleFactor()
+float WgMultiSlider::SetValueVisitor::value()
 {
-	WgCoordF pos = m_pWidget->_handleFactor(*m_pSlider);
-
-	return (m_pSlider->origo == WG_WEST || m_pSlider->origo == WG_EAST) ? pos.x : pos.y;
+	return m_value;
 }
 
 //____ SetValueVisitor::valueBounds() ___________________________________________
@@ -1147,15 +1340,16 @@ WgMultiSlider::Bounds WgMultiSlider::SetValueVisitor::valueBounds()
 
 //____ SetValueVisitor2D::Constructor ___________________________________________
 
-WgMultiSlider::SetValueVisitor2D::SetValueVisitor2D(WgMultiSlider * pWidget, WgMultiSlider::Slider * pSlider) : SetValueVisitorBase(pWidget, pSlider)
+WgMultiSlider::SetValueVisitor2D::SetValueVisitor2D(WgMultiSlider * pWidget, WgMultiSlider::Slider * pSlider, WgCoordF value) : SetValueVisitorBase(pWidget, pSlider)
 {
+	m_value = value;
 }
 
-//____ SetValueVisitor2D::handleFactor2D() _______________________________________
+//____ SetValueVisitor2D::value2D() _______________________________________
 
-WgCoordF WgMultiSlider::SetValueVisitor2D::handleFactor2D()
+WgCoordF WgMultiSlider::SetValueVisitor2D::value2D()
 {
-	return m_pWidget->_handleFactor(*m_pSlider);
+	return m_value;
 }
 
 //____ SetValueVisitor2D::valueBoundsX() ___________________________________________
@@ -1168,61 +1362,6 @@ WgMultiSlider::Bounds WgMultiSlider::SetValueVisitor2D::valueBoundsX()
 //____ SetValueVisitor2D::valueBoundsY() ___________________________________________
 
 WgMultiSlider::Bounds WgMultiSlider::SetValueVisitor2D::valueBoundsY()
-{
-	return m_pSlider->bounds[1];
-}
-
-//____ SetHandleVisitor::Constructor _______________________________________
-
-WgMultiSlider::SetHandleVisitor::SetHandleVisitor(WgMultiSlider * pWidget, Slider * pSlider) : Visitor(pWidget,pSlider)
-{
-}
-
-//____ SetHandleVisitor::value() ___________________________________________
-
-float WgMultiSlider::SetHandleVisitor::value()
-{
-	return m_pSlider->value[0];
-}
-
-//____ SetHandleVisitor::valueBounds() __________________________________________
-
-WgMultiSlider::Bounds WgMultiSlider::SetHandleVisitor::valueBounds()
-{
-	return m_pSlider->bounds[0];
-}
-
-
-//____ SetHandleVisitor2D::Constructor _______________________________________
-
-WgMultiSlider::SetHandleVisitor2D::SetHandleVisitor2D(WgMultiSlider * pWidget, Slider * pSlider) : Visitor(pWidget, pSlider)
-{
-}
-
-//____ SetHandleVisitor2D::valueX() ___________________________________________
-
-float WgMultiSlider::SetHandleVisitor2D::valueX()
-{
-	return m_pSlider->value[0];
-}
-
-//____ SetHandleVisitor2D::valueY() ___________________________________________
-
-float WgMultiSlider::SetHandleVisitor2D::valueY()
-{
-	return m_pSlider->value[1];
-}
-
-//____ SetHandleVisitor2D::valueBoundsX() __________________________________________
-
-WgMultiSlider::Bounds WgMultiSlider::SetHandleVisitor2D::valueBoundsX()
-{
-	return m_pSlider->bounds[0];
-}
-
-//____ SetHandleVisitor2D::valueBoundsY() __________________________________________
-
-WgMultiSlider::Bounds WgMultiSlider::SetHandleVisitor2D::valueBoundsY()
 {
 	return m_pSlider->bounds[1];
 }

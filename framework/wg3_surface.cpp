@@ -74,7 +74,7 @@ namespace wg
 		m_accessMode	= AccessMode::None;
 		m_pPixels		= nullptr;
 		m_pClut			= nullptr;
-		m_scaleMode		= ScaleMode::Nearest;
+		m_scaleMode = ScaleMode::Interpolate; // Should be ScaleMode::Nearest, but that is not supported in software renderer yet!
 		
 		memset( &m_pixelDescription, 0, sizeof(PixelDescription) );
 	}

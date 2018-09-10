@@ -25,6 +25,7 @@
 #include <wg_font.h>
 #include <wg_gfxdevice.h>
 #include <wg_eventhandler.h>
+#include <wg_util.h>
 
 static const char	c_widgetType[] = {"TextDisplay"};
 
@@ -104,20 +105,51 @@ void WgTextDisplay::SetEditMode(WgTextEditMode mode)
 
 int WgTextDisplay::MatchingPixelHeight( int width ) const
 {
-    WgSize padding = m_pSkin ? m_pSkin->ContentPadding(m_scale) : WgSize(0,0);
-    int height = m_text.heightForWidth( width - padding.w );
-    return height + padding.h;
+	int height = 0;
+
+	if (m_pSkin)
+		height = m_pSkin->PreferredSize(m_scale).h;
+
+	if (m_text.nbChars() != 0)
+	{
+		WgSize padding;
+
+		if (m_pSkin)
+			padding = m_pSkin->ContentPadding(m_scale);
+
+		int heightForText = m_text.heightForWidth(width - padding.w) + padding.h;
+		if (heightForText > height)
+			height = heightForText;
+	}
+
+	return height;
 }
 
 //____ PreferredPixelSize() _____________________________________________________________
 
 WgSize WgTextDisplay::PreferredPixelSize() const
 {
+	WgSize bestSize;
 
-	WgSize sz = m_text.unwrappedSize();
 	if (m_pSkin)
-		sz = m_pSkin->SizeForContent(sz, m_scale);
-	return sz;
+		bestSize = m_pSkin->PreferredSize(m_scale);
+
+
+	if (m_text.nbChars() != 0)
+	{
+		WgSize textSize = m_text.unwrappedSize();
+
+		if (m_pSkin)
+			textSize += m_pSkin->ContentPadding(m_scale);
+
+		if (textSize.w > bestSize.w)
+			bestSize.w = textSize.w;
+
+		if (textSize.h > bestSize.h)
+			bestSize.h = textSize.h;
+	}
+
+	return bestSize;
 }
 
 //____ GetPointerStyle() ________________________________________
@@ -150,9 +182,13 @@ WgString WgTextDisplay::GetTooltipString() const
 
 void WgTextDisplay::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
+	if( m_pSkin )
+		m_pSkin->Render(pDevice, m_state, _canvas, _clip, m_scale);
 
-	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
+	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, m_state, m_scale) : _canvas;
+
+
+	m_text.setMode(WgUtil::StateToMode(m_state));
 
 	WgText * pText = &m_text;
 
@@ -182,6 +218,8 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 {
 	bool bSwallowed = false;
 
+	WgState	oldState = m_state;
+
 	int type 				= pEvent->Type();
 	WgModifierKeys modKeys 	= pEvent->ModKeys();
 
@@ -195,6 +233,26 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 		return;
 	}
 
+
+	if (type == WG_EVENT_MOUSE_ENTER)
+	{
+		m_state.setHovered(true);
+	}
+
+	if (type == WG_EVENT_MOUSE_LEAVE)
+	{
+		m_state.setHovered(false);
+	}
+
+	if(type == WG_EVENT_MOUSEBUTTON_PRESS)
+	{
+		m_state.setPressed(true);
+	}
+
+	if (type == WG_EVENT_MOUSEBUTTON_RELEASE)
+	{
+		m_state.setPressed(false);
+	}
 
 
 	if( m_bFocused && (type == WG_EVENT_MOUSEBUTTON_PRESS || type == WG_EVENT_MOUSEBUTTON_DRAG) && ((const WgEvent::MouseButtonEvent*)(pEvent))->Button() == 1 )
@@ -363,6 +421,17 @@ void WgTextDisplay::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 		RequestRender();
 */
 
+	//
+
+	if (oldState != m_state)
+	{
+		if (m_pSkin && !m_pSkin->IsStateIdentical(m_state, oldState))
+			_requestRender();
+
+		m_text.setMode(WgUtil::StateToMode(m_state));
+	}
+
+
 	// Forward event depending on rules.
 
 	if (!bSwallowed)
@@ -406,7 +475,12 @@ void WgTextDisplay::_onDisable( void )
 
 void WgTextDisplay::_onNewSize( const WgSize& size )
 {
-	m_text.setLineWidth( size.w );
+	WgRect	contentRect(0, 0, PixelSize());
+
+	if (m_pSkin)
+		contentRect = m_pSkin->ContentRect(contentRect, WG_STATE_NORMAL, m_scale);
+
+	m_text.setLineWidth( contentRect.w );
 }
 
 
@@ -448,6 +522,8 @@ void WgTextDisplay::_setScale( int scale )
 	WgWidget::_setScale(scale);
 
 	m_text.SetScale(scale);
+
+	_requestResize();
 }
 
 

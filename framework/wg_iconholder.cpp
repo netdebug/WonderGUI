@@ -23,6 +23,8 @@
 #include <wg_iconholder.h>
 #include <wg_util.h>
 
+#include <algorithm>
+
 //____ Constructor ____________________________________________________________
 
 WgIconHolder::WgIconHolder()
@@ -92,22 +94,24 @@ void WgIconHolder::SetIconPushingText( bool bPush )
 WgRect WgIconHolder::_getIconRect( const WgRect& contentRect, const WgBlocksetPtr& pBlocks, int scale ) const
 {
 	if( pBlocks )
-		return _getIconRect(contentRect, WgSize(pBlocks->Size(scale)));
+		return _getIconRect(contentRect, WgSize(pBlocks->Size(scale)), scale);
 	else
 		return WgRect();
 }
 
-WgRect WgIconHolder::_getIconRect( const WgRect& contentRect, const WgSize& iconSize ) const
+WgRect WgIconHolder::_getIconRect( const WgRect& contentRect, const WgSize& iconSize, int scale ) const
 {
 	WgRect rect;
+
+	WgBorders iconBorders = m_iconBorders.Scale(scale);
 
 	int w = iconSize.w;
 	int h = iconSize.h;
 
 	if( w > 0 && h > 0 )
 	{
-		int bgW = contentRect.w - m_iconBorders.Width();
-		int bgH = contentRect.h - m_iconBorders.Height();
+		int bgW = contentRect.w - iconBorders.Width();
+		int bgH = contentRect.h - iconBorders.Height();
 
 		if( m_iconScale != 0.f )
 		{
@@ -125,12 +129,12 @@ WgRect WgIconHolder::_getIconRect( const WgRect& contentRect, const WgSize& icon
 
 		// 
 
-		w += m_iconBorders.Width();
-		h += m_iconBorders.Height();
+		w += iconBorders.Width();
+		h += iconBorders.Height();
 
 		rect = WgUtil::OrigoToRect( m_iconOrigo, contentRect.Size(), WgSize(w,h) );
 		rect += contentRect.Pos();
-		rect -= m_iconBorders;
+		rect -= iconBorders;
 	}
 
 	return rect;
@@ -191,6 +195,27 @@ WgRect WgIconHolder::_getTextRect( const WgRect& contentRect, const WgRect& icon
 
 	return textRect;
 }
+
+//____ _expandTextRect() ______________________________________________________
+
+WgSize WgIconHolder::_expandTextRect(WgSize textRectSize, WgBlocksetPtr pIconBlock, int scale) const
+{
+	if (!pIconBlock)
+		return textRectSize;
+
+	WgSize iconSize = pIconBlock->Size(scale) + m_iconBorders.Scale(scale);
+
+	if (m_bIconPushText)
+	{
+		if (m_iconOrigo == WG_NORTH || m_iconOrigo == WG_CENTER || m_iconOrigo == WG_SOUTH )
+			return { std::max(textRectSize.w, iconSize.w), textRectSize.h + iconSize.h };
+		else
+			return { textRectSize.w + iconSize.w , std::max(textRectSize.h, iconSize.h) };
+	}
+	else
+		return { std::max(textRectSize.w, iconSize.w), std::max(textRectSize.h, iconSize.h) };
+}
+
 
 //____ _onCloneContent() ________________________________________________________
 

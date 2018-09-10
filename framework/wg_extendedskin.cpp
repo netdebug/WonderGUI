@@ -145,3 +145,16 @@ WgRect WgExtendedSkin::ContentRect( const WgRect& canvas, WgState state, int sca
 	WgBorders padding(m_contentPadding.left *scale >> WG_SCALE_BINALS, m_contentPadding.top *scale >> WG_SCALE_BINALS, m_contentPadding.right *scale >> WG_SCALE_BINALS, m_contentPadding.bottom *scale >> WG_SCALE_BINALS);
 	return (canvas - padding) + shift;
 }
+
+//____ IsStateIdentical() _____________________________________________________
+
+bool WgExtendedSkin::IsStateIdentical(WgState state, WgState comparedTo) const
+{
+	int i1 = WgUtil::_stateToIndex(state);
+	int i2 = WgUtil::_stateToIndex(comparedTo);
+
+	if (m_contentShift[i1] == m_contentShift[i2] )
+		return true;
+
+	return false;
+}

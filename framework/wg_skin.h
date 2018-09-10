@@ -60,7 +60,9 @@ public:
 	virtual bool	IsOpaque() const = 0;
 	virtual bool	IsOpaque( WgState state ) const = 0;
 	virtual bool	IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState state, int scale ) const = 0;
-	
+
+	virtual bool	IsStateIdentical(WgState state, WgState comparedTo) const = 0;
+
 protected:
 	WgSkin() {};
 	

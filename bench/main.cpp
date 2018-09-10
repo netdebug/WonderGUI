@@ -47,10 +47,11 @@
 
 #include <wg_popupopener.h>
 #include <wg_popuplayer.h>
+#include <wg_blockset.h>
 
 #include "testwidget.h"
 
-#define USE_OPEN_GL
+//#define USE_OPEN_GL
 
 
 WgSurfaceFactory *	g_pSurfaceFactory = nullptr;
@@ -159,7 +160,7 @@ int main ( int argc, char** argv )
 #endif
 
 
-	IMG_Init( IMG_INIT_PNG | IMG_INIT_JPG );
+	int res = IMG_Init( IMG_INIT_PNG | IMG_INIT_JPG );
 
 
 	SDL_Thread *thread;
@@ -526,6 +527,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	WgRootPanel * pRoot = new WgRootPanel(pDevice);
 
+	pRoot->SetScale(8192);
+
 	WgEventHandler * pEventHandler = pRoot->EventHandler();
 
 	WgEventLogger * pEventLogger = new WgEventLogger(std::cout);
@@ -566,6 +569,10 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	auto pPressablePlateSkin = WgBlockSkin::CreateClickableFromSurface(pPlateImg, 0, WgBorders(3));
 
+	WgSurface * pInjectWidget = sdl_wglib::LoadSurface("../resources/IDR_MOD_INJECT_WIDGET_CHROME.2x.png", *g_pSurfaceFactory);
+	pInjectWidget->SetScaleFactor(4096 * 2);
+
+	
 
 //	WgBlockSkinPtr pTagSkin = WgBlockSkin::Create();
 
@@ -580,7 +587,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	WgFlexPanel * pBottom = new WgFlexPanel();
 	pPopupLayer->SetBase(pBottom); 
 //	pRoot->SetChild(pBottom);
-	pBottom->SetSkin(WgColorSkin::Create(WgColor::black));
+	pBottom->SetSkin(WgColorSkin::Create({60,60,60,255} ));
+//	pBottom->SetSkin(WgColorSkin::Create({ 255,255,255,255 }));
 
 	// Main Flex
 
@@ -588,11 +596,42 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pBottom->AddChild(pFlex, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(10));
 
 	// Background
-
+/*
 	WgImage * pBackground = new WgImage();
 	pBackground->SetSource(pBackBlock);
 	WgFlexHook * pHook = pFlex->AddChild(pBackground);
 	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
+*/
+
+	// BlendTest
+
+	{
+		auto pSkin = WgBlockSkin::CreateStaticFromSurface(pInjectWidget);
+
+		WgImage * pImage = new WgImage();
+		pImage->SetSkin(pSkin);
+
+		WgShaderCapsule * pShader = new WgShaderCapsule();
+		pShader->SetChild(pImage);
+//		pShader->SetBlendMode(WgBlendMode::WG_BLENDMODE_OPAQUE);
+
+		WgCanvasCapsule * pCapsule = new WgCanvasCapsule();
+		pCapsule->SetSurfaceFactory(g_pSurfaceFactory);
+		pCapsule->SetChild(pShader);
+
+
+
+
+		WgFlexHook * pHook = pFlex->AddChild(pCapsule, WgRect( 20,20,366/2,178/2 ) );
+
+
+		WgImage * pFacitImage = new WgImage();
+		pFacitImage->SetSkin(pSkin);
+		WgFlexHook * pHook2 = pFlex->AddChild(pFacitImage, WgRect(240, 20, 366 / 2, 178 / 2));
+
+	}
+
+
 
 
 	// Animplayer test
@@ -763,12 +802,13 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 */
 
 	// Popup Layer Test
-	
+/*
 	{
 		auto pOpener = new WgPopupOpener();
 
 		pOpener->SetSkin(pPressablePlateSkin);
 		pOpener->SetText("OPEN");
+
 //		pOpener->setPointerStyle(PointerStyle::Crosshair);
 
 		pFlex->AddChild(pOpener, WgRect(30, 30, 100, 100) );
@@ -798,10 +838,14 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pEntry3->SetSkin(pPressablePlateSkin);
 		pMenu->AddChild(pEntry3);
 
+		//---
+
 		auto pSubMenuOpener = new WgPopupOpener();
 		pSubMenuOpener->SetText("Sub Menu");
 		pSubMenuOpener->SetSkin(pPressablePlateSkin);
 		pSubMenuOpener->SetOpenOnHover(true);
+		pSubMenuOpener->SetAttachPoint(WG_NORTHEAST);
+		pSubMenuOpener->SetPopupOffset({ -10,5 });
 		pMenu->AddChild(pSubMenuOpener);
 
 
@@ -826,6 +870,39 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 		pSubMenuOpener->SetPopup(pSubMenu);
 
+		//---
+
+		auto pSubMenuOpener2 = new WgPopupOpener();
+		pSubMenuOpener2->SetText("Sub Menu 2");
+		pSubMenuOpener2->SetSkin(pPressablePlateSkin);
+		pSubMenuOpener2->SetOpenOnHover(true);
+		pSubMenuOpener2->SetAttachPoint(WG_NORTHEAST);
+		pMenu->AddChild(pSubMenuOpener2);
+
+
+		auto pSubMenu2 = new WgPackPanel();
+		pSubMenu2->SetOrientation(WG_VERTICAL);
+		pSubMenu2->SetSkin(pSkin);
+
+		auto pSubEntry21 = new WgTextDisplay();
+		pSubEntry21->SetText("Subentry A");
+		pSubEntry21->SetSkin(pPressablePlateSkin);
+		pSubMenu2->AddChild(pSubEntry21);
+
+		auto pSubEntry22 = new WgTextDisplay();
+		pSubEntry22->SetText("Subentry B");
+		pSubEntry22->SetSkin(pPressablePlateSkin);
+		pSubMenu2->AddChild(pSubEntry22);
+
+		auto pSubEntry23 = new WgTextDisplay();
+		pSubEntry23->SetText("Subentry C");
+		pSubEntry23->SetSkin(pPressablePlateSkin);
+		pSubMenu2->AddChild(pSubEntry23);
+
+		pSubMenuOpener2->SetPopup(pSubMenu2);
+
+		//---
+
 		auto pButtons = new WgPackPanel();
 		
 		auto pBtn1 = new WgButton();
@@ -843,7 +920,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pOpener->SetPopup( pMenu );
 
 	}
-
+*/
 
 
 	// Button skin test
@@ -968,9 +1045,12 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	// Multislider widget
-/*
 
-	WgSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::black, 1, WgColor::black);
+/*
+	WgBoxSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::grey, 1, WgColor::grey);
+	pSliderBgSkin->SetStateColor(WG_STATE_HOVERED, WgColor::blue);
+	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED, WgColor::black, WgColor::black);
+
 
 	WgBoxSkinPtr pSliderHandleSkin = WgBoxSkin::Create(WgColor::white, 1, WgColor::red);
 	pSliderHandleSkin->SetContentPadding(10);
@@ -984,13 +1064,19 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin);
 
+	pMultiSlider->SetPassive(true);
+
+	pMultiSlider->SetCallback([pMultiSlider](int sliderId, float value, float value2) 
+	{ 
+		pMultiSlider->SetSliderValue(sliderId, value, value2); 
+	}
+	);
 
 	pMultiSlider->AddSlider2D(0, WG_NORTHWEST, 
 						[](WgMultiSlider::SetGeoVisitor& visitor) {
 							return WgRectF( 0.1f, 0.1f, 0.8f, 0.1f ); 
 						},
 						0.00f, 0.50f, -3.5f, 2.1f, 5, 0.f, 1.f, 0,
-						nullptr,
 						nullptr
 						);
 
@@ -1002,29 +1088,26 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 							return WgRectF( r.x + r.w*c.x, r.y + r.h*c.y + 0.1f, 0.0f, 1.f - r.y -0.2f ); 
 						},
 						0.25f, 0.f, 1.f, 0,
-						[](WgMultiSlider::SetHandleVisitor& visitor) {
-							return visitor.value();
-						},
 						[](WgMultiSlider::SetValueVisitor& visitor) {
 
 							static float prevValue = -1.f;
 
-							float	value = visitor.handleFactor();
+							float	value = visitor.value();
 							if (value < 0.001f)
 								value = 0.001f;
 
 							if (prevValue == -1.f)
-								prevValue = visitor.handleFactor();
+								prevValue = visitor.value();
 
 							float	scaleFactor = value/prevValue;
 
 
 							prevValue = value;
 
-							visitor.setHandleFactor(2, visitor.handleFactor(2)*scaleFactor);
-							visitor.setHandleFactor(3, visitor.handleFactor(3)*scaleFactor);
+							visitor.setValue(2, visitor.value(2)*scaleFactor);
+							visitor.setValue(3, visitor.value(3)*scaleFactor);
 
-							return visitor.handleFactor();
+							return visitor.value();
 						});
 
 	pMultiSlider->AddSlider(2, WG_UP,
@@ -1034,11 +1117,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 							return WgRectF(r.x-0.1f, r.y + 0.1f, r.w, r.h - 0.2f); 
 						},
 						0.25f, 0.f, 1.f, 0,
-						[](WgMultiSlider::SetHandleVisitor& visitor) {
-							return visitor.value();
-						},
 						[](WgMultiSlider::SetValueVisitor& visitor) {
-							return visitor.handleFactor(); 
+							return visitor.value(); 
 						});
 	
 	pMultiSlider->AddSlider(3, WG_UP,
@@ -1048,11 +1128,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 							return WgRectF(r.x + 0.1f, r.y + 0.1f, r.w, r.h - 0.2f );
 						},
 						0.75f, 0.f, 1.f, 0,
-						[](WgMultiSlider::SetHandleVisitor& visitor) {						
-							return visitor.value();
-						},
 						[](WgMultiSlider::SetValueVisitor& visitor) { 
-							return visitor.handleFactor(); 
+							return visitor.value(); 
 						}, nullptr, nullptr, { 1.f,1.f }, WgBorders(10) );
 
 
@@ -1060,6 +1137,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pFlex->SetScale(WG_SCALE_BASE * 2);
 */
+
 	// Scroll chart widget
 
 /*

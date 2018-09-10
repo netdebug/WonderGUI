@@ -458,3 +458,20 @@ WgState WgUtil::FallbackState(WgState state, int step)
 
 	return WgState((WgStateEnum) (state & mask[step]));
 }
+
+//____ StateToMode() __________________________________________________________
+
+WgMode WgUtil::StateToMode(WgState state)
+{
+	WgMode mode = WG_MODE_NORMAL;
+
+	if (!state.isEnabled())
+		mode = WG_MODE_DISABLED;
+	else if (state.isPressed())
+		mode = WG_MODE_SELECTED;
+	else if (state.isHovered())
+		mode = WG_MODE_MARKED;
+
+	return mode;
+}
+

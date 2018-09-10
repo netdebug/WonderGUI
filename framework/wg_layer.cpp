@@ -23,6 +23,8 @@
 #include <wg_layer.h>
 #include <wg_patches.h>
 
+static const char    c_basehookType[] = {"LayerBasehook"};
+
 
 //____ Constructor ____________________________________________________________
 
@@ -217,4 +219,16 @@ void WgLayerHook::_requestRender( const WgRect& rect )
 WgLayer* WgLayerHook::Parent() const
 { 
 	return static_cast<WgLayer*>(_parent()); 
+}
+
+//_____________________________________________________________________________
+const char * WgLayer::BaseHook::Type( void ) const
+{
+    return ClassType();
+}
+
+//_____________________________________________________________________________
+const char * WgLayer::BaseHook::ClassType()
+{
+    return c_basehookType;
 }

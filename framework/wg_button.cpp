@@ -192,7 +192,7 @@ WgSize WgButton::PreferredPixelSize() const
 			bestSize.h = textSize.h;
 	}
 
-	//TODO: Take icon into account.
+	bestSize = _expandTextRect(bestSize, m_pIconGfx, m_scale);
 
 	return bestSize;
 }

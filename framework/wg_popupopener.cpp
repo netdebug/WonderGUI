@@ -37,7 +37,7 @@ static const char	c_widgetType[] = {"PopupOpener"};
 
 WgPopupOpener::WgPopupOpener() : m_attachPoint(WG_SOUTHWEST), m_bOpenOnHover(false), m_bOpen(false)
 {
-
+	m_bSelectable = false;
 
 	m_pText = &m_text;
 	m_text.setAlignment( WG_CENTER );
@@ -128,6 +128,13 @@ void WgPopupOpener::SetAttachPoint(WgOrigo attachPoint)
 	m_attachPoint = attachPoint;
 }
 
+//____ SetPopupOffset() _______________________________________________________
+
+void WgPopupOpener::SetPopupOffset(WgCoord offset)
+{
+	m_popupOfs = offset;
+}
+
 
 //____ GetTextAreaWidth() _____________________________________________________
 
@@ -193,7 +200,7 @@ WgSize WgPopupOpener::PreferredPixelSize() const
 			bestSize.h = textSize.h;
 	}
 
-	//TODO: Take icon into account.
+	bestSize = _expandTextRect(bestSize, m_pIconGfx, m_scale);
 
 	return bestSize;
 }
@@ -210,14 +217,7 @@ void WgPopupOpener::_setState(WgState state)
 	}
 //	WgWidget::_setState(state);
 
-	WgMode mode = WG_MODE_NORMAL;
-
-	if (!m_state.isEnabled())
-		mode = WG_MODE_DISABLED;
-	else if (m_state.isPressed())
-		mode = WG_MODE_SELECTED;
-	else if (m_state.isHovered())
-		mode = WG_MODE_MARKED;
+	WgMode mode = WgUtil::StateToMode(m_state);
 
 	m_text.setMode(mode);
 	_requestRender(); //TODO: Only requestRender if text appearance has changed (let m_text.setState() return if rendering is needed)
@@ -269,9 +269,13 @@ void WgPopupOpener::_setScale( int scale )
 
 void WgPopupOpener::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
+	WgState useState = m_state;
+	if (m_bOpen)
+		useState.setPressed(true);
+
 	if (m_pSkin)
     {
-        m_pSkin->Render(pDevice, m_state, _canvas, _clip, m_scale);
+        m_pSkin->Render(pDevice, useState, _canvas, _clip, m_scale);
     }
 
     WgRect cli = _clip;
@@ -282,9 +286,10 @@ void WgPopupOpener::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 
     WgRect contentRect = _canvas;
 
+
     if (m_pSkin)
     {
-        contentRect = m_pSkin->ContentRect(_canvas, m_state, m_scale);
+        contentRect = m_pSkin->ContentRect(_canvas, useState, m_scale);
     }
 
 	// Get icon and text rect from content rect
@@ -294,14 +299,7 @@ void WgPopupOpener::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 
 	// Convert WgState to WgMode
 
-	WgMode mode = WG_MODE_NORMAL;
-
-	if (!m_state.isEnabled())
-		mode = WG_MODE_DISABLED;
-	else if (m_state.isPressed())
-		mode = WG_MODE_SELECTED;
-	else if (m_state.isHovered())
-		mode = WG_MODE_MARKED;
+	WgMode mode = WgUtil::StateToMode(useState);
 
 	// Render icon
 
@@ -417,6 +415,8 @@ void WgPopupOpener::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 		case WG_EVENT_POPUP_CLOSED:
 		{
 			m_bOpen = false;
+			if (!m_state.isPressed())
+				_requestRender();			// We have been rendered with pressed state since popup has been open.
 
 			break;
 		}
@@ -516,7 +516,7 @@ void WgPopupOpener::_open()
 	auto pLayer = Parent()->_getPopupLayer();
 	if (pLayer && m_pPopup)
 	{
-		pLayer->Push(m_pPopup, this, ScreenPixelGeo(), m_attachPoint, m_bOpenOnHover);
+		pLayer->Push(m_pPopup, this, ScreenPixelGeo(), m_attachPoint, m_popupOfs, m_bOpenOnHover);
 		m_bOpen = true;
 		m_closeState = m_state;
 	}

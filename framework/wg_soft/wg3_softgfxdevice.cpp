@@ -253,6 +253,24 @@ namespace wg
 
 		if (mode == BlendMode::Blend)
 		{
+
+			
+/*  Correct method with some rounding problems
+			uint32_t alpha = s_mulTab[srcA];
+
+				uint32_t totAlpha = (backA * (65536-alpha) + 255 * alpha) >> 16;
+
+				uint32_t relAlpha = (alpha*255 / (totAlpha+1));
+				uint32_t invAlpha = 65536 - relAlpha;
+
+				if (backA == 0 && invAlpha > 256)
+					int x = 1;
+
+				outB = (backB * invAlpha + srcB * relAlpha) >> 16;
+				outG = (backG * invAlpha + srcG * relAlpha) >> 16;
+				outR = (backR * invAlpha + srcR * relAlpha) >> 16;
+				outA = totAlpha;
+*/
 				int alpha = s_mulTab[srcA];
 				int invAlpha = 65536 - alpha;
 
@@ -3289,7 +3307,7 @@ namespace wg
 		// Init mulTab
 
 		for (int i = 0; i < 256; i++)
-			s_mulTab[i] = i * 256 + i + 1;
+			s_mulTab[i] = 65536 * i / 255;
 
 		// Init lineThicknessTable
 		

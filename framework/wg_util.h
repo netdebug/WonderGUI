@@ -38,6 +38,8 @@ namespace WgUtil
 	template <class T> inline T Max (T a, T b) {return (a>b?a:b); }
 	template <class T> inline T Min (T a, T b) {return (a<b?a:b); }
 
+	WgMode		StateToMode(WgState state);
+
 
 	inline int _stateToIndex(WgStateEnum state)
 	{
