@@ -85,6 +85,12 @@ public:
 	void	SetTiledRightBorder( bool bTiled );
 	void	SetTiledCenter( bool bTiled );
 
+	void	SetTint( WgColor tint );
+//	bool	SetTint(std::initializer_list<WgStateColor> stateColors);
+
+	void	SetBlendMode( WgBlendMode blendMode );
+	WgBlendMode	BlendMode() const { return m_blendMode; }
+
 
 	//.____ Misc ____________________________________________________	
 
@@ -110,7 +116,7 @@ private:
 	~WgBlockSkin() {};
 
 	void	_setBitFlag( int& bitmask, int bit, bool bSet );
-	void	_renderNoClip( WgGfxDevice * pDevice, const StateData * pState, const WgRect& _canvas ) const;
+//	void	_renderNoClip( WgGfxDevice * pDevice, const StateData * pState, const WgRect& _canvas ) const;
 	void	_scanStateBlockSectionArea( StateData * pState, WgOrigo section, const WgRect& sectionArea );
 	
 	static const int ALL_SECTIONS = 0x1FF;
@@ -119,9 +125,13 @@ private:
 	WgSize			m_dimensions;                   // Stored in pixels
 	WgBorders		m_frame;                        // Stored in points
 	int				m_tiledSections;
-	bool			m_bIsOpaque;
+	bool			m_bOpaqueBlocks;
 	int 			m_scale = WG_SCALE_BASE;
 	
+	WgColor			m_tintColor = WgColor::white;
+	WgBlendMode		m_blendMode = WG_BLENDMODE_BLEND;
+	bool			m_bHasBlendMode = false;
+
 	StateData		m_state[WG_NB_STATES];
 };
 	

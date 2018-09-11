@@ -225,7 +225,7 @@ WgBlockSkin::WgBlockSkin()
 
 	m_pSurface = 0;
 	m_tiledSections = 0;
-	m_bIsOpaque = false;
+	m_bOpaqueBlocks = false;
 
 	for( int i = 0 ; i < WG_NB_STATES ; i++ )
 	{
@@ -256,12 +256,12 @@ void WgBlockSkin::SetSurface( WgSurface * pSurf )
 	m_pSurface = pSurf;
 	if( m_pSurface )
 	{
-		m_bIsOpaque = pSurf->IsOpaque();
+		m_bOpaqueBlocks = pSurf->IsOpaque();
 		m_scale = m_pSurface->ScaleFactor();		
 	}
 	else
 	{
-		m_bIsOpaque = false;
+		m_bOpaqueBlocks = false;
 		m_scale = WG_SCALE_BASE;		
 	}
 }
@@ -368,6 +368,23 @@ void WgBlockSkin::SetTiledCenter( bool bTiled )
 {
 	_setBitFlag( m_tiledSections, (int)WG_CENTER, bTiled );
 }
+
+//____ setTint() ______________________________________________________________
+
+void WgBlockSkin::SetTint(WgColor tint)
+{
+	m_tintColor = tint;
+}
+
+//____ setBlendMode() _________________________________________________________
+
+void WgBlockSkin::SetBlendMode(WgBlendMode blendMode)
+{
+	m_blendMode = blendMode;
+	m_bHasBlendMode = true;
+}
+
+
 
 //____ optimizeRenderMethods() ________________________________________________
 
@@ -495,6 +512,20 @@ void WgBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _c
 	if( pState->invisibleSections == ALL_SECTIONS )
 		return;
 
+	WgColor oldTint;
+	if (m_tintColor != WgColor::white)
+	{
+		oldTint = pDevice->GetTintColor();
+		pDevice->SetTintColor(oldTint*m_tintColor);
+	}
+
+	WgBlendMode oldBlendMode;
+	if (m_bHasBlendMode)
+	{
+		oldBlendMode = pDevice->GetBlendMode();
+		pDevice->SetBlendMode(m_blendMode);
+	}
+
     const WgRect&	src		= WgRect(pState->ofs, m_dimensions);
 
 	// Shortcuts & optimizations for common special cases.
@@ -502,54 +533,65 @@ void WgBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _c
 	if( src.w == _canvas.w && src.h == _canvas.h && scale == m_scale )
 	{
 		pDevice->ClipBlit( _clip, m_pSurface, src, _canvas.Pos().x, _canvas.Pos().y);
-		return;
+		goto cleanup;
 	}
 
     if( m_frame.left + m_frame.top + m_frame.right + m_frame.bottom == 0 )
 	{
         pDevice->ClipStretchBlit( _clip, m_pSurface, src, _canvas );
-		return;
+		goto cleanup;
 	}
+	{
+		// Need local context for declaration to allow the gotos above to jump over them.
 
-    const WgBorders&    sourceBorders = m_frame.Scale(m_scale);
-    const WgBorders     canvasBorders = m_frame.Scale(scale);
+		const WgBorders&    sourceBorders = m_frame.Scale(m_scale);
+		const WgBorders     canvasBorders = m_frame.Scale(scale);
     
     
-    if( src.w == _canvas.w )
-	{
-        pDevice->ClipBlitVertStretchBar( _clip, m_pSurface, src, sourceBorders, _canvas, canvasBorders );
-		return;
+		if( src.w == _canvas.w )
+		{
+			pDevice->ClipBlitVertStretchBar( _clip, m_pSurface, src, sourceBorders, _canvas, canvasBorders );
+			goto cleanup;
+		}
+
+		// Render upper row (top-left corner, top stretch area and top-right corner)
+
+		if( canvasBorders.top > 0 )
+		{
+			WgRect sourceRect( src.x, src.y, src.w, sourceBorders.top );
+			WgRect destRect( _canvas.x, _canvas.y, _canvas.w, canvasBorders.top );
+
+			pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
+		}
+
+		// Render mid row (left and right stretch area and middle section)
+
+		if( _canvas.h - canvasBorders.Height() > 0 )
+		{
+			WgRect sourceRect( src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.Height() );
+			WgRect destRect( _canvas.x, _canvas.y + canvasBorders.top, _canvas.w, _canvas.h - canvasBorders.Height() );
+
+			pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
+		}
+
+		// Render lowest row (bottom-left corner, bottom stretch area and bottom-right corner)
+
+		if( canvasBorders.bottom > 0 )
+		{
+			WgRect sourceRect( src.x, src.y + src.h - sourceBorders.bottom, src.w, sourceBorders.bottom );
+			WgRect destRect( _canvas.x, _canvas.y + _canvas.h - canvasBorders.bottom, _canvas.w, canvasBorders.bottom );
+
+			pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
+		}
 	}
 
-	// Render upper row (top-left corner, top stretch area and top-right corner)
+cleanup:
 
-	if( canvasBorders.top > 0 )
-	{
-		WgRect sourceRect( src.x, src.y, src.w, sourceBorders.top );
-        WgRect destRect( _canvas.x, _canvas.y, _canvas.w, canvasBorders.top );
+	if (m_bHasBlendMode)
+		pDevice->SetBlendMode(oldBlendMode);
 
-        pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
-	}
-
-    // Render mid row (left and right stretch area and middle section)
-
-    if( _canvas.h - canvasBorders.Height() > 0 )
-    {
-        WgRect sourceRect( src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.Height() );
-        WgRect destRect( _canvas.x, _canvas.y + canvasBorders.top, _canvas.w, _canvas.h - canvasBorders.Height() );
-
-        pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
-    }
-
-	// Render lowest row (bottom-left corner, bottom stretch area and bottom-right corner)
-
-	if( canvasBorders.bottom > 0 )
-	{
-		WgRect sourceRect( src.x, src.y + src.h - sourceBorders.bottom, src.w, sourceBorders.bottom );
-        WgRect destRect( _canvas.x, _canvas.y + _canvas.h - canvasBorders.bottom, _canvas.w, canvasBorders.bottom );
-
-        pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
-	}
+	if (m_tintColor != WgColor::white)
+		pDevice->SetTintColor(oldTint);
 }
 
 
@@ -707,12 +749,12 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
 
 bool WgBlockSkin::IsOpaque() const
 {
-	return m_bIsOpaque;
+	return (m_bOpaqueBlocks && m_tintColor.a == 255);
 }
 
 bool WgBlockSkin::IsOpaque( WgState state ) const
 {
-	if( m_bIsOpaque )
+	if( m_bOpaqueBlocks && m_tintColor.a == 255)
 		return true;
 
 	return (m_state[WgUtil::_stateToIndex(state)].opaqueSections == ALL_SECTIONS);
@@ -722,7 +764,7 @@ bool WgBlockSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgStat
 {
 	// Quick exit in optimal case
 
-	if( m_bIsOpaque )
+	if( m_bOpaqueBlocks && m_tintColor.a == 255)
 		return true;
 
 	// Semi-quick exit
