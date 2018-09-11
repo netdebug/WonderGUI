@@ -49,6 +49,15 @@ public:
 
 	WgSize	PreferredPixelSize() const;
 
+	enum PressMode
+	{
+		NoMovement,
+		SetValue,
+//		StepValue,
+		MultiSetValue
+//		MultiStepValue
+	};
+
 	struct Bounds
 	{
 		float	min;
@@ -150,7 +159,8 @@ public:
 
 	void	SetSkin(const WgSkinPtr& pSkin);
 
-
+	void	SetPressMode(WgMultiSlider::PressMode mode);
+	PressMode GetPressMode() const { return m_pressMode; }
 
 protected:
 
@@ -193,17 +203,18 @@ protected:
 	WgRect	_sliderSkinGeo(Slider& slider, const WgRect& sliderGeo );
 	WgRect	_sliderHandleGeo(Slider& slider, const WgRect& sliderGeo );
 
-	Slider * _markedSlider(WgCoord ofs, WgCoord * pOfsOutput = nullptr );
-	void	_markSlider(Slider * pSlider);
-	void	_selectSlider(Slider * pSlider);
+	Slider * _markedSliderHandle(WgCoord ofs, WgCoord * pOfsOutput = nullptr );
+	void	_markSliderHandle(Slider * pSlider);
+	void	_selectSliderHandle(Slider * pSlider);
 	void	_requestRenderHandle(Slider * pSlider);
+
+	Slider * _markedSlider(WgCoord ofs, WgCoord * pOfsOutput = nullptr);
 
 
 	WgCoordF	_setHandlePosition(Slider& slider, WgCoordF pos);					// Set handlePos and update value(s).
 	WgCoordF	_calcSendValue(Slider& slider, WgCoordF pos);						// Like _setHandlePosition(), but only calculates and sends the value (no internal update).
 
 	void		_invokeSetValueCallback(Slider& slider, float& value, float& value2);
-
 
 	float		_setValue(Slider& slider, float valueX, float valueY, bool bSendOnUpdate );			// Set value(s) and update handlePos.
 	void		_sendValue(Slider& slider, float value, float value2);
@@ -226,8 +237,11 @@ private:
 
 	std::vector<Slider>	m_sliders;
 
-	int					m_selectedSlider = -1;
+	int					m_selectedSliderHandle = -1;
 	WgCoord				m_selectPressOfs;
+
+	int					m_selectedSlider = -1;								// For press on slider in certain modes.
+
 
 	bool				m_bPassive = false;
 
@@ -235,6 +249,8 @@ private:
 	WgCoord				m_totalDrag;
 	WgCoord				m_finetuneFraction;
 	const static int	c_finetuneResolution = 5;
+
+	PressMode			m_pressMode = PressMode::NoMovement;
 
 	std::function<void(int sliderId, float value, float value2 )>	m_callback = nullptr;
 

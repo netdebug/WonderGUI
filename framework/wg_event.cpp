@@ -929,6 +929,16 @@ namespace WgEvent
 		m_value2	= value2;
 	}
 
+	SliderPressed::SliderPressed(WgMultiSlider * pSlider, int sliderId, int button, WgOrigo offsetFromHandle)
+	{
+		m_type		= WG_EVENT_SLIDER_PRESS;
+		m_pWidget	= pSlider;
+		m_id		= sliderId;
+		m_button	= button;
+		m_offsetFromHandle = offsetFromHandle;
+	}
+
+
 	//____ Link event methods __________________________________________________
 
 	std::string LinkEvent::Link() const

@@ -302,6 +302,96 @@ namespace WgEvent
 
 
 
+	//____ Item events ________________________________________________________
+/*
+
+	class ItemEvent : public Event
+	{
+		int	ItemId() const;
+
+		WgRect	ItemPixelGeo() const;
+		WgRect	ItemPointGeo() const;
+
+		WgCoord	ItemPointerPixelPos() const;
+		WgCoord ItemPointerPointPos() const;
+
+	protected:
+		int		m_itemId;
+		WgRect	m_itemPixelGeo;
+	};
+
+
+	class ItemButtonEvent
+
+	class ItemEnter : public ItemEvent
+	{
+	public:
+		ItemEnter(WgWidget * pWidget, int itemId);
+	};
+
+
+	class ItemLeave : public ItemEvent
+	{
+	public:
+		ItemLeave(WgWidget * pWidget, int itemId);
+	};
+
+	class ItemPress : public ItemButtonEvent
+	{
+		friend class ::WgEventHandler;
+	public:
+		ItemPress(int button, WgWidget * pWidget, int itemId);
+	};
+
+	class ItemDrag : public ItemButtonEvent
+	{
+	public:
+		ItemDrag(int button, WgWidget * pWidget, int itemId, const WgCoord& orgPos, const WgCoord& prevPos, const WgCoord& currPos);
+
+		WgCoord			DraggedTotalPixels() const;
+		WgCoord			DraggedNowPixels() const;
+		WgCoord			StartPixelPos() const;
+		WgCoord			PrevPixelPos() const;
+		WgCoord			CurrPixelPos() const;
+
+		WgCoord			DraggedTotalPoints() const;
+		WgCoord			DraggedNowPoints() const;
+		WgCoord			StartPointPos() const;
+		WgCoord			PrevPointPos() const;
+		WgCoord			CurrPointPos() const;
+	protected:
+		WgCoord			m_startPos;
+		WgCoord			m_prevPos;
+		WgCoord			m_currPos;
+	};
+
+	class ItemRepeat : public ItemButtonEvent
+	{
+	public:
+		ItemRepeat(int button, WgWidget * pWidget, int itemId);
+	};
+
+
+	class ItemRelease : public ItemButtonEvent
+	{
+	public:
+		ItemRelease(int button, WgWidget * pWidget, int itemId);
+
+	};
+
+	class ItemClick : public ItemButtonEvent
+	{
+	public:
+		ItemClick(int button, WgWidget * pWidget, int itemId);
+	};
+
+	class ItemDoubleClick : public ItemButtonEvent
+	{
+	public:
+		ItemDoubleClick(int button, WgWidget * pWidget, int itemId);
+	};
+*/
+
 
 	//____ WgCheckBox events ______________________________________________
 
@@ -646,6 +736,24 @@ namespace WgEvent
 		float	m_value;
 		float	m_value2;
 	};
+
+	class SliderPressed : public Event
+	{
+		friend class ::WgMultiSlider;
+	public:
+		int id() const { return m_id; }
+
+		int		button() { return m_button; }
+		WgOrigo	sideOfHandle() { return m_offsetFromHandle; }
+
+	protected:
+		SliderPressed(WgMultiSlider * pSlider, int sliderId, int button, WgOrigo offsetFromHandle );
+
+		int		m_id;
+		int		m_button;
+		WgOrigo	m_offsetFromHandle;
+	};
+
 
 
 	//____ Link events _________________________________________________________
