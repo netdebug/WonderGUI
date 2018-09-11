@@ -604,7 +604,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 */
 
 	// BlendTest
-
+/*
 	{
 		auto pSkin = WgBlockSkin::CreateStaticFromSurface(pInjectWidget);
 
@@ -630,7 +630,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		WgFlexHook * pHook2 = pFlex->AddChild(pFacitImage, WgRect(240, 20, 366 / 2, 178 / 2));
 
 	}
-
+*/
 
 
 
@@ -1046,7 +1046,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	// Multislider widget
 
-/*
+
 	WgBoxSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::grey, 1, WgColor::grey);
 	pSliderBgSkin->SetStateColor(WG_STATE_HOVERED, WgColor::blue);
 	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED, WgColor::black, WgColor::black);
@@ -1133,10 +1133,26 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 						}, nullptr, nullptr, { 1.f,1.f }, WgBorders(10) );
 
 
-	pHook = pFlex->AddChild(pMultiSlider, WgRect(0, 0, 450, 300));
+	auto pMyHook = pFlex->AddChild(pMultiSlider, WgRect(0, 0, 450, 300));
 
 	pFlex->SetScale(WG_SCALE_BASE * 2);
-*/
+
+
+	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::SetValue);
+
+	auto pEvH = pRoot->EventHandler();
+
+	pEvH->AddCallback(WgEventFilter::Type(WG_EVENT_SLIDER_PRESS), [](const WgEvent::Event * _pEv, void * pParam) 
+	{
+		auto pEv = ((WgEvent::SliderPressed *)_pEv);
+
+		int id = pEv->id();
+		int button = pEv->button();
+		WgOrigo side = pEv->sideOfHandle();
+
+
+	}, nullptr );
+
 
 	// Scroll chart widget
 

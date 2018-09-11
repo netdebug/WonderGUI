@@ -467,7 +467,7 @@ WgMode WgUtil::StateToMode(WgState state)
 
 	if (!state.isEnabled())
 		mode = WG_MODE_DISABLED;
-	else if (state.isPressed())
+	else if (state.isPressed() )
 		mode = WG_MODE_SELECTED;
 	else if (state.isHovered())
 		mode = WG_MODE_MARKED;

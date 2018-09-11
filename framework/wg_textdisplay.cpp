@@ -182,13 +182,12 @@ WgString WgTextDisplay::GetTooltipString() const
 
 void WgTextDisplay::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	if( m_pSkin )
-		m_pSkin->Render(pDevice, m_state, _canvas, _clip, m_scale);
+    WgWidget::_onRender(pDevice,_canvas,_window,_clip);
 
 	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, m_state, m_scale) : _canvas;
 
-
-	m_text.setMode(WgUtil::StateToMode(m_state));
+    m_text.setMode(WG_MODE_NORMAL);
+//	m_text.setMode(WgUtil::StateToMode(m_state));
 
 	WgText * pText = &m_text;
 

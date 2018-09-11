@@ -262,6 +262,8 @@ protected:
 
 	bool			m_bSelectable = true;	// Set if widget is allowed to be selected.
 
+    WgState         m_state;
+
 };
 
 typedef class WgWeakPtr<WgWidget> WgWidgetWeakPtr;

@@ -115,8 +115,6 @@ private:
 	void	_textModified();
 	bool	_insertCharAtCursor( Uint16 c );
 
-	WgState				m_state;
-
 	WgText				m_text;
 	bool				m_bHasFocus;
 	int					m_maxLines;

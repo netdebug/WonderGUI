@@ -23,9 +23,11 @@
 #include <wg_widget.h>
 #include <wg_types.h>
 #include <wg_gfxdevice.h>
+#include <wg_util.h>
 
 #	include <wg_rootpanel.h>
 #	include <wg_eventhandler.h>
+
 
 //____ Constructor ____________________________________________________________
 
@@ -63,6 +65,7 @@ void WgWidget::SetEnabled( bool bEnabled )
 	if( m_bEnabled != bEnabled || IsContainer() )
 	{
 		m_bEnabled = bEnabled;
+        m_state.setEnabled(bEnabled);
 		if( bEnabled )
 			_onEnable();
 		else
@@ -258,6 +261,7 @@ bool WgWidget::SetSelected()
 	if (m_bEnabled)
 	{
 		m_bSelected = true;
+        m_state.setSelected(true);
 		return true;
 	}
 	else
@@ -271,6 +275,7 @@ bool WgWidget::SetNormal()
 	if (m_bEnabled)
 	{
 		m_bSelected = false;
+        m_state.setSelected(false);
 		return true;
 	}
 	else
@@ -289,12 +294,14 @@ void WgWidget::SetSelectable(bool bSelectable)
 
 WgMode WgWidget::Mode() const
 {
-	if (m_bSelected)
-		return WG_MODE_SELECTED;
-	else if( m_bEnabled )
-		return WG_MODE_NORMAL;
-	else
-		return WG_MODE_DISABLED;
+    return WgUtil::StateToMode(m_state);
+
+//	if (m_bSelected)
+//		return WG_MODE_SELECTED;
+//	else if( m_bEnabled )
+//		return WG_MODE_NORMAL;
+//	else
+//		return WG_MODE_DISABLED;
 }
 
 //____ PreferredPointSize() ___________________________________________________
@@ -401,12 +408,12 @@ void WgWidget::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const Wg
 {
 	if (m_pSkin)
 	{
-		WgState	state;
-		state.setFocused(m_bFocused);
-		state.setSelected(m_bSelected);
-		state.setEnabled(m_bEnabled);
+//		WgState	state;
+//		state.setFocused(m_bFocused);
+//		state.setSelected(m_bSelected);
+//		state.setEnabled(m_bEnabled);
 
-		m_pSkin->Render(pDevice, state, _canvas, _clip, m_scale);
+		m_pSkin->Render(pDevice, m_state, _canvas, _clip, m_scale);
 	}
 }
 
@@ -451,12 +458,14 @@ void WgWidget::_onDisable()
 void WgWidget::_onGotInputFocus()
 {
 	m_bFocused = true;
+    m_state.setFocused(true);
 	_queueEvent(new WgEvent::FocusGained(this));
 }
 
 void WgWidget::_onLostInputFocus()
 {
 	m_bFocused = false;
+    m_state.setFocused(false);
 	_queueEvent(new WgEvent::FocusLost(this));
 }
 
