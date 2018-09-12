@@ -11,9 +11,9 @@ WgSimpleVolumeMeter::WgSimpleVolumeMeter()
 {
 	m_direction = WG_UP;
 
-	m_sectionColors[0] = WgColor::green;
-	m_sectionColors[1] = WgColor::yellow;
-	m_sectionColors[2] = WgColor::red;
+	m_sectionColors[0] = WgColor::Green;
+	m_sectionColors[1] = WgColor::Yellow;
+	m_sectionColors[2] = WgColor::Red;
 	
 	m_fSectionHeight[0] = 0.75f;
 	m_fSectionHeight[1] = 0.18f;

@@ -31,9 +31,10 @@
 #	include <wg_gfxdevice.h>
 #endif
 
+#include <wg_color.h>
+
 class WgSurface;
 class WgRect;
-class WgColor;
 
 class WgGfxDeviceNull : public WgGfxDevice
 {

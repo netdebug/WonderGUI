@@ -641,7 +641,7 @@ WgTextpropPtr WgResDB::GetTextprop( const std::string& id ) const
 WgColor WgResDB::GetColor( const std::string& id ) const
 {
 	ColorRes* colorRes = GetResColor(id);
-	return colorRes ? colorRes->res : WgColor::black;
+	return colorRes ? colorRes->res : WgColor::Black;
 }
 
 //____ () _________________________________________________________

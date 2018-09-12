@@ -54,12 +54,12 @@ WgKnob::WgKnob(WgSurfaceFactory * pFactory)
     WgKnob();
     m_bOpaque = false;
     m_iNextPixel = 0;
-    m_lineColor = WgColor::white;
+    m_lineColor = WgColor::White;
     m_fValue = 0.0f;
     m_preferredSize = WgSize(100,100);
 
     m_pSurf = pFactory->CreateSurface(PixelSize()*m_iOversampleX, WG_PIXEL_BGRA_8);
-    m_pSurf->Fill(WgColor::transparent);
+    m_pSurf->Fill(WgColor::Transparent);
     m_pSurfaceFactory = pFactory;
 
     m_size = PixelSize();

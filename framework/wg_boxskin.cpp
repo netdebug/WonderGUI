@@ -47,8 +47,8 @@ WgBoxSkin::WgBoxSkin()
 {
 	for( int i = 0 ; i < WG_NB_STATES ; i++ )
 	{
-		m_color[i] = WgColor::black;
-		m_frameColor[i] = WgColor::black;
+		m_color[i] = WgColor::Black;
+		m_frameColor[i] = WgColor::Black;
 	}
 
 	m_bOpaque = true;

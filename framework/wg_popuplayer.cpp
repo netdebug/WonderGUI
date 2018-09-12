@@ -583,7 +583,7 @@ void WgPopupLayer::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas, 
 	{
 		WidgetRenderContext * p = &renderList[i];
 
-		WgColor tint = WgColor::white;
+		WgColor tint = WgColor::White;
 
 		if (p->pSlot->state == WgPopupHook::State::Opening)
 			tint.a = 255 * p->pSlot->stateCounter / m_openingFadeMs;

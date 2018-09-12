@@ -271,11 +271,11 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
         pDevice->SetCanvas(m_pCanvas);
 
         pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
-        pDevice->SetTintColor(WgColor::white);
+        pDevice->SetTintColor(WgColor::White);
 
         for( const WgRect * pRect = renderStack.Begin() ; pRect != renderStack.End() ; pRect++ )
         {
-            pDevice->Fill(*pRect, WgColor::transparent);
+            pDevice->Fill(*pRect, WgColor::Transparent);
         }
 
         pDevice->SetBlendMode(WG_BLENDMODE_BLEND);

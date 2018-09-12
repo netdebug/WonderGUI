@@ -47,7 +47,7 @@ inline wg::RectF _convert(const WgRectF& r) { return wg::RectF(r.x, r.y, r.w, r.
 
 
 inline WgColor _convert(wg::Color c) { return WgColor(c.argb); }
-inline wg::Color _convert(WgColor c) { return wg::Color(c.argb); }
+//inline wg::Color _convert(WgColor c) { return wg::Color(c.argb); }
 
 inline WgDirection _convert(wg::Direction dir )
 {

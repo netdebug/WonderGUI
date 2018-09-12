@@ -109,7 +109,7 @@ public:
 
 
 
-	int		StartLineWave( float startSample, float thickness = 1.f, WgColor color = WgColor::black, std::function<float(uint64_t timeCode)> sampleFeeder = nullptr );
+	int		StartLineWave( float startSample, float thickness = 1.f, WgColor color = WgColor::Black, std::function<float(uint64_t timeCode)> sampleFeeder = nullptr );
 
 	int		StartSimpleWave( float startSample, float floor, float topLineThickness, WgColor topLineColor, 
 							float floorLineThickness, WgColor floorLineColor, WgColor aboveFloorFill, WgColor belowFloorFill, std::function<float(uint64_t timeCode)> sampleFeeder = nullptr );
@@ -160,12 +160,12 @@ protected:
 	{
 		Wave() {}
 
-		WgColor	frontFill = WgColor::darkgrey;
-		WgColor	backFill = WgColor::darkgrey;
+		WgColor	frontFill = WgColor::DarkGrey;
+		WgColor	backFill = WgColor::DarkGrey;
 		float	topLineThickness = 1.f;
-		WgColor topLineColor = WgColor::black;
+		WgColor topLineColor = WgColor::Black;
 		float	bottomLineThickness = 0.f;
-		WgColor	bottomLineColor = WgColor::black;
+		WgColor	bottomLineColor = WgColor::Black;
 
 		int			id;
 		WaveType	type;

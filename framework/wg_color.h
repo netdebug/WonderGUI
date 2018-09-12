@@ -27,6 +27,13 @@
 #	include	<wg_types.h>
 #endif
 
+#include <wg3_color.h>
+
+typedef wg::Color		WgColor;
+
+
+#if false
+
 //____ Class WgColor _______________________________________________________________________
 
 /**
@@ -319,5 +326,7 @@ inline WgColor::WgColor( Uint32 rgb, Uint8 _a )
 	argb = rgb;
 	a = _a;
 }
+
+#endif
 
 #endif // WG_COLOR_DOT_H

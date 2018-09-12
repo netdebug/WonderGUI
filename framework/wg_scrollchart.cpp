@@ -76,7 +76,7 @@ WgScrollChart::WgScrollChart()
 	m_valueLabelStyle.alignment = WG_WEST;
 	m_valueLabelStyle.offset = { 0,0 };
 
-	m_chartColor = WgColor::white;
+	m_chartColor = WgColor::White;
 }
 
 //____ Destructor _____________________________________________________________

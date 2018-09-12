@@ -18,7 +18,6 @@
     <ClCompile Include="framework\wg_chart.cpp" />
     <ClCompile Include="framework\wg_checkbox.cpp" />
     <ClCompile Include="framework\wg_codepages.cpp" />
-    <ClCompile Include="framework\wg_color.cpp" />
     <ClCompile Include="framework\wg_colorset.cpp" />
     <ClCompile Include="framework\wg_colorskin.cpp" />
     <ClCompile Include="framework\wg_cursor.cpp" />

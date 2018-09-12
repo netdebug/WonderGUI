@@ -513,7 +513,7 @@ void WgBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _c
 		return;
 
 	WgColor oldTint;
-	if (m_tintColor != WgColor::white)
+	if (m_tintColor != WgColor::White)
 	{
 		oldTint = pDevice->GetTintColor();
 		pDevice->SetTintColor(oldTint*m_tintColor);
@@ -590,7 +590,7 @@ cleanup:
 	if (m_bHasBlendMode)
 		pDevice->SetBlendMode(oldBlendMode);
 
-	if (m_tintColor != WgColor::white)
+	if (m_tintColor != WgColor::White)
 		pDevice->SetTintColor(oldTint);
 }
 

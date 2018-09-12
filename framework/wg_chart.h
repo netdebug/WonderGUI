@@ -74,7 +74,7 @@ public:
 	void	ClearWaves();
 	int		AddWave();
 
-	bool	SetWaveStyle(int waveId, WgColor frontFill, WgColor backFill, float topLineThickness = 0.f, WgColor topLineColor = WgColor::black, float bottomLineThickness = 0.f, WgColor bottomLineColor = WgColor::black);
+	bool	SetWaveStyle(int waveId, WgColor frontFill, WgColor backFill, float topLineThickness = 0.f, WgColor topLineColor = WgColor::Black, float bottomLineThickness = 0.f, WgColor bottomLineColor = WgColor::Black);
 
 	bool	SetWaveSamples(int waveId, int firstSample, int nSamples, float * pTopBorderSamples, float * pBottomBorderSamples);
 	bool	SetWaveSamples(int waveId, int firstSample, int nSamples, float * pSamples, float floor = 0.f);
@@ -123,12 +123,12 @@ protected:
 
 		int		id;
 
-		WgColor	frontFill = WgColor::darkgrey;
-		WgColor	backFill = WgColor::darkgrey;
+		WgColor	frontFill = WgColor::DarkGrey;
+		WgColor	backFill = WgColor::DarkGrey;
 		float	topLineThickness = 1.f;
-		WgColor topLineColor = WgColor::black;
+		WgColor topLineColor = WgColor::Black;
 		float	bottomLineThickness = 0.f;
-		WgColor	bottomLineColor = WgColor::black;
+		WgColor	bottomLineColor = WgColor::Black;
 
 		int		firstSample = 0;
 		int		nSamples = 0;

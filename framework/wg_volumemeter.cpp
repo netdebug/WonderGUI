@@ -13,12 +13,12 @@ static const char	c_widgetType[] = {"VolumeMeter"};
 
 WgVolumeMeter::WgVolumeMeter()
 {
-	m_LEDColors[0][0] = WgColor::black;
-	m_LEDColors[1][0] = WgColor::black;
-	m_LEDColors[2][0] = WgColor::black;
-	m_LEDColors[0][1] = WgColor::green;
-	m_LEDColors[1][1] = WgColor::yellow;
-	m_LEDColors[2][1] = WgColor::red;
+	m_LEDColors[0][0] = WgColor::Black;
+	m_LEDColors[1][0] = WgColor::Black;
+	m_LEDColors[2][0] = WgColor::Black;
+	m_LEDColors[0][1] = WgColor::Green;
+	m_LEDColors[1][1] = WgColor::Yellow;
+	m_LEDColors[2][1] = WgColor::Red;
 	
 	m_nSectionLEDs[0] = 8;
 	m_nSectionLEDs[1] = 2;

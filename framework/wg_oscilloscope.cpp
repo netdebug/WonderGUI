@@ -38,8 +38,8 @@ static const char	c_widgetType[] = {"Oscilloscope"};
 
 WgOscilloscope::WgOscilloscope()
 {
-	m_gridColor = WgColor::black;
-	m_lineColor = WgColor::white;
+	m_gridColor = WgColor::Black;
+	m_lineColor = WgColor::White;
 	m_lineThickness = 2.f;
 
 	m_nVGridLines = 0;

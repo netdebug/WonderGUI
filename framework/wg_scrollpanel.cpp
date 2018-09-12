@@ -45,7 +45,7 @@ WgScrollPanel::WgScrollPanel()
 	m_sliderTargets[1].m_bHorizontal = true;
 	m_sliderTargets[1].m_pParent = this;
 
-	m_bgColor = WgColor::white;
+	m_bgColor = WgColor::White;
 	m_contentOrigo = WG_NORTHWEST;
 	m_widthPolicy = WG_DEFAULT;
 	m_heightPolicy = WG_DEFAULT;

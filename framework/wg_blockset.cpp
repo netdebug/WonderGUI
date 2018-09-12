@@ -308,7 +308,7 @@ const WgBlockset::Alt_Data*	WgBlockset::_getAltForScale( int scale ) const
 WgColor WgBlockset::TextColor( WgMode mode ) const
 {
 	if( !m_pTextColors )
-		return WgColor::transparent;
+		return WgColor::Transparent;
 
 	return m_pTextColors->Color(mode);
 }

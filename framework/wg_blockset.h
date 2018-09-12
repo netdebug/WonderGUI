@@ -43,7 +43,8 @@
 #	include <wg_surface.h>
 #endif
 
-class WgColor;
+#include <wg_color.h>
+
 class WgRect;
 class WgBlock;
 class WgSurface;

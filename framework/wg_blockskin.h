@@ -128,7 +128,7 @@ private:
 	bool			m_bOpaqueBlocks;
 	int 			m_scale = WG_SCALE_BASE;
 	
-	WgColor			m_tintColor = WgColor::white;
+	WgColor			m_tintColor = WgColor::White;
 	WgBlendMode		m_blendMode = WG_BLENDMODE_BLEND;
 	bool			m_bHasBlendMode = false;
 

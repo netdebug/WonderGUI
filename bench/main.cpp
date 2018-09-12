@@ -263,7 +263,7 @@ int main ( int argc, char** argv )
 	WgTextprop prop;
 
 	prop.SetFont(pFont);
-	prop.SetColor( WgColor::black );
+	prop.SetColor( WgColor::Black );
 	prop.SetSize(16);
 
 	WgBase::SetDefaultTextprop( prop.Register() );
@@ -281,7 +281,7 @@ int main ( int argc, char** argv )
 	
 
 //	WgColor lineColor = WgColor::transparent;
-	WgColor lineColor = WgColor::white;
+	WgColor lineColor = WgColor::White;
 
 	int lineThickness = 1.f;
 
@@ -961,7 +961,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pMenu->SetOrientation(WG_VERTICAL);
 //		pMenu->setSelectable(false);
 
-		auto pSkin = WgBoxSkin::Create(WgColor::red, WgBorders(0), WgColor::red );
+		auto pSkin = WgBoxSkin::Create(WgColor::Red, WgBorders(0), WgColor::Red );
 		pSkin->SetContentPadding(12);
 		pMenu->SetSkin(pSkin);
 
@@ -1208,13 +1208,13 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	WgBoxSkinPtr pSliderHandleSkin = WgBoxSkin::Create(WgColor::white, 1, WgColor::red);
 	pSliderHandleSkin->SetContentPadding(10);
-	pSliderHandleSkin->SetStateColor(WG_STATE_HOVERED, WgColor::blue);
-	pSliderHandleSkin->SetStateColor(WG_STATE_PRESSED, WgColor::red);
+	pSliderHandleSkin->SetStateColor(WG_STATE_HOVERED, WgColor::Blue);
+	pSliderHandleSkin->SetStateColor(WG_STATE_PRESSED, WgColor::Red);
 
 
 	auto pMultiSlider = new WgMultiSlider();
 
-//	pMultiSlider->SetSkin(WgBoxSkin::Create(WgColor::white, { 1 }, WgColor::green));
+//	pMultiSlider->SetSkin(WgBoxSkin::Create(WgColor::White, { 1 }, WgColor::Green));
 
 	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin);
 

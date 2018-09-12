@@ -72,7 +72,7 @@ int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord ofs)
 	for (int i = 0; i < WG_NB_STATES; i++)
 	{
 		layer.blockOfs[i] = ofs*m_scale / WG_SCALE_BASE;
-		layer.tintColor[i] = WgColor::white;
+		layer.tintColor[i] = WgColor::White;
 
 		_updateStateOpacity(i);
 	}
@@ -110,7 +110,7 @@ int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord blockStartOfs, WgSize 
 
 	for (int i = 0; i < WG_NB_STATES; i++)
 	{
-		layer.tintColor[i] = WgColor::white;
+		layer.tintColor[i] = WgColor::White;
 		bSlotUsed[i] = false;
 	}
 
@@ -181,7 +181,7 @@ bool WgMultiBlockSkin::SetLayerTint(int layerIdx, std::initializer_list<WgStateC
 
 	bool	bSlotUsed[WG_NB_STATES];
 
-	layer.tintColor[0] = WgColor::white;
+	layer.tintColor[0] = WgColor::White;
 	bSlotUsed[0] = true;						// StateColor doesn't need to be specified for normal state, assumed to be white if not included
 
 	for (int i = 1; i < WG_NB_STATES; i++)

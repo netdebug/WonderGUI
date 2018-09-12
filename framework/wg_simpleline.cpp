@@ -41,7 +41,7 @@ WgSimpleLine::WgSimpleLine()
     m_erasePixelC.resize(m_iAlloc);
     m_iLen = 0;
     
-    m_kColor = WgColor::white;
+    m_kColor = WgColor::White;
     
     /*
     m_fValue = 0.0f;

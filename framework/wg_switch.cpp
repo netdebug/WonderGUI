@@ -33,7 +33,7 @@ WgSwitch::WgSwitch()
 {
 	m_bOpaque = false;
     m_iValue = 0;
-    m_onColor = WgColor::white;
+    m_onColor = WgColor::White;
     m_offColor = WgColor(64, 64, 64, 255);
     m_preferredSize = WgSize(46,46);
 }
