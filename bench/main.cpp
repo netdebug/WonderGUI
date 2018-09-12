@@ -452,8 +452,8 @@ int main ( int argc, char** argv )
 //		g_pGfxDevice->Fill(WgSize(width,height), WgColor::brown);
 
 		static float cnt = -70.f;
-		g_pGfxDevice->Fill(WgSize(600, 400), WgColor::brown);
-		g_pGfxDevice->ClipDrawElipse({ 0,0,600,400 }, { 100.0f+cnt,100.0f+cnt,100+cnt,100+cnt }, 5.f, WgColor::cornflowerblue, 3.f, WgColor::white);
+		g_pGfxDevice->Fill(WgSize(600, 400), WgColor::Brown);
+		g_pGfxDevice->ClipDrawElipse({ 0,0,600,400 }, { 100.0f+cnt,100.0f+cnt,100+cnt,100+cnt }, 5.f, WgColor::CornflowerBlue, 3.f, WgColor::White);
 
 		if( g_bRightPressed )
 			cnt += 0.1;

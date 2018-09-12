@@ -338,11 +338,11 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSlider(WgCoord ofs, WgCoord * pOfs
 	{
 		WgRect sliderGeo = _sliderSkinGeo(slider,_sliderGeo(slider, PixelSize()));
 
-		WgRect sliderMarkGeo = sliderGeo + (slider.sliderMarkExtension.IsEmpty() ? m_defaultSliderMarkExtension : slider.sliderMarkExtension);
+		WgRect sliderMarkGeo = sliderGeo + (slider.sliderMarkExtension.isEmpty() ? m_defaultSliderMarkExtension : slider.sliderMarkExtension);
 
-		if (sliderMarkGeo.Contains(ofs) )
+		if (sliderMarkGeo.contains(ofs) )
 		{
-			markedOfs = ofs - sliderGeo.Pos();
+			markedOfs = ofs - sliderGeo.pos();
 			pMarked = &slider;
 		}
 	}
@@ -380,27 +380,27 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSliderHandle(WgCoord ofs, WgCoord 
 
             // We are using WG_STATE_NORMAL on purpose here, so that hover hightlights are not included. Not perfect, but the lesser of two evils...
             
-            if (handleGeo.Contains(ofs) && pHandleSkin->MarkTest(ofs - handleGeo.Pos(), handleGeo.Size(), WgStateEnum::WG_STATE_NORMAL, m_markOpacity, m_scale))
+            if (handleGeo.contains(ofs) && pHandleSkin->MarkTest(ofs - handleGeo.pos(), handleGeo.size(), WgStateEnum::WG_STATE_NORMAL, m_markOpacity, m_scale))
 			{
-				fullyMarkedOfs = ofs - handleGeo.Pos();
+				fullyMarkedOfs = ofs - handleGeo.pos();
 				pFullyMarked = &slider;
 			}
 
-			WgBorders markExtension = slider.handleMarkExtension.IsEmpty() ? m_defaultHandleMarkExtension : slider.handleMarkExtension;
+			WgBorders markExtension = slider.handleMarkExtension.isEmpty() ? m_defaultHandleMarkExtension : slider.handleMarkExtension;
 
-			if (!markExtension.IsEmpty())
+			if (!markExtension.isEmpty())
 			{
-				WgRect extendedGeo = handleGeo + markExtension.Scale(m_scale);
+				WgRect extendedGeo = handleGeo + markExtension.scale(m_scale);
 
-				if (extendedGeo.Contains(ofs))
+				if (extendedGeo.contains(ofs))
 				{
-                    WgCoord distance = ofs - handleGeo.Center();
+                    WgCoord distance = ofs - handleGeo.center();
 
                     // This is our new slightly marked if ofs is closer to handleGeo than any previous slightly marked.
                     
                     if( !pSlightlyMarked || (distance.x*distance.x + distance.y*distance.y) < (slightlyMarkedDistance.x*slightlyMarkedDistance.x + slightlyMarkedDistance.y*slightlyMarkedDistance.y) )
                     {
-                        slightlyMarkedOfs = ofs - handleGeo.Pos();
+                        slightlyMarkedOfs = ofs - handleGeo.pos();
                         pSlightlyMarked = &slider;
                         slightlyMarkedDistance = distance;
                     }
@@ -511,7 +511,7 @@ void WgMultiSlider::_requestRenderSlider(Slider * pSlider)
 	if (pBgSkin)
 	{
 		WgRect sliderSkinGeo = _sliderSkinGeo(*pSlider, sliderGeo);
-		handleGeo.GrowToContain(sliderSkinGeo);
+		handleGeo.growToContain(sliderSkinGeo);
 	}
 
 	_requestRender(handleGeo);
@@ -1118,18 +1118,18 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 						for (auto& slider : m_sliders)
 						{
 							WgRect sliderGeo = _sliderSkinGeo(slider, _sliderGeo(slider, PixelSize()));
-							WgRect sliderMarkGeo = sliderGeo + (slider.sliderMarkExtension.IsEmpty() ? m_defaultSliderMarkExtension : slider.sliderMarkExtension);
+							WgRect sliderMarkGeo = sliderGeo + (slider.sliderMarkExtension.isEmpty() ? m_defaultSliderMarkExtension : slider.sliderMarkExtension);
 
 							if (prevPos.x < sliderMarkGeo.x && currPos.x > sliderMarkGeo.x)
 								int a = 0;
 
-							if (sliderMarkGeo.IntersectsWithOrContains(prevPos, currPos) )
+							if (sliderMarkGeo.intersectsWithOrContains(prevPos, currPos) )
 							{
 								WgCoord clippedPrevPos = prevPos;
 								WgCoord clippedCurrPos = currPos;
-								sliderMarkGeo.ClipLine(&clippedPrevPos, &clippedCurrPos);
+								sliderMarkGeo.clipLine(&clippedPrevPos, &clippedCurrPos);
 
-								WgCoord	handlePos = clippedCurrPos - sliderGeo.Pos();
+								WgCoord	handlePos = clippedCurrPos - sliderGeo.pos();
 
 								fraction.x = sliderGeo.w == 0 ? 0 : handlePos.x / (float)sliderGeo.w;
 								fraction.y = sliderGeo.h == 0 ? 0 : handlePos.y / (float)sliderGeo.h;
@@ -1199,7 +1199,7 @@ void WgMultiSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 		{
 			WgRect bgGeo = _sliderSkinGeo(slider, sliderGeo);
 
-			if (bgGeo.IntersectsWith(_clip))
+			if (bgGeo.intersectsWith(_clip))
 			{
 				WgState	emptyPartState = slider.sliderState;
 				WgState filledPartState = slider.sliderState;
@@ -1284,7 +1284,7 @@ bool WgMultiSlider::_onAlphaTest( const WgCoord& ofs )
 		{
 			WgRect bgGeo = _sliderSkinGeo(slider, sliderGeo);
 
-			if( bgGeo.Contains(ofs) && pBgSkin->MarkTest(ofs-bgGeo.Pos(), bgGeo.Size(), slider.sliderState, m_markOpacity, m_scale) )
+			if( bgGeo.contains(ofs) && pBgSkin->MarkTest(ofs-bgGeo.pos(), bgGeo.size(), slider.sliderState, m_markOpacity, m_scale) )
 				return true;
 		}
 
@@ -1295,7 +1295,7 @@ bool WgMultiSlider::_onAlphaTest( const WgCoord& ofs )
 			{
 				WgRect handleGeo = _sliderHandleGeo(slider, sliderGeo);
 
-				if (handleGeo.Contains(ofs) && pHandleSkin->MarkTest(ofs - handleGeo.Pos(), handleGeo.Size(), slider.handleState, m_markOpacity, m_scale))
+				if (handleGeo.contains(ofs) && pHandleSkin->MarkTest(ofs - handleGeo.pos(), handleGeo.size(), slider.handleState, m_markOpacity, m_scale))
 					return true;
 			}
 		}
@@ -1446,8 +1446,8 @@ void WgMultiSlider::_updateGeo(Slider& slider)
 
 			if (slider.pBgSkin || m_pDefaultBgSkin)
 			{
-				oldGeo.GrowToContain(_sliderSkinGeo(slider, oldSliderGeo));
-				newGeo.GrowToContain(_sliderSkinGeo(slider, newSliderGeo));
+				oldGeo.growToContain(_sliderSkinGeo(slider, oldSliderGeo));
+				newGeo.growToContain(_sliderSkinGeo(slider, newSliderGeo));
 			}
 
 			_requestRender(oldGeo);
@@ -1482,7 +1482,7 @@ WgRect  WgMultiSlider::_sliderSkinGeo(Slider& slider, const WgRect& sliderGeo)
 
         WgSize min = pSkin->PreferredSize(m_scale);
 
-        return { bgGeo.Pos(),std::max(bgGeo.w,min.w), std::max(bgGeo.h,min.h) };
+        return { bgGeo.pos(),std::max(bgGeo.w,min.w), std::max(bgGeo.h,min.h) };
     }
     else
         return sliderGeo;
@@ -1500,7 +1500,7 @@ WgRect  WgMultiSlider::_sliderHandleGeo(Slider& slider, const WgRect& sliderGeo)
 
 
 	WgCoord pos = { (int)(slider.handlePos.x * sliderGeo.w), (int)(slider.handlePos.y * sliderGeo.h) };
-	pos += sliderGeo.Pos();
+	pos += sliderGeo.pos();
 	pos -= { (int)(handleHotspot.x * sz.w), (int)(handleHotspot.y * sz.h) };
 
 	return { pos,sz };
