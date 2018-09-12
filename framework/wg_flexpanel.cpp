@@ -114,7 +114,7 @@ bool WgFlexHook::SetFloating( const WgCoord& pos, int anchor, WgOrigo hotspot )
 	m_bFloating		= true;
 	m_anchor		= anchor;
 	m_hotspot		= hotspot;
-	m_placementGeo.SetPos(pos);
+	m_placementGeo.setPos(pos);
 
 	_refreshRealGeo();
 	return true;
@@ -490,7 +490,7 @@ bool WgFlexHook::MovePointsY( int y )
 
 WgCoord WgFlexHook::ScreenPixelPos() const
 {
-	return m_realGeo.Pos() + m_pParent->ScreenPixelPos();
+	return m_realGeo.pos() + m_pParent->ScreenPixelPos();
 }
 
 //____ WgFlexHook::ScreenPixelGeo() ________________________________________________
@@ -547,13 +547,13 @@ void WgFlexHook::_refreshRealGeo()
 		
 		// Calculate size
 
-		WgSize sz = _sizeFromPolicy( scaledGeo.Size() + scaledPadding, m_widthPolicy, m_heightPolicy, scale );
+		WgSize sz = _sizeFromPolicy( scaledGeo.size() + scaledPadding, m_widthPolicy, m_heightPolicy, scale );
 
 		// Calculate position
 
 		WgCoord pos = m_pParent->Anchor(m_anchor)->Position( parentSize, scale );	// Anchor,
 		pos -= WgUtil::OrigoToOfs( m_hotspot, sz );						// hotspot
-		pos += scaledGeo.Pos();											// and Offset.
+		pos += scaledGeo.pos();											// and Offset.
 
 		// Limit size/pos according to parent
 
@@ -579,7 +579,7 @@ void WgFlexHook::_refreshRealGeo()
 
 		newGeo = WgRect(topLeft,bottomRight);
 	}
-    newGeo.Shrink( scaledPadding );
+    newGeo.shrink( scaledPadding );
 
 
 	// Request render and update positions.
@@ -673,8 +673,8 @@ WgSize WgFlexHook::_sizeNeededForGeo()
         
         const WgFlexAnchor * pa = m_pParent->Anchor(m_anchor);
         
-        WgCoord hotspot = WgUtil::OrigoToOfs(m_hotspot,geo.Size());
-        WgCoord offset = (pa->Offset()*scale)/WG_SCALE_BASE + geo.Pos() - hotspot;
+        WgCoord hotspot = WgUtil::OrigoToOfs(m_hotspot,geo.size());
+        WgCoord offset = (pa->Offset()*scale)/WG_SCALE_BASE + geo.pos() - hotspot;
         
         int leftOfAnchor = 0 - offset.x;
         int rightOfAnchor = offset.x + geo.w;
@@ -730,7 +730,7 @@ void WgFlexHook::_requestRender()
 
 void WgFlexHook::_requestRender( const WgRect& rect )
 {
-	m_pParent->_onRequestRender( rect + m_realGeo.Pos(), this );
+	m_pParent->_onRequestRender( rect + m_realGeo.pos(), this );
 }
 
 //____ WgFlexHook::_requestResize() ____________________________________________
@@ -1179,7 +1179,7 @@ WgSize WgFlexPanel::PreferredPixelSize() const
         while( pHook )
         {
             WgSize sz = pHook->_sizeNeededForGeo();
-            minSize = WgSize::Max(minSize,sz);
+            minSize = WgSize::max(minSize,sz);
             pHook = pHook->Next();
         }
         return minSize;
@@ -1203,7 +1203,7 @@ void WgFlexPanel::_onRequestRender( const WgRect& rect, const WgFlexHook * pHook
 	WgFlexHook * pCover = pHook->Next();
 	while( pCover )
 	{
-		if( pCover->m_bVisible && pCover->m_realGeo.IntersectsWith( rect ) )
+		if( pCover->m_bVisible && pCover->m_realGeo.intersectsWith( rect ) )
 			pCover->Widget()->_onMaskPatches( patches, pCover->m_realGeo, WgRect(0,0,65536,65536 ), _getBlendMode() );
 
 		pCover = pCover->Next();

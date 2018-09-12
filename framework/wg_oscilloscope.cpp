@@ -470,7 +470,7 @@ void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 		int x = m_pMarkers[i].x;
 		int y = (int) (m_pMarkers[i].y*scaleY+centerY);
 
-		dest.SetSize( m_pMarkerGfx->Size(m_scale) );
+		dest.setSize( m_pMarkerGfx->Size(m_scale) );
 		dest.x = x - dest.w / 2;
 		dest.y = y - dest.h / 2;
 

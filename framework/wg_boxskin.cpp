@@ -64,7 +64,7 @@ WgBoxSkin::WgBoxSkin( WgColor color, WgBorders frame, WgColor frameColor )
 		m_frameColor[i] = frameColor;
 	}
 
-	bool hasFrame = frame.Width() + frame.Height();
+	bool hasFrame = frame.width() + frame.height();
 	if( color.a == 255 && (!hasFrame || frameColor.a == 255) )
 		m_bOpaque = true;
 	else
@@ -78,7 +78,7 @@ void WgBoxSkin::SetColor( WgColor color )
 	for( int i = 0 ; i < WG_NB_STATES ; i++ )
 		m_color[i] = color;
 
-	if( m_frame.Width() + m_frame.Height() == 0 )
+	if( m_frame.width() + m_frame.height() == 0 )
 		m_bOpaque = color.a == 255;
 	else if( (color.a == 255 && !m_bOpaque) || (color.a < 255 && m_bOpaque) )
 		_updateOpaqueFlag();
@@ -91,7 +91,7 @@ void WgBoxSkin::SetFrameColor( WgColor color )
 	for( int i = 0 ; i < WG_NB_STATES ; i++ )
 		m_frameColor[i] = color;
 
-	bool hasFrame = m_frame.Width() + m_frame.Height();
+	bool hasFrame = m_frame.width() + m_frame.height();
 	if( hasFrame && ((color.a == 255 && !m_bOpaque) || (color.a < 255 && m_bOpaque)) )
 		_updateOpaqueFlag();
 }
@@ -100,8 +100,8 @@ void WgBoxSkin::SetFrameColor( WgColor color )
 
 void WgBoxSkin::SetFrameThickness( WgBorders frame )
 {
-	bool hadFrame = m_frame.Width() + m_frame.Height();
-	bool hasFrame = frame.Width() + frame.Height();
+	bool hadFrame = m_frame.width() + m_frame.height();
+	bool hasFrame = frame.width() + frame.height();
 
 	m_frame = frame;
 
@@ -155,7 +155,7 @@ PACE_FUSION_NO_USER_CALLBACK
 void WgBoxSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _canvas, const WgRect& _clip, int scale ) const
 {
 	int i = WgUtil::_stateToIndex(state);
-	if( m_frame.Width() + m_frame.Height() == 0 )
+	if( m_frame.width() + m_frame.height() == 0 )
 	{
 		pDevice->Fill( _clip, m_color[i] );
 	}
@@ -164,8 +164,8 @@ void WgBoxSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _can
 		WgBorders frame(m_frame.left *scale >> WG_SCALE_BINALS, m_frame.top *scale >> WG_SCALE_BINALS, m_frame.right *scale >> WG_SCALE_BINALS, m_frame.bottom *scale >> WG_SCALE_BINALS);
 
 		WgRect top( WgRect(_canvas.x, _canvas.y, _canvas.w, frame.top), _clip );
-		WgRect left( WgRect(_canvas.x, _canvas.y+frame.top, frame.left, _canvas.h - frame.Height()), _clip );
-		WgRect right( WgRect(_canvas.x + _canvas.w - frame.right, _canvas.y+frame.top, frame.right, _canvas.h - frame.Height()), _clip );
+		WgRect left( WgRect(_canvas.x, _canvas.y+frame.top, frame.left, _canvas.h - frame.height()), _clip );
+		WgRect right( WgRect(_canvas.x + _canvas.w - frame.right, _canvas.y+frame.top, frame.right, _canvas.h - frame.height()), _clip );
 		WgRect bottom( WgRect(_canvas.x, _canvas.y + _canvas.h - frame.bottom, _canvas.w, frame.bottom), _clip );
 		WgRect center( _canvas - frame, _clip );
 
@@ -219,7 +219,7 @@ bool WgBoxSkin::MarkTest( const WgCoord& ofs, const WgSize& canvasSize, WgState 
 	int i = WgUtil::_stateToIndex(state);
 
 	WgRect center = ContentRect(WgRect(canvasSize), state, scale);
-	if( center.Contains(ofs) )
+	if( center.contains(ofs) )
 		return m_color[i].a >= opacityTreshold;
 	else
 		return m_frameColor[i].a >= opacityTreshold;
@@ -239,7 +239,7 @@ bool WgBoxSkin::IsOpaque() const
 bool WgBoxSkin::IsOpaque( WgState state ) const
 {
 	int i = WgUtil::_stateToIndex(state);
-	if( m_bOpaque || (m_color[i].a == 255 && (m_frameColor[i] == 255 || (m_frame.Width() + m_frame.Height() == 0))) )
+	if( m_bOpaque || (m_color[i].a == 255 && (m_frameColor[i] == 255 || (m_frame.width() + m_frame.height() == 0))) )
 		return true;
 
 	return false;
@@ -252,9 +252,9 @@ bool WgBoxSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgState 
 
 	WgRect center = ContentRect(WgRect(canvasSize), state, scale);
 	int i = WgUtil::_stateToIndex(state);
-	if( center.Contains(rect) )
+	if( center.contains(rect) )
 		return m_color[i].a == 255;
-	else if( !center.IntersectsWith(rect) )
+	else if( !center.intersectsWith(rect) )
 		return m_frameColor[i].a == 255;
 
 	return m_color[i].a == 255 && m_frameColor[i].a == 255;
@@ -287,7 +287,7 @@ void WgBoxSkin::_updateOpaqueFlag()
 		frameAlpha += (int) m_frameColor[i].a;
 	}
 
-	bool hasFrame = m_frame.Width() + m_frame.Height();
+	bool hasFrame = m_frame.width() + m_frame.height();
 	
 	if( alpha == 255*WG_NB_STATES && (!hasFrame || frameAlpha == 255*WG_NB_STATES) )
 		m_bOpaque = true;

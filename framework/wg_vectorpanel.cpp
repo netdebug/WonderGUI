@@ -25,12 +25,12 @@
 
 WgCoord WgVectorHook::PixelPos() const
 {
-	return Parent()->_hookGeo(this).Pos();
+	return Parent()->_hookGeo(this).pos();
 }
 
 WgSize WgVectorHook::PixelSize() const
 {
-	return Parent()->_hookGeo(this).Size();
+	return Parent()->_hookGeo(this).size();
 }
 
 WgRect WgVectorHook::PixelGeo() const
@@ -40,7 +40,7 @@ WgRect WgVectorHook::PixelGeo() const
 
 WgCoord WgVectorHook::ScreenPixelPos() const
 {
-	return Parent()->_hookGeo(this).Pos() + Parent()->ScreenPixelPos();
+	return Parent()->_hookGeo(this).pos() + Parent()->ScreenPixelPos();
 
 }
 

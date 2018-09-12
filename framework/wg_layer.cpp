@@ -151,7 +151,7 @@ void WgLayer::_onRequestRender( const WgRect& rect, const WgLayerHook * pHook )
 
 	while( pCover )
 	{
-		if( pCover->m_geo.IntersectsWith( rect ) )
+		if( pCover->m_geo.intersectsWith( rect ) )
 			pCover->Widget()->_onMaskPatches( patches, pCover->m_geo, WgRect(0,0,65536,65536 ), _getBlendMode() );
 
 		pCover = pCover->Next();
@@ -194,7 +194,7 @@ void WgLayer::BaseHook::_requestResize()
 //_____________________________________________________________________________
 WgCoord WgLayerHook::ScreenPixelPos() const
 {
-	return Parent()->ScreenPixelPos() + m_geo.Pos();
+	return Parent()->ScreenPixelPos() + m_geo.pos();
 }
 
 //_____________________________________________________________________________
@@ -212,7 +212,7 @@ void WgLayerHook::_requestRender()
 //_____________________________________________________________________________
 void WgLayerHook::_requestRender( const WgRect& rect )
 {
-	Parent()->_onRequestRender( rect + m_geo.Pos(), this );
+	Parent()->_onRequestRender( rect + m_geo.pos(), this );
 }
 
 //_____________________________________________________________________________

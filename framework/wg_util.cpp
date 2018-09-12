@@ -37,17 +37,17 @@ bool WgUtil::AdjustScaledArea(const WgBlock& block, WgRect& area)
 
 	const WgBorders& borders = block.CanvasFrame();
 
-	int areaW = area.w - borders.Width();
-	int areaH = area.h - borders.Height();
+	int areaW = area.w - borders.width();
+	int areaH = area.h - borders.height();
 
-	int blockW = block.Width() - borders.Width();
-	int blockH = block.Height() - borders.Height();
+	int blockW = block.Width() - borders.width();
+	int blockH = block.Height() - borders.height();
 
 	if(areaW <= 0 || areaH <= 0 || blockW <= 0 || blockH <= 0)
 		return false;
 
-	int adjustedW = borders.Width();
-	int adjustedH = borders.Height();
+	int adjustedW = borders.width();
+	int adjustedH = borders.height();
 
 	if(areaW * blockH > blockW * areaH)
 	{
@@ -78,7 +78,7 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
 	AdjustScaledArea(block, canvas);
 
 	// Sanity check & shortcuts.
-	if( !canvas.Contains(ofs.x,ofs.y) )
+	if( !canvas.contains(ofs.x,ofs.y) )
 		return false;
 
 	int alpha;
@@ -131,9 +131,9 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
 	}
 	else if( xSection == 1 )
 	{
-		int tileAreaWidth = dimensions.w - sourceFrame.Width();
+		int tileAreaWidth = dimensions.w - sourceFrame.width();
 
-        int canvasStretchWidth = canvas.w - canvasFrame.Width();	// Width of stretch-area on screen.
+        int canvasStretchWidth = canvas.w - canvasFrame.width();	// Width of stretch-area on screen.
         
         ofs.x = ofs.x - canvasFrame.left;               // Offset in middle section of canvas
 //        ofs.x = (ofs.x * surfaceScale) / outputScale;        // Scale from canvas to source offset
@@ -154,15 +154,15 @@ bool WgUtil::MarkTestBlock( WgCoord ofs, const WgBlock& block, WgRect canvas, in
 	}
 	else if( ySection == 1 )
 	{
-		int tileAreaHeight = dimensions.h - sourceFrame.Height();	
-        int canvasStretchHeight = canvas.h - canvasFrame.Height();	// Height of stretch-area on screen.
+		int tileAreaHeight = dimensions.h - sourceFrame.height();	
+        int canvasStretchHeight = canvas.h - canvasFrame.height();	// Height of stretch-area on screen.
         
         ofs.y = ofs.y - canvasFrame.top;               // Offset in middle section of canvas
   //      ofs.y = (ofs.y * surfaceScale) / outputScale;        // Scale from canvas to source offset
         ofs.y = (int)((ofs.y / (float)canvasStretchHeight)*tileAreaHeight) + sourceFrame.top;
 	}
 
-	WgCoord srcOfs = block.Rect().Pos();
+	WgCoord srcOfs = block.Rect().pos();
 
 	alpha = block.Surface()->GetOpacity(srcOfs.x+ofs.x, srcOfs.y+ofs.y);
 	

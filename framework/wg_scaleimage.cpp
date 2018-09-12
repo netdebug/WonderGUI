@@ -92,7 +92,7 @@ void WgScaleImage::SetImageMaxSize( WgSize max )
 		(m_imgRect.h == m_maxImgSize.h && max.h > m_maxImgSize.h) )
 		bRegenerate = true;
 
-	m_imgRect.SetSize(max);
+	m_imgRect.setSize(max);
 
 	if( bRegenerate )
 	{
@@ -138,13 +138,13 @@ void WgScaleImage::_recalcImageRect( WgSize widgetSize )
 		
 		WgRect imgRect = WgUtil::OrigoToRect( m_imgOrigo, widgetSize, WgSize(w,h) );
 
-		if( imgRect.Size() != m_imgRect.Size() )
+		if( imgRect.size() != m_imgRect.size() )
 		{
 			m_imgRect = imgRect;
 			_regenerateSurface();
 
 		}
-		else if( imgRect.Pos() != m_imgRect.Pos() )
+		else if( imgRect.pos() != m_imgRect.pos() )
 		{
 			m_imgRect = imgRect;
 			_requestRender();
@@ -152,7 +152,7 @@ void WgScaleImage::_recalcImageRect( WgSize widgetSize )
 	}
 	else
 	{
-		m_imgRect.Clear();
+		m_imgRect.clear();
 		if( m_pGenSurface )
 		{
 			delete m_pGenSurface;
@@ -180,7 +180,7 @@ void WgScaleImage::_regenerateSurface()
 
 	if( m_pSurfaceFactory )
 	{
-		m_pGenSurface = m_pSurfaceFactory->CreateSurface( m_imgRect.Size(), WG_PIXEL_BGRA_8 );
+		m_pGenSurface = m_pSurfaceFactory->CreateSurface( m_imgRect.size(), WG_PIXEL_BGRA_8 );
 
 		// Insert code here to stretch-copy content from m_pOrgSurface to m_pGenSurface
         resample(m_pOrgSurface, m_pGenSurface);
@@ -277,9 +277,9 @@ bool WgScaleImage::_onAlphaTest( const WgCoord& ofs )
 		return	false;												// No visible pixel, so don't accept the mark...
 
 
-	if (m_imgRect.Contains(ofs))
+	if (m_imgRect.contains(ofs))
 	{
-		WgCoord ofs2 = ofs - m_imgRect.Pos();
+		WgCoord ofs2 = ofs - m_imgRect.pos();
 		Uint8 opacity = m_pGenSurface->GetOpacity(ofs2);
 		if (opacity > 0)
 			return true;

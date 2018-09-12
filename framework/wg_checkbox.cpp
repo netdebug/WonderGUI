@@ -173,12 +173,12 @@ WgSize WgCheckBox::PreferredPixelSize() const
 
 	if( m_pIconUnchecked )
 	{
-		iconPreferredSize = m_pIconUnchecked->Size(m_scale) + m_iconBorders.Size();
+		iconPreferredSize = m_pIconUnchecked->Size(m_scale) + m_iconBorders.size();
 
 		//TODO: Add magic for how icon influences textPreferredSize based on origo, iconBorders, iconScale and bgPreferredSize
 	}
 
-	WgSize preferredSize = WgSize::Max( WgSize::Max(iconPreferredSize,bgPreferredSize), textPreferredSize);
+	WgSize preferredSize = WgSize::max( WgSize::max(iconPreferredSize,bgPreferredSize), textPreferredSize);
 
 	return preferredSize;
 }
@@ -520,26 +520,26 @@ bool WgCheckBox::_onAlphaTest( const WgCoord& ofs )
 			if( iconRect.x + iconRect.w < textRect.x )
 				iconRect.w = textRect.x - iconRect.x;
 
-			if( iconRect.x > textRect.Right() )
+			if( iconRect.x > textRect.right() )
 			{
-				iconRect.w += iconRect.x - textRect.Right();
-				iconRect.x = textRect.Right();
+				iconRect.w += iconRect.x - textRect.right();
+				iconRect.x = textRect.right();
 			}
 
 			if( iconRect.y + iconRect.h < textRect.y )
 				iconRect.h = textRect.y - iconRect.y;
 
-			if( iconRect.y > textRect.Bottom() )
+			if( iconRect.y > textRect.bottom() )
 			{
-				iconRect.h += iconRect.y - textRect.Bottom();
-				iconRect.y = textRect.Bottom();
+				iconRect.h += iconRect.y - textRect.bottom();
+				iconRect.y = textRect.bottom();
 			}
 
 			//
 
 			if( (bgBlock.IsValid() && WgUtil::MarkTestBlock( ofs, bgBlock, WgRect(0,0,bgSize), m_markOpacity )) ||
 				_markTestTextArea( ofs.x, ofs.y ) ||
-				iconRect.Contains( ofs.x, ofs.y ) )
+				iconRect.contains( ofs.x, ofs.y ) )
 				return true;
 
 			return false;

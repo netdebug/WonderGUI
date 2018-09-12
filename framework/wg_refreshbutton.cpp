@@ -188,7 +188,7 @@ void WgRefreshButton::_onNewSize( const WgSize& size )
 	Uint32 w = size.w;
 
 	if( m_pBgGfx )
-		w -= m_pBgGfx->Padding(m_scale).Width();
+		w -= m_pBgGfx->Padding(m_scale).width();
 	m_refreshText.setLineWidth(w);
 
 	WgButton::_onNewSize( size );

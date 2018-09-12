@@ -666,39 +666,39 @@ WgWidget * WgScrollPanel::FindWidget( const WgCoord& pos, WgSearchMode mode )
 	// Check XDRAG
 
 	WgScrollHook * p = &m_elements[XDRAG];
-	if( p->IsVisible() && p->m_pWidget && p->m_windowGeo.Contains( pos ) )
+	if( p->IsVisible() && p->m_pWidget && p->m_windowGeo.contains( pos ) )
 	{
-		if( mode != WG_SEARCH_MARKPOLICY || p->m_pWidget->MarkTest( pos - p->m_windowGeo.Pos() ) )
+		if( mode != WG_SEARCH_MARKPOLICY || p->m_pWidget->MarkTest( pos - p->m_windowGeo.pos() ) )
 			return p->m_pWidget;
 	}
 
 	// Check YDRAG
 
 	p = &m_elements[YDRAG];
-	if( p->IsVisible() && p->m_pWidget && p->m_windowGeo.Contains( pos ) )
+	if( p->IsVisible() && p->m_pWidget && p->m_windowGeo.contains( pos ) )
 	{
-		if( mode != WG_SEARCH_MARKPOLICY || p->m_pWidget->MarkTest( pos - p->m_windowGeo.Pos() ) )
+		if( mode != WG_SEARCH_MARKPOLICY || p->m_pWidget->MarkTest( pos - p->m_windowGeo.pos() ) )
 			return p->m_pWidget;
 	}
 
 	// Check WINDOW
 
 	p = &m_elements[WINDOW];
-	if( p->IsVisible() && p->m_pWidget && p->m_windowGeo.Contains( pos ) && p->m_canvasGeo.Contains( pos ) )
+	if( p->IsVisible() && p->m_pWidget && p->m_windowGeo.contains( pos ) && p->m_canvasGeo.contains( pos ) )
 	{
 		if( p->m_pWidget->IsContainer() )
 		{
-			WgWidget * pFound = p->m_pWidget->CastToContainer()->FindWidget( pos - p->m_canvasGeo.Pos(), mode );
+			WgWidget * pFound = p->m_pWidget->CastToContainer()->FindWidget( pos - p->m_canvasGeo.pos(), mode );
 			if( pFound )
 				return pFound;
 		}
-		else if( mode != WG_SEARCH_MARKPOLICY || p->m_pWidget->MarkTest( pos - p->m_canvasGeo.Pos() ) )
+		else if( mode != WG_SEARCH_MARKPOLICY || p->m_pWidget->MarkTest( pos - p->m_canvasGeo.pos() ) )
 			return p->m_pWidget;
 	}
 
 	// Check window background color
 
-	if( m_bgColor.a != 0 && p->m_windowGeo.Contains( pos ) )
+	if( m_bgColor.a != 0 && p->m_windowGeo.contains( pos ) )
 		return this;
 
 
@@ -1034,9 +1034,9 @@ void WgScrollPanel::_updateElementGeo( WgSize mySize )
 		// Notify sliders of their new size.
 
 		if( bShowDragX )
-			m_elements[XDRAG].Widget()->_onNewSize(newDragX.Size());
+			m_elements[XDRAG].Widget()->_onNewSize(newDragX.size());
 		if( bShowDragY )
-			m_elements[YDRAG].Widget()->_onNewSize(newDragY.Size());
+			m_elements[YDRAG].Widget()->_onNewSize(newDragY.size());
 	}
 
 	// If contentSize has changed we save changes and set flags
@@ -1118,7 +1118,7 @@ void WgScrollPanel::_updateElementGeo( WgSize mySize )
 
 WgRect WgScrollPanel::_genContentCanvasGeo( const WgRect& window, WgSize contentSize, WgOrigo origo, WgCoord viewOfs )
 {
-	WgRect	out( window.Pos() - viewOfs, contentSize);
+	WgRect	out( window.pos() - viewOfs, contentSize);
 
 	if( window.w > contentSize.w )
 	{
@@ -1152,7 +1152,7 @@ void WgScrollPanel::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * p
 		{			
 			const WgEvent::MouseWheelRoll * pEvent = static_cast<const WgEvent::MouseWheelRoll*>(_pEvent);
 
-			if( m_elements[WINDOW].m_windowGeo.Contains(pEvent->PointerPixelPos()) )
+			if( m_elements[WINDOW].m_windowGeo.contains(pEvent->PointerPixelPos()) )
 			{
 				int wheel = pEvent->Wheel();
 
@@ -1181,7 +1181,7 @@ void WgScrollPanel::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas
 
 	for( const WgRect * pRect = _pPatches->Begin() ; pRect != _pPatches->End() ; pRect++ )
 	{
-		if( _window.IntersectsWith( *pRect ) )
+		if( _window.intersectsWith( *pRect ) )
 			patches.Push( WgRect(*pRect,_window) );
 	}
 
@@ -1193,7 +1193,7 @@ void WgScrollPanel::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas
 
 	if( m_bgColor.a != 0 )
 	{
-		WgRect window = m_elements[WINDOW].m_windowGeo + _canvas.Pos();
+		WgRect window = m_elements[WINDOW].m_windowGeo + _canvas.pos();
 
 		for( const WgRect * pRect = patches.Begin() ; pRect != patches.End() ; pRect++ )
 			pDevice->ClipFill(*pRect, window, m_bgColor );
@@ -1203,29 +1203,29 @@ void WgScrollPanel::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas
 
 	if( m_elements[WINDOW].Widget() )
 	{
-		WgRect canvas = m_elements[WINDOW].m_canvasGeo + _canvas.Pos();
-		WgRect window( canvas, m_elements[WINDOW].m_windowGeo + _canvas.Pos() );	// Use intersection in case canvas is smaller than window.
+		WgRect canvas = m_elements[WINDOW].m_canvasGeo + _canvas.pos();
+		WgRect window( canvas, m_elements[WINDOW].m_windowGeo + _canvas.pos() );	// Use intersection in case canvas is smaller than window.
 
-		if( window.IntersectsWith(dirtBounds) )
+		if( window.intersectsWith(dirtBounds) )
 			m_elements[WINDOW].Widget()->_renderPatches( pDevice, canvas, window, &patches );
 	}
 	if( m_elements[XDRAG].m_bVisible )
 	{
-		WgRect canvas = m_elements[XDRAG].m_windowGeo + _canvas.Pos();
-		if( canvas.IntersectsWith(dirtBounds) )
+		WgRect canvas = m_elements[XDRAG].m_windowGeo + _canvas.pos();
+		if( canvas.intersectsWith(dirtBounds) )
 			m_elements[XDRAG].Widget()->_renderPatches( pDevice, canvas, canvas, &patches );
 	}
 	if( m_elements[YDRAG].m_bVisible )
 	{
-		WgRect canvas = m_elements[YDRAG].m_windowGeo + _canvas.Pos();
-		if( canvas.IntersectsWith(dirtBounds) )
+		WgRect canvas = m_elements[YDRAG].m_windowGeo + _canvas.pos();
+		if( canvas.intersectsWith(dirtBounds) )
 			m_elements[YDRAG].Widget()->_renderPatches( pDevice, canvas, canvas, &patches );
 	}
 
 	WgMode mode = m_bEnabled?WG_MODE_NORMAL:WG_MODE_DISABLED;
 	if( m_pFillerBlocks && m_geoFiller.w != 0 && m_geoFiller.h != 0 )
 	{
-		WgRect canvas = m_geoFiller + _canvas.Pos();
+		WgRect canvas = m_geoFiller + _canvas.pos();
 
 		for( const WgRect * pRect = patches.Begin() ; pRect != patches.End() ; pRect++ )
 		{
@@ -1258,24 +1258,24 @@ void WgScrollPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const
 			WgScrollHook * p = &m_elements[WINDOW];
 
 			if( m_bgColor.a == 255 )
-				patches.Sub( WgRect( p->m_windowGeo + geo.Pos(), clip) );
+				patches.Sub( WgRect( p->m_windowGeo + geo.pos(), clip) );
 			else if( p->Widget() )
-				p->Widget()->_onMaskPatches( patches, p->m_canvasGeo + geo.Pos(), WgRect(p->m_windowGeo + geo.Pos(), clip), blendMode );
+				p->Widget()->_onMaskPatches( patches, p->m_canvasGeo + geo.pos(), WgRect(p->m_windowGeo + geo.pos(), clip), blendMode );
 
 			// Mask against dragbars
 
 			p = &m_elements[XDRAG];
 			if( p->IsVisible() )
-				p->Widget()->_onMaskPatches( patches, p->m_windowGeo + geo.Pos(), clip, blendMode );
+				p->Widget()->_onMaskPatches( patches, p->m_windowGeo + geo.pos(), clip, blendMode );
 
 			p = &m_elements[YDRAG];
 			if( p->IsVisible() )
-				p->Widget()->_onMaskPatches( patches, p->m_windowGeo + geo.Pos(), clip, blendMode );
+				p->Widget()->_onMaskPatches( patches, p->m_windowGeo + geo.pos(), clip, blendMode );
 
 			// Maska against corner piece
 
-			if( !m_geoFiller.IsEmpty() && m_pFillerBlocks && m_pFillerBlocks->IsOpaque() )
-				patches.Sub( WgRect(m_geoFiller + geo.Pos(), clip) );
+			if( !m_geoFiller.isEmpty() && m_pFillerBlocks && m_pFillerBlocks->IsOpaque() )
+				patches.Sub( WgRect(m_geoFiller + geo.pos(), clip) );
 
 			break;
 		}
@@ -1291,7 +1291,7 @@ void WgScrollPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const
 
 bool WgScrollPanel::_onAlphaTest( const WgCoord& ofs )
 {
-	if( m_pFillerBlocks && m_geoFiller.Contains( ofs ) )
+	if( m_pFillerBlocks && m_geoFiller.contains( ofs ) )
 	{
 		WgMode mode = m_bEnabled?WG_MODE_NORMAL:WG_MODE_DISABLED;
 
@@ -1500,14 +1500,14 @@ const char * WgScrollHook::ClassType()
 
 WgCoord WgScrollHook::PixelPos() const
 {
-	return m_canvasGeo.Pos();
+	return m_canvasGeo.pos();
 }
 
 //____ WgScrollHook::PixelSize() _______________________________________________________
 
 WgSize WgScrollHook::PixelSize() const
 {
-	return m_canvasGeo.Size();
+	return m_canvasGeo.size();
 }
 
 //____ WgScrollHook::PixelGeo() ________________________________________________________
@@ -1521,7 +1521,7 @@ WgRect WgScrollHook::PixelGeo() const
 
 WgCoord WgScrollHook::ScreenPixelPos() const
 {
-	return m_pView->ScreenPixelPos() + m_canvasGeo.Pos();
+	return m_pView->ScreenPixelPos() + m_canvasGeo.pos();
 }
 
 //____ WgScrollHook::ScreenPixelGeo() __________________________________________________
@@ -1544,9 +1544,9 @@ void WgScrollHook::_requestRender( const WgRect& rect )
 {
 	if( m_bVisible )
 	{
-		WgRect r( m_windowGeo, rect + m_canvasGeo.Pos() );
+		WgRect r( m_windowGeo, rect + m_canvasGeo.pos() );
 
-		if( !r.IsEmpty() )
+		if( !r.isEmpty() )
 			m_pView->_requestRender( r );
 	}
 }

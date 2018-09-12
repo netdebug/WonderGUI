@@ -1068,7 +1068,7 @@ void WgScrollChart::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, cons
 		{
 			WgRect coverage = m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale);
 
-			if ( !coverage.Contains( _clip) )
+			if ( !coverage.contains( _clip) )
 			{
 				WgRect topSection(canvas.x, canvas.y, canvas.w, coverage.y - canvas.y);
 				WgRect leftSection(canvas.x, coverage.y, coverage.x - canvas.x, coverage.h);
@@ -1104,7 +1104,7 @@ void WgScrollChart::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, cons
 
 	if (m_pCanvas)
 	{
-		assert(m_pCanvas->PixelSize() == scrollCanvas.Size());
+		assert(m_pCanvas->PixelSize() == scrollCanvas.size());
 	
 		if( m_windowBegin == 0 )
 			pDevice->ClipBlitFromCanvas(_clip, m_pCanvas, { 0, 0, scrollCanvas.w, scrollCanvas.h }, scrollCanvas.x, scrollCanvas.y);
@@ -1151,7 +1151,7 @@ void WgScrollChart::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, cons
 				if (m_valueLabelStyle.pSkin)
 				{
 					labelSize = m_valueLabelStyle.pSkin->SizeForContent(labelSize, m_scale);
-					textOfs = m_valueLabelStyle.pSkin->ContentRect(labelSize, WG_STATE_NORMAL, m_scale).Pos();
+					textOfs = m_valueLabelStyle.pSkin->ContentRect(labelSize, WG_STATE_NORMAL, m_scale).pos();
 				}
 
 				WgCoord labelPos = _placeLabel({ canvas.x, yOfs }, m_valueLabelStyle.alignment, m_valueLabelStyle.offset, labelSize);
@@ -1211,7 +1211,7 @@ void WgScrollChart::_regenCanvas()
 
 	if (m_pFactory)
 	{
-		WgSize sz = _getScrollWindow().Size();
+		WgSize sz = _getScrollWindow().size();
 
 		if (sz.w <= 0 && sz.h <= 0)
 			return;
@@ -1292,7 +1292,7 @@ WgRect WgScrollChart::_getScrollWindow() const
 	WgRect r = PixelSize();
 
 	if (m_pSkin)
-		r = m_pSkin->ContentRect(r, WG_STATE_NORMAL, m_scale).Size();
+		r = m_pSkin->ContentRect(r, WG_STATE_NORMAL, m_scale).size();
 
 	r -= m_pixelPadding;
 

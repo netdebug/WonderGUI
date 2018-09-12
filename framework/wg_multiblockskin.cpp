@@ -287,7 +287,7 @@ void WgMultiBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRec
 
 		if (src.w == _canvas.w && src.h == _canvas.h && scale == m_scale)
 		{ 
-			pDevice->ClipBlit(_clip, layer.pSurface, src, _canvas.Pos().x, _canvas.Pos().y);
+			pDevice->ClipBlit(_clip, layer.pSurface, src, _canvas.pos().x, _canvas.pos().y);
 			continue;
 		}
 
@@ -297,8 +297,8 @@ void WgMultiBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRec
 			continue;
 		}
 
-		const WgBorders&    sourceBorders = m_frame.Scale(m_scale);
-		const WgBorders     canvasBorders = m_frame.Scale(scale);
+		const WgBorders&    sourceBorders = m_frame.scale(m_scale);
+		const WgBorders     canvasBorders = m_frame.scale(scale);
 
 		if (src.w == _canvas.w)
 		{
@@ -318,10 +318,10 @@ void WgMultiBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRec
 
 		// Render mid row (left and right stretch area and middle section)
 
-		if (_canvas.h - canvasBorders.Height() > 0)
+		if (_canvas.h - canvasBorders.height() > 0)
 		{
-			WgRect sourceRect(src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.Height());
-			WgRect destRect(_canvas.x, _canvas.y + canvasBorders.top, _canvas.w, _canvas.h - canvasBorders.Height());
+			WgRect sourceRect(src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.height());
+			WgRect destRect(_canvas.x, _canvas.y + canvasBorders.top, _canvas.w, _canvas.h - canvasBorders.height());
 
 			pDevice->ClipBlitHorrStretchBar(_clip, layer.pSurface, sourceRect, sourceBorders, destRect, canvasBorders);
 		}
@@ -351,7 +351,7 @@ void WgMultiBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRec
 WgSize WgMultiBlockSkin::MinSize(int scale) const
 {
 	WgSize content = WgExtendedSkin::MinSize(scale);
-	WgSize frame = m_frame.Scale(scale).Size();
+	WgSize frame = m_frame.scale(scale).size();
 	return WgSize( WgMax(content.w, frame.w), WgMax(content.h, frame.h) );
 }
 
@@ -368,7 +368,7 @@ WgSize WgMultiBlockSkin::PreferredSize(int scale) const
 WgSize WgMultiBlockSkin::SizeForContent( const WgSize contentSize, int scale ) const
 {
 	WgSize sz = WgExtendedSkin::SizeForContent(contentSize, scale);
-	WgSize min = m_frame.Scale(scale).Size();
+	WgSize min = m_frame.scale(scale).size();
 
 	return WgSize( WgMax(sz.w,min.w), WgMax(sz.h,min.h) );
 }
@@ -391,8 +391,8 @@ bool WgMultiBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgSt
 		{
 			WgCoord ofs = _ofs;
 
-			WgBorders canvasFrame = m_frame.Scale(scale);
-			WgBorders sourceFrame = m_frame.Scale(m_scale);
+			WgBorders canvasFrame = m_frame.scale(scale);
+			WgBorders sourceFrame = m_frame.scale(m_scale);
 
 			// Determine in which section the cordinate is (0-2 for x and y).
 
@@ -423,9 +423,9 @@ bool WgMultiBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgSt
 			}
 			else if (xSection == 1)
 			{
-				int tileAreaWidth = m_blockSize.w - sourceFrame.Width();
+				int tileAreaWidth = m_blockSize.w - sourceFrame.width();
 
-				int canvasStretchWidth = canvas.w - canvasFrame.Width();	// Width of stretch-area on screen.
+				int canvasStretchWidth = canvas.w - canvasFrame.width();	// Width of stretch-area on screen.
 
 				ofs.x = ofs.x - canvasFrame.left;               // Offset in middle section of canvas
 				ofs.x = (ofs.x * m_scale) / scale;        // Scale from canvas to source offset
@@ -447,9 +447,9 @@ bool WgMultiBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgSt
 			}
 			else if (ySection == 1)
 			{
-				int tileAreaHeight = m_blockSize.h - sourceFrame.Height();
+				int tileAreaHeight = m_blockSize.h - sourceFrame.height();
 
-				int canvasStretchHeight = canvas.h - canvasFrame.Height();	// Height of stretch-area on screen.
+				int canvasStretchHeight = canvas.h - canvasFrame.height();	// Height of stretch-area on screen.
 
 				ofs.y = ofs.y - canvasFrame.top;               // Offset in middle section of canvas
 				ofs.y = (ofs.y * m_scale) / scale;        // Scale from canvas to source offset

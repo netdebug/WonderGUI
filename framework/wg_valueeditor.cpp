@@ -256,7 +256,7 @@ void WgValueEditor::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 			canvas.w = textW;
 
 		WgCursorInstance * pCursor = m_text.GetCursor();
-		m_viewOfs = m_text.FocusWindowOnRange( canvas.Size(), WgRect(m_viewOfs,_canvas.Size()), WgRange( pCursor->column(),0 ) );
+		m_viewOfs = m_text.FocusWindowOnRange( canvas.size(), WgRect(m_viewOfs,_canvas.size()), WgRange( pCursor->column(),0 ) );
 	}
 	else
 		m_viewOfs = WgCoord(0,0);

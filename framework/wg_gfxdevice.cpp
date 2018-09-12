@@ -373,10 +373,10 @@ void WgGfxDevice::ClipBlitBlock( const WgRect& _clip, const WgBlock& _block, con
 
     // Render mid row (left and right stretch area and middle section)
     
-    if( canvas.h - canvasBorders.Height() > 0 )
+    if( canvas.h - canvasBorders.height() > 0 )
     {
-        WgRect sourceRect( src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.Height() );
-        WgRect destRect( canvas.x, canvas.y + canvasBorders.top, canvas.w, canvas.h - canvasBorders.Height() );
+        WgRect sourceRect( src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.height() );
+        WgRect destRect( canvas.x, canvas.y + canvasBorders.top, canvas.w, canvas.h - canvasBorders.height() );
         
         ClipBlitHorrStretchBar( _clip, pSurf, sourceRect, sourceBorders, destRect, canvasBorders );
     }
@@ -411,9 +411,9 @@ void WgGfxDevice::ClipBlitHorrStretchBar(	const WgRect& _clip, const WgSurface *
     ClipStretchBlit( _clip, _pSurf, src, dest );
 
     src.x += src.w;
-    src.w = _src.w - _srcBorders.Width();
+    src.w = _src.w - _srcBorders.width();
     dest.x += dest.w;
-    dest.w = _dest.w - _destBorders.Width();
+    dest.w = _dest.w - _destBorders.width();
     
     ClipStretchBlit( _clip, _pSurf, src, dest );
     
@@ -443,9 +443,9 @@ void WgGfxDevice::ClipBlitVertStretchBar(	const WgRect& _clip, const WgSurface *
     ClipStretchBlit( _clip, _pSurf, src, dest );
     
     src.y += src.h;
-    src.h = _src.h - _srcBorders.Height();
+    src.h = _src.h - _srcBorders.height();
     dest.y += dest.h;
-    dest.h = _dest.h - _destBorders.Height();
+    dest.h = _dest.h - _destBorders.height();
     
     ClipStretchBlit( _clip, _pSurf, src, dest );
     
@@ -473,13 +473,13 @@ void WgGfxDevice::ClipBlitHorrBar(	const WgRect& _clip, const WgSurface * _pSurf
 	WgRect	r( _src.x, _src.y, _borders.left, _src.h );
 	ClipBlit( _clip, _pSurf, r, _dx, _dy );
 
-	_len -= _borders.Width();			// Remove left and right edges from len.
+	_len -= _borders.width();			// Remove left and right edges from len.
 	_dx += _borders.left;
 
 	// Blit tiling part
 
 	r.x += _borders.left;
-	r.w = _src.w - _borders.Width();
+	r.w = _src.w - _borders.width();
 
 	if( _bTile )
 	{
@@ -524,13 +524,13 @@ void WgGfxDevice::ClipBlitVertBar(	const WgRect& _clip, const WgSurface * _pSurf
 	WgRect	r( _src.x, _src.y, _src.w, _borders.top );
 	ClipBlit( _clip, _pSurf, r, _dx, _dy );
 
-	_len -= _borders.Height();			// Remove top and bottom edges from len.
+	_len -= _borders.height();			// Remove top and bottom edges from len.
 	_dy += _borders.top;
 
 	// Blit tiling part
 
 	r.y += _borders.top;
-	r.h = _src.h - _borders.Height();
+	r.h = _src.h - _borders.height();
 
 	if( _bTile )
 	{
@@ -572,13 +572,13 @@ void WgGfxDevice::BlitHorrBar(	const WgSurface * _pSurf, const WgRect& _src,
 	WgRect	r( _src.x, _src.y, _borders.left, _src.h );
 	Blit( _pSurf, r, _dx, _dy );
 
-	_len -= _borders.Width();			// Remove left and right edges from len.
+	_len -= _borders.width();			// Remove left and right edges from len.
 	_dx += _borders.left;
 
 	// Blit tiling part
 
 	r.x += _borders.left;
-	r.w = _src.w - _borders.Width();
+	r.w = _src.w - _borders.width();
 
 	if( _bTile )
 	{
@@ -619,13 +619,13 @@ void WgGfxDevice::BlitVertBar(	const WgSurface * _pSurf, const WgRect& _src,
 	WgRect	r( _src.x, _src.y, _src.w, _borders.top );
 	Blit( _pSurf, r, _dx, _dy );
 
-	_len -= _borders.Height();			// Remove top and bottom borders from len.
+	_len -= _borders.height();			// Remove top and bottom borders from len.
 	_dy += _borders.top;
 
 	// Blit tiling part
 
 	r.y += _borders.top;
-	r.h = _src.h - _borders.Height();
+	r.h = _src.h - _borders.height();
 
 	if( _bTile )
 	{
@@ -679,7 +679,7 @@ bool WgGfxDevice::PrintText( const WgRect& clip, const WgText * pText, const WgR
 
 	WgSize	textSize( pText->width(), pText->height() );
 
-	if( dest.h < (int) textSize.h || dest.w < (int) textSize.w || !clip.Contains( dest ) || pText->isCursorShowing() )
+	if( dest.h < (int) textSize.h || dest.w < (int) textSize.w || !clip.contains( dest ) || pText->isCursorShowing() )
 		pen.SetClipRect( clip );
 
 	const WgCursorInstance* pCursor = 0;

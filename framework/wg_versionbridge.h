@@ -31,19 +31,19 @@
 
 
 inline WgCoord _convert(const wg::Coord& r) { return WgCoord(r.x, r.y); }
-inline wg::Coord _convert(const WgCoord& r) { return wg::Coord(r.x, r.y); }
+//inline wg::Coord _convert(const WgCoord& r) { return wg::Coord(r.x, r.y); }
 
 inline WgSize _convert(const wg::Size& r) { return WgSize(r.w, r.h); }
-inline wg::Size _convert(const WgSize& r) { return wg::Size(r.w, r.h); }
+//inline wg::Size _convert(const WgSize& r) { return wg::Size(r.w, r.h); }
 
 inline WgBorders _convert(const wg::Border& r) { return WgBorders( (Uint8)r.left, (Uint8)r.top, (Uint8)r.right, (Uint8)r.bottom); }
-inline wg::Border _convert(const WgBorders& r) { return wg::Border(r.top,r.right,r.bottom,r.left); }
+//inline wg::Border _convert(const WgBorders& r) { return wg::Border(r.top,r.right,r.bottom,r.left); }
 
 inline WgRect _convert(const wg::Rect& r) { return WgRect(r.x, r.y, r.w, r.h); }
-inline wg::Rect _convert(const WgRect& r) { return wg::Rect(r.x, r.y, r.w, r.h); }
+//inline wg::Rect _convert(const WgRect& r) { return wg::Rect(r.x, r.y, r.w, r.h); }
 
 inline WgRectF _convert(const wg::RectF& r) { return WgRectF(r.x, r.y, r.w, r.h); }
-inline wg::RectF _convert(const WgRectF& r) { return wg::RectF(r.x, r.y, r.w, r.h); }
+//inline wg::RectF _convert(const WgRectF& r) { return wg::RectF(r.x, r.y, r.w, r.h); }
 
 
 inline WgColor _convert(wg::Color c) { return WgColor(c.argb); }

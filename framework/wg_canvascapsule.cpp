@@ -223,9 +223,9 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
         if (_canvas.w > maxSize.w || _canvas.h > maxSize.h)
             return;                            // Can't create a canvas of the required size!
 
-        m_pCanvas = m_pFactory->CreateSurface(_canvas.Size(), WG_PIXEL_BGRA_8);
+        m_pCanvas = m_pFactory->CreateSurface(_canvas.size(), WG_PIXEL_BGRA_8);
         m_dirtyPatches.Clear();
-        m_dirtyPatches.Add(_canvas.Size());
+        m_dirtyPatches.Add(_canvas.size());
     }
 
     // Go through dirty patches from screen canvas and update our back canvas where they overlap with our own
@@ -244,7 +244,7 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
 
             for (const WgRect * pLocalDirt = m_dirtyPatches.Begin(); pLocalDirt != m_dirtyPatches.End(); pLocalDirt++)
             {
-                if (pLocalDirt->IntersectsWith(r))
+                if (pLocalDirt->intersectsWith(r))
                 {
                     renderStack.Push(WgRect(*pLocalDirt,r));
                     bIntersected = true;
@@ -280,7 +280,7 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
 
         pDevice->SetBlendMode(WG_BLENDMODE_BLEND);
 
-        m_hook.Widget()->_renderPatches(pDevice, _canvas.Size(), _canvas.Size(), &renderStack);
+        m_hook.Widget()->_renderPatches(pDevice, _canvas.size(), _canvas.size(), &renderStack);
         pDevice->SetCanvas(pOldCanvas);
 
     }

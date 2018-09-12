@@ -36,7 +36,7 @@
 #	include <wg_blockset.h>
 #endif
 
-class WgRect;
+#include <wg_geo.h>
 
 //____ WgOscilloscope ____________________________________________________________
 #define WG_OSC_PIXEL_BUFFER_SIZE 16000

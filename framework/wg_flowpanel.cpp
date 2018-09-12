@@ -162,14 +162,14 @@ int WgFlowPanel::MatchingPixelHeight( int width ) const
 				{
 					height += row.h;
 					height += pH->_paddedMatchingPixelHeight(width, m_scale);
-					row.Clear();
+					row.clear();
 				}
 				else
 				{
 					if (sz.w + row.w > width)
 					{
 						height += row.h;
-						row.Clear();
+						row.clear();
 					}
 
 					row.w += sz.w;
@@ -261,7 +261,7 @@ void WgFlowPanel::_onRenderRequested( WgVectorHook * pHook )
 void WgFlowPanel::_onRenderRequested( WgVectorHook * pHook, const WgRect& rect )
 {
 	WgFlowHook * p = static_cast<WgFlowHook*>(pHook);
-	_requestRender( rect + p->m_geo.Pos() );
+	_requestRender( rect + p->m_geo.pos() );
 }
 
 //____ _onResizeRequested() _____________________________________________________
@@ -407,8 +407,8 @@ void WgFlowPanel::_refreshChildGeo()
 
 				newGeo = {	pH->m_padding.left,
 								row.y+pH->m_padding.top,
-								canvas.w-pH->m_padding.Width(),
-								paddedHeight-pH->m_padding.Height() };
+								canvas.w-pH->m_padding.width(),
+								paddedHeight-pH->m_padding.height() };
 
 				row.y += paddedHeight;
 			}
@@ -424,7 +424,7 @@ void WgFlowPanel::_refreshChildGeo()
 
 				newGeo = {	row.w + pH->m_padding.left,
 								row.y + pH->m_padding.top,
-								sz - pH->m_padding.Size() };
+								sz - pH->m_padding.size() };
 
 				row.w += sz.w;
 
@@ -441,7 +441,7 @@ void WgFlowPanel::_refreshChildGeo()
 				int oldH = pH->m_geo.h;
 				pH->m_geo = newGeo;
 				if (newGeo.w != oldW || newGeo.h != oldH)
-					pH->m_pWidget->_onNewSize(newGeo.Size());
+					pH->m_pWidget->_onNewSize(newGeo.size());
 			}
 
 		}

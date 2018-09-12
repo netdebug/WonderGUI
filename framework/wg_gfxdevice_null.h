@@ -34,7 +34,6 @@
 #include <wg_color.h>
 
 class WgSurface;
-class WgRect;
 
 class WgGfxDeviceNull : public WgGfxDevice
 {

@@ -103,15 +103,15 @@ WgRect WgIconHolder::_getIconRect( const WgRect& contentRect, const WgSize& icon
 {
 	WgRect rect;
 
-	WgBorders iconBorders = m_iconBorders.Scale(scale);
+	WgBorders iconBorders = m_iconBorders.scale(scale);
 
 	int w = iconSize.w;
 	int h = iconSize.h;
 
 	if( w > 0 && h > 0 )
 	{
-		int bgW = contentRect.w - iconBorders.Width();
-		int bgH = contentRect.h - iconBorders.Height();
+		int bgW = contentRect.w - iconBorders.width();
+		int bgH = contentRect.h - iconBorders.height();
 
 		if( m_iconScale != 0.f )
 		{
@@ -129,11 +129,11 @@ WgRect WgIconHolder::_getIconRect( const WgRect& contentRect, const WgSize& icon
 
 		// 
 
-		w += iconBorders.Width();
-		h += iconBorders.Height();
+		w += iconBorders.width();
+		h += iconBorders.height();
 
-		rect = WgUtil::OrigoToRect( m_iconOrigo, contentRect.Size(), WgSize(w,h) );
-		rect += contentRect.Pos();
+		rect = WgUtil::OrigoToRect( m_iconOrigo, contentRect.size(), WgSize(w,h) );
+		rect += contentRect.pos();
 		rect -= iconBorders;
 	}
 
@@ -203,7 +203,7 @@ WgSize WgIconHolder::_expandTextRect(WgSize textRectSize, WgBlocksetPtr pIconBlo
 	if (!pIconBlock)
 		return textRectSize;
 
-	WgSize iconSize = pIconBlock->Size(scale) + m_iconBorders.Scale(scale);
+	WgSize iconSize = pIconBlock->Size(scale) + m_iconBorders.scale(scale);
 
 	if (m_bIconPushText)
 	{

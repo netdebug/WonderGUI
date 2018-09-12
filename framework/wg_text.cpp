@@ -1955,7 +1955,7 @@ int WgText::LineStartY( int line, const WgRect& container ) const
 
 	if( m_alignment != WG_NORTHWEST && m_alignment != WG_NORTH && m_alignment != WG_NORTHEAST )
 	{
-		ofs = WgUtil::OrigoToRect( m_alignment, container.Size(), WgSize(0,height() )).y;
+		ofs = WgUtil::OrigoToRect( m_alignment, container.size(), WgSize(0,height() )).y;
 		if( ofs < 0 )
 			ofs = 0;
 	}
@@ -1976,7 +1976,7 @@ int WgText::LineStartX( int line, const WgRect& container ) const
 
 	if( m_alignment != WG_NORTHWEST && m_alignment != WG_WEST && m_alignment != WG_SOUTHWEST )
 	{
-		ofs = WgUtil::OrigoToRect( m_alignment, container.Size(), WgSize(getSoftLineWidth(line),0 )).x;
+		ofs = WgUtil::OrigoToRect( m_alignment, container.size(), WgSize(getSoftLineWidth(line),0 )).x;
 		if( ofs < 0 )
 			ofs = 0;
 	}
@@ -2250,7 +2250,7 @@ WgTextPos WgText::ClampPos( WgTextPos pos ) const
 WgCoord WgText::FocusWindowOnRange( const WgSize& canvas, const WgRect& _window, WgRange range ) const
 {
 	if( _window == canvas )
-		return _window.Pos();
+		return _window.pos();
 
 	// Move view so that range stays visible with:
 	// 1. At least one character displayed before and (if possible) after the range.
@@ -2301,11 +2301,11 @@ WgCoord WgText::FocusWindowOnRange( const WgSize& canvas, const WgRect& _window,
 
 	WgRect window = _window;
 
-	if( rangeRect.Right() > window.Right() )
-		window.x = rangeRect.Right() - window.w;
+	if( rangeRect.right() > window.right() )
+		window.x = rangeRect.right() - window.w;
 
-	if( rangeRect.Bottom() > window.Bottom() )
-		window.x = rangeRect.Bottom() - window.h;
+	if( rangeRect.bottom() > window.bottom() )
+		window.x = rangeRect.bottom() - window.h;
 
 	if( rangeRect.x < window.x )
 		window.x = rangeRect.x;
@@ -2331,7 +2331,7 @@ WgCoord WgText::FocusWindowOnRange( const WgSize& canvas, const WgRect& _window,
 	else if( window.y + window.h > canvas.h )
 		window.y = canvas.h - window.h;
 
-	return window.Pos();
+	return window.pos();
 
 /*
 	// Possibly move viewOfs so that:

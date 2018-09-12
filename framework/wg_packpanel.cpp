@@ -377,7 +377,7 @@ void WgPackPanel::_onRenderRequested( WgVectorHook * pHook )
 void WgPackPanel::_onRenderRequested( WgVectorHook * pHook, const WgRect& rect )
 {
 	WgPackHook * p = static_cast<WgPackHook*>(pHook);
-	_requestRender( rect + p->m_geo.Pos() );
+	_requestRender( rect + p->m_geo.pos() );
 }
 
 //____ _onResizeRequested() _____________________________________________________
@@ -567,7 +567,7 @@ void WgPackPanel::_refreshChildGeo()
 					geo.h = p->m_preferredSize.h;
 					pos.y += p->m_preferredSize.h;
 				}
-				geo -= p->m_padding.Scale(m_scale);
+				geo -= p->m_padding.scale(m_scale);
             
 				if( geo != p->m_geo )
 				{
@@ -577,7 +577,7 @@ void WgPackPanel::_refreshChildGeo()
 					int oldH = p->m_geo.h;
 					p->m_geo = geo;
 					if( geo.w != oldW || geo.h != oldH )
-						p->m_pWidget->_onNewSize( geo.Size() );
+						p->m_pWidget->_onNewSize( geo.size() );
                 
 				}
 			}
@@ -639,7 +639,7 @@ void WgPackPanel::_refreshChildGeo()
 					geo.h = pI->output;
 					pos.y += pI->output;
 				}
-				geo -= pH->m_padding.Scale(m_scale);
+				geo -= pH->m_padding.scale(m_scale);
 			
 				if( geo != pH->m_geo )
 				{					
@@ -650,7 +650,7 @@ void WgPackPanel::_refreshChildGeo()
 					int oldH = pH->m_geo.h;
 					pH->m_geo = geo;
 					if( geo.w != oldW || geo.h != oldH )
-						pH->m_pWidget->_onNewSize( geo.Size() );
+						pH->m_pWidget->_onNewSize( geo.size() );
 				}
 				pI++;
 			}

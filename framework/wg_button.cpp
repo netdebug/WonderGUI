@@ -127,7 +127,7 @@ Uint32 WgButton::GetTextAreaWidth()
 	WgRect	contentRect(0,0, PixelSize());
 
 	if( m_pBgGfx )
-		contentRect.Shrink(m_pBgGfx->Padding(m_scale));
+		contentRect.shrink(m_pBgGfx->Padding(m_scale));
 
 	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx, m_scale ) );
 
@@ -152,7 +152,7 @@ int WgButton::MatchingPixelHeight( int width ) const
 		if (m_pSkin)
 			padding = m_pSkin->ContentPadding(m_scale);
 		else if( m_pBgGfx )
-			padding = m_pBgGfx->Padding(m_scale).Size();
+			padding = m_pBgGfx->Padding(m_scale).size();
 
 		int heightForText = m_text.heightForWidth(width-padding.w) + padding.h;
 		if( heightForText > height )
@@ -223,7 +223,7 @@ void WgButton::_onNewSize( const WgSize& size )
 	if (m_pSkin)
 		contentRect = m_pSkin->ContentRect(contentRect, WG_STATE_NORMAL, m_scale);
 	else if( m_pBgGfx )
-		contentRect.Shrink(m_pBgGfx->Padding(m_scale));
+		contentRect.shrink(m_pBgGfx->Padding(m_scale));
 
 	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx, m_scale ) );
 

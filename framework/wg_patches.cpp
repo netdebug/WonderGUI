@@ -402,7 +402,7 @@ void WgPatches::Clip( const WgRect& clip )
 			pRect->x + pRect->w > clip.x + clip.w ||
 			pRect->y + pRect->h > clip.y + clip.h )
 		{
-			if( !pRect->Intersection( *pRect, clip ) )
+			if( !pRect->intersection( *pRect, clip ) )
 				*pRect-- = m_pFirst[--m_size];				// Delete the rectangle
 		}
 	}

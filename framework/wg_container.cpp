@@ -147,13 +147,13 @@ WgWidget * WgContainer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 	{
 		bool bVisibleHook = IsPanel()?static_cast<WgPanelHook*>(pHook)->IsVisible():true;
 
-		if( bVisibleHook && childGeo.Contains( ofs ) )
+		if( bVisibleHook && childGeo.contains( ofs ) )
 		{
 			if( pHook->Widget()->IsContainer() )
 			{
-				pResult = pHook->Widget()->CastToContainer()->FindWidget( ofs - childGeo.Pos(), mode );
+				pResult = pHook->Widget()->CastToContainer()->FindWidget( ofs - childGeo.pos(), mode );
 			}
-			else if( mode == WG_SEARCH_GEOMETRY || pHook->Widget()->MarkTest( ofs - childGeo.Pos() ) )
+			else if( mode == WG_SEARCH_GEOMETRY || pHook->Widget()->MarkTest( ofs - childGeo.pos() ) )
 			{
 				pResult = pHook->Widget();
 			}
@@ -298,7 +298,7 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 
 	for( const WgRect * pRect = _pPatches->Begin() ; pRect != _pPatches->End() ; pRect++ )
 	{
-		if( _canvas.IntersectsWith( *pRect ) )
+		if( _canvas.intersectsWith( *pRect ) )
 			patches.Push( WgRect(*pRect,_canvas) );
 	}
 
@@ -324,11 +324,11 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 		WgHook * p = _firstHookWithGeo( childGeo );
 		while(p)
 		{
-			WgRect geo = childGeo + _canvas.Pos();
+			WgRect geo = childGeo + _canvas.pos();
 
 			bool bVisibleHook = IsPanel()?static_cast<WgPanelHook*>(p)->IsVisible():true;
 
-			if( bVisibleHook && geo.IntersectsWith( dirtBounds ) )
+			if( bVisibleHook && geo.intersectsWith( dirtBounds ) )
 				renderList.push_back( WidgetRenderContext(p->Widget(), geo ) );
 
 			p = _nextHookWithGeo( childGeo, p );
@@ -364,9 +364,9 @@ void WgContainer::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, 
 
 		while(p)
 		{
-			WgRect canvas = childGeo + _canvas.Pos();
+			WgRect canvas = childGeo + _canvas.pos();
 			bool bVisibleHook = IsPanel()?static_cast<WgPanelHook*>(p)->IsVisible():true;
-			if( bVisibleHook && canvas.IntersectsWith( dirtBounds ) )
+			if( bVisibleHook && canvas.intersectsWith( dirtBounds ) )
 				p->Widget()->_renderPatches( pDevice, canvas, canvas, &patches );
 			p = _nextHookWithGeo( childGeo, p );
 		}
@@ -392,7 +392,7 @@ void WgContainer::_onCollectPatches( WgPatches& container, const WgRect& geo, co
 	{
 		bool bVisibleHook = IsPanel()?static_cast<WgPanelHook*>(p)->IsVisible():true;
 		if( bVisibleHook )
-			p->Widget()->_onCollectPatches( container, childGeo + geo.Pos(), clip );
+			p->Widget()->_onCollectPatches( container, childGeo + geo.pos(), clip );
 		p = _nextHookWithGeo( childGeo, p );
 	}
 }
@@ -410,7 +410,7 @@ void WgContainer::_onMaskPatches( WgPatches& patches, const WgRect& geo, const W
 	{
 		bool bVisibleHook = IsPanel()?static_cast<WgPanelHook*>(p)->IsVisible():true;
 		if( bVisibleHook )
-			p->Widget()->_onMaskPatches( patches, childGeo + geo.Pos(), clip, blendMode );
+			p->Widget()->_onMaskPatches( patches, childGeo + geo.pos(), clip, blendMode );
 		p = _nextHookWithGeo( childGeo, p );
 	}
 }

@@ -31,8 +31,8 @@ class WgLayerHook : public WgHook
 {
 	friend class WgLayer;
 public:
-	WgCoord			PixelPos() const { return m_geo.Pos(); }
-	WgSize			PixelSize() const { 	return m_geo.Size(); }
+	WgCoord			PixelPos() const { return m_geo.pos(); }
+	WgSize			PixelSize() const { 	return m_geo.size(); }
 	WgRect			PixelGeo() const { return m_geo; }
 
 	WgCoord			ScreenPixelPos() const;

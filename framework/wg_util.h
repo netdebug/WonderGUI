@@ -11,7 +11,6 @@
 #endif
 
 class WgBlock;
-class WgRect;
 class WgWidget;
 class WgPanelHook;
 

@@ -69,7 +69,7 @@ bool WgModalHook::SetGeo( const WgRect& geometry, WgOrigo origo )
 //_____________________________________________________________________________
 bool WgModalHook::SetGeo( const WgCoord& ofs, WgOrigo origo )
 {
-	m_placementGeo.SetPos(ofs);
+	m_placementGeo.setPos(ofs);
 	m_origo	= origo;
 	return _refreshRealGeo();
 }
@@ -77,7 +77,7 @@ bool WgModalHook::SetGeo( const WgCoord& ofs, WgOrigo origo )
 //_____________________________________________________________________________
 bool WgModalHook::SetOfs( const WgCoord& ofs )
 {
-	m_placementGeo.SetPos(ofs);
+	m_placementGeo.setPos(ofs);
 	return _refreshRealGeo();
 }
 
@@ -102,7 +102,7 @@ bool WgModalHook::SetSize( WgSize sz )
 	if( sz.w < 0 || sz.h < 0 )
 		return false;
 
-	m_placementGeo.SetSize( sz );
+	m_placementGeo.setSize( sz );
 	return _refreshRealGeo();
 }
 
@@ -162,7 +162,7 @@ WgModalHook::WgModalHook( WgModalLayer * pParent )
 //_____________________________________________________________________________
 bool WgModalHook::_refreshRealGeo()	// Return false if we couldn't get exactly the requested (floating) geometry.
 {
-	WgSize sz = m_placementGeo.Size();
+	WgSize sz = m_placementGeo.size();
 
 	if( sz.w == 0 && sz.h == 0 )
 		sz = m_pWidget->PreferredPixelSize();
@@ -177,7 +177,7 @@ bool WgModalHook::_refreshRealGeo()	// Return false if we couldn't get exactly t
 		sz.h = 1;
 
 	WgCoord ofs = WgUtil::OrigoToOfs( m_origo, m_pParent->PixelSize() ) - WgUtil::OrigoToOfs( m_origo, sz );
-	ofs += m_placementGeo.Pos();
+	ofs += m_placementGeo.pos();
 
 	WgRect newGeo( ofs, sz );
 

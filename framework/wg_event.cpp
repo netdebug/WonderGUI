@@ -33,7 +33,6 @@
 #include <wg_slider.h>
 #include <wg_textdisplay.h>
 #include <wg_lineeditor.h>
-#include <wg_tablepanel.h>
 #include <wg_multislider.h>
 
 namespace WgEvent
@@ -895,28 +894,6 @@ namespace WgEvent
 		return m_column;
 	}
 	
-	WgWidget * TableCellEvent::CellContent() const
-	{
-		return m_pCellContent.GetRealPtr();
-	}
-		
-	TableCellMarked::TableCellMarked( WgTablePanel * pTable, int row, int column, WgWidget * pCellContent )
-	{
-		m_type 			= WG_EVENT_TABLE_CELL_MARK;
-		m_pWidget 		= pTable;
-		m_row 			= row;
-		m_column 		= column;
-		m_pCellContent 	= pCellContent;
-	}
-
-	TableCellUnmarked::TableCellUnmarked( WgTablePanel * pTable, int row, int column, WgWidget * pCellContent )
-	{
-		m_type 			= WG_EVENT_TABLE_CELL_UNMARK;
-		m_pWidget 		= pTable;
-		m_row 			= row;
-		m_column 		= column;
-		m_pCellContent 	= pCellContent;
-	}
 
 	//____ MultiSlider event methods __________________________________________
 

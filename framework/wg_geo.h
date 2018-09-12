@@ -28,6 +28,23 @@
 #	include <wg_types.h>
 #endif
 
+#include <wg3_geo.h>
+
+typedef wg::Coord8		WgCoord8;
+typedef wg::Coord16		WgCoord16;
+typedef wg::Coord16		WgUCoord8;
+
+typedef wg::Coord		WgCoord;
+typedef wg::CoordF		WgCoordF;
+
+typedef wg::Border		WgBorders;
+typedef wg::Size		WgSize;
+typedef wg::Rect		WgRect;
+typedef wg::RectF		WgRectF;
+
+
+#if false
+
 class WgRect;
 
 //____ Class: WgCoord8 _________________________________________________________
@@ -538,6 +555,6 @@ inline bool WgRectF::operator!=(const WgRectF& rect) const
 {
 	return !(*this == rect);
 }
-
+#endif
 //=======================================================================================
 #endif	//WG_GEO_DOT_H

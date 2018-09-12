@@ -240,7 +240,7 @@ void WgStackPanel::_onRenderRequested( WgVectorHook * _pHook, const WgRect& _rec
 
 	// Put our rectangle into patches
 
-	WgRect rect = _rect + pHook->_getGeo(WgRect(0,0,m_size)).Pos();
+	WgRect rect = _rect + pHook->_getGeo(WgRect(0,0,m_size)).pos();
 
 
 	WgPatches patches;
@@ -252,7 +252,7 @@ void WgStackPanel::_onRenderRequested( WgVectorHook * _pHook, const WgRect& _rec
 	while( pCover )
 	{
 		WgRect geo = pCover->_getGeo(m_size);
-		if( pCover->IsVisible() && geo.IntersectsWith( rect ) )
+		if( pCover->IsVisible() && geo.intersectsWith( rect ) )
 			pCover->Widget()->_onMaskPatches( patches, geo, WgRect(0,0,65536,65536 ), _getBlendMode() );
 
 		pCover = pCover->Next();

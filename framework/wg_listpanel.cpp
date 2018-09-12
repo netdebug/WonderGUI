@@ -295,7 +295,7 @@ void  WgListPanel::_onRenderRequested( WgVectorHook * pHook )
 		return;
 
 	WgRect rect = _hookGeo(pHook);
-	if( !rect.IsEmpty() )
+	if( !rect.isEmpty() )
 		_requestRender(rect);
 }
 
@@ -305,9 +305,9 @@ void  WgListPanel::_onRenderRequested( WgVectorHook * pHook, const WgRect& rect 
 		return;
 
 	WgRect hookGeo = _hookGeo(pHook);
-	WgRect clippedRect( hookGeo, rect + hookGeo.Pos() );
+	WgRect clippedRect( hookGeo, rect + hookGeo.pos() );
 
-	if( !clippedRect.IsEmpty() )
+	if( !clippedRect.isEmpty() )
 		_requestRender(clippedRect);
 }
 
@@ -448,7 +448,7 @@ void WgListPanel::_refreshDefaultWidth()
 
 void WgListPanel::_refreshPreferredPixelSize()
 {
-	m_preferredSize.Clear();
+	m_preferredSize.clear();
 	m_nPreferredWidth = 0;
 	WgListHook * pHook = FirstHook();
 

@@ -36,21 +36,21 @@ WgBlockSkinPtr WgBlockSkin::Create()
 
 WgBlockSkinPtr WgBlockSkin::CreateStatic( WgSurface * pSurface, WgRect block, WgBorders frame )
 {
-	if( !pSurface || frame.Width() >= block.w || frame.Height() >= block.h ||
-		block.x < 0 || pSurface->PixelSize().w < block.Right() ||
-		block.y < 0 || pSurface->PixelSize().h < block.Bottom() )
+	if( !pSurface || frame.width() >= block.w || frame.height() >= block.h ||
+		block.x < 0 || pSurface->PixelSize().w < block.right() ||
+		block.y < 0 || pSurface->PixelSize().h < block.bottom() )
 		return 0;
 
 	WgBlockSkin * pSkin = new WgBlockSkin();
 	pSkin->SetSurface( pSurface );
-	pSkin->SetBlockGeo( block.Size(), frame );
-	pSkin->SetAllBlocks( block.Pos() );
+	pSkin->SetBlockGeo( block.size(), frame );
+	pSkin->SetAllBlocks( block.pos() );
 	return WgBlockSkinPtr(pSkin);
 }
 
 WgBlockSkinPtr WgBlockSkin::CreateEnable( WgSurface * pSurface, WgSize blockSize, WgCoord ofsEnabled, WgCoord ofsDisabled, WgBorders frame )
 {
-	if( !pSurface || frame.Width() >= blockSize.w || frame.Height() >= blockSize.h ||
+	if( !pSurface || frame.width() >= blockSize.w || frame.height() >= blockSize.h ||
 		pSurface->PixelSize().w < ofsEnabled.x + blockSize.w ||
 		pSurface->PixelSize().w < ofsDisabled.x + blockSize.w ||
 		pSurface->PixelSize().h < ofsEnabled.y + blockSize.h ||
@@ -67,7 +67,7 @@ WgBlockSkinPtr WgBlockSkin::CreateEnable( WgSurface * pSurface, WgSize blockSize
 
 WgBlockSkinPtr WgBlockSkin::CreateClickable( WgSurface * pSurface, WgSize blockGeo, WgCoord blockStartOfs, WgSize blockPitch, WgBorders blockFrame )
 {
-	if( !pSurface || blockFrame.Width() >= blockGeo.w || blockFrame.Height() >= blockGeo.h ||
+	if( !pSurface || blockFrame.width() >= blockGeo.w || blockFrame.height() >= blockGeo.h ||
 		pSurface->PixelSize().w < blockStartOfs.x + blockGeo.w + blockPitch.w*3 ||
 		pSurface->PixelSize().h < blockStartOfs.y + blockGeo.h + blockPitch.h*3 )
 		return 0;
@@ -241,7 +241,7 @@ bool WgBlockSkin::SetBlockGeo( WgSize size, WgBorders frame )
 {
     // NOTE! size is in pixels, frame is in base-size pixels. This is API inconsistency!
     
-	if( size.w <= frame.Width() || size.h <= frame.Height() )
+	if( size.w <= frame.width() || size.h <= frame.height() )
 		return false;
 
 	m_dimensions	= (size*m_scale)/WG_SCALE_BASE;
@@ -431,8 +431,8 @@ void WgBlockSkin::OptimizeRenderMethods()
 		int y2 = m_state[i].ofs.y + m_frame.top;
 		int y3 = m_state[i].ofs.y + m_dimensions.h - m_frame.bottom;
 
-		int centerW = m_dimensions.w - m_frame.Width();
-		int	centerH = m_dimensions.h - m_frame.Height();
+		int centerW = m_dimensions.w - m_frame.width();
+		int	centerH = m_dimensions.h - m_frame.height();
 
 		if( m_frame.top > 0 )
 		{
@@ -532,7 +532,7 @@ void WgBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _c
 
 	if( src.w == _canvas.w && src.h == _canvas.h && scale == m_scale )
 	{
-		pDevice->ClipBlit( _clip, m_pSurface, src, _canvas.Pos().x, _canvas.Pos().y);
+		pDevice->ClipBlit( _clip, m_pSurface, src, _canvas.pos().x, _canvas.pos().y);
 		goto cleanup;
 	}
 
@@ -544,8 +544,8 @@ void WgBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _c
 	{
 		// Need local context for declaration to allow the gotos above to jump over them.
 
-		const WgBorders&    sourceBorders = m_frame.Scale(m_scale);
-		const WgBorders     canvasBorders = m_frame.Scale(scale);
+		const WgBorders&    sourceBorders = m_frame.scale(m_scale);
+		const WgBorders     canvasBorders = m_frame.scale(scale);
     
     
 		if( src.w == _canvas.w )
@@ -566,10 +566,10 @@ void WgBlockSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _c
 
 		// Render mid row (left and right stretch area and middle section)
 
-		if( _canvas.h - canvasBorders.Height() > 0 )
+		if( _canvas.h - canvasBorders.height() > 0 )
 		{
-			WgRect sourceRect( src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.Height() );
-			WgRect destRect( _canvas.x, _canvas.y + canvasBorders.top, _canvas.w, _canvas.h - canvasBorders.Height() );
+			WgRect sourceRect( src.x, src.y + sourceBorders.top, src.w, src.h - sourceBorders.height() );
+			WgRect destRect( _canvas.x, _canvas.y + canvasBorders.top, _canvas.w, _canvas.h - canvasBorders.height() );
 
 			pDevice->ClipBlitHorrStretchBar( _clip, m_pSurface, sourceRect, sourceBorders, destRect, canvasBorders );
 		}
@@ -600,7 +600,7 @@ cleanup:
 WgSize WgBlockSkin::MinSize(int scale) const
 {
 	WgSize content = WgExtendedSkin::MinSize(scale);
-	WgSize frame = m_frame.Scale(scale).Size();
+	WgSize frame = m_frame.scale(scale).size();
 	return WgSize( WgMax(content.w, frame.w), WgMax(content.h, frame.h) );
 }
 
@@ -617,7 +617,7 @@ WgSize WgBlockSkin::PreferredSize(int scale) const
 WgSize WgBlockSkin::SizeForContent( const WgSize contentSize, int scale ) const
 {
 	WgSize sz = WgExtendedSkin::SizeForContent(contentSize, scale);
-	WgSize min = m_frame.Scale(scale).Size();
+	WgSize min = m_frame.scale(scale).size();
 
 	return WgSize( WgMax(sz.w,min.w), WgMax(sz.h,min.h) );
 }
@@ -636,8 +636,8 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
 	{
 		WgCoord ofs = _ofs;
 
-        WgBorders canvasFrame = m_frame.Scale(scale);
-        WgBorders sourceFrame = m_frame.Scale(m_scale);
+        WgBorders canvasFrame = m_frame.scale(scale);
+        WgBorders sourceFrame = m_frame.scale(m_scale);
 	
 		// Determine in which section the cordinate is (0-2 for x and y).
 
@@ -668,7 +668,7 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
 		}
 		else if( xSection == 1 )
 		{
-			int tileAreaWidth = m_dimensions.w - sourceFrame.Width();
+			int tileAreaWidth = m_dimensions.w - sourceFrame.width();
 
 			bool bTile;
 
@@ -687,7 +687,7 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
             }
 			else
 			{
-                int canvasStretchWidth = canvas.w - canvasFrame.Width();	// Width of stretch-area on screen.
+                int canvasStretchWidth = canvas.w - canvasFrame.width();	// Width of stretch-area on screen.
 
                 ofs.x = ofs.x - canvasFrame.left;               // Offset in middle section of canvas
                 ofs.x = (ofs.x * m_scale) / scale;        // Scale from canvas to source offset
@@ -710,7 +710,7 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
 		}
 		else if( ySection == 1 )
 		{
-			int tileAreaHeight = m_dimensions.h - sourceFrame.Height();
+			int tileAreaHeight = m_dimensions.h - sourceFrame.height();
 
 			bool bTile;
 
@@ -729,7 +729,7 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
             }
 			else
 			{
-                int canvasStretchHeight = canvas.h - canvasFrame.Height();	// Height of stretch-area on screen.
+                int canvasStretchHeight = canvas.h - canvasFrame.height();	// Height of stretch-area on screen.
 
                 ofs.y = ofs.y - canvasFrame.top;               // Offset in middle section of canvas
                 ofs.y = (ofs.y * m_scale) / scale;        // Scale from canvas to source offset
@@ -774,8 +774,8 @@ bool WgBlockSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgStat
 	if( rect.w == canvasSize.w && rect.h == canvasSize.h )
 		return (m_state[index].opaqueSections == ALL_SECTIONS);
 
-	WgRect center = WgRect(canvasSize) - m_frame.Scale(scale);
-	if( center.Contains(rect) )
+	WgRect center = WgRect(canvasSize) - m_frame.scale(scale);
+	if( center.contains(rect) )
         return ( m_state[index].opaqueSections & (1<<(int)WG_CENTER) ) != 0;
 
 	//

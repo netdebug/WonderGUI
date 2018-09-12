@@ -45,7 +45,6 @@
 
 #include <wg_color.h>
 
-class WgRect;
 class WgBlock;
 class WgSurface;
 
@@ -103,9 +102,9 @@ public:
 	inline int 					OutputScale() const { return m_scale; }
 	inline int 					SurfaceScale() const { return m_pSurf->ScaleFactor(); }
 
-	inline int					MinWidth() const { return m_canvasFrame.Width(); }
-	inline int					MinHeight() const { return m_canvasFrame.Height(); }
-	inline WgSize				MinSize() const { return m_canvasFrame.Size(); }
+	inline int					MinWidth() const { return m_canvasFrame.width(); }
+	inline int					MinHeight() const { return m_canvasFrame.height(); }
+	inline WgSize				MinSize() const { return m_canvasFrame.size(); }
 
 	inline bool					IsOpaque() const { return ((m_flags & WG_OPAQUE) != 0); }
 	inline bool					HasOpaqueCenter() const { return ((m_flags & WG_OPAQUE_CENTER) != 0); }

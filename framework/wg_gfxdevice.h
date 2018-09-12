@@ -52,6 +52,7 @@
 */
 
 #include <wg3_gfxdevice.h>
+#include <wg_geo.h>
 
 //____ WgWaveLine ___________________________________________________________
 
@@ -65,8 +66,6 @@ struct WgWaveLine
 };
 
 class	WgBlock;
-class	WgRect;
-class	WgBorders;
 class	WgSurface;
 class	WgText;
 class	WgCursorInstance;

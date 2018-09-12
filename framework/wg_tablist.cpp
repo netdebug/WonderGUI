@@ -645,8 +645,8 @@ WgSize WgTablist::PreferredPixelSize() const
 		{
 			h = pBg->Height(m_scale);
 			int textH = pTab->m_text.height();
-			if( h - pBg->Padding(m_scale).Height() < textH )
-				h = textH + pBg->Padding(m_scale).Height();
+			if( h - pBg->Padding(m_scale).height() < textH )
+				h = textH + pBg->Padding(m_scale).height();
 		}
 		else
 			h = pTab->m_text.height();
@@ -992,7 +992,7 @@ int WgTablist::_calcTabsWantedWidth( WgTab * pTab ) const
 	WgBlocksetPtr pSrc = _getTabSource(pTab);
 	if( pSrc )
 	{
-		width += pSrc->Padding(m_scale).Width();
+		width += pSrc->Padding(m_scale).width();
 
 		if( width < pSrc->MinWidth(m_scale) )
 			width = pSrc->MinWidth(m_scale);

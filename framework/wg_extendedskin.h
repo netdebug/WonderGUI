@@ -53,7 +53,7 @@ public:
 
 protected:
 
-	inline WgSize _scaledContentPadding(int scale) const { return WgSize((m_contentPadding.Width()*scale) >> WG_SCALE_BINALS, (m_contentPadding.Height()*scale) >> WG_SCALE_BINALS); }
+	inline WgSize _scaledContentPadding(int scale) const { return WgSize((m_contentPadding.width()*scale) >> WG_SCALE_BINALS, (m_contentPadding.height()*scale) >> WG_SCALE_BINALS); }
 
 	WgBorders	m_contentPadding;
 	WgCoord		m_contentShift[WG_NB_STATES];	

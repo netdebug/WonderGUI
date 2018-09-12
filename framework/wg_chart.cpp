@@ -543,7 +543,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 				if (m_sampleLabelStyle.pSkin)
 				{
 					labelSize = m_sampleLabelStyle.pSkin->SizeForContent(labelSize, m_scale);
-					textOfs = m_sampleLabelStyle.pSkin->ContentRect(labelSize, WG_STATE_NORMAL, m_scale).Pos();
+					textOfs = m_sampleLabelStyle.pSkin->ContentRect(labelSize, WG_STATE_NORMAL, m_scale).pos();
 				}
 
 				WgCoord labelPos = _placeLabel({ xOfs,canvas.y+canvas.h }, m_sampleLabelStyle.alignment, m_sampleLabelStyle.offset, labelSize);
@@ -591,7 +591,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 				if (m_valueLabelStyle.pSkin)
 				{
 					labelSize = m_valueLabelStyle.pSkin->SizeForContent(labelSize, m_scale);
-					textOfs = m_valueLabelStyle.pSkin->ContentRect(labelSize, WG_STATE_NORMAL, m_scale).Pos();
+					textOfs = m_valueLabelStyle.pSkin->ContentRect(labelSize, WG_STATE_NORMAL, m_scale).pos();
 				}
 
 				WgCoord labelPos = _placeLabel({ canvas.x, yOfs }, m_valueLabelStyle.alignment, m_valueLabelStyle.offset, labelSize);

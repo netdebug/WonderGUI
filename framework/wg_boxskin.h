@@ -68,7 +68,7 @@ private:
 	WgBoxSkin();
 	WgBoxSkin( WgColor color, WgBorders frame, WgColor frameColor );
 	void	_updateOpaqueFlag();
-	inline WgSize _scaledFrame(int scale) const { return WgSize((m_frame.Width()*scale) >> WG_SCALE_BINALS, (m_frame.Height()*scale) >> WG_SCALE_BINALS); }
+	inline WgSize _scaledFrame(int scale) const { return WgSize((m_frame.width()*scale) >> WG_SCALE_BINALS, (m_frame.height()*scale) >> WG_SCALE_BINALS); }
 
 
 	bool		m_bOpaque;

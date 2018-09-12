@@ -84,7 +84,7 @@ const char * WgSimpleLine::GetClass()
 
 WgSize WgSimpleLine::PreferredPixelSize() const
 {
-    return m_src.Size();
+    return m_src.size();
 }
 
 //____ SetSurfaceSize() _______________________________________________________

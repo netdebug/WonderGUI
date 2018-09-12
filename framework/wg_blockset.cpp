@@ -346,21 +346,21 @@ int WgBlockset::Height( int scale ) const
 
 WgSize WgBlockset::MinSize( int scale ) const
 {
-	return m_frame.Scale(scale).Size();
+	return m_frame.scale(scale).size();
 }
 
 //____ MinWidth() ______________________________________________________________
 
 int WgBlockset::MinWidth( int scale ) const
 {
-    return m_frame.Scale(scale).Width();
+    return m_frame.scale(scale).width();
 }
 
 //____ MinHeight() _____________________________________________________________
 
 int WgBlockset::MinHeight( int scale ) const
 {
-    return m_frame.Scale(scale).Height();
+    return m_frame.scale(scale).height();
 }
 
 //____ Surface() _______________________________________________________________
@@ -379,7 +379,7 @@ const WgSurface * WgBlockset::Surface( int scale ) const
 
 WgBorders WgBlockset::Frame( int scale ) const
 {
-	return m_frame.Scale(scale);
+	return m_frame.scale(scale);
 }
 
 
@@ -387,7 +387,7 @@ WgBorders WgBlockset::Frame( int scale ) const
 
 WgBorders WgBlockset::Padding( int scale ) const
 {
-	return m_padding.Scale(scale);
+	return m_padding.scale(scale);
 }
 
 
@@ -527,6 +527,6 @@ WgBlock WgBlockset::_getBlock(WgMode m, const Alt_Data * p, int scale) const
 	WgRect source((m_pos[m] * scaleFactor) / WG_SCALE_BASE, (m_size*scaleFactor) / WG_SCALE_BASE );
 	WgCoord shift( (m_contentShift[m].x * scale) >> WG_SCALE_BINALS, (m_contentShift[m].y * scale) >> WG_SCALE_BINALS );
 
-	return WgBlock( p->pSurf, source, m_frame.Scale(scaleFactor), m_frame.Scale(scale), m_padding.Scale(scale), shift, scale, flags );
+	return WgBlock( p->pSurf, source, m_frame.scale(scaleFactor), m_frame.scale(scale), m_padding.scale(scale), shift, scale, flags );
 }
 

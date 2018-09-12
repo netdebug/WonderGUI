@@ -117,7 +117,7 @@ bool WgRootPanel::SetChild( WgWidget * pWidget )
 		return false;
 
 	m_hook._attachWidget(pWidget);
-	m_hook.Widget()->_onNewSize(m_geo.Size());
+	m_hook.Widget()->_onNewSize(m_geo.size());
 
 	m_hook.Widget()->_onCollectPatches( m_dirtyPatches, PixelGeo(), PixelGeo() );
 
@@ -281,7 +281,7 @@ bool WgRootPanel::RenderSection( const WgRect& _clip )
 	WgRect clipped;
 	for( const WgRect * pRect = m_dirtyPatches.Begin() ; pRect != m_dirtyPatches.End() ; pRect++ )
 	{
-		if( clipped.Intersection( *pRect, clip ) )
+		if( clipped.intersection( *pRect, clip ) )
 			dirtyPatches.Push( clipped );
 	}
 
@@ -340,7 +340,7 @@ bool WgRootPanel::EndRender( void )
 
 WgWidget * WgRootPanel::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 {
-	if( !PixelGeo().Contains(ofs) || !m_hook.Widget() )
+	if( !PixelGeo().contains(ofs) || !m_hook.Widget() )
 		return 0;
 
 	if( m_hook.Widget() && m_hook.Widget()->IsContainer() )
@@ -437,7 +437,7 @@ void WgRootPanel::Hook::_requestRender()
 void WgRootPanel::Hook::_requestRender( const WgRect& rect )
 {
 	if( m_pRoot->m_bVisible )
-		m_pRoot->AddDirtyPatch( WgRect( PixelPos() + rect.Pos(), rect.Size() ) );
+		m_pRoot->AddDirtyPatch( WgRect( PixelPos() + rect.pos(), rect.size() ) );
 }
 
 void WgRootPanel::Hook::_requestResize()

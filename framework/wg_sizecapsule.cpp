@@ -185,7 +185,7 @@ WgSize WgSizeCapsule::MinPixelSize() const
 {
 
 	if( m_hook.Widget() )
-		return WgSize::Max(m_pixelsMin,m_hook.Widget()->MinPixelSize());
+		return WgSize::max(m_pixelsMin,m_hook.Widget()->MinPixelSize());
 	else
 		return m_pixelsMin;
 }
@@ -195,7 +195,7 @@ WgSize WgSizeCapsule::MinPixelSize() const
 WgSize WgSizeCapsule::MaxPixelSize() const
 {
 	if( m_hook.Widget() )
-		return WgSize::Min(m_pixelsMax,m_hook.Widget()->MaxPixelSize());
+		return WgSize::min(m_pixelsMax,m_hook.Widget()->MaxPixelSize());
 	else
 		return m_pixelsMax;
 }

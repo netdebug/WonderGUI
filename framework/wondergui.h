@@ -256,10 +256,6 @@
 #	include <wg_stackpanel.h>
 #endif
 
-#ifndef WG_TABLEPANEL_DOT_H
-#	include <wg_tablepanel.h>
-#endif
-
 #ifndef WG_TABLIST_DOT_H
 #	include <wg_tablist.h>
 #endif

@@ -66,7 +66,7 @@ void WgPopupHook::_requestRender()
 //_____________________________________________________________________________
 void WgPopupHook::_requestRender(const WgRect& rect)
 {
-	m_pParent->_onRequestRender(rect + m_geo.Pos(), this);
+	m_pParent->_onRequestRender(rect + m_geo.pos(), this);
 }
 
 //_____________________________________________________________________________
@@ -211,56 +211,56 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 	
 	//
 	
-	WgRect geo(0,0,WgSize::Min(pSlot->m_pWidget->PreferredPixelSize(),WgSize::Min(pSlot->maxSize,m_size)));
+	WgRect geo(0,0,WgSize::min(pSlot->m_pWidget->PreferredPixelSize(),WgSize::min(pSlot->maxSize,m_size)));
 	
 	switch( pSlot->attachPoint )
 	{
 		case WgOrigo::WG_NORTHEAST:					// Right side of launcherGeo, going down.
 		{
-			geo.x = pSlot->launcherGeo.Right();
-			geo.y = pSlot->launcherGeo.Top();
+			geo.x = pSlot->launcherGeo.right();
+			geo.y = pSlot->launcherGeo.top();
 			break;
 		}
 	
 		case WgOrigo::WG_SOUTHEAST:					// Right side of launcherGeo, going up.
 		{
-			geo.x = pSlot->launcherGeo.Right();
-			geo.y = pSlot->launcherGeo.Bottom() - geo.h;
+			geo.x = pSlot->launcherGeo.right();
+			geo.y = pSlot->launcherGeo.bottom() - geo.h;
 			break;
 		}
 	
 		case WgOrigo::WG_NORTHWEST:					// Left-aligned above launcher.
 		{
-			geo.x = pSlot->launcherGeo.Left();
-			geo.y = pSlot->launcherGeo.Top() - geo.h;
+			geo.x = pSlot->launcherGeo.left();
+			geo.y = pSlot->launcherGeo.top() - geo.h;
 			break;
 		}
 	
 		case WgOrigo::WG_SOUTHWEST:					// Left-aligned below launcher.
 		{
-			geo.x = pSlot->launcherGeo.Left();
-			geo.y = pSlot->launcherGeo.Bottom();
+			geo.x = pSlot->launcherGeo.left();
+			geo.y = pSlot->launcherGeo.bottom();
 			break;
 		}
 	
 		case WgOrigo::WG_WEST:						// Centered left of launcherGeo.
 		{
-			geo.x = pSlot->launcherGeo.Left() - geo.w;
-			geo.y = pSlot->launcherGeo.Top() + pSlot->launcherGeo.h/2 - geo.h/2;
+			geo.x = pSlot->launcherGeo.left() - geo.w;
+			geo.y = pSlot->launcherGeo.top() + pSlot->launcherGeo.h/2 - geo.h/2;
 			break;
 		}
 	
 		case WgOrigo::WG_NORTH:						// Centered above launcherGeo.
 		{
-			geo.x = pSlot->launcherGeo.Left() + pSlot->launcherGeo.w/2 + geo.w/2;
-			geo.y = pSlot->launcherGeo.Top() - geo.h;
+			geo.x = pSlot->launcherGeo.left() + pSlot->launcherGeo.w/2 + geo.w/2;
+			geo.y = pSlot->launcherGeo.top() - geo.h;
 			break;
 		}
 	
 		case WgOrigo::WG_EAST:						// Centered right of launcherGeo.
 		{
-			geo.x = pSlot->launcherGeo.Right();
-			geo.y = pSlot->launcherGeo.Top() + pSlot->launcherGeo.h/2 - geo.h/2;
+			geo.x = pSlot->launcherGeo.right();
+			geo.y = pSlot->launcherGeo.top() + pSlot->launcherGeo.h/2 - geo.h/2;
 			break;
 		}
 
@@ -271,8 +271,8 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 	
 		case WgOrigo::WG_SOUTH:						// Centered below launcherGeo.
 		{
-			geo.x = pSlot->launcherGeo.Left() + pSlot->launcherGeo.w/2 + geo.w/2;
-			geo.y = pSlot->launcherGeo.Bottom();
+			geo.x = pSlot->launcherGeo.left() + pSlot->launcherGeo.w/2 + geo.w/2;
+			geo.y = pSlot->launcherGeo.bottom();
 			break;
 		}
 	
@@ -285,17 +285,17 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 	
 	// Adjust geometry to fit inside parent.
 	
-	if( geo.Right() > m_size.w )
+	if( geo.right() > m_size.w )
 	{
-		if( geo.Left() == pSlot->launcherGeo.Right() )
+		if( geo.left() == pSlot->launcherGeo.right() )
 		{
-			if( pSlot->launcherGeo.Left() > m_size.w - pSlot->launcherGeo.Right() )
+			if( pSlot->launcherGeo.left() > m_size.w - pSlot->launcherGeo.right() )
 			{
-				geo.x = pSlot->launcherGeo.Left() - geo.w;
+				geo.x = pSlot->launcherGeo.left() - geo.w;
 				if( geo.x < 0 )
 				{
 					geo.x = 0;
-					geo.w = pSlot->launcherGeo.Left();
+					geo.w = pSlot->launcherGeo.left();
 				}
 			}
 			else
@@ -305,20 +305,20 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 			geo.x = m_size.w - geo.w;
 	}
 	
-	if( geo.Left() < 0 )
+	if( geo.left() < 0 )
 	{
-		if( geo.Right() == pSlot->launcherGeo.Left() )
+		if( geo.right() == pSlot->launcherGeo.left() )
 		{
-			if( pSlot->launcherGeo.Left() < m_size.w - pSlot->launcherGeo.Right() )
+			if( pSlot->launcherGeo.left() < m_size.w - pSlot->launcherGeo.right() )
 			{
-				geo.x = pSlot->launcherGeo.Right();
-				if( geo.Right() > m_size.w )
+				geo.x = pSlot->launcherGeo.right();
+				if( geo.right() > m_size.w )
 					geo.w = m_size.w - geo.x;
 			}
 			else
 			{
 				geo.x = 0;
-				geo.w = pSlot->launcherGeo.Left();
+				geo.w = pSlot->launcherGeo.left();
 			}
 	
 		}
@@ -326,17 +326,17 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 			geo.x = 0;
 	}
 	
-	if( geo.Bottom() > m_size.h )
+	if( geo.bottom() > m_size.h )
 	{
-		if( geo.Top() == pSlot->launcherGeo.Bottom() )
+		if( geo.top() == pSlot->launcherGeo.bottom() )
 		{
-			if( pSlot->launcherGeo.Top() > m_size.h - pSlot->launcherGeo.Bottom() )
+			if( pSlot->launcherGeo.top() > m_size.h - pSlot->launcherGeo.bottom() )
 			{
-				geo.y = pSlot->launcherGeo.Top() - geo.h;
+				geo.y = pSlot->launcherGeo.top() - geo.h;
 				if( geo.y < 0 )
 				{
 					geo.y = 0;
-					geo.h = pSlot->launcherGeo.Top();
+					geo.h = pSlot->launcherGeo.top();
 				}
 			}
 			else
@@ -346,20 +346,20 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 			geo.y = m_size.h - geo.h;
 	}
 	
-	if( geo.Top() < 0 )
+	if( geo.top() < 0 )
 	{
-		if( geo.Bottom() == pSlot->launcherGeo.Top() )
+		if( geo.bottom() == pSlot->launcherGeo.top() )
 		{
-			if( pSlot->launcherGeo.Top() < m_size.h - pSlot->launcherGeo.Bottom() )
+			if( pSlot->launcherGeo.top() < m_size.h - pSlot->launcherGeo.bottom() )
 			{
-				geo.y = pSlot->launcherGeo.Bottom();
-				if( geo.Bottom() > m_size.h )
+				geo.y = pSlot->launcherGeo.bottom();
+				if( geo.bottom() > m_size.h )
 					geo.h = m_size.h - geo.y;
 			}
 			else
 			{
 				geo.y = 0;
-				geo.h = pSlot->launcherGeo.Bottom();
+				geo.h = pSlot->launcherGeo.bottom();
 			}
 		}
 		else
@@ -376,7 +376,7 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 		_onRequestRender(pSlot->m_geo,pSlot);	
 
 //		if( pSlot->m_pWidget->PixelSize() != geo.Size() ) This check doesn't work in WG2, since it asks the Hook for the size... 
-			pSlot->m_pWidget->_onNewSize(geo.Size());
+			pSlot->m_pWidget->_onNewSize(geo.size());
 
 		return true;
 	}
@@ -401,11 +401,11 @@ WgWidget *  WgPopupLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 	
 		while( pSlot && !pResult )
 		{
-			if( pSlot->m_geo.Contains( ofs ) )
+			if( pSlot->m_geo.contains( ofs ) )
 			{
 				if( pSlot->m_pWidget->IsContainer() )
-					pResult = static_cast<WgContainer*>(pSlot->m_pWidget)->FindWidget( ofs - pSlot->m_geo.Pos(), mode );
-				else if( pSlot->m_pWidget->MarkTest( ofs - pSlot->m_geo.Pos() ) )
+					pResult = static_cast<WgContainer*>(pSlot->m_pWidget)->FindWidget( ofs - pSlot->m_geo.pos(), mode );
+				else if( pSlot->m_pWidget->MarkTest( ofs - pSlot->m_geo.pos() ) )
 					pResult = pSlot->m_pWidget;
 			}
             
@@ -427,7 +427,7 @@ WgWidget *  WgPopupLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 				WgCoord 	absPos 		= ofs + ScreenPixelPos();
 				WgRect	openerGeo 	= pOpener->ScreenPixelGeo();
 	
-				if( openerGeo.Contains(absPos) && pOpener->MarkTest( absPos - openerGeo.Pos() ) )
+				if( openerGeo.contains(absPos) && pOpener->MarkTest( absPos - openerGeo.pos() ) )
 					pResult = pOpener;
 			}
 				
@@ -491,7 +491,7 @@ void WgPopupLayer::_onRequestRender( const WgRect& rect, const WgPopupHook * pSl
 
 		while (pCover)
 		{
-			if (pCover->m_geo.IntersectsWith(rect) && pCover->state != WgPopupHook::State::OpeningDelay && pCover->state != WgPopupHook::State::Opening && pCover->state != WgPopupHook::State::Closing)
+			if (pCover->m_geo.intersectsWith(rect) && pCover->state != WgPopupHook::State::OpeningDelay && pCover->state != WgPopupHook::State::Opening && pCover->state != WgPopupHook::State::Closing)
 				pCover->m_pWidget->_onMaskPatches(patches, pCover->m_geo, WgRect(0, 0, INT_MAX, INT_MAX), _getBlendMode());
 
 			pCover = pCover->Prev();
@@ -525,7 +525,7 @@ void WgPopupLayer::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas, 
 
 	for (const WgRect * pRect = _pPatches->Begin(); pRect != _pPatches->End(); pRect++)
 	{
-		if (_canvas.IntersectsWith(*pRect))
+		if (_canvas.intersectsWith(*pRect))
 			patches.Push(WgRect(*pRect, _canvas));
 	}
 
@@ -548,9 +548,9 @@ void WgPopupLayer::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas, 
 
 	while (pSlot != nullptr )
 	{
-		WgRect geo = pSlot->m_geo + _canvas.Pos();
+		WgRect geo = pSlot->m_geo + _canvas.pos();
 
-		if (geo.IntersectsWith(dirtBounds) && pSlot->state != WgPopupHook::State::OpeningDelay)
+		if (geo.intersectsWith(dirtBounds) && pSlot->state != WgPopupHook::State::OpeningDelay)
 			renderList.push_back(WidgetRenderContext(pSlot, geo));
 
 		pSlot = pSlot->Next();
@@ -734,7 +734,7 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 
                 if( pHook->state == WgPopupHook::State::PeekOpen)
                 {
-                    if (pHook->m_geo.Contains(pointerPos))
+                    if (pHook->m_geo.contains(pointerPos))
                         pHook->state = WgPopupHook::State::WeakOpen;
                 }
                 
@@ -742,7 +742,7 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
                 
                 if ( pHook->state == WgPopupHook::State::PeekOpen || pHook->state == WgPopupHook::State::Opening || pHook->state == WgPopupHook::State::OpeningDelay )
                 {
-                    if (!pHook->launcherGeo.Contains(pointerPos))
+                    if (!pHook->launcherGeo.contains(pointerPos))
                         _beginClosing(pHook, false);
                 }
             }
@@ -760,12 +760,12 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 			{
 				if (pHook->state == WgPopupHook::State::ClosingDelay)
 				{
-					if (pHook->launcherGeo.Contains(pointerPos))
+					if (pHook->launcherGeo.contains(pointerPos))
 					{
 						pHook->state = WgPopupHook::State::PeekOpen;
 						pHook->stateCounter = 0;
 					}
-					else if (pHook->m_geo.Contains(pointerPos))
+					else if (pHook->m_geo.contains(pointerPos))
 					{
 						WgPopupHook * p = pHook;
 						while (p && p->state == WgPopupHook::State::ClosingDelay)
@@ -827,7 +827,7 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 				WgCoord absPos = static_cast<const WgEvent::MouseButtonRelease*>(pEvent)->PointerPixelPos();
 				WgRect	openerGeo = pOpener->ScreenPixelGeo();
 
-				if (pOpener->MarkTest(absPos - openerGeo.Pos()))
+				if (pOpener->MarkTest(absPos - openerGeo.pos()))
 					break;
 			}
 						

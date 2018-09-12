@@ -187,7 +187,6 @@
     <ClInclude Include="framework\wg_surface.h" />
     <ClInclude Include="framework\wg_surfacefactory.h" />
     <ClInclude Include="framework\wg_switch.h" />
-    <ClInclude Include="framework\wg_tablepanel.h" />
     <ClInclude Include="framework\wg_tablist.h" />
     <ClInclude Include="framework\wg_tabordercapsule.h" />
     <ClInclude Include="framework\wg_text.h" />
@@ -259,7 +258,6 @@
     <ClCompile Include="framework\wg_font.cpp" />
     <ClCompile Include="framework\wg_fpsdisplay.cpp" />
     <ClCompile Include="framework\wg_frameskin.cpp" />
-    <ClCompile Include="framework\wg_geo.cpp" />
     <ClCompile Include="framework\wg_gfxanim.cpp" />
     <ClCompile Include="framework\wg_gfxdevice.cpp" />
     <ClCompile Include="framework\wg_gfxdevice_null.cpp" />
@@ -309,7 +307,6 @@
     <ClCompile Include="framework\wg_string.cpp" />
     <ClCompile Include="framework\wg_surface.cpp" />
     <ClCompile Include="framework\wg_switch.cpp" />
-    <ClCompile Include="framework\wg_tablepanel.cpp" />
     <ClCompile Include="framework\wg_tablist.cpp" />
     <ClCompile Include="framework\wg_tabordercapsule.cpp" />
     <ClCompile Include="framework\wg_text.cpp" />

@@ -119,7 +119,7 @@ void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRec
             while(p)
             {
                 if( p->IsVisible() )
-                    p->Widget()->_onMaskPatches( patches, childGeo + geo.Pos(), myClip, blendMode );
+                    p->Widget()->_onMaskPatches( patches, childGeo + geo.pos(), myClip, blendMode );
                 p = static_cast<WgPanelHook*>(_nextHookWithGeo( childGeo, p ));
             }
             break;
@@ -227,29 +227,29 @@ WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPol
 
 WgSize WgPanelHook::_paddedPreferredPixelSize(int scale) const
 {
-    return m_pWidget->PreferredPixelSize() + m_padding.Scale(scale);
+    return m_pWidget->PreferredPixelSize() + m_padding.scale(scale);
 }
 
 WgSize WgPanelHook::_paddedMinPixelSize(int scale) const
 {
-    return m_pWidget->MinPixelSize() + m_padding.Scale(scale);
+    return m_pWidget->MinPixelSize() + m_padding.scale(scale);
 }
 
 WgSize WgPanelHook::_paddedMaxPixelSize(int scale) const
 {
-        return m_pWidget->MaxPixelSize() + m_padding.Scale(scale);
+        return m_pWidget->MaxPixelSize() + m_padding.scale(scale);
 }
 
 int WgPanelHook::_paddedMatchingPixelWidth( int paddedHeight, int scale ) const
 {
-    WgBorders padding = m_padding.Scale(scale);
+    WgBorders padding = m_padding.scale(scale);
 
-    return m_pWidget->MatchingPixelWidth( paddedHeight - padding.Height() ) + padding.Width();
+    return m_pWidget->MatchingPixelWidth( paddedHeight - padding.height() ) + padding.width();
 }
 
 int WgPanelHook::_paddedMatchingPixelHeight( int paddedWidth, int scale ) const
 {
-    WgBorders padding = m_padding.Scale(scale);
+    WgBorders padding = m_padding.scale(scale);
 
-    return m_pWidget->MatchingPixelHeight( paddedWidth - padding.Width() ) + padding.Height();
+    return m_pWidget->MatchingPixelHeight( paddedWidth - padding.width() ) + padding.height();
 }
