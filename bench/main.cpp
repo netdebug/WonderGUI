@@ -1206,7 +1206,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED_PRESSED, selectedPressedBg, selectedPressedBg);
 
 
-	WgBoxSkinPtr pSliderHandleSkin = WgBoxSkin::Create(WgColor::white, 1, WgColor::red);
+	WgBoxSkinPtr pSliderHandleSkin = WgBoxSkin::Create(WgColor::White, 1, WgColor::Red);
 	pSliderHandleSkin->SetContentPadding(10);
 	pSliderHandleSkin->SetStateColor(WG_STATE_HOVERED, WgColor::Blue);
 	pSliderHandleSkin->SetStateColor(WG_STATE_PRESSED, WgColor::Red);
@@ -1302,7 +1302,9 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pFlex->SetScale(WG_SCALE_BASE * 2);
 
 
-	pMultiSlider->SetSkin(WgColorSkin::Create(WgColor::blanchedalmond));
+	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::MultiSetValue);
+
+	pMultiSlider->SetSkin(WgColorSkin::Create(WgColor::BlanchedAlmond));
 
 	auto pEvH = pRoot->EventHandler();
 
