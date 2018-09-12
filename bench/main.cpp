@@ -569,8 +569,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	auto pPressablePlateSkin = WgBlockSkin::CreateClickableFromSurface(pPlateImg, 0, WgBorders(3));
 
-	WgSurface * pInjectWidget = sdl_wglib::LoadSurface("../resources/IDR_MOD_INJECT_WIDGET_CHROME.2x.png", *g_pSurfaceFactory);
-	pInjectWidget->SetScaleFactor(4096 * 2);
+//	WgSurface * pInjectWidget = sdl_wglib::LoadSurface("../resources/IDR_MOD_INJECT_WIDGET_CHROME.2x.png", *g_pSurfaceFactory);
+//	pInjectWidget->SetScaleFactor(4096 * 2);
 
 	
 
@@ -1060,7 +1060,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	auto pMultiSlider = new WgMultiSlider();
 
-	pMultiSlider->SetSkin(WgBoxSkin::Create(WgColor::white, { 1 }, WgColor::green));
+//	pMultiSlider->SetSkin(WgBoxSkin::Create(WgColor::white, { 1 }, WgColor::green));
 
 	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin);
 
@@ -1133,12 +1133,16 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 						}, nullptr, nullptr, { 1.f,1.f }, WgBorders(10) );
 
 
+	WgButton * pBlockedButton = new WgButton();
+	pBlockedButton->SetSkin(pPressablePlateSkin);
+
+	pFlex->AddChild(pBlockedButton, WgRect(0, 0, 450, 300));
 	auto pMyHook = pFlex->AddChild(pMultiSlider, WgRect(0, 0, 450, 300));
 
 	pFlex->SetScale(WG_SCALE_BASE * 2);
 
 
-	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::SetValue);
+	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::MultiSetValue);
 
 	auto pEvH = pRoot->EventHandler();
 
