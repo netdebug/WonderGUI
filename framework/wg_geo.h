@@ -362,6 +362,9 @@ public:
 
 	inline bool IntersectsWith( const WgRect& _rect ) const;
 
+	bool		IntersectsWithOrContains(WgCoord p1, WgCoord p2, int precision = 14) const;
+	bool		ClipLine(WgCoord * p1, WgCoord * p2, int precision = 14) const;
+
 	inline int Width() const		{ return w; }
 	inline int Height() const	{ return h; }
 	inline WgSize Size() const		{ return WgSize(w,h); }
