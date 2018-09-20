@@ -442,6 +442,23 @@ WgWidget *  WgPopupLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 	}
 }
 	
+
+//____ _SetDelays() ___________________________________________________________
+
+void WgPopupLayer::SetDelays(int popupOpenDelay, int popupFadeInDelay, int popupCloseDelay, int popupFadeOutDelay)
+{
+	WG_LIMIT(popupOpenDelay, 0, 2000);
+	WG_LIMIT(popupFadeInDelay, 0, 2000);
+	WG_LIMIT(popupCloseDelay, 0, 2000);
+	WG_LIMIT(popupFadeOutDelay, 0, 2000);
+
+	m_openingDelayMs = popupOpenDelay;
+	m_openingFadeMs = popupFadeInDelay;
+	m_closingFadeMs = popupCloseDelay;
+	m_closingDelayMs = popupFadeOutDelay;
+}
+
+
 //____ _onRequestRender() _____________________________________________________
 	
 void WgPopupLayer::_onRequestRender( const WgRect& rect, const WgPopupHook * pSlot )
@@ -856,10 +873,21 @@ void WgPopupLayer::_closeAutoOpenedUntil(WgWidget * pStayOpen)
 	auto p = m_popupHooks.First();
 	while (p->bAutoClose && p->m_pWidget != pStayOpen)
 	{
-		if (p->state != WgPopupHook::State::Closing && p->state != WgPopupHook::State::Closing)
+		switch (p->state)
 		{
-			p->state = WgPopupHook::State::Closing;
-			p->stateCounter = 0;
+			case WgPopupHook::State::OpeningDelay:
+				p->state = WgPopupHook::State::Closing;
+				p->stateCounter = m_closingFadeMs;
+				break;
+			case WgPopupHook::State::Opening:
+				p->state = WgPopupHook::State::Closing;
+				p->stateCounter = p->stateCounter * m_closingFadeMs / m_openingFadeMs;
+				break;
+			case WgPopupHook::State::Closing:
+				break;
+			default:
+				p->state = WgPopupHook::State::Closing;
+				p->stateCounter = 0;
 		}
 		p = p->_next();
 	}

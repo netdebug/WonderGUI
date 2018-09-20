@@ -127,6 +127,7 @@ public:
 	bool			DeleteAllChildren() { return 0; }
 	bool			ReleaseAllChildren() { return 0; }
 
+	void			SetDelays(int popupOpenDelay, int popupFadeInDelay, int popupCloseDelay, int popupFadeOutDelay);
 
 protected:
 	virtual WgWidget* _newOfMyType() const { return new WgPopupLayer(); };

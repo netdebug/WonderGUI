@@ -743,8 +743,8 @@ namespace WgEvent
 	public:
 		int id() const { return m_id; }
 
-		int		button() { return m_button; }
-		WgOrigo	sideOfHandle() { return m_offsetFromHandle; }
+		int		button() const { return m_button; }
+		WgOrigo	sideOfHandle() const { return m_offsetFromHandle; }
 
 	protected:
 		SliderPressed(WgMultiSlider * pSlider, int sliderId, int button, WgOrigo offsetFromHandle );

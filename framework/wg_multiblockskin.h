@@ -102,7 +102,7 @@ private:
 
 	void			_updateStateOpacity( int stateIdx );
 
-	WgSize			m_blockSizePoints;					// Stored in pixels
+	WgSize			m_blockSizePoints;					// Stored in points
 
 	WgSize			m_blockSize;						// Stored in pixels
 	int 			m_scale = WG_SCALE_BASE;

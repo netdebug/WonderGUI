@@ -261,7 +261,12 @@ bool WgWidget::SetSelected()
 	if (m_bEnabled)
 	{
 		m_bSelected = true;
-        m_state.setSelected(true);
+
+		if (!m_state.isSelected())
+		{
+			m_state.setSelected(true);
+			_requestRender();
+		}
 		return true;
 	}
 	else
@@ -275,7 +280,11 @@ bool WgWidget::SetNormal()
 	if (m_bEnabled)
 	{
 		m_bSelected = false;
-        m_state.setSelected(false);
+		if (m_state.isSelected())
+		{
+			m_state.setSelected(false);
+			_requestRender();
+		}
 		return true;
 	}
 	else

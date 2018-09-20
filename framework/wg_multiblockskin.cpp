@@ -71,7 +71,7 @@ int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord ofs)
 
 	for (int i = 0; i < WG_NB_STATES; i++)
 	{
-		layer.blockOfs[i] = ofs;
+		layer.blockOfs[i] = ofs*m_scale / WG_SCALE_BASE;
 		layer.tintColor[i] = WgColor::white;
 
 		_updateStateOpacity(i);
@@ -87,6 +87,11 @@ int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord blockStartOfs, WgSize 
 
 	m_scale = pSurf->ScaleFactor();
 	m_blockSize = (m_blockSizePoints*m_scale) / WG_SCALE_BASE;
+
+	//
+
+	blockStartOfs = blockStartOfs * m_scale / WG_SCALE_BASE;
+	blockPitch = blockPitch * m_scale / WG_SCALE_BASE;
 
 	//
 

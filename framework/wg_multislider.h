@@ -129,24 +129,38 @@ public:
 	typedef std::function<WgRectF(SetGeoVisitor& visitor)>			SetGeoFunc;
 	
 
-	void	SetDefaults(const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot = { 0.5f,0.5f }, WgBorders markExtension = WgBorders(0) );
+	void	SetDefaults(const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot = { 0.5f,0.5f },
+						WgBorders handleMarkExtension = WgBorders(0), WgBorders sliderMarkExtension = WgBorders(0) );
+
 	void	SetCallback(const std::function<void(int sliderId, float value, float value2)>& callback);
 
-	void	SetPassive(bool bPassive);
+	void	SetPassive(bool bPassive);							// No slider repositioning on its own, relies callback/event-listener to call SetSliderValue().
 	bool	IsPassive() const { return m_bPassive; }
 
-	void	SetDeltaDrag(bool bDelta);
+	void	SetDeltaDrag(bool bDelta);							// Use relative movements, instead of the new position, for slider placement.
 	bool	IsDeltaDrag() const { return m_bDeltaDrag;  }
+
+	void	SetGhostHandle(bool bGhost);						// Handle is not pressable, only background. Can be useful in some press-modes.
+	bool	IsGhostHandle() const { return m_bGhostHandle; }
+
+	void	SetSkin(const WgSkinPtr& pSkin);
+
+	void	SetPressMode(WgMultiSlider::PressMode mode);
+	PressMode GetPressMode() const { return m_pressMode; }
+
+	void	SetFinetune( int stepSize, float stepIncrement = 0.f, WgModifierKeys modifier = WG_MODKEY_CTRL);
 
 
 	int		AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, float startValue = 0.f, float minValue = 0.f, float maxValue = 1.f, int steps = 0,
 						SetValueFunc pSetValueFunc = nullptr, const WgSkinPtr& pBgSkin = nullptr, 
-						const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f,-1.f }, WgBorders markExtension = WgBorders(0));
+						const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f,-1.f }, 
+						WgBorders handleMarkExtension = WgBorders(0), WgBorders sliderMarkExtension = WgBorders(0) );
 
 	int		AddSlider2D( int id, WgOrigo origo, SetGeoFunc pSetGeoFunc, float startValueX = 0.f, float startValueY = 0.f, 
 						float minValueX = 0.f,  float maxValueX = 1.f, int stepsX = 0, float minValueY = 0.f, float maxValueY = 1.f, int stepsY = 0,
 						SetValueFunc2D pSetValueFunc = nullptr,
-						const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f, -1.f }, WgBorders markExtension = WgBorders(0) );
+						const WgSkinPtr& pBgSkin = nullptr, const WgSkinPtr& pHandleSkin = nullptr, WgCoordF handleHotspot = { -1.f, -1.f }, 
+						WgBorders handleMarkExtension = WgBorders(0), WgBorders sliderMarkExtension = WgBorders(0) );
 
     void    RemoveAllSliders();
 
@@ -157,10 +171,6 @@ public:
 
 	bool	MarkTest(const WgCoord& ofs) override;
 
-	void	SetSkin(const WgSkinPtr& pSkin);
-
-	void	SetPressMode(WgMultiSlider::PressMode mode);
-	PressMode GetPressMode() const { return m_pressMode; }
 
 protected:
 
@@ -182,7 +192,8 @@ protected:
 
 		WgSkinPtr		pBgSkin;
 		WgSkinPtr		pHandleSkin;
-		WgBorders		markExtension;		// Frame surrounding slider that also marks the slider. Measured in points, not pixels.
+		WgBorders		handleMarkExtension;		// Frame surrounding handle that also marks the handle. Measured in points, not pixels.
+		WgBorders		sliderMarkExtension;		// Frame surrounding slider that also marks the slider. Measured in points, not pixels.
 
 		SetValueFunc	pSetValueFunc;
 		SetValueFunc2D	pSetValueFunc2D;
@@ -224,6 +235,7 @@ protected:
 
 	void		_refreshSliders();
 	void		_refreshSliderGeo();
+	void		_updatePointerStyle(WgCoord pointerPos);
 
 	Slider *	_findSlider(int sliderId);
 
@@ -233,7 +245,8 @@ private:
 	WgSkinPtr			m_pDefaultBgSkin;
 	WgSkinPtr			m_pDefaultHandleSkin;
 	WgCoordF			m_defaultHandleHotspot = { 0.5f, 0.5f };
-	WgBorders			m_defaultMarkExtension;
+	WgBorders			m_defaultHandleMarkExtension;
+	WgBorders			m_defaultSliderMarkExtension;
 
 	std::vector<Slider>	m_sliders;
 
@@ -244,11 +257,15 @@ private:
 
 
 	bool				m_bPassive = false;
+	bool				m_bGhostHandle = false;
 
 	bool				m_bDeltaDrag = false;
 	WgCoord				m_totalDrag;
 	WgCoord				m_finetuneFraction;
-	const static int	c_finetuneResolution = 5;
+
+	WgModifierKeys		m_finetuneModifier = WG_MODKEY_CTRL;
+	int					m_finetuneStepSize = 5;							// 0 = increment on every pixel, otherwise points to move pointer before value incremented.
+	float				m_finetuneStepIncrement = 0.f;					// 0 = increment with value of one pixels movement, otherwise by specified value.
 
 	PressMode			m_pressMode = PressMode::NoMovement;
 
