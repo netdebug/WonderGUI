@@ -454,15 +454,16 @@ void WgMultiSlider::_selectSliderHandle(Slider * pSlider)
 		_requestRenderHandle(p);
 	}
 
-	// Clear drag related information
-
-	m_totalDrag = { 0,0 };
-	m_finetuneFraction = { 0,0 };
-
 	// Select this slider
 
 	if (pSlider)
 	{
+		// Clear drag related information
+
+		m_dragFraction = { 0.f,0.f };
+		m_dragStartFraction = pSlider->handlePos;
+		m_finetuneRemainder = { 0,0 };
+
 		//TODO: Only re-render if state change results in graphic change
 		//		WgState oldState = pSlider->handleState;
 		pSlider->handleState.setPressed(true);
@@ -565,7 +566,7 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 			{
 				WgCoord	pointerPos = pEvent->PointerPixelPos();
 
-				Slider * pMarked = _markedSliderHandle(pointerPos, &m_selectPressOfs);
+				Slider * pMarked = _markedSliderHandle(pointerPos, nullptr);
 
 				WgOrigo pressOfs = WG_CENTER;
 
@@ -595,7 +596,6 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 							WgCoordF handleHotspot = pMarked->handleHotspot.x == -1.f ? m_defaultHandleHotspot : pMarked->handleHotspot;
 
-							m_selectPressOfs = { (int)(handleGeo.w * handleHotspot.x), (int)(handleGeo.h * handleHotspot.y) };
 							_selectSliderHandle(pMarked);
 						}
 						// In PressMode SetValue and MultiSetValue we set the value directly.
@@ -606,20 +606,6 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 								_calcSendValue(*pMarked, relPos);
 							else
 								_setHandlePosition(*pMarked, relPos);
-
-							// 
-/*
-							if (pEv->ModKeys() == m_finetuneModifier)
-							{
-								WgRect sliderGeo = _sliderGeo(*pMarked, PixelSize());
-								WgRect handleGeo = _sliderHandleGeo(*pMarked, sliderGeo);
-
-								WgCoordF handleHotspot = pMarked->handleHotspot.x == -1.f ? m_defaultHandleHotspot : pMarked->handleHotspot;
-
-								m_selectPressOfs = { (int) (handleGeo.w * handleHotspot.x), (int) (handleGeo.h * handleHotspot.y) };
-								_selectSliderHandle(pMarked);
-							}
-*/
 						}
 
 						// Set pressOfs for the event
@@ -689,77 +675,124 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 			if (pEv->Button() == 1)
 			{
-				Slider *	pAffectedSlider = nullptr;
-				WgRect		sliderGeo;
-				WgCoord		handlePos;
+				WgCoordF	fraction;
 
 				if (m_selectedSliderHandle >= 0)
 				{
 					Slider& slider = m_sliders[m_selectedSliderHandle];
 
-					sliderGeo = _sliderGeo(slider, PixelSize());
-					WgRect handleGeo = _sliderHandleGeo(slider, sliderGeo);
-					WgCoordF handleHotspot = slider.handleHotspot.x == -1.f ? m_defaultHandleHotspot : slider.handleHotspot;
+					WgRect sliderGeo = _sliderGeo(slider, PixelSize());
 
-					WgCoord movement = pEv->DraggedNowPixels();
+					WgCoord dragNow = pEv->DraggedNowPixels();
+
+					WgCoordF movement;
+					
 
 					if (pEv->ModKeys() == m_finetuneModifier)
 					{
-						movement = movement + m_finetuneFraction;
-						m_finetuneFraction = { movement.x % m_finetuneStepSize, movement.y % m_finetuneStepSize };
-						movement /= m_finetuneStepSize;
+						int pixelStepSize = m_finetuneStepSize == 0 ? 1 : m_finetuneStepSize * m_scale / WG_SCALE_BASE;
+						WgCoordF stepIncrement;
+						
+						if (m_finetuneStepIncrement == 0.f)
+						{
+							stepIncrement.x = 1 / (sliderGeo.w - 0.001);
+							stepIncrement.y = 1 / (sliderGeo.h - 0.001);
+						}
+						else
+						{
+							stepIncrement.x = m_finetuneStepIncrement;
+							stepIncrement.y = m_finetuneStepIncrement;
+						}
+
+						m_finetuneRemainder += dragNow;
+
+						movement.x = (m_finetuneRemainder.x / pixelStepSize) * stepIncrement.x;
+						movement.y = (m_finetuneRemainder.y / pixelStepSize) * stepIncrement.y;
+
+						m_finetuneRemainder.x %= pixelStepSize;
+						m_finetuneRemainder.y %= pixelStepSize;
 					}
 					else
-						m_finetuneFraction = { 0,0 };
+					{
+						movement.x = sliderGeo.w == 0 ? 0 : ((float) dragNow.x) / (sliderGeo.w-0.001);
+						movement.y = sliderGeo.h == 0 ? 0 : ((float)dragNow.y) / (sliderGeo.h-0.001);
 
-					m_totalDrag += movement;
+						m_finetuneRemainder = { 0,0 };
+					}
 
-					WgCoord unlimitedPos = pEv->StartPixelPos() + m_totalDrag - m_selectPressOfs + WgCoord((int)(handleGeo.w * handleHotspot.x), (int)(handleGeo.h * handleHotspot.y));
+					m_dragFraction += movement;
 
-					handlePos = sliderGeo.Limit(unlimitedPos);
+					fraction = m_dragStartFraction + m_dragFraction;
+
+					WG_LIMIT(fraction.x, 0.f, 1.f);
+					WG_LIMIT(fraction.y, 0.f, 1.f);
 
 					if (m_bDeltaDrag)
-						m_totalDrag -= unlimitedPos - handlePos;
+						m_dragFraction = fraction - m_dragStartFraction;
 
-					pAffectedSlider = &slider;
+					if (m_bPassive)
+						_calcSendValue(slider, fraction);
+					else
+						_setHandlePosition(slider, fraction);
 				}
 				else
 				{
 					if (m_pressMode == PressMode::MultiSetValue)
 					{
+
+						WgCoord prevPos = pEv->PrevPixelPos();
+						WgCoord currPos = pEv->PointerPixelPos();
+
+						for (auto& slider : m_sliders)
+						{
+							WgRect sliderGeo = _sliderSkinGeo(slider, _sliderGeo(slider, PixelSize()));
+							WgRect sliderMarkGeo = sliderGeo + (slider.sliderMarkExtension.IsEmpty() ? m_defaultSliderMarkExtension : slider.sliderMarkExtension);
+
+							if (prevPos.x < sliderMarkGeo.x && currPos.x > sliderMarkGeo.x)
+								int a = 0;
+
+							if (sliderMarkGeo.IntersectsWithOrContains(prevPos, currPos) )
+							{
+								WgCoord clippedPrevPos = prevPos;
+								WgCoord clippedCurrPos = currPos;
+								sliderMarkGeo.ClipLine(&clippedPrevPos, &clippedCurrPos);
+
+								WgCoord	handlePos = clippedCurrPos - sliderGeo.Pos();
+
+								fraction.x = sliderGeo.w == 0 ? 0 : handlePos.x / (float)sliderGeo.w;
+								fraction.y = sliderGeo.h == 0 ? 0 : handlePos.y / (float)sliderGeo.h;
+
+								WG_LIMIT(fraction.x, 0.f, 1.f);
+								WG_LIMIT(fraction.y, 0.f, 1.f);
+
+								if (m_bPassive)
+									_calcSendValue(slider, fraction);
+								else
+									_setHandlePosition(slider, fraction);
+
+								if (pEv->ModKeys() == m_finetuneModifier)
+								{
+									_selectSliderHandle(&slider);
+									break;										// Only one can be selected to finetune.
+								}
+							}
+						}
+/*
+						WgCoord		handlePos;
 						pAffectedSlider = _markedSlider(pEv->CurrPixelPos(), &handlePos);
 						if (pAffectedSlider)
 						{
-							sliderGeo = _sliderGeo(*pAffectedSlider, PixelSize());
-							handlePos = sliderGeo.Limit(handlePos+sliderGeo.Pos());
+							WgRect sliderGeo = _sliderGeo(*pAffectedSlider, PixelSize());
+
+							fraction.x = sliderGeo.w == 0 ? 0 : handlePos.x / (float)sliderGeo.w;
+							fraction.y = sliderGeo.h == 0 ? 0 : handlePos.y / (float)sliderGeo.h;
 
 							if (pEv->ModKeys() == m_finetuneModifier)
-							{
-								WgRect handleGeo = _sliderHandleGeo(*pAffectedSlider, sliderGeo);
-
-								WgCoordF handleHotspot = pAffectedSlider->handleHotspot.x == -1.f ? m_defaultHandleHotspot : pAffectedSlider->handleHotspot;
-
-								m_selectPressOfs = { (int)(handleGeo.w * handleHotspot.x), (int)(handleGeo.h * handleHotspot.y) };
 								_selectSliderHandle(pAffectedSlider);
-
-								m_totalDrag = pEv->DraggedTotalPixels();
-							}
 						}
+*/
 					}
-
 				}
-
-				if (pAffectedSlider)
-				{
-					float relX = sliderGeo.w == 0 ? 0 : (handlePos.x - sliderGeo.x) / (float)sliderGeo.w;
-					float relY = sliderGeo.h == 0 ? 0 : (handlePos.y - sliderGeo.y) / (float)sliderGeo.h;
-
-					if (m_bPassive)
-						_calcSendValue(*pAffectedSlider, { relX,relY });
-					else
-						_setHandlePosition(*pAffectedSlider, { relX,relY });
-				}
-
 
 
 			}

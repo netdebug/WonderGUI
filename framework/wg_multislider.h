@@ -251,21 +251,21 @@ private:
 	std::vector<Slider>	m_sliders;
 
 	int					m_selectedSliderHandle = -1;
-	WgCoord				m_selectPressOfs;
 
 	int					m_selectedSlider = -1;								// For press on slider in certain modes.
 
 
 	bool				m_bPassive = false;
 	bool				m_bGhostHandle = false;
-
 	bool				m_bDeltaDrag = false;
-	WgCoord				m_totalDrag;
-	WgCoord				m_finetuneFraction;
+
+	WgCoordF			m_dragFraction;
+	WgCoordF			m_dragStartFraction;
 
 	WgModifierKeys		m_finetuneModifier = WG_MODKEY_CTRL;
 	int					m_finetuneStepSize = 5;							// 0 = increment on every pixel, otherwise points to move pointer before value incremented.
 	float				m_finetuneStepIncrement = 0.f;					// 0 = increment with value of one pixels movement, otherwise by specified value.
+	WgCoord				m_finetuneRemainder;							// pixels dragged not a full step yet.
 
 	PressMode			m_pressMode = PressMode::NoMovement;
 

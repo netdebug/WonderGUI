@@ -802,7 +802,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 */
 
 	// Popup Layer Test
-
+/*
 	{
 		auto pOpener = new WgPopupOpener();
 
@@ -920,7 +920,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pOpener->SetPopup( pMenu );
 
 	}
-
+*/
 
 
 	// Button skin test
@@ -1045,7 +1045,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	// Multislider widget
-/*
+
 
 	WgBoxSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::grey, 1, WgColor::grey);
 	pSliderBgSkin->SetStateColor(WG_STATE_HOVERED, WgColor::blue);
@@ -1158,7 +1158,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	}, nullptr );
-*/
+
 
 	// Scroll chart widget
 
