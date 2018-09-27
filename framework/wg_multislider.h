@@ -148,8 +148,9 @@ public:
 	void	SetPressMode(WgMultiSlider::PressMode mode);
 	PressMode GetPressMode() const { return m_pressMode; }
 
-	void	SetFinetune( int stepSize, float stepIncrement = 0.f, WgModifierKeys modifier = WG_MODKEY_CTRL);
+	void	SetFinetune( int stepSize, float stepIncrement = 0.f);
 
+	void	SetModifierKeys( WgModifierKeys finetune, WgModifierKeys axisLock, WgModifierKeys override = WG_MODKEY_NONE );
 
 	int		AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, float startValue = 0.f, float minValue = 0.f, float maxValue = 1.f, int steps = 0,
 						SetValueFunc pSetValueFunc = nullptr, const WgSkinPtr& pBgSkin = nullptr, 
@@ -174,6 +175,14 @@ public:
 
 protected:
 
+	enum AxisLockState
+	{
+		Unlocked,
+		Locking,							// Locking started, but axis not determined yet.
+		Horizontal,							// Only horizontal movement.
+		Vertical,							// Only vertical movement.
+	};
+
 	struct Slider
 	{
 		int				id;
@@ -187,6 +196,7 @@ protected:
 		WgRectF			geo;				// 0.f -> 1.f, within widgets content rect
 		WgCoordF		handlePos;			// 0.f -> 1.f, within geo
 		WgCoordF		handleHotspot;		// 0.f -> 1.f, within its own size
+		WgState			sliderState;
 		WgState			handleState;
 		int				geoState;			// 0 = needs refresh, 1 = refresh in progress, 2 = refreshed.
 
@@ -207,6 +217,7 @@ protected:
 	bool	_onAlphaTest( const WgCoord& ofs ) override;
 	void	_setScale(int scale) override;
 
+	void	_setSliderStates(Slider& slider, WgState newSliderState, WgState newHandleState);
 	void	_updateHandlePos(Slider& slider);									// Updates handlePos from its parameter values.
 	void	_updateGeo(Slider& slider);
 
@@ -216,11 +227,14 @@ protected:
 
 	Slider * _markedSliderHandle(WgCoord ofs, WgCoord * pOfsOutput = nullptr );
 	void	_markSliderHandle(Slider * pSlider);
+	void	_markSliderBg(Slider * pSlider);
 	void	_selectSliderHandle(Slider * pSlider);
+	void	_selectSliderBg(Slider * pSlider);
 	void	_requestRenderHandle(Slider * pSlider);
 
 	Slider * _markedSlider(WgCoord ofs, WgCoord * pOfsOutput = nullptr);
 
+	WgCoordF	_alignPosToStep(Slider& slider, WgCoordF pos) const;
 
 	WgCoordF	_setHandlePosition(Slider& slider, WgCoordF pos);					// Set handlePos and update value(s).
 	WgCoordF	_calcSendValue(Slider& slider, WgCoordF pos);						// Like _setHandlePosition(), but only calculates and sends the value (no internal update).
@@ -250,24 +264,36 @@ private:
 
 	std::vector<Slider>	m_sliders;
 
-	int					m_selectedSliderHandle = -1;
+	// Settings parameters
 
-	int					m_selectedSlider = -1;								// For press on slider in certain modes.
-
+	PressMode			m_pressMode = PressMode::NoMovement;
 
 	bool				m_bPassive = false;
 	bool				m_bGhostHandle = false;
 	bool				m_bDeltaDrag = false;
 
-	WgCoordF			m_dragFraction;
-	WgCoordF			m_dragStartFraction;
-
+	WgModifierKeys		m_axisLockModifier = WG_MODKEY_ALT;
 	WgModifierKeys		m_finetuneModifier = WG_MODKEY_CTRL;
+	WgModifierKeys		m_overrideModifier = WG_MODKEY_NONE;			// If pressed, we only do callback and send event, we don't grab or move slider.
+
 	int					m_finetuneStepSize = 5;							// 0 = increment on every pixel, otherwise points to move pointer before value incremented.
 	float				m_finetuneStepIncrement = 0.f;					// 0 = increment with value of one pixels movement, otherwise by specified value.
+
+	// Dynamically changing parameters
+
+	int					m_selectedSliderHandle = -1;					// Handle selected
+	int					m_selectedSlider = -1;							// Selected slider, when slider but not handle is selected (used in certain modes).
+
+	WgCoordF			m_dragFraction;									// Accumulated drag movement from dragStartFraction.
+	WgCoordF			m_dragStartFraction;							// Slider handle position in fractions when selected for drag.
+
 	WgCoord				m_finetuneRemainder;							// pixels dragged not a full step yet.
 
-	PressMode			m_pressMode = PressMode::NoMovement;
+	AxisLockState		m_axisLockState = AxisLockState::Unlocked;
+	WgCoord				m_axisLockPosition;
+	WgCoordF			m_axisLockFraction;
+
+
 
 	std::function<void(int sliderId, float value, float value2 )>	m_callback = nullptr;
 

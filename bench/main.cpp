@@ -1046,10 +1046,22 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	// Multislider widget
 
+	WgColor		normalBg = { 64,64,64 }; 
+	WgColor		hoveredBg = { 128,128,128 };
+	WgColor		pressedBg = { 192,192,192 };
 
-	WgBoxSkinPtr pSliderBgSkin = WgBoxSkin::Create(WgColor::grey, 1, WgColor::grey);
-	pSliderBgSkin->SetStateColor(WG_STATE_HOVERED, WgColor::blue);
-	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED, WgColor::black, WgColor::black);
+	WgColor		selectedBg = { 255,64,64 };
+	WgColor		selectedHoveredBg = { 255,128,128 };
+	WgColor		selectedPressedBg = { 255,192,192 };
+
+
+	WgBoxSkinPtr pSliderBgSkin = WgBoxSkin::Create(normalBg, 1, normalBg);
+	pSliderBgSkin->SetStateColor(WG_STATE_HOVERED, hoveredBg, hoveredBg);
+	pSliderBgSkin->SetStateColor(WG_STATE_PRESSED, pressedBg, pressedBg);
+
+	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED, selectedBg, selectedBg);
+	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED_HOVERED, selectedHoveredBg, selectedHoveredBg);
+	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED_PRESSED, selectedPressedBg, selectedPressedBg);
 
 
 	WgBoxSkinPtr pSliderHandleSkin = WgBoxSkin::Create(WgColor::white, 1, WgColor::red);
@@ -1064,19 +1076,21 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pMultiSlider->SetDefaults(pSliderBgSkin, pSliderHandleSkin);
 
-	pMultiSlider->SetPassive(true);
+	pMultiSlider->SetModifierKeys(WG_MODKEY_CTRL, WG_MODKEY_SHIFT, WG_MODKEY_ALT );
 
-	pMultiSlider->SetCallback([pMultiSlider](int sliderId, float value, float value2) 
-	{ 
-		pMultiSlider->SetSliderValue(sliderId, value, value2); 
-	}
-	);
+//	pMultiSlider->SetPassive(true);
+
+//	pMultiSlider->SetCallback([pMultiSlider](int sliderId, float value, float value2) 
+//	{ 
+//		pMultiSlider->SetSliderValue(sliderId, value, value2); 
+//	}
+//	);
 
 	pMultiSlider->AddSlider2D(0, WG_NORTHWEST, 
 						[](WgMultiSlider::SetGeoVisitor& visitor) {
 							return WgRectF( 0.1f, 0.1f, 0.8f, 0.1f ); 
 						},
-						0.00f, 0.50f, -3.5f, 2.1f, 5, 0.f, 1.f, 0,
+						0.00f, 0.50f, -3.5f, 2.1f, 0, 0.f, 1.f, 0,
 						nullptr
 						);
 
@@ -1142,7 +1156,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pFlex->SetScale(WG_SCALE_BASE * 2);
 
 
-	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::MultiSetValue);
+	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::SetValue);
 
 	pMultiSlider->SetSkin(WgColorSkin::Create(WgColor::blanchedalmond));
 

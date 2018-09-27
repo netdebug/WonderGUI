@@ -151,6 +151,7 @@ int WgMultiSlider::AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, f
 	s.pSetGeoFunc = pSetGeoFunc;
 
 	s.handleHotspot = handleHotspot;
+	s.sliderState = WG_STATE_NORMAL;
 	s.handleState = WG_STATE_NORMAL;
 
 	_updateHandlePos(s);
@@ -200,6 +201,7 @@ int WgMultiSlider::AddSlider2D( int id, WgOrigo origo, SetGeoFunc pSetGeoFunc, f
 	s.pSetGeoFunc = pSetGeoFunc;
 
 	s.handleHotspot = handleHotspot;
+	s.sliderState = WG_STATE_NORMAL;
 	s.handleState = WG_STATE_NORMAL;
 
 	_updateHandlePos(s);
@@ -310,12 +312,21 @@ void WgMultiSlider::SetPressMode(PressMode mode)
 
 //____ SetFinetune() __________________________________________________________
 
-void WgMultiSlider::SetFinetune(int stepSize, float stepIncrement, WgModifierKeys modifier )
+void WgMultiSlider::SetFinetune(int stepSize, float stepIncrement)
 {
 	m_finetuneStepSize		= stepSize;
 	m_finetuneStepIncrement = stepIncrement;
-	m_finetuneModifier		= modifier;
 }
+
+//____ SetModifierKeys() ______________________________________________________
+
+void WgMultiSlider::SetModifierKeys(WgModifierKeys finetune, WgModifierKeys axisLock, WgModifierKeys override )
+{
+	m_finetuneModifier = finetune;
+	m_axisLockModifier = axisLock;
+	m_overrideModifier = override;
+}
+
 
 //____ _markedSlider() ________________________________________________________
 
@@ -405,7 +416,50 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSliderHandle(WgCoord ofs, WgCoord 
 	}
 }
 
-//____ _markSlider() __________________________________________________________
+//____ _markSliderBg() __________________________________________________________
+
+void WgMultiSlider::_markSliderBg(Slider * pSlider)
+{
+	if (pSlider && pSlider->sliderState.isHovered() && !pSlider->handleState.isHovered())
+		return;											// Already marked bg and unmarked handle, nothing to do.
+
+	// Unmark any previously marked slider
+
+	for (auto& slider : m_sliders)
+	{
+		if (slider.sliderState.isHovered())
+			_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState - WG_STATE_HOVERED);
+	}
+
+	// Mark this slider
+
+	if (pSlider)
+		_setSliderStates(*pSlider, pSlider->sliderState + WG_STATE_HOVERED, pSlider->handleState - WG_STATE_HOVERED);
+}
+
+//____ _selectSliderBg() __________________________________________________________
+
+void WgMultiSlider::_selectSliderBg(Slider * pSlider)
+{
+	if (pSlider && pSlider->sliderState.isSelected() && !pSlider->handleState.isHovered())
+		return;											// Already selected bg and unmarked handle, nothing to do.
+
+	// Unmark any previously marked slider
+
+	for (auto& slider : m_sliders)
+	{
+		if (slider.sliderState.isHovered())
+			_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState - WG_STATE_HOVERED);
+	}
+
+	// Select this slider
+
+	if (pSlider)
+		_setSliderStates(*pSlider, pSlider->sliderState + WG_STATE_PRESSED, pSlider->handleState - WG_STATE_HOVERED);
+}
+
+
+//____ _markSliderHandle() __________________________________________________________
 
 void WgMultiSlider::_markSliderHandle(Slider * pSlider)
 {
@@ -417,28 +471,16 @@ void WgMultiSlider::_markSliderHandle(Slider * pSlider)
 	for (auto& slider : m_sliders)
 	{
 		if (slider.handleState.isHovered() )
-		{
-			//TODO: Only re-render if state change results in graphic change
-			//		WgState oldState = pSlider->handleState;
-			slider.handleState.setHovered(false);
-
-			_requestRenderHandle(&slider);
-		}
+			_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState - WG_STATE_HOVERED);
 	}
 
 	// Mark this slider
 
 	if (pSlider)
-	{
-		//TODO: Only re-render if state change results in graphic change
-		//		WgState oldState = pSlider->handleState;
-		pSlider->handleState.setHovered(true);
-
-		_requestRenderHandle(pSlider);
-	}
+		_setSliderStates(*pSlider, pSlider->sliderState + WG_STATE_HOVERED, pSlider->handleState + WG_STATE_HOVERED);
 }
 
-//____ _selectSlider() ________________________________________________________
+//____ _selectSliderHandle() ________________________________________________________
 
 void WgMultiSlider::_selectSliderHandle(Slider * pSlider)
 {
@@ -450,8 +492,7 @@ void WgMultiSlider::_selectSliderHandle(Slider * pSlider)
 	if (m_selectedSliderHandle >= 0)
 	{
 		auto p = &m_sliders[m_selectedSliderHandle];
-		p->handleState.setPressed(false);
-		_requestRenderHandle(p);
+		_setSliderStates(*p, p->sliderState - WG_STATE_PRESSED, p->handleState - WG_STATE_PRESSED);
 	}
 
 	// Select this slider
@@ -463,17 +504,29 @@ void WgMultiSlider::_selectSliderHandle(Slider * pSlider)
 		m_dragFraction = { 0.f,0.f };
 		m_dragStartFraction = pSlider->handlePos;
 		m_finetuneRemainder = { 0,0 };
-
-		//TODO: Only re-render if state change results in graphic change
-		//		WgState oldState = pSlider->handleState;
-		pSlider->handleState.setPressed(true);
-		_requestRenderHandle(pSlider);
-
 		m_selectedSliderHandle = pSlider - &m_sliders.front();
+
+		_setSliderStates(*pSlider, pSlider->sliderState + WG_STATE_PRESSED, pSlider->handleState + WG_STATE_PRESSED);
 	}
 	else
 		m_selectedSliderHandle = -1;
 }
+
+//____ _setSliderStates() ___________________________________________________
+
+void WgMultiSlider::_setSliderStates(Slider& slider, WgState newSliderState, WgState newHandleState)
+{
+	WgSkin * pSliderSkin = slider.pBgSkin ? slider.pBgSkin.GetRealPtr() : m_pDefaultBgSkin.GetRealPtr();
+	WgSkin * pHandleSkin = slider.pBgSkin ? slider.pHandleSkin.GetRealPtr() : m_pDefaultHandleSkin.GetRealPtr();
+
+	if ((pSliderSkin && !pSliderSkin->IsStateIdentical(slider.sliderState, newSliderState)) ||
+		(pHandleSkin && !pHandleSkin->IsStateIdentical(slider.handleState, newHandleState)))
+		_requestRenderHandle(&slider);
+
+	slider.sliderState = newSliderState;
+	slider.handleState = newHandleState;
+}
+
 
 //____ _requestRenderHandle() _________________________________________________
 
@@ -492,7 +545,6 @@ void WgMultiSlider::_requestRenderHandle(Slider * pSlider)
 
 	_requestRender(handleGeo);
 }
-
 
 //____ _ updatePointerStyle() _________________________________________________
 
@@ -537,15 +589,31 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 {
 	//TODO: Handle swallowing of events.
 	//TODO: Send SliderPressed events for all mouse buttons, not just button 1.
-	//TODO: Support finetune in MultiSetValue mode (switch to just affect marked slider).
+	//TODO: Detect release of modifier keys for finetune and axislock and handle it in a better way.
 
 	bool	bSwallow = false;
 
 	switch (pEvent->Type())
 	{
+		case WG_EVENT_KEY_RELEASE:
+		{
+			// Check if a modifier key has been released and act accordingly.
+
+
+			WgModifierKeys modKeys = pEvent->ModKeys();
+
+			if( (modKeys & m_finetuneModifier) != m_finetuneModifier )
+				m_finetuneRemainder = { 0,0 };
+
+			if ((modKeys & m_axisLockModifier) != m_axisLockModifier)
+				m_axisLockState = AxisLockState::Unlocked;
+			break;
+		}
+
+
 		case WG_EVENT_MOUSE_LEAVE:
 			if(m_selectedSliderHandle == -1)
-				_markSliderHandle(nullptr);
+				_markSliderBg(nullptr);
 			break;
 
 		case WG_EVENT_MOUSE_ENTER:
@@ -553,39 +621,60 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 			if (m_selectedSliderHandle == -1)
 			{
 				Slider * p = _markedSliderHandle(pEvent->PointerPixelPos() );
-				_markSliderHandle(p);
+				
+				if(p)
+					_markSliderHandle(p);
+				else
+					_markSliderBg( _markedSlider(pEvent->PointerPixelPos()) );
+
 			}
 			_updatePointerStyle(pEvent->PointerPixelPos());
 			break;
 
 		case WG_EVENT_MOUSEBUTTON_PRESS:
 		{
+			Slider * pMarked = nullptr;
+			WgCoord markOfs;
+			bool	bHandleMarked = false;
+
 			const WgEvent::MouseButtonPress * pEv = static_cast<const WgEvent::MouseButtonPress*>(pEvent);
-		
-			if (pEv->Button() == 1)
+			WgCoord	pointerPos = pEvent->PointerPixelPos();
+
+			if (pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() & m_overrideModifier) != m_overrideModifier) )
 			{
-				WgCoord	pointerPos = pEvent->PointerPixelPos();
+				GrabFocus();
 
-				Slider * pMarked = _markedSliderHandle(pointerPos, nullptr);
 
-				WgOrigo pressOfs = WG_CENTER;
+				pMarked = _markedSliderHandle(pointerPos, nullptr);
 
 				if (pMarked)
 				{
 					_selectSliderHandle(pMarked);
+					bHandleMarked = true;
 				}
 				else
 				{
 					WgSize widgetSize = PixelSize();
 
-					WgCoord markOfs;
 					pMarked = _markedSlider(pointerPos, &markOfs);
 
 					if (pMarked)
 					{
+						_selectSliderBg(pMarked);
+
 						// Convert the press offset to fraction.
 
 						WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
+
+						// In PressMode SetValue and MultiSetValue we set the value directly.
+
+						if (m_pressMode == PressMode::SetValue || m_pressMode == PressMode::MultiSetValue)
+						{
+							if (m_bPassive)
+								_calcSendValue(*pMarked, relPos);
+							else
+								_setHandlePosition(*pMarked, relPos);
+						}
 
 						// In SetValue mode we actually select the handle
 
@@ -598,59 +687,61 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 							_selectSliderHandle(pMarked);
 						}
-						// In PressMode SetValue and MultiSetValue we set the value directly.
+					}
+				}
+			}
+			else
+				pMarked = _markedSliderHandle(pointerPos, nullptr);
 
-						if (m_pressMode == PressMode::SetValue || m_pressMode == PressMode::MultiSetValue)
-						{
-							if (m_bPassive)
-								_calcSendValue(*pMarked, relPos);
-							else
-								_setHandlePosition(*pMarked, relPos);
-						}
 
-						// Set pressOfs for the event
+			// Queue the event
 
-						if (pMarked->origo == WG_WEST || pMarked->origo == WG_EAST)		// Horizontal slider
+			if (pMarked)
+			{
+				// Set pressOfs for the event
+
+				WgOrigo pressOfs = WG_CENTER;
+				WgSize widgetSize = PixelSize();
+				WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
+
+				if (!bHandleMarked)
+				{
+					if (pMarked->origo == WG_WEST || pMarked->origo == WG_EAST)		// Horizontal slider
+					{
+						if (relPos.x < pMarked->handlePos.x)
+							pressOfs = WG_WEST;
+						else
+							pressOfs = WG_EAST;
+					}
+					else if (pMarked->origo == WG_NORTH || pMarked->origo == WG_SOUTH)		// Vertical slider
+					{
+						if (relPos.y < pMarked->handlePos.y)
+							pressOfs = WG_NORTH;
+						else
+							pressOfs = WG_SOUTH;
+					}
+					else																// 2D slider
+					{
+						if (relPos.y < pMarked->handlePos.y)
 						{
 							if (relPos.x < pMarked->handlePos.x)
-								pressOfs = WG_WEST;
+								pressOfs = WG_NORTHWEST;
 							else
-								pressOfs = WG_EAST;
+								pressOfs = WG_NORTHEAST;
 						}
-						else if (pMarked->origo == WG_NORTH || pMarked->origo == WG_SOUTH)		// Vertical slider
+						else
 						{
-							if (relPos.y < pMarked->handlePos.y)
-								pressOfs = WG_NORTH;
+							if (relPos.x < pMarked->handlePos.x)
+								pressOfs = WG_SOUTHWEST;
 							else
-								pressOfs = WG_SOUTH;
+								pressOfs = WG_SOUTHEAST;
 						}
-						else																// 2D slider
-						{
-							if (relPos.y < pMarked->handlePos.y)
-							{
-								if (relPos.x < pMarked->handlePos.x)
-									pressOfs = WG_NORTHWEST;
-								else
-									pressOfs = WG_NORTHEAST;
-							}
-							else
-							{
-								if (relPos.x < pMarked->handlePos.x)
-									pressOfs = WG_SOUTHWEST;
-								else
-									pressOfs = WG_SOUTHEAST;
-							}
-						}
-
-
 					}
 				}
 
-				// Queue the event
-
-				if (pMarked)
-					pHandler->QueueEvent(new WgEvent::SliderPressed(this, pMarked->id, pEv->Button(), pressOfs));
+				pHandler->QueueEvent(new WgEvent::SliderPressed(this, pMarked->id, pEv->Button(), pressOfs));
 			}
+
 			break;
 		}
 
@@ -673,7 +764,14 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 		{
 			const WgEvent::MouseButtonDrag * pEv = static_cast<const WgEvent::MouseButtonDrag*>(pEvent);
 
-			if (pEv->Button() == 1)
+			// If a modKey that we don't support is pressed, we ignore all modkeys.
+
+			int modKeys = pEv->ModKeys();
+			if (modKeys != (modKeys & (m_finetuneModifier | m_axisLockModifier)))
+				modKeys = 0;
+
+
+			if (pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() & m_overrideModifier) != m_overrideModifier) )
 			{
 				WgCoordF	fraction;
 
@@ -688,7 +786,7 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 					WgCoordF movement;
 					
 
-					if (pEv->ModKeys() == m_finetuneModifier)
+					if (modKeys & m_finetuneModifier)
 					{
 						int pixelStepSize = m_finetuneStepSize == 0 ? 1 : m_finetuneStepSize * m_scale / WG_SCALE_BASE;
 						WgCoordF stepIncrement;
@@ -720,7 +818,44 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 						m_finetuneRemainder = { 0,0 };
 					}
 
-					m_dragFraction += movement;
+					if (modKeys & m_axisLockModifier && slider.is2D)
+					{
+						switch (m_axisLockState)
+						{
+						case AxisLockState::Unlocked:
+						{
+							m_axisLockPosition = pEv->PrevPixelPos();
+							m_axisLockFraction = m_dragFraction;
+							m_axisLockState = AxisLockState::Locking;
+							break;
+						}
+
+						case AxisLockState::Locking:
+						{
+							WgCoord drag = pEv->CurrPixelPos() - m_axisLockPosition;
+							drag.x = abs(drag.x);
+							drag.y = abs(drag.y);
+
+							if (drag.x >= 3 && drag.x > drag.y * 2)
+								m_axisLockState = AxisLockState::Horizontal;
+							else if (drag.y >= 3 && drag.y > drag.x * 2)
+								m_axisLockState = AxisLockState::Vertical;
+							break;
+						}
+						case AxisLockState::Horizontal:
+							m_dragFraction.x += movement.x;
+							break;
+						case AxisLockState::Vertical:
+							m_dragFraction.y += movement.y;
+							break;
+						default:
+							assert(false);							// Should never get here...
+						}
+					}
+					else
+					{
+						m_dragFraction += movement;
+					}
 
 					fraction = m_dragStartFraction + m_dragFraction;
 
@@ -770,7 +905,7 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 								else
 									_setHandlePosition(slider, fraction);
 
-								if (pEv->ModKeys() == m_finetuneModifier)
+								if (modKeys & m_finetuneModifier)
 								{
 									_selectSliderHandle(&slider);
 									break;										// Only one can be selected to finetune.
@@ -820,6 +955,7 @@ void WgMultiSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 
 	WgRect contentCanvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
 
+
 	for (auto& slider : m_sliders)
 	{
 		WgRect sliderGeo = _sliderGeo(slider, contentCanvas);
@@ -831,8 +967,13 @@ void WgMultiSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 
 			if (bgGeo.IntersectsWith(_clip))
 			{
-				if (pBgSkin->IsStateIdentical(WG_STATE_NORMAL, WG_STATE_SELECTED))
-					pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, _clip, m_scale);
+				WgState	emptyPartState = slider.sliderState;
+				WgState filledPartState = slider.sliderState;
+				filledPartState.setSelected(true);
+
+
+				if (pBgSkin->IsStateIdentical(emptyPartState, filledPartState))
+					pBgSkin->Render(pDevice, emptyPartState, bgGeo, _clip, m_scale);
 				else
 				{
 					WgCoord divider = { sliderGeo.x + (int)(slider.handlePos.x*sliderGeo.w), sliderGeo.y + (int)(slider.handlePos.y*sliderGeo.h) };
@@ -840,40 +981,40 @@ void WgMultiSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 					switch (slider.origo)
 					{
 					case WG_NORTHWEST:
-						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,divider.y - bgGeo.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, divider.y - bgGeo.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
 					case WG_NORTH:
-						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w,divider.y - bgGeo.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x, divider.y, bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w,divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x, divider.y, bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
 					case WG_NORTHEAST:
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,divider.y - bgGeo.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, divider.y - bgGeo.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
 					case WG_EAST:
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,bgGeo.h }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.h }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,bgGeo.h }), m_scale);
+						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.h }), m_scale);
 						break;
 					case WG_SOUTHEAST:
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w, divider.y - bgGeo.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,divider.x - bgGeo.x,bgGeo.y + bgGeo.h - divider.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { divider.x, divider.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w, divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,divider.x - bgGeo.x,bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { divider.x, divider.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
 					case WG_SOUTH:
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w,divider.y - bgGeo.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x, divider.y, bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w,divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x, divider.y, bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
 					case WG_SOUTHWEST:
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w, divider.y - bgGeo.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,divider.x - bgGeo.x,bgGeo.y + bgGeo.h - divider.y }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { divider.x, divider.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w, divider.y - bgGeo.y }), m_scale);
+						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,divider.x - bgGeo.x,bgGeo.y + bgGeo.h - divider.y }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { divider.x, divider.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
 					case WG_WEST:
-						pBgSkin->Render(pDevice, WG_STATE_SELECTED, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,bgGeo.h }), m_scale);
-						pBgSkin->Render(pDevice, WG_STATE_NORMAL, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.h }), m_scale);
+						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,bgGeo.h }), m_scale);
+						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.h }), m_scale);
 						break;
 
 					default:
@@ -942,14 +1083,8 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 {
 	WgCoordF	handlePos;
 
-	int		x = -1;
-	int		y = -1;
-
 	if (slider.is2D)
 	{
-		x = 0;
-		y = 1;
-
 		WgCoordF values;
 
 		values.x = (slider.value[0] - slider.bounds[0].min) / (slider.bounds[0].max - slider.bounds[0].min);
@@ -986,19 +1121,15 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 		{
 		case WG_WEST:
 			handlePos.x = value;
-			x = 0;
 			break;
 		case WG_EAST:
 			handlePos.x = 1.f -value;
-			x = 0;
 			break;
 		case WG_NORTH:
 			handlePos.y = value;
-			y = 0;
 			break;
 		case WG_SOUTH:
 			handlePos.y = 1.f - value;
-			y = 0;
 			break;
         default:
             assert(false);   // Should never get here!
@@ -1007,25 +1138,7 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 
 	// Align position to even step sizes.
 
-	if (x >= 0)
-	{
-		if (slider.bounds[x].steps != 0)
-		{
-			float stepSize = 1.f / (slider.bounds[x].steps - 1);
-			handlePos.x += stepSize / 2;
-			handlePos.x -= fmod(handlePos.x, stepSize);
-		}
-	}
-
-	if (y >= 0)
-	{
-		if (slider.bounds[y].steps != 0)
-		{
-			float stepSize = 1.f / (slider.bounds[y].steps / 1);
-			handlePos.y += stepSize / 2;
-			handlePos.y -= fmod(handlePos.y, stepSize);
-		}
-	}
+	handlePos = _alignPosToStep(slider, handlePos);
 
 	// Limit range
 
@@ -1225,10 +1338,9 @@ float WgMultiSlider::_setValue(Slider& slider, float value, float value2, bool b
 	return value;
 }
 
+//____ _alignPosToStep() ______________________________________________________
 
-//____ _calcSendValue() _______________________________________________________
-
-WgCoordF WgMultiSlider::_calcSendValue(Slider& slider, WgCoordF pos)
+WgCoordF WgMultiSlider::_alignPosToStep(Slider& slider, WgCoordF pos) const
 {
 	// Get parameters controlled by X and Y axies.
 
@@ -1258,12 +1370,15 @@ WgCoordF WgMultiSlider::_calcSendValue(Slider& slider, WgCoordF pos)
 		assert(false);   // Should never get here!
 	}
 
-	// Align position to even step sizes.
-
 	if (x >= 0)
 	{
 		if (slider.bounds[x].steps != 0)
 		{
+//			float stepPos = 1.f / (slider.bounds[x].steps - 1);
+//			float stepSize = 1.f / (slider.bounds[x].steps);
+//			int step = pos.x / stepSize;
+//			pos.x = stepPos * step;
+
 			float stepSize = 1.f / (slider.bounds[x].steps - 1);
 			pos.x += stepSize / 2;
 			pos.x -= fmod(pos.x, stepSize);
@@ -1279,6 +1394,17 @@ WgCoordF WgMultiSlider::_calcSendValue(Slider& slider, WgCoordF pos)
 			pos.y -= fmod(pos.y, stepSize);
 		}
 	}
+
+	return pos;
+}
+
+//____ _calcSendValue() _______________________________________________________
+
+WgCoordF WgMultiSlider::_calcSendValue(Slider& slider, WgCoordF pos)
+{
+	// Align position to even step sizes.
+
+	pos = _alignPosToStep(slider, pos);
 
 	// Limit range
 
@@ -1311,7 +1437,7 @@ WgCoordF WgMultiSlider::_calcSendValue(Slider& slider, WgCoordF pos)
 	}
 	else
 	{
-		if (x >= 0)
+		if (slider.origo == WG_WEST || slider.origo == WG_EAST )
 			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.x;
 		else
 			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.y;
@@ -1349,55 +1475,9 @@ void WgMultiSlider::_sendValue(Slider& slider, float value, float value2)
 
 WgCoordF WgMultiSlider::_setHandlePosition(Slider& slider, WgCoordF pos)
 {
-	// Get parameters controlled by X and Y axies.
-
-	int x = -1;
-	int y = -1;
-
-	switch (slider.origo)
-	{
-	case WG_WEST:
-	case WG_EAST:
-		x = 0;
-		break;
-
-	case WG_NORTH:
-	case WG_SOUTH:
-		y = 0;
-		break;
-
-	case WG_NORTHWEST:
-	case WG_NORTHEAST:
-	case WG_SOUTHEAST:
-	case WG_SOUTHWEST:
-		x = 0;
-		y = 1;
-		break;
-    default:
-        assert(false);   // Should never get here!
-	}
-
 	// Align position to even step sizes.
 
-	if (x >= 0)
-	{
-		if (slider.bounds[x].steps != 0)
-		{
-			float stepSize = 1.f / (slider.bounds[x].steps -1);
-			pos.x += stepSize / 2;
-			pos.x -= fmod(pos.x, stepSize);
-		}
-	}
-
-	if (y >= 0)
-	{
-		if (slider.bounds[y].steps != 0)
-		{
-			float stepSize = 1.f / (slider.bounds[y].steps /1);
-			pos.y += stepSize / 2;
-			pos.y -= fmod(pos.y, stepSize);
-		}
-	}
+	pos = _alignPosToStep(slider, pos);
 
 	// Limit range
 
@@ -1429,7 +1509,7 @@ WgCoordF WgMultiSlider::_setHandlePosition(Slider& slider, WgCoordF pos)
 	}
 	else
 	{
-		if (x >= 0)
+		if (slider.origo == WG_WEST || slider.origo == WG_EAST)
 			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.x;
 		else
 			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.y;
