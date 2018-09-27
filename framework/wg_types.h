@@ -145,7 +145,7 @@ public:
 //	void		set( WgModeEnum state ) { m_state = state; }
 //	WgModeEnum	getEnum() const { return (WgModeEnum) m_state; }
 
-	bool	setEnabled(bool bEnabled) { if(bEnabled) m_state &= ~WG_STATE_DISABLED; else m_state = WG_STATE_DISABLED; return true; }
+	bool	setEnabled(bool bEnabled) { if(bEnabled) m_state &= ~WG_STATE_DISABLED; else m_state = (m_state & WG_STATE_SELECTED) | WG_STATE_DISABLED; return true; }
 	bool	setSelected(bool bSelected) { if( m_state == WG_STATE_DISABLED ) return false; if(bSelected) m_state |= WG_STATE_SELECTED; else m_state &= ~WG_STATE_SELECTED; return true; }
 	bool	setFocused(bool bFocused) { if( m_state == WG_STATE_DISABLED ) return false; if(bFocused) m_state |= WG_STATE_FOCUSED; else m_state &= ~WG_STATE_FOCUSED; return true; }
 	bool	setHovered(bool bHovered) { if( m_state == WG_STATE_DISABLED ) return false; if(bHovered) m_state |= WG_STATE_HOVERED; else m_state &= ~WG_STATE_PRESSED; return true; }
@@ -162,6 +162,12 @@ public:
 	inline bool operator!=(WgStateEnum state) const { return m_state != state; }
 
 	inline void operator=(WgStateEnum state) { m_state = state; }
+
+	inline WgState operator+(WgStateEnum state) const { int s = m_state | state; if (s & WG_STATE_DISABLED) s &= WG_STATE_DISABLED_SELECTED; return (WgStateEnum) s; }
+	inline WgState operator-(WgStateEnum state) const { int s = (m_state & ~state); if ((s & WG_STATE_HOVERED) == 0) s &= ~WG_STATE_PRESSED; return (WgStateEnum)s; }
+
+	inline WgState& operator+=(WgStateEnum state) { m_state |= state; if (m_state & WG_STATE_DISABLED) m_state &= WG_STATE_DISABLED_SELECTED; return *this; }
+	inline WgState& operator-=(WgStateEnum state) { m_state &= ~state; if ((m_state & WG_STATE_HOVERED) == 0) m_state &= ~WG_STATE_PRESSED; return *this; }
 
 	operator WgStateEnum() const { return (WgStateEnum) m_state; }
 
