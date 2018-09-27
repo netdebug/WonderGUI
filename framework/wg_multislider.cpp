@@ -625,7 +625,14 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				if(p)
 					_markSliderHandle(p);
 				else
-					_markSliderBg( _markedSlider(pEvent->PointerPixelPos()) );
+				{
+					p = _markedSlider(pEvent->PointerPixelPos());
+
+					if(m_bGhostHandle)
+						_markSliderHandle(p);		// In ghost mode we let handle get hover state along with slider background.
+					else
+						_markSliderBg(p);
+				}
 
 			}
 			_updatePointerStyle(pEvent->PointerPixelPos());
@@ -640,7 +647,7 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 			const WgEvent::MouseButtonPress * pEv = static_cast<const WgEvent::MouseButtonPress*>(pEvent);
 			WgCoord	pointerPos = pEvent->PointerPixelPos();
 
-			if (pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() & m_overrideModifier) != m_overrideModifier) )
+			if (pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() != m_overrideModifier)) )
 			{
 				GrabFocus();
 
@@ -662,6 +669,11 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 					{
 						_selectSliderBg(pMarked);
 
+						if (m_bGhostHandle || m_pressMode == PressMode::MultiSetValue )
+						{
+							pMarked->handleState.setPressed(true);	// We let handle get pressed state along with background.
+							_requestRenderHandle(pMarked);
+						}
 						// Convert the press offset to fraction.
 
 						WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
@@ -676,17 +688,11 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 								_setHandlePosition(*pMarked, relPos);
 						}
 
-						// In SetValue mode we actually select the handle
-
 						if (m_pressMode == PressMode::SetValue)
 						{
-							WgRect sliderGeo = _sliderGeo(*pMarked, PixelSize());
-							WgRect handleGeo = _sliderHandleGeo(*pMarked, sliderGeo);
-
-							WgCoordF handleHotspot = pMarked->handleHotspot.x == -1.f ? m_defaultHandleHotspot : pMarked->handleHotspot;
-
-							_selectSliderHandle(pMarked);
+							_selectSliderHandle(pMarked);				// In SetValue mode we actually select the handle
 						}
+
 					}
 				}
 			}
@@ -771,7 +777,7 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				modKeys = 0;
 
 
-			if (pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() & m_overrideModifier) != m_overrideModifier) )
+			if (pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() != m_overrideModifier)) )
 			{
 				WgCoordF	fraction;
 

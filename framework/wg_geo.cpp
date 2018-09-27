@@ -25,6 +25,7 @@
 //#include <wg_blockset.h>
 
 #include <utility>
+#include <algorithm>
 
 //____ WgBorders::Scale() ____________________________________________________
 
@@ -352,7 +353,7 @@ bool WgRect::ClipLine(WgCoord * p1, WgCoord* p2, int precision) const
 	// Calculate both angles now before we destroy precision
 
 	int angleX = ((p2->y - p1->y) << precision) / (1 + p2->x - p1->x);		// Change in Y for each increase of X.
-	int angleY = ((p2->x - p1->x) << precision) / (1 + abs(p2->y - p1->y));		// Change in X for each increase of Y.
+	int angleY = ((p2->x - p1->x) << precision) / (1 + std::abs(p2->y - p1->y));		// Change in X for each increase of Y.
 
 	// Clip line so no coord is outside rectangles x-dimensions
 

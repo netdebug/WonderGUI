@@ -24,6 +24,7 @@
 #include <wg3_geo.h>
 
 #include <utility>
+#include <algorithm>
 
 namespace wg 
 {

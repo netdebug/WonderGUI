@@ -141,6 +141,7 @@ public:
 	bool	IsDeltaDrag() const { return m_bDeltaDrag;  }
 
 	void	SetGhostHandle(bool bGhost);						// Handle is not pressable, only background. Can be useful in some press-modes.
+																// In ghost-mode, handle will also get hover and press states when slider is hovered/pressed.
 	bool	IsGhostHandle() const { return m_bGhostHandle; }
 
 	void	SetSkin(const WgSkinPtr& pSkin);

@@ -534,8 +534,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	WgEventLogger * pEventLogger = new WgEventLogger(std::cout);
 	pEventLogger->LogAllEvents();
 	pEventLogger->IgnoreEvent(WG_EVENT_TICK);
-	pEventLogger->IgnoreEvent(WG_EVENT_MOUSE_POSITION);
-	pEventLogger->IgnoreEvent(WG_EVENT_MOUSE_MOVE);
+//	pEventLogger->IgnoreEvent(WG_EVENT_MOUSE_POSITION);
+//	pEventLogger->IgnoreEvent(WG_EVENT_MOUSE_MOVE);
 	pEventLogger->IgnoreEvent(WG_EVENT_MOUSEBUTTON_REPEAT);
 
 	//	pEventLogger->IgnoreEvent( WG_EVENT_MOUSE_POSITION );
@@ -1078,6 +1078,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pMultiSlider->SetModifierKeys(WG_MODKEY_CTRL, WG_MODKEY_SHIFT, WG_MODKEY_ALT );
 
+	pMultiSlider->SetGhostHandle(false);
+
 //	pMultiSlider->SetPassive(true);
 
 //	pMultiSlider->SetCallback([pMultiSlider](int sliderId, float value, float value2) 
@@ -1156,7 +1158,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pFlex->SetScale(WG_SCALE_BASE * 2);
 
 
-	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::SetValue);
+	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::MultiSetValue);
 
 	pMultiSlider->SetSkin(WgColorSkin::Create(WgColor::blanchedalmond));
 
