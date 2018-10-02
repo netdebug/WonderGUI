@@ -91,6 +91,8 @@ public:
 
 	virtual ~WgGfxDevice();
 
+	wg::GfxDevice * RealDevice() const { return m_pRealDevice.rawPtr(); }
+
 	void			SetTintColor( WgColor color );
 	bool			SetBlendMode( WgBlendMode blendMode );
 //	virtual Uint32	SetRenderFlags( Uint32 flags );

@@ -125,6 +125,8 @@ namespace wg
 
 		void	clipDrawHorrWave(const Rect&clip, Coord begin, int length, const WaveLine * PTopBorder, const WaveLine * pBottomBorder, Color frontFill, Color backFill);
 
+		void	clipDrawElipse(const Rect&clip, const RectF& canvas, float thickness, Color fill, float outlineThickness = 0, Color outlineColor = Color::Black);
+
 
 		struct ColTrans
 		{

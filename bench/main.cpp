@@ -49,6 +49,8 @@
 #include <wg_popuplayer.h>
 #include <wg_blockset.h>
 
+#include <wg3_softgfxdevice.h>
+
 #include "testwidget.h"
 
 //#define USE_OPEN_GL
@@ -415,20 +417,25 @@ int main ( int argc, char** argv )
 #ifndef USE_OPEN_GL
 		SDL_LockSurface( pScreen );
 #endif
-/*
+
 		g_pGfxDevice->BeginRender();
 
-		g_pGfxDevice->Fill(WgSize(width,height), WgColor::black);
+		g_pGfxDevice->Fill(WgSize(width,height), WgColor::brown);
+		g_pGfxDevice->Fill({ 10,10,100,50 }, WgColor::black);
 
-		g_pGfxDevice->ClipDrawHorrWave({ 10,100,380,500 }, { 0,500 }, 1900, topLine, bottomLine, WgColor::red, WgColor::red);
+		wg::SoftGfxDevice * pSoftDevice = (wg::SoftGfxDevice*)g_pGfxDevice->RealDevice();
+
+		pSoftDevice->clipDrawElipse({ 11,0,98,200 }, { 10.5f,10,99,100 }, 15.f, wg::Color::CornflowerBlue, 4.f, wg::Color::White);
+
+		// g_pGfxDevice->ClipDrawHorrWave({ 10,100,380,500 }, { 0,500 }, 1900, topLine, bottomLine, WgColor::red, WgColor::red);
 
 		//		pGfxDevice->stretchBlitSubPixelWithInvert(pMyCanvas, 0,0,400,400, 0,0, 200, 200 );
 		//		pGfxDevice->blit(pMyCanvas, { 0,0,400,400 }, { 0,0 });
 		//		pGfxDevice->stretchBlit(pMyCanvas, { 0,0,400,400 }, { 0,0,200,200 });
 		g_pGfxDevice->EndRender();
-*/
 
-		pRoot->Render();
+
+//		pRoot->Render();
 
 #ifndef USE_OPEN_GL
 		SDL_UnlockSurface( pScreen );
