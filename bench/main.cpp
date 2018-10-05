@@ -79,6 +79,9 @@ WgFlexPanel * createPresetSelector();
 void updateOscilloscope( WgOscilloscope * pOsc, int ofs, float width, float amplitude );
 
 
+bool		g_bLeftPressed = false;
+bool		g_bRightPressed = false;
+
 WgModalLayer * g_pModal = 0;
 
 WgWidget * pWidgetToMove = 0;
@@ -421,11 +424,34 @@ int main ( int argc, char** argv )
 		g_pGfxDevice->BeginRender();
 
 		g_pGfxDevice->Fill(WgSize(width,height), WgColor::brown);
-		g_pGfxDevice->Fill({ 10,10,100,50 }, WgColor::black);
+//		g_pGfxDevice->Fill({ 10,10,100,100 }, WgColor::black);
+//		g_pGfxDevice->Fill({ 120,10,100,100 }, WgColor::black);
+//		g_pGfxDevice->Fill({ 230,10,100,100 }, WgColor::black);
 
 		wg::SoftGfxDevice * pSoftDevice = (wg::SoftGfxDevice*)g_pGfxDevice->RealDevice();
 
-		pSoftDevice->clipDrawElipse({ 11,0,98,200 }, { 10.5f,10,99,100 }, 15.f, wg::Color::CornflowerBlue, 4.f, wg::Color::White);
+		static float cnt = -70.f;
+
+
+
+
+		g_pGfxDevice->Fill(WgSize(600, 400), WgColor::brown);
+		pSoftDevice->clipDrawElipse({ 0,0,600,400 }, { 100.0f+cnt,100.0f+cnt,100+cnt,100+cnt }, 5.f, wg::Color::CornflowerBlue, 3.f, wg::Color::White);
+
+//		pSoftDevice->clipDrawElipse({ 0,0,600,400 }, { 70.9996414f,70.9996414f,160.999634,160.999634 }, 5.f, wg::Color::CornflowerBlue, 3.f, wg::Color::White);
+
+		if( g_bRightPressed )
+			cnt += 0.1;
+
+		if (g_bLeftPressed)
+			cnt -= 0.1;
+
+		if (cnt > 350)
+			cnt = 0;
+
+//		pSoftDevice->clipDrawElipse({ 120,0,200,200 }, { 120.0f,10.5f,99,100 }, 15.f, wg::Color::CornflowerBlue, 4.f, wg::Color::White);
+
+//		pSoftDevice->clipDrawElipse({ 230,0,200,200 }, { 230.0f,10.9f,99,100 }, 15.f, wg::Color::CornflowerBlue, 4.f, wg::Color::White);
 
 		// g_pGfxDevice->ClipDrawHorrWave({ 10,100,380,500 }, { 0,500 }, 1900, topLine, bottomLine, WgColor::red, WgColor::red);
 
@@ -1872,6 +1898,18 @@ bool eventLoop( WgEventHandler * pHandler )
 				// exit if ESCAPE is pressed
 //				if (event.key.keysym.sym == SDLK_ESCAPE)
 //					return false;
+
+				if (event.key.keysym.sym == SDLK_RIGHT)
+					g_bRightPressed = true;
+				else
+					g_bRightPressed = false;
+
+				if (event.key.keysym.sym == SDLK_LEFT)
+					g_bLeftPressed = true;
+				else
+					g_bLeftPressed = false;
+
+				break;
 			}
 		}
 		sdl_wglib::TranslateEvent( event );

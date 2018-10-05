@@ -2133,98 +2133,133 @@ namespace wg
 
 		int samplePoints = clip.w + 1;
 
-		int bufferSize = samplePoints * sizeof(int) * 4;		// length+1 * sizeof(int) * 4 separate traces.
+		int bufferSize = samplePoints * sizeof(int) * 4 * 2;		// length+1 * sizeof(int) * 4 separate traces * 2 halves.
 		int * pBuffer = (int*) Base::memStackAlloc(bufferSize);
 
-		// Do upper half line traces.
+		// Do line traces.
 
 		int yAdjust = center.y & 0xFF;						// Compensate for center not being on pixel boundary.
 		int centerOfs = center.x - (outerRect.x << 8);		
 
 		for (int edge = 0; edge < 4; edge++)
 		{
-			int * pOut = pBuffer + samplePoints * edge;
+			int * pOutUpper = pBuffer + samplePoints * edge;
+			int * pOutLower = pBuffer + samplePoints * edge + samplePoints * 4;
 
-			int xStart = (centerOfs - radiusX[edge] + 255) >> 8;		// First pixel-edge inside curve.
-			int xMid = centerOfs >> 8;								// Pixel edge on or right before center.
-			int xEnd = (centerOfs + radiusX[edge]) >> 8;				// Last pixel-edge inside curve.
-
-			int curveInc = (65536*4 * (c_nCurveTabEntries-1) / radiusX[edge]) << (8-2);
-			int curvePos = (((centerOfs - radiusX[edge]) & 0xFF) * curveInc) >> 8;
-
-			if ( clipLeft > 0 )
+			if (radiusX[edge] <= 0)
 			{
-				xStart -= clipLeft;
-				xMid -= clipLeft;
-				xEnd -= clipLeft;
-
-				if (xStart < 0)
-					curvePos += (-xStart) * curveInc;
+				for (int sample = 0; sample < samplePoints; sample++ )
+				{
+					pOutUpper[sample] = 0;
+					pOutLower[sample] = 0;
+				}
 			}
-
-			if (xEnd >= samplePoints)
-				xEnd = samplePoints-1;
-
-			int sample = 0;
-			while (sample < xStart)
-				pOut[sample++] = 0;
-
-			while( sample <= xMid )
+			else
 			{
-				int i = curvePos >> 16;
-				uint32_t f = curvePos & 0xFFFF;
+				int xStart = (centerOfs - radiusX[edge] + 255) >> 8;		// First pixel-edge inside curve.
+				int xMid = centerOfs >> 8;								// Pixel edge on or right before center.
+				int xEnd = (centerOfs + radiusX[edge]) >> 8;				// Last pixel-edge inside curve.
 
 
-				uint32_t heightFactor = (s_pCurveTab[i] * (65535 - f) + s_pCurveTab[i + 1] * f) >> 16;
-				int height = radiusY[edge] * heightFactor/65536 - yAdjust;
+				int curveInc = (int)(((int64_t)65536) * 256 * (c_nCurveTabEntries - 1) / radiusX[edge]); // Keep as many decimals as possible, this is important!
+				int curvePos = (((radiusX[edge] - centerOfs) & 0xFF) * ((int64_t)curveInc)) >> 8;
 
-				pOut[sample++] = height;
-				curvePos += curveInc;
+				if (clipLeft > 0)
+				{
+					xStart -= clipLeft;
+					xMid -= clipLeft;
+					xEnd -= clipLeft;
+
+					if (xStart < 0)
+						curvePos += (-xStart) * curveInc;
+				}
+
+				if (xEnd >= samplePoints)
+					xEnd = samplePoints - 1;
+
+				int sample = 0;
+				while (sample < xStart)
+				{
+					pOutUpper[sample] = 0;
+					pOutLower[sample++] = 0;
+				}
+
+				while (sample <= xMid)
+				{
+					int i = curvePos >> 16;
+					uint32_t f = curvePos & 0xFFFF;
+
+					uint32_t heightFactor = (s_pCurveTab[i] * (65535 - f) + s_pCurveTab[i + 1] * f) >> 16;
+					int height = radiusY[edge] * heightFactor / 65536;
+
+					pOutUpper[sample] = height - yAdjust;
+					pOutLower[sample++] = height + yAdjust;
+					curvePos += curveInc;
+				}
+
+				curvePos = (c_nCurveTabEntries - 1) * 65536 * 2 - curvePos;
+
+				while (sample <= xEnd)
+				{
+					int i = curvePos >> 16;
+					uint32_t f = curvePos & 0xFFFF;
+
+					uint32_t heightFactor = (s_pCurveTab[i] * (65535 - f) + s_pCurveTab[i + 1] * f) >> 16;
+					int height = radiusY[edge] * heightFactor / 65536;
+
+					pOutUpper[sample] = height - yAdjust;
+					pOutLower[sample++] = height + yAdjust;
+					curvePos -= curveInc;
+				}
+
+				while (sample < samplePoints)
+				{
+					pOutUpper[sample] = 0;
+					pOutLower[sample++] = 0;
+				}
+
+				// Take care of left and right edges that needs more calculations to get the angle right.
+
+				int pixFracLeft = (xStart << 8) - (centerOfs - radiusX[edge]);
+				int pixFracRight = (centerOfs + radiusX[edge]) & 0xFF;
+
+				if (pixFracLeft > 0 && xStart > 0)
+				{
+					pOutUpper[xStart - 1] = pOutUpper[xStart] - (pOutUpper[xStart] + yAdjust) * 256 / pixFracLeft;
+					pOutLower[xStart - 1] = pOutLower[xStart] - (pOutLower[xStart] - yAdjust) * 256 / pixFracLeft;
+				}
+				if (pixFracRight > 0 && xEnd < samplePoints - 1)
+				{
+					pOutUpper[xEnd + 1] = pOutUpper[xEnd] - (pOutUpper[xEnd] + yAdjust) * 256 / pixFracRight;
+					pOutLower[xEnd + 1] = pOutLower[xEnd] - (pOutLower[xEnd] - yAdjust) * 256 / pixFracRight;
+				}
+
 			}
-
-			curvePos = (c_nCurveTabEntries-1) * 65536 * 2 - curvePos;
-
-			while (sample <= xEnd)
-			{
-				int i = curvePos >> 16;
-				uint32_t f = curvePos & 0xFFFF;
-
-				uint32_t heightFactor = (s_pCurveTab[i] * (65535 - f) + s_pCurveTab[i + 1] * f) >> 16;
-				int height = radiusY[edge] * heightFactor/65536 - yAdjust;
-
-				pOut[sample++] = height;
-				curvePos -= curveInc;
-			}
-
-			while( sample < samplePoints )
-				pOut[sample++] = 0;
-
-			// Take care of left and right edges that needs more calculations to get the angle right.
-
-			int pixFracLeft = (xStart<<8) - (centerOfs - radiusX[edge]);
-			int pixFracRight = (centerOfs + radiusX[edge]) & 0xFF;
-
-			if( pixFracLeft > 0 && xStart > 0 )
-				pOut[xStart - 1] = pOut[xStart] - pOut[xStart] * 256 / pixFracLeft;
-			if( pixFracRight > 0 && xEnd < samplePoints-1 )
-				pOut[xEnd + 1] = pOut[xEnd] -pOut[xEnd] * 256 / pixFracRight;
-
 		}
 
 		// Render columns
 
 
-		uint8_t * pColumn = m_pCanvasPixels + outerRect.y * m_canvasPitch + clip.x * (m_canvasPixelBits / 8);
 		int pos[2][4];						// Startpositions for the 4 fields of the column (topline, fill, bottomline, line end) for left and right edge of pixel column. 16 binals.
 
-		int clipBeg = clip.y - outerRect.y;
-		int clipLen = clip.h;
+		int yMid = (center.y & 0xFFFFFF00) - outerRect.y * 256;
+
+
+		int clipY1 = clip.y - outerRect.y;
+		int clipY2 = min(clip.y + clip.h - outerRect.y, yMid >> 8);
+		int clipY3 = clip.y + clip.h - outerRect.y;
 
 		Color	col[3];
 		col[0] = outlineColor;
 		col[1] = fillColor;
 		col[2] = outlineColor;
 
+		// Render upper half
+
+		int clipBeg = clipY1;
+		int clipLen = clipY2 - clipY1;
+
+		uint8_t * pColumn = m_pCanvasPixels + outerRect.y * m_canvasPitch + clip.x * (m_canvasPixelBits / 8);
 
 		for ( int i = 0; i < samplePoints; i++ )
 		{
@@ -2235,11 +2270,43 @@ namespace wg
 
 			// Generate new rightpos table
 
-			pRightPos[0] = (radiusY[0] - pBuffer[i]) << 8;
-			pRightPos[1] = (radiusY[0] - pBuffer[i+samplePoints]) << 8;
+			pRightPos[0] = (yMid - pBuffer[i]) << 8;
+			pRightPos[1] = (yMid - pBuffer[i+samplePoints]) << 8;
 
-			pRightPos[2] = (radiusY[0] - pBuffer[i + samplePoints*2]) << 8;
-			pRightPos[3] = (radiusY[0] - pBuffer[i + samplePoints*3]) << 8;
+			pRightPos[2] = (yMid - pBuffer[i + samplePoints*2]) << 8;
+			pRightPos[3] = (yMid - pBuffer[i + samplePoints*3]) << 8;
+
+			// Render the column
+
+			if (i > 0)
+			{
+				WaveOp_p pOp = s_waveOpTab[(int)m_blendMode][(int)m_pCanvas->pixelFormat()];
+				pOp(clipBeg, clipLen, pColumn, pLeftPos, pRightPos, col, m_canvasPitch);
+				pColumn += m_canvasPixelBits / 8;
+			}
+		}
+
+		// Render lower half
+
+		clipBeg = clipY2;
+		clipLen = clipY3 - clipY2;
+
+		pColumn = m_pCanvasPixels + outerRect.y * m_canvasPitch + clip.x * (m_canvasPixelBits / 8);
+
+		for (int i = 0; i < samplePoints; i++)
+		{
+			// Old right pos becomes new left pos and old left pos will be reused for new right pos
+
+			int * pLeftPos = pos[i % 2];
+			int * pRightPos = pos[(i + 1) % 2];
+
+			// Generate new rightpos table
+
+			pRightPos[3] = (yMid + pBuffer[i + samplePoints * 4]) << 8;
+			pRightPos[2] = (yMid + pBuffer[i + samplePoints * 4 + samplePoints]) << 8;
+
+			pRightPos[1] = (yMid + pBuffer[i + samplePoints * 4 + samplePoints * 2]) << 8;
+			pRightPos[0] = (yMid + pBuffer[i + samplePoints * 4 + samplePoints * 3]) << 8;
 
 			// Render the column
 

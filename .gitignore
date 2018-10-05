@@ -7,3 +7,7 @@ Debug/
 *.dll
 
 bench/log\.txt
+
+bench/Release/
+
+Release/
