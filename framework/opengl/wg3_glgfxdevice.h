@@ -91,6 +91,8 @@ namespace wg
 
 		void	clipDrawHorrWave(const Rect&clip, Coord begin, int length, const WaveLine * pTopLine, const WaveLine * pBottomLine, Color front, Color back);
 
+		void	clipDrawElipse(const Rect&clip, const RectF& canvas, float thickness, Color fill, float outlineThickness = 0, Color outlineColor = Color::Black);
+
 
 		void	blit( Surface * src, const Rect& srcrect, Coord dest  ) override;
 

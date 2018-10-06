@@ -175,6 +175,14 @@ void WgGfxDevice::ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length
 	m_pRealDevice->clipDrawHorrWave(_convert(clip), _convert(begin), length, (const wg::WaveLine*) &topBorder, (const wg::WaveLine*) &bottomBorder, _convert(frontFill), _convert(backFill));
 }
 
+//____ ClipDrawElipse() _______________________________________________________
+
+void WgGfxDevice::ClipDrawElipse(const WgRect&clip, const WgRectF& canvas, float thickness, WgColor fill, float outlineThickness, WgColor outlineColor)
+{
+	m_pRealDevice->clipDrawElipse(_convert(clip), _convert(canvas), thickness, _convert(fill), outlineThickness, _convert(outlineColor));
+
+}
+
 //_____ ClipBlitFromCanvas() ______________________________________________________
 
 void WgGfxDevice::ClipBlitFromCanvas(const WgRect& clip, const WgSurface* pSrc, const WgRect& src, int dx, int dy)

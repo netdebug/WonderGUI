@@ -136,6 +136,9 @@ public:
 
 	 void	ClipDrawHorrWave(const WgRect& clip, WgCoord begin, int length, const WgWaveLine& topBorder, const WgWaveLine& bottomBorder, WgColor frontFill, WgColor backFill);
 
+	 void	ClipDrawElipse(const WgRect&clip, const WgRectF& canvas, float thickness, WgColor fill, float outlineThickness = 0, WgColor outlineColor = WgColor::black);
+
+
 	 void	Blit( const WgSurface* pSrc );
 	 void	Blit( const WgSurface* pSrc, int dx, int dy );
 	 void	Blit( const WgSurface* pSrc, const WgRect& src, int dx, int dy );

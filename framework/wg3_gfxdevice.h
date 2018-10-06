@@ -145,6 +145,8 @@ namespace wg
 
 		virtual void	clipDrawHorrWave(const Rect&clip, Coord begin, int length, const WaveLine * pTopBorder, const WaveLine * pBottomBorder, Color frontFill, Color backFill) = 0;
 
+		virtual void	clipDrawElipse(const Rect&clip, const RectF& canvas, float thickness, Color fill, float outlineThickness = 0, Color outlineColor = Color::Black) = 0;
+
 
 		// Special draw methods
 

@@ -134,6 +134,10 @@ namespace wg
 	{
 	}
 
+	void NullGfxDevice::clipDrawElipse(const Rect&clip, const RectF& canvas, float thickness, Color fill, float outlineThickness, Color outlineColor)
+	{
+	}
+
 	void NullGfxDevice::_drawStraightLine(Coord start, Orientation orientation, int _length, const Color& _col)
 	{
 	}

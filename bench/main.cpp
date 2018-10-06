@@ -53,7 +53,7 @@
 
 #include "testwidget.h"
 
-//#define USE_OPEN_GL
+#define USE_OPEN_GL
 
 
 WgSurfaceFactory *	g_pSurfaceFactory = nullptr;
@@ -423,12 +423,10 @@ int main ( int argc, char** argv )
 
 		g_pGfxDevice->BeginRender();
 
-		g_pGfxDevice->Fill(WgSize(width,height), WgColor::brown);
+//		g_pGfxDevice->Fill(WgSize(width,height), WgColor::brown);
 //		g_pGfxDevice->Fill({ 10,10,100,100 }, WgColor::black);
 //		g_pGfxDevice->Fill({ 120,10,100,100 }, WgColor::black);
 //		g_pGfxDevice->Fill({ 230,10,100,100 }, WgColor::black);
-
-		wg::SoftGfxDevice * pSoftDevice = (wg::SoftGfxDevice*)g_pGfxDevice->RealDevice();
 
 		static float cnt = -70.f;
 
@@ -436,7 +434,8 @@ int main ( int argc, char** argv )
 
 
 		g_pGfxDevice->Fill(WgSize(600, 400), WgColor::brown);
-		pSoftDevice->clipDrawElipse({ 0,0,600,400 }, { 100.0f+cnt,100.0f+cnt,100+cnt,100+cnt }, 5.f, wg::Color::CornflowerBlue, 3.f, wg::Color::White);
+		g_pGfxDevice->ClipDrawElipse({ 0,0,600,400 }, { 100.0f+cnt,100.0f+cnt,100+cnt,100+cnt }, 5.f, WgColor::cornflowerblue, 3.f, WgColor::white);
+//		g_pGfxDevice->ClipDrawElipse({ 0,0,600,400 }, { 0,0,100,100 }, 5.f, WgColor::cornflowerblue, 3.f, WgColor::white);
 
 //		pSoftDevice->clipDrawElipse({ 0,0,600,400 }, { 70.9996414f,70.9996414f,160.999634,160.999634 }, 5.f, wg::Color::CornflowerBlue, 3.f, wg::Color::White);
 
