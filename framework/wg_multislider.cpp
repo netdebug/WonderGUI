@@ -457,7 +457,7 @@ void WgMultiSlider::_selectSliderHandle(Slider * pSlider)
 void WgMultiSlider::_setSliderStates(Slider& slider, WgState newSliderState, WgState newHandleState)
 {
 	WgSkin * pSliderSkin = slider.pBgSkin ? slider.pBgSkin.GetRealPtr() : m_pDefaultBgSkin.GetRealPtr();
-	WgSkin * pHandleSkin = slider.pBgSkin ? slider.pHandleSkin.GetRealPtr() : m_pDefaultHandleSkin.GetRealPtr();
+	WgSkin * pHandleSkin = slider.pHandleSkin ? slider.pHandleSkin.GetRealPtr() : m_pDefaultHandleSkin.GetRealPtr();
 
 	if (pSliderSkin && !pSliderSkin->IsStateIdentical(slider.sliderState, newSliderState))
 		_requestRenderSlider(&slider);
@@ -855,7 +855,23 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 						}
 
 						if (m_pressMode == PressMode::SetValue)
+                        {
 							_selectSliderHandle(pMarked);				// In SetValue mode we actually select the handle
+
+                            // HACK:
+                            // In passive mode we need to set dragStartFraction directly since
+                            // slider.handlePos is out of date (waiting to be set externally).
+
+                            if( m_bPassive )
+                            {
+                                relPos = _alignPosToStep(*pMarked, relPos);
+
+                                WG_LIMIT(relPos.x, 0.f, 1.f);
+                                WG_LIMIT(relPos.y, 0.f, 1.f);
+
+                                m_dragStartFraction = relPos;
+                            }
+                        }
 						else
 						{
 							m_selectedSlider = -1;
@@ -967,6 +983,8 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				if (m_selectedSliderHandle >= 0)
 				{
 					Slider& slider = m_sliders[m_selectedSliderHandle];
+
+                    //
 
 					WgRect sliderGeo = _sliderGeo(slider, PixelSize());
 
