@@ -420,24 +420,14 @@ int main ( int argc, char** argv )
 #ifndef USE_OPEN_GL
 		SDL_LockSurface( pScreen );
 #endif
-
+/*
 		g_pGfxDevice->BeginRender();
 
 //		g_pGfxDevice->Fill(WgSize(width,height), WgColor::brown);
-//		g_pGfxDevice->Fill({ 10,10,100,100 }, WgColor::black);
-//		g_pGfxDevice->Fill({ 120,10,100,100 }, WgColor::black);
-//		g_pGfxDevice->Fill({ 230,10,100,100 }, WgColor::black);
 
 		static float cnt = -70.f;
-
-
-
-
 		g_pGfxDevice->Fill(WgSize(600, 400), WgColor::brown);
 		g_pGfxDevice->ClipDrawElipse({ 0,0,600,400 }, { 100.0f+cnt,100.0f+cnt,100+cnt,100+cnt }, 5.f, WgColor::cornflowerblue, 3.f, WgColor::white);
-//		g_pGfxDevice->ClipDrawElipse({ 0,0,600,400 }, { 0,0,100,100 }, 5.f, WgColor::cornflowerblue, 3.f, WgColor::white);
-
-//		pSoftDevice->clipDrawElipse({ 0,0,600,400 }, { 70.9996414f,70.9996414f,160.999634,160.999634 }, 5.f, wg::Color::CornflowerBlue, 3.f, wg::Color::White);
 
 		if( g_bRightPressed )
 			cnt += 0.1;
@@ -448,19 +438,13 @@ int main ( int argc, char** argv )
 		if (cnt > 350)
 			cnt = 0;
 
-//		pSoftDevice->clipDrawElipse({ 120,0,200,200 }, { 120.0f,10.5f,99,100 }, 15.f, wg::Color::CornflowerBlue, 4.f, wg::Color::White);
-
-//		pSoftDevice->clipDrawElipse({ 230,0,200,200 }, { 230.0f,10.9f,99,100 }, 15.f, wg::Color::CornflowerBlue, 4.f, wg::Color::White);
 
 		// g_pGfxDevice->ClipDrawHorrWave({ 10,100,380,500 }, { 0,500 }, 1900, topLine, bottomLine, WgColor::red, WgColor::red);
 
-		//		pGfxDevice->stretchBlitSubPixelWithInvert(pMyCanvas, 0,0,400,400, 0,0, 200, 200 );
-		//		pGfxDevice->blit(pMyCanvas, { 0,0,400,400 }, { 0,0 });
-		//		pGfxDevice->stretchBlit(pMyCanvas, { 0,0,400,400 }, { 0,0,200,200 });
 		g_pGfxDevice->EndRender();
+*/
 
-
-//		pRoot->Render();
+		pRoot->Render();
 
 #ifndef USE_OPEN_GL
 		SDL_UnlockSurface( pScreen );
@@ -1110,6 +1094,8 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pMultiSlider->SetModifierKeys(WG_MODKEY_CTRL, WG_MODKEY_SHIFT, WG_MODKEY_ALT );
 
+	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::MultiSetValue);
+
 	pMultiSlider->SetGhostHandle(false);
 
 //	pMultiSlider->SetPassive(true);
@@ -1189,8 +1175,6 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pFlex->SetScale(WG_SCALE_BASE * 2);
 
-
-	pMultiSlider->SetPressMode(WgMultiSlider::PressMode::MultiSetValue);
 
 	pMultiSlider->SetSkin(WgColorSkin::Create(WgColor::blanchedalmond));
 
