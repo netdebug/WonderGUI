@@ -164,10 +164,11 @@ public:
 	inline void operator=(WgStateEnum state) { m_state = state; }
 
 	inline WgState operator+(WgStateEnum state) const { int s = m_state | state; if (s & WG_STATE_DISABLED) s &= WG_STATE_DISABLED_SELECTED; return (WgStateEnum) s; }
-	inline WgState operator-(WgStateEnum state) const { int s = (m_state & ~state); if ((s & WG_STATE_HOVERED) == 0) s &= ~WG_STATE_PRESSED; return (WgStateEnum)s; }
+	inline WgState operator-(WgStateEnum state) const { if ((state & WG_STATE_PRESSED) == WG_STATE_PRESSED) state = (WgStateEnum)(state & ~WG_STATE_HOVERED); int s = (m_state & ~state); if ((s & WG_STATE_HOVERED) == 0) s &= ~WG_STATE_PRESSED;  return (WgStateEnum)s; }
 
 	inline WgState& operator+=(WgStateEnum state) { m_state |= state; if (m_state & WG_STATE_DISABLED) m_state &= WG_STATE_DISABLED_SELECTED; return *this; }
-	inline WgState& operator-=(WgStateEnum state) { m_state &= ~state; if ((m_state & WG_STATE_HOVERED) == 0) m_state &= ~WG_STATE_PRESSED; return *this; }
+	inline WgState& operator-=(WgStateEnum state) { if ((state & WG_STATE_PRESSED) == WG_STATE_PRESSED) state = (WgStateEnum) (state & ~WG_STATE_HOVERED); m_state &= ~state; if ((m_state & WG_STATE_HOVERED) == 0) m_state &= ~WG_STATE_PRESSED; return *this;
+}
 
 	operator WgStateEnum() const { return (WgStateEnum) m_state; }
 

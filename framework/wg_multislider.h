@@ -228,10 +228,9 @@ protected:
 
 	Slider * _markedSliderHandle(WgCoord ofs, WgCoord * pOfsOutput = nullptr );
 	void	_markSliderHandle(Slider * pSlider);
-	void	_markSliderBg(Slider * pSlider);
 	void	_selectSliderHandle(Slider * pSlider);
-	void	_selectSliderBg(Slider * pSlider);
-	void	_requestRenderHandle(Slider * pSlider);
+	void	_requestRenderSlider(Slider * pSlider);								// Render whole slider (background and handle)
+	void	_requestRenderHandle(Slider * pSlider);								// Render only handle part of slider
 
 	Slider * _markedSlider(WgCoord ofs, WgCoord * pOfsOutput = nullptr);
 
@@ -251,6 +250,7 @@ protected:
 	void		_refreshSliders();
 	void		_refreshSliderGeo();
 	void		_updatePointerStyle(WgCoord pointerPos);
+	void		_updateSliderStates();
 
 	Slider *	_findSlider(int sliderId);
 
@@ -284,6 +284,9 @@ private:
 
 	int					m_selectedSliderHandle = -1;					// Handle selected
 	int					m_selectedSlider = -1;							// Selected slider, when slider but not handle is selected (used in certain modes).
+
+	int					m_hoveredSliderHandle = -1;						// Handle hovered
+	int					m_hoveredSlider = -1;							// Hovered slider, when slider but not handle is hovered.
 
 	WgCoordF			m_dragFraction;									// Accumulated drag movement from dragStartFraction.
 	WgCoordF			m_dragStartFraction;							// Slider handle position in fractions when selected for drag.

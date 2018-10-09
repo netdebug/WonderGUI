@@ -255,14 +255,14 @@ WgCoord WgMultiSlider::HandlePixelPos( int sliderId )
     Slider * p = _findSlider(sliderId);
     if( p )
     {
-        WgRect canvas = m_pSkin ? m_pSkin->ContentRect( PixelSize(), WG_STATE_NORMAL, m_scale ) : WgRect(PixelSize());
+        WgRect canvas = m_pSkin ? m_pSkin->ContentRect( PixelSize(), m_state, m_scale ) : WgRect(PixelSize());
         WgRect sliderGeo = _sliderGeo(*p, canvas);
 
         pos.x = sliderGeo.x + (int)(sliderGeo.w * p->handlePos.x);
         pos.y = sliderGeo.y + (int)(sliderGeo.h * p->handlePos.y);
 
         if( m_pSkin )
-            pos += m_pSkin->ContentOfs( WG_STATE_NORMAL, m_scale );
+            pos += m_pSkin->ContentOfs( m_state, m_scale );
     }
     return pos;
 }
@@ -416,84 +416,24 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSliderHandle(WgCoord ofs, WgCoord 
 	}
 }
 
-//____ _markSliderBg() __________________________________________________________
-
-void WgMultiSlider::_markSliderBg(Slider * pSlider)
-{
-	if (pSlider && pSlider->sliderState.isHovered() && !pSlider->handleState.isHovered())
-		return;											// Already marked bg and unmarked handle, nothing to do.
-
-	// Unmark any previously marked slider
-
-	for (auto& slider : m_sliders)
-	{
-		if (slider.sliderState.isHovered())
-			_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState - WG_STATE_HOVERED);
-	}
-
-	// Mark this slider
-
-	if (pSlider)
-		_setSliderStates(*pSlider, pSlider->sliderState + WG_STATE_HOVERED, pSlider->handleState - WG_STATE_HOVERED);
-}
-
-//____ _selectSliderBg() __________________________________________________________
-
-void WgMultiSlider::_selectSliderBg(Slider * pSlider)
-{
-	if (pSlider && pSlider->sliderState.isSelected() && !pSlider->handleState.isHovered())
-		return;											// Already selected bg and unmarked handle, nothing to do.
-
-	// Unmark any previously marked slider
-
-	for (auto& slider : m_sliders)
-	{
-		if (slider.sliderState.isHovered())
-			_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState - WG_STATE_HOVERED);
-	}
-
-	// Select this slider
-
-	if (pSlider)
-		_setSliderStates(*pSlider, pSlider->sliderState + WG_STATE_PRESSED, pSlider->handleState - WG_STATE_HOVERED);
-}
-
-
 //____ _markSliderHandle() __________________________________________________________
 
 void WgMultiSlider::_markSliderHandle(Slider * pSlider)
 {
-	if (pSlider && pSlider->handleState.isHovered())
-		return;											// Already marked, nothing to do.
-
-	// Unmark any previously marked slider handle
-
-	for (auto& slider : m_sliders)
-	{
-		if (slider.handleState.isHovered() )
-			_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState - WG_STATE_HOVERED);
-	}
-
-	// Mark this slider
-
 	if (pSlider)
-		_setSliderStates(*pSlider, pSlider->sliderState + WG_STATE_HOVERED, pSlider->handleState + WG_STATE_HOVERED);
+		m_hoveredSliderHandle = pSlider - &m_sliders.front();
+	else
+		m_hoveredSliderHandle = -1;
+
+	_updateSliderStates();
 }
 
 //____ _selectSliderHandle() ________________________________________________________
 
 void WgMultiSlider::_selectSliderHandle(Slider * pSlider)
 {
-	if (pSlider && pSlider->handleState.isPressed())
+	if (pSlider && m_selectedSliderHandle == pSlider - &m_sliders.front())
 		return;											// Already selected, nothing to do.
-
-	// Unselect previously selected slider
-
-	if (m_selectedSliderHandle >= 0)
-	{
-		auto p = &m_sliders[m_selectedSliderHandle];
-		_setSliderStates(*p, p->sliderState - WG_STATE_PRESSED, p->handleState - WG_STATE_PRESSED);
-	}
 
 	// Select this slider
 
@@ -505,11 +445,11 @@ void WgMultiSlider::_selectSliderHandle(Slider * pSlider)
 		m_dragStartFraction = pSlider->handlePos;
 		m_finetuneRemainder = { 0,0 };
 		m_selectedSliderHandle = pSlider - &m_sliders.front();
-
-		_setSliderStates(*pSlider, pSlider->sliderState + WG_STATE_PRESSED, pSlider->handleState + WG_STATE_PRESSED);
 	}
 	else
 		m_selectedSliderHandle = -1;
+
+	_updateSliderStates();
 }
 
 //____ _setSliderStates() ___________________________________________________
@@ -519,14 +459,33 @@ void WgMultiSlider::_setSliderStates(Slider& slider, WgState newSliderState, WgS
 	WgSkin * pSliderSkin = slider.pBgSkin ? slider.pBgSkin.GetRealPtr() : m_pDefaultBgSkin.GetRealPtr();
 	WgSkin * pHandleSkin = slider.pBgSkin ? slider.pHandleSkin.GetRealPtr() : m_pDefaultHandleSkin.GetRealPtr();
 
-	if ((pSliderSkin && !pSliderSkin->IsStateIdentical(slider.sliderState, newSliderState)) ||
-		(pHandleSkin && !pHandleSkin->IsStateIdentical(slider.handleState, newHandleState)))
+	if (pSliderSkin && !pSliderSkin->IsStateIdentical(slider.sliderState, newSliderState))
+		_requestRenderSlider(&slider);
+	else if (pHandleSkin && !pHandleSkin->IsStateIdentical(slider.handleState, newHandleState))
 		_requestRenderHandle(&slider);
 
 	slider.sliderState = newSliderState;
 	slider.handleState = newHandleState;
 }
 
+
+//____ _requestRenderSlider() _________________________________________________
+
+void WgMultiSlider::_requestRenderSlider(Slider * pSlider)
+{
+	WgRect sliderGeo = _sliderGeo(*pSlider, PixelSize());
+	WgRect handleGeo = _sliderHandleGeo(*pSlider, sliderGeo);
+
+	WgSkinPtr	pBgSkin = pSlider->pBgSkin ? pSlider->pBgSkin : m_pDefaultBgSkin;
+
+	if (pBgSkin)
+	{
+		WgRect sliderSkinGeo = _sliderSkinGeo(*pSlider, sliderGeo);
+		handleGeo.GrowToContain(sliderSkinGeo);
+	}
+
+	_requestRender(handleGeo);
+}
 
 //____ _requestRenderHandle() _________________________________________________
 
@@ -535,16 +494,9 @@ void WgMultiSlider::_requestRenderHandle(Slider * pSlider)
 	WgRect sliderGeo = _sliderGeo(*pSlider, PixelSize());
 	WgRect handleGeo = _sliderHandleGeo(*pSlider, sliderGeo);
 
-	WgSkinPtr	pBgSkin = pSlider->pBgSkin ? pSlider->pBgSkin : m_pDefaultBgSkin;
-
-	if (pBgSkin && !pBgSkin->IsStateIdentical(WG_STATE_NORMAL, WG_STATE_SELECTED))
-	{
-		WgRect sliderSkinGeo = _sliderSkinGeo(*pSlider, sliderGeo);
-		handleGeo.GrowToContain(sliderSkinGeo);
-	}
-
 	_requestRender(handleGeo);
 }
+
 
 //____ _ updatePointerStyle() _________________________________________________
 
@@ -583,6 +535,209 @@ void WgMultiSlider::_updatePointerStyle(WgCoord pointerOfs)
 		m_pointerStyle = WG_POINTER_DEFAULT;
 }
 
+//____ _updateSliderStates() __________________________________________________
+
+void WgMultiSlider::_updateSliderStates()
+{
+
+	if (!m_state.isEnabled())
+	{
+		for (auto& slider : m_sliders)
+		{
+			if (slider.sliderState.isEnabled())
+				_setSliderStates(slider, WG_STATE_DISABLED, WG_STATE_DISABLED);
+		}
+		return;
+	}
+
+	// Update sliderStates (states for background)
+
+	if (m_selectedSlider >= 0 || m_selectedSliderHandle >= 0)
+	{
+		// Fullfills the following rules:
+		// 1. If some HANDLE is SELECTED -> That sliders background is PRESSED, no other background is HOVERED.
+		// 2. If some SLIDER is PRESSED->That sliders background is PRESSED, no other background is HOVERED.
+
+		Slider& selected = m_sliders[m_selectedSliderHandle >= 0 ? m_selectedSliderHandle : m_selectedSlider];
+		for ( auto& slider : m_sliders )
+		{
+			if (&slider == &selected)
+			{
+				if(!slider.sliderState.isPressed() )
+					_setSliderStates(slider, slider.sliderState + WG_STATE_PRESSED, slider.handleState );
+			}
+			else
+			{
+				if( slider.sliderState.isHovered())
+					_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+			}
+		}
+
+	}
+	else if (m_pressMode == PressMode::MultiSetValue && m_state.isPressed())
+	{
+		// Fullfills the following rules:
+		// 3. If DRAW MODE and mouse pressed over background or handle->background is PRESSED.
+
+		if (m_hoveredSlider >= 0 || m_hoveredSliderHandle >= 0)
+		{
+			Slider& hovered = m_sliders[m_hoveredSliderHandle >= 0 ? m_hoveredSliderHandle : m_hoveredSlider];
+			for (auto& slider : m_sliders)
+			{
+				if (&slider == &hovered)
+				{
+					if (!slider.sliderState.isPressed())
+						_setSliderStates(slider, slider.sliderState + WG_STATE_PRESSED, slider.handleState);
+				}
+				else
+				{
+					if (slider.sliderState.isHovered())
+						_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+				}
+			}
+		}
+		else
+		{
+			for (auto& slider : m_sliders)
+			{
+				if (slider.sliderState.isHovered())
+					_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+			}
+		}
+	}
+	else
+	{
+		// Fullfills the following rules:
+		// 4. If mouse over selection area OR handle->That sliders background is HOVERED.
+
+		if( m_hoveredSlider >= 0 || m_hoveredSliderHandle >= 0 )
+		{
+			Slider& hovered = m_sliders[m_hoveredSliderHandle >= 0 ? m_hoveredSliderHandle : m_hoveredSlider];
+			for (auto& slider : m_sliders)
+			{
+				if (&slider == &hovered)
+				{
+					if( slider.sliderState.isPressed() )
+						_setSliderStates(slider, slider.sliderState - WG_STATE_PRESSED, slider.handleState);
+					else if (!slider.sliderState.isHovered())
+						_setSliderStates(slider, slider.sliderState + WG_STATE_HOVERED, slider.handleState);
+				}
+				else
+				{
+					if (slider.sliderState.isHovered())
+						_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+				}
+			}
+		}
+		else
+		{
+			for (auto& slider : m_sliders)
+			{
+				if (slider.sliderState.isHovered())
+					_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+			}
+		}
+	}
+
+	// Update handle states
+
+	if (m_bGhostHandle)
+	{
+		// Fullfills the following rules:
+		// 1. If GHOST mode->All handles follows their backgrounds states.
+
+		for (auto& slider : m_sliders)
+		{
+			if( slider.handleState != slider.sliderState )
+				_setSliderStates(slider, slider.sliderState, slider.sliderState);
+		}
+	}
+	else if (m_selectedSliderHandle >= 0)
+	{
+		// Fullfills the following rules:
+		// 2. If a handle is SELECTED->That handle is PRESSED, no other handle is HOVERED.
+
+		Slider& selected = m_sliders[m_selectedSliderHandle];
+		for (auto& slider : m_sliders)
+		{
+			if (&slider == &selected)
+			{
+				if (!slider.handleState.isPressed())
+					_setSliderStates(slider, slider.sliderState, slider.handleState + WG_STATE_PRESSED );
+			}
+			else
+			{
+				if (slider.handleState.isHovered())
+					_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+			}
+		}
+
+	}
+	else if (m_pressMode == PressMode::MultiSetValue && m_state.isPressed())
+	{
+		// Fullfills the following rules:
+		// 3. If DRAW MODE and mouse pressed over background or handle-> handle is PRESSED.
+
+		if (m_hoveredSliderHandle >= 0)
+		{
+			Slider& hovered = m_sliders[m_hoveredSliderHandle];
+			for (auto& slider : m_sliders)
+			{
+				if (&slider == &hovered)
+				{
+					if (!slider.handleState.isPressed())
+						_setSliderStates(slider, slider.sliderState, slider.handleState + WG_STATE_PRESSED );
+				}
+				else
+				{
+					if (slider.handleState.isHovered())
+						_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+				}
+			}
+		}
+		else
+		{
+			for (auto& slider : m_sliders)
+			{
+				if (slider.handleState.isHovered())
+					_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+			}
+		}
+	}
+
+	else if (m_hoveredSliderHandle >= 0)
+	{
+		// Fullfills the following rules:
+		// 4. If a handle is HOVERED->That handle is HOVERED.
+
+		Slider& hovered = m_sliders[m_hoveredSliderHandle];
+		for (auto& slider : m_sliders)
+		{
+			if (&slider == &hovered)
+			{
+				if (slider.handleState.isPressed())
+					_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_PRESSED);
+				if (!slider.handleState.isHovered())
+					_setSliderStates(slider, slider.sliderState, slider.handleState + WG_STATE_HOVERED);
+			}
+			else
+			{
+				if (slider.handleState.isHovered())
+					_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+			}
+		}
+	}
+	else
+	{
+		for (auto& slider : m_sliders)
+		{
+			if (slider.handleState.isHovered())
+				_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+		}
+	}
+}
+
+
 //____ _onEvent() _____________________________________________________________
 
 void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHandler)
@@ -612,11 +767,19 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 
 		case WG_EVENT_MOUSE_LEAVE:
-			if(m_selectedSliderHandle == -1)
-				_markSliderBg(nullptr);
+			m_state.setHovered(false);
+
+			if (m_selectedSliderHandle == -1)
+			{
+				m_hoveredSlider = -1;
+				m_hoveredSliderHandle = -1;
+				_updateSliderStates();
+			}
 			break;
 
 		case WG_EVENT_MOUSE_ENTER:
+			m_state.setHovered(true);
+												// No break on purpose!
 		case WG_EVENT_MOUSE_MOVE:
 			if (m_selectedSliderHandle == -1)
 			{
@@ -626,14 +789,17 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 					_markSliderHandle(p);
 				else
 				{
+					m_hoveredSlider = -1;
+					m_hoveredSliderHandle = -1;
+
 					p = _markedSlider(pEvent->PointerPixelPos());
-
-					if(m_bGhostHandle)
-						_markSliderHandle(p);		// In ghost mode we let handle get hover state along with slider background.
+					if (p)
+						m_hoveredSlider = p - &m_sliders.front();
 					else
-						_markSliderBg(p);
-				}
+						int dbg = 1;
 
+					_updateSliderStates();
+				}
 			}
 			_updatePointerStyle(pEvent->PointerPixelPos());
 			break;
@@ -642,12 +808,14 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 		{
 			Slider * pMarked = nullptr;
 			WgCoord markOfs;
-			bool	bHandleMarked = false;
 
 			const WgEvent::MouseButtonPress * pEv = static_cast<const WgEvent::MouseButtonPress*>(pEvent);
 			WgCoord	pointerPos = pEvent->PointerPixelPos();
 
-			if (pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() != m_overrideModifier)) )
+			if (pEv->Button() == 1)
+				m_state.setPressed(true);
+
+			if (m_state.isEnabled() && pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() != m_overrideModifier)) )
 			{
 				GrabFocus();
 
@@ -657,7 +825,6 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				if (pMarked)
 				{
 					_selectSliderHandle(pMarked);
-					bHandleMarked = true;
 				}
 				else
 				{
@@ -667,13 +834,9 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 					if (pMarked)
 					{
-						_selectSliderBg(pMarked);
+						m_selectedSlider = pMarked - &m_sliders.front();
+						m_selectedSliderHandle = -1;
 
-						if (m_bGhostHandle || m_pressMode == PressMode::MultiSetValue )
-						{
-							pMarked->handleState.setPressed(true);	// We let handle get pressed state along with background.
-							_requestRenderHandle(pMarked);
-						}
 						// Convert the press offset to fraction.
 
 						WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
@@ -686,11 +849,17 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 								_calcSendValue(*pMarked, relPos);
 							else
 								_setHandlePosition(*pMarked, relPos);
+
+							m_hoveredSliderHandle = pMarked - &m_sliders.front();
+							m_hoveredSlider = -1;
 						}
 
 						if (m_pressMode == PressMode::SetValue)
-						{
 							_selectSliderHandle(pMarked);				// In SetValue mode we actually select the handle
+						else
+						{
+							m_selectedSlider = -1;
+							_updateSliderStates();
 						}
 
 					}
@@ -710,7 +879,7 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				WgSize widgetSize = PixelSize();
 				WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
 
-				if (!bHandleMarked)
+				if (!m_selectedSliderHandle)
 				{
 					if (pMarked->origo == WG_WEST || pMarked->origo == WG_EAST)		// Horizontal slider
 					{
@@ -755,13 +924,27 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 		{
 			const WgEvent::MouseButtonRelease * p = static_cast<const WgEvent::MouseButtonRelease*>(pEvent);
 
-			if (p->Button() == 1)
+			if (m_state.isEnabled() && p->Button() == 1)
 			{
-				m_selectedSlider = -1;
+				m_state.setPressed(false);
 
-				_selectSliderHandle(nullptr);
+				m_selectedSlider = -1;
+				m_selectedSliderHandle = -1;
+
+				m_hoveredSliderHandle = -1;
+				m_hoveredSlider = -1;
+
 				Slider * p = _markedSliderHandle(pEvent->PointerPixelPos());
-				_markSliderHandle(p);
+				if (p)
+					m_hoveredSliderHandle = p - &m_sliders.front();
+				else
+				{
+					p = _markedSlider(pEvent->PointerPixelPos());
+					if (p)
+						m_hoveredSlider = p - &m_sliders.front();
+				}
+
+				_updateSliderStates();
 			}
 			break;
 		}
@@ -777,7 +960,7 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				modKeys = 0;
 
 
-			if (pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() != m_overrideModifier)) )
+			if (m_state.isEnabled() && pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() != m_overrideModifier)) )
 			{
 				WgCoordF	fraction;
 
@@ -959,7 +1142,7 @@ void WgMultiSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 {
 	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
 
-	WgRect contentCanvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
+	WgRect contentCanvas = m_pSkin ? m_pSkin->ContentRect(_canvas, m_state, m_scale) : _canvas;
 
 
 	for (auto& slider : m_sliders)
@@ -1056,7 +1239,7 @@ bool WgMultiSlider::_onAlphaTest( const WgCoord& ofs )
 		{
 			WgRect bgGeo = _sliderSkinGeo(slider, sliderGeo);
 
-			if( bgGeo.Contains(ofs) && pBgSkin->MarkTest(ofs-bgGeo.Pos(), bgGeo.Size(), WG_STATE_NORMAL, m_markOpacity, m_scale) )
+			if( bgGeo.Contains(ofs) && pBgSkin->MarkTest(ofs-bgGeo.Pos(), bgGeo.Size(), slider.sliderState, m_markOpacity, m_scale) )
 				return true;
 		}
 
@@ -1172,14 +1355,14 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 		_requestRender(oldHandleGeo);
 		_requestRender(newHandleGeo);
 	}
-
+/*
 	WgSkinPtr pBgSkin = slider.pBgSkin ? slider.pBgSkin : m_pDefaultBgSkin;
 	if (pBgSkin && !pBgSkin->IsStateIdentical(WG_STATE_NORMAL, WG_STATE_SELECTED))
 	{
 		WgRect sliderSkinGeo = _sliderSkinGeo(slider, sliderGeo);
 		_requestRender(sliderSkinGeo);
 	}
-
+*/
 
 	return;
 }
@@ -1235,7 +1418,7 @@ void WgMultiSlider::_updateGeo(Slider& slider)
 
 WgRect  WgMultiSlider::_sliderGeo(Slider& slider, const WgRect& _canvas )
 {
-    WgRect canvas = m_pSkin ? m_pSkin->ContentRect( _canvas, WG_STATE_NORMAL, m_scale ) : _canvas;
+    WgRect canvas = m_pSkin ? m_pSkin->ContentRect( _canvas, m_state, m_scale ) : _canvas;
 
 	return { canvas.x + (int)(slider.geo.x * canvas.w + 0.5f), canvas.y + (int)(slider.geo.y * canvas.h + 0.5f), (int)(canvas.w * slider.geo.w), (int)(canvas.h * slider.geo.h) };
 }
@@ -1249,7 +1432,7 @@ WgRect  WgMultiSlider::_sliderSkinGeo(Slider& slider, const WgRect& sliderGeo)
     if(pSkin)
     {
         WgRect bgGeo = sliderGeo;
-        bgGeo -= pSkin->ContentOfs(WG_STATE_NORMAL, m_scale);
+        bgGeo -= pSkin->ContentOfs(m_state, m_scale);
         bgGeo += pSkin->ContentPadding(m_scale);
 
         WgSize min = pSkin->PreferredSize(m_scale);
@@ -1424,9 +1607,9 @@ WgCoordF WgMultiSlider::_calcSendValue(Slider& slider, WgCoordF pos)
 
 	// Set handle position and handle re-rendering.
 
-//	_requestRenderHandle(&slider);
+//	_requestRenderSlider(&slider);
 //	slider.handlePos = pos;
-//	_requestRenderHandle(&slider);
+//	_requestRenderSlider(&slider);
 
 	// Calculate values from handle position
 
@@ -1497,9 +1680,9 @@ WgCoordF WgMultiSlider::_setHandlePosition(Slider& slider, WgCoordF pos)
 
 	// Set handle position and handle re-rendering.
 
-	_requestRenderHandle(&slider);
+	_requestRenderSlider(&slider);
 	slider.handlePos = pos;
-	_requestRenderHandle(&slider);
+	_requestRenderSlider(&slider);
 
 	// Calculate values from handle position
 
