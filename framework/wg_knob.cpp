@@ -264,7 +264,6 @@ void WgKnob::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRe
     WgColor col;
 
     unsigned char* dest = (unsigned char*)m_pSurf->Lock(WG_WRITE_ONLY);
-    unsigned int *ddest = (unsigned int *)dest;
 
     float x=0.0f, y=0.0f;
     float y_inv = 0.0f;
@@ -276,6 +275,7 @@ void WgKnob::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRe
         y = (float)yc*yd - 1.0f;
         y_inv = 1.0f/std::max(std::abs(y), 0.0001f);
 
+        unsigned int *ddest = (unsigned int *)(dest + m_pSurf->Pitch() * yc);    // Don't forget about pitch, it will turn her into a bitch...
         for(int xc=0;xc<w*oversampling;xc++)
         {
             // [-1, 1] coordinates
@@ -577,6 +577,8 @@ void WgKnob::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRe
 
             *ddest++ = color;
         }
+
+
     }
 
     m_pSurf->Unlock();
