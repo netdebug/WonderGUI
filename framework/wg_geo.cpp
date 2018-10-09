@@ -26,6 +26,7 @@
 
 #include <utility>
 #include <algorithm>
+#include <cstdlib>
 
 //____ WgBorders::Scale() ____________________________________________________
 
