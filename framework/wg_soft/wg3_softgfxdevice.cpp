@@ -2092,6 +2092,7 @@ namespace wg
 
 	void SoftGfxDevice::clipDrawElipse(const Rect& _clip, const RectF& canvas, float thickness, Color fillColor, float outlineThickness, Color outlineColor)
 	{
+
 		// Center and corners in 24.8 format.
 
 		int x1 = (int) (canvas.x * 256);
@@ -2175,8 +2176,11 @@ namespace wg
 				}
 
 				if (xEnd >= samplePoints)
+				{
 					xEnd = samplePoints - 1;
-
+					if(xMid >= samplePoints)
+						xMid = samplePoints - 1;
+				}
 				int sample = 0;
 				while (sample < xStart)
 				{
@@ -2237,6 +2241,11 @@ namespace wg
 			}
 		}
 
+        // Tint our colors
+
+        fillColor = fillColor * m_tintColor;
+        outlineColor = outlineColor * m_tintColor;
+
 		// Render columns
 
 
@@ -2246,8 +2255,8 @@ namespace wg
 
 
 		int clipY1 = clip.y - outerRect.y;
-		int clipY2 = min(clip.y + clip.h - outerRect.y, yMid >> 8);
-		int clipY3 = clip.y + clip.h - outerRect.y;
+//		int clipY2 = min(clip.y + clip.h - outerRect.y, yMid >> 8);
+		int clipY2 = clip.y + clip.h - outerRect.y;
 
 		Color	col[3];
 		col[0] = outlineColor;
@@ -2257,7 +2266,7 @@ namespace wg
 		// Render upper half
 
 		int clipBeg = clipY1;
-		int clipLen = clipY2 - clipY1;
+		int clipLen = min(clipY2, yMid >> 8) - clipBeg;
 
 		uint8_t * pColumn = m_pCanvasPixels + outerRect.y * m_canvasPitch + clip.x * (m_canvasPixelBits / 8);
 
@@ -2288,8 +2297,8 @@ namespace wg
 
 		// Render lower half
 
-		clipBeg = clipY2;
-		clipLen = clipY3 - clipY2;
+		clipBeg = max(clipY1, yMid >> 8);
+		clipLen = clipY2 - clipBeg;
 
 		pColumn = m_pCanvasPixels + outerRect.y * m_canvasPitch + clip.x * (m_canvasPixelBits / 8);
 

@@ -1700,7 +1700,11 @@ namespace wg
 				}
 
 				if (xEnd >= samplePoints)
+				{
 					xEnd = samplePoints - 1;
+					if (xMid >= samplePoints)
+						xMid = samplePoints - 1;
+				}
 
 				int sample = 0;
 				while (sample < xStart)
@@ -1762,6 +1766,11 @@ namespace wg
 			}
 		}
 
+        // Tint our colors
+
+        fillColor = fillColor * m_tintColor;
+        outlineColor = outlineColor * m_tintColor;
+
 		// Render columns
 
 
@@ -1773,14 +1782,14 @@ namespace wg
 		int yMid = (center.y & 0xFFFFFF00) - outerRect.y * 256;
 
 		int clipY1 = clip.y - outerRect.y;
-		int clipY2 = min(clip.y + clip.h - outerRect.y, yMid >> 8);
-		int clipY3 = clip.y + clip.h - outerRect.y;
+		//		int clipY2 = min(clip.y + clip.h - outerRect.y, yMid >> 8);
+		int clipY2 = clip.y + clip.h - outerRect.y;
 
 
 		// Render upper half
 
 		int clipBeg = clipY1;
-		int clipLen = clipY2 - clipY1;
+		int clipLen = min(clipY2, yMid >> 8) - clipBeg;
 
 		int * wpBuffer = pTextureBufferData;
 
@@ -1845,7 +1854,7 @@ namespace wg
 			glBindBuffer(GL_TEXTURE_BUFFER, m_horrWaveBufferTextureData);
 			glBufferData(GL_TEXTURE_BUFFER, textureBufferDataSize, pTextureBufferData, GL_STREAM_DRAW);
 
-			Rect box(clip.x, clip.y, clip.w, clipY2 - clipY1);
+			Rect box(clip.x, canvas.y+clipBeg, clip.w, clipLen);
 
 			int	dx1 = box.x;
 			int	dy1 = m_canvasSize.h - box.y;
@@ -1893,8 +1902,8 @@ namespace wg
 
 		// Render lower half
 
-		clipBeg = clipY2;
-		clipLen = clipY3 - clipY2;
+		clipBeg = max(clipY1, yMid >> 8);
+		clipLen = clipY2 - clipBeg;
 
 		wpBuffer = pTextureBufferData;
 
@@ -1959,7 +1968,7 @@ namespace wg
 		glBufferData(GL_TEXTURE_BUFFER, textureBufferDataSize, pTextureBufferData, GL_STREAM_DRAW);
 
 
-		Rect box(clip.x, clip.y + clipY2, clip.w, clipY3 - clipY2);
+		Rect box(clip.x, canvas.y + clipBeg, clip.w, clipLen);
 
 		int	dx1 = box.x;
 		int	dy1 = m_canvasSize.h - box.y;
