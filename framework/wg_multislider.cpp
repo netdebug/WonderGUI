@@ -806,97 +806,34 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 		case WG_EVENT_MOUSEBUTTON_PRESS:
 		{
-			Slider * pMarked = nullptr;
-			WgCoord markOfs;
+			if (!m_state.isEnabled())
+				break;
 
 			const WgEvent::MouseButtonPress * pEv = static_cast<const WgEvent::MouseButtonPress*>(pEvent);
 			WgCoord	pointerPos = pEvent->PointerPixelPos();
 
-			if (pEv->Button() == 1)
-				m_state.setPressed(true);
+			// Find pressed slider and whether handle was pressed
 
-			if (m_state.isEnabled() && pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() != m_overrideModifier)) )
-			{
-				GrabFocus();
+			WgCoord markOfs;
+			Slider * pMarked = _markedSliderHandle(pointerPos, nullptr);
+			bool		bHandlePressed = pMarked;		// If press really was on handle, needed for message.
 
+			if(!bHandlePressed)
+				pMarked = _markedSlider(pointerPos, &markOfs);
 
-				pMarked = _markedSliderHandle(pointerPos, nullptr);
-
-				if (pMarked)
-				{
-					_selectSliderHandle(pMarked);
-				}
-				else
-				{
-					WgSize widgetSize = PixelSize();
-
-					pMarked = _markedSlider(pointerPos, &markOfs);
-
-					if (pMarked)
-					{
-						m_selectedSlider = pMarked - &m_sliders.front();
-						m_selectedSliderHandle = -1;
-
-						// Convert the press offset to fraction.
-
-						WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
-
-						// In PressMode SetValue and MultiSetValue we set the value directly.
-
-						if (m_pressMode == PressMode::SetValue || m_pressMode == PressMode::MultiSetValue)
-						{
-							if (m_bPassive)
-								_calcSendValue(*pMarked, relPos);
-							else
-								_setHandlePosition(*pMarked, relPos);
-
-							m_hoveredSliderHandle = pMarked - &m_sliders.front();
-							m_hoveredSlider = -1;
-						}
-
-						if (m_pressMode == PressMode::SetValue)
-                        {
-							_selectSliderHandle(pMarked);				// In SetValue mode we actually select the handle
-
-                            // HACK:
-                            // In passive mode we need to set dragStartFraction directly since
-                            // slider.handlePos is out of date (waiting to be set externally).
-
-                            if( m_bPassive )
-                            {
-                                relPos = _alignPosToStep(*pMarked, relPos);
-
-                                WG_LIMIT(relPos.x, 0.f, 1.f);
-                                WG_LIMIT(relPos.y, 0.f, 1.f);
-
-                                m_dragStartFraction = relPos;
-                            }
-                        }
-						else
-						{
-							m_selectedSlider = -1;
-							_updateSliderStates();
-						}
-
-					}
-				}
-			}
-			else
-				pMarked = _markedSliderHandle(pointerPos, nullptr);
-
-
-			// Queue the event
+			// Queue the event. Need to do this before we update any handle position.
 
 			if (pMarked)
 			{
 				// Set pressOfs for the event
 
 				WgOrigo pressOfs = WG_CENTER;
-				WgSize widgetSize = PixelSize();
-				WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
 
-				if (!m_selectedSliderHandle)
+				if (!bHandlePressed)
 				{
+					WgSize widgetSize = PixelSize();
+					WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
+
 					if (pMarked->origo == WG_WEST || pMarked->origo == WG_EAST)		// Horizontal slider
 					{
 						if (relPos.x < pMarked->handlePos.x)
@@ -931,6 +868,69 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				}
 
 				pHandler->QueueEvent(new WgEvent::SliderPressed(this, pMarked->id, pEv->Button(), pressOfs));
+			}
+
+			// Do everyting else
+
+			if (pEv->Button() == 1)
+				m_state.setPressed(true);
+
+			if (pEv->Button() == 1 && (m_overrideModifier == WG_MODKEY_NONE || (pEv->ModKeys() != m_overrideModifier)) )
+			{
+				GrabFocus();
+
+				if (bHandlePressed)
+				{
+					_selectSliderHandle(pMarked);
+				}
+				else if (pMarked)
+				{
+					WgSize widgetSize = PixelSize();
+
+					m_selectedSlider = pMarked - &m_sliders.front();
+					m_selectedSliderHandle = -1;
+
+					// Convert the press offset to fraction.
+
+					WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
+
+					// In PressMode SetValue and MultiSetValue we set the value directly.
+
+					if (m_pressMode == PressMode::SetValue || m_pressMode == PressMode::MultiSetValue)
+					{
+						if (m_bPassive)
+							_calcSendValue(*pMarked, relPos);
+						else
+							_setHandlePosition(*pMarked, relPos);
+
+						m_hoveredSliderHandle = pMarked - &m_sliders.front();
+						m_hoveredSlider = -1;
+					}
+
+					if (m_pressMode == PressMode::SetValue)
+                    {
+						_selectSliderHandle(pMarked);				// In SetValue mode we actually select the handle
+
+                        // HACK:
+                        // In passive mode we need to set dragStartFraction directly since
+                        // slider.handlePos is out of date (waiting to be set externally).
+
+                        if( m_bPassive )
+                        {
+                            relPos = _alignPosToStep(*pMarked, relPos);
+
+                            WG_LIMIT(relPos.x, 0.f, 1.f);
+                            WG_LIMIT(relPos.y, 0.f, 1.f);
+
+                            m_dragStartFraction = relPos;
+                        }
+                    }
+					else
+					{
+						m_selectedSlider = -1;
+						_updateSliderStates();
+					}
+				}
 			}
 
 			break;
@@ -995,13 +995,13 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 					if (modKeys & m_finetuneModifier)
 					{
-						int pixelStepSize = m_finetuneStepSize == 0 ? 1 : m_finetuneStepSize * m_scale / WG_SCALE_BASE;
+						int pixelStepSize = m_finetuneStepSize == 0 ? m_scale / WG_SCALE_BASE : m_finetuneStepSize * m_scale / WG_SCALE_BASE;
 						WgCoordF stepIncrement;
 						
 						if (m_finetuneStepIncrement == 0.f)
 						{
-							stepIncrement.x = 1 / (sliderGeo.w - 0.001);
-							stepIncrement.y = 1 / (sliderGeo.h - 0.001);
+							stepIncrement.x = 1 / (sliderGeo.w - 0.0001);
+							stepIncrement.y = 1 / (sliderGeo.h - 0.0001);
 						}
 						else
 						{
@@ -1019,8 +1019,8 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 					}
 					else
 					{
-						movement.x = sliderGeo.w == 0 ? 0 : ((float) dragNow.x) / (sliderGeo.w-0.001);
-						movement.y = sliderGeo.h == 0 ? 0 : ((float)dragNow.y) / (sliderGeo.h-0.001);
+						movement.x = sliderGeo.w == 0 ? 0 : ((float) dragNow.x) / (sliderGeo.w-0.0001);
+						movement.y = sliderGeo.h == 0 ? 0 : ((float)dragNow.y) / (sliderGeo.h-0.0001);
 
 						m_finetuneRemainder = { 0,0 };
 					}
@@ -1373,14 +1373,14 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 		_requestRender(oldHandleGeo);
 		_requestRender(newHandleGeo);
 	}
-/*
+
 	WgSkinPtr pBgSkin = slider.pBgSkin ? slider.pBgSkin : m_pDefaultBgSkin;
-	if (pBgSkin && !pBgSkin->IsStateIdentical(WG_STATE_NORMAL, WG_STATE_SELECTED))
-	{
+	if (pBgSkin && !pBgSkin->IsStateIdentical(slider.handleState, slider.handleState + WG_STATE_SELECTED))
+	{	
 		WgRect sliderSkinGeo = _sliderSkinGeo(slider, sliderGeo);
 		_requestRender(sliderSkinGeo);
 	}
-*/
+
 
 	return;
 }
@@ -1468,7 +1468,7 @@ WgRect  WgMultiSlider::_sliderHandleGeo(Slider& slider, const WgRect& sliderGeo)
 {
 	WgSkinPtr pSkin = slider.pHandleSkin ? slider.pHandleSkin : m_pDefaultHandleSkin;
 
-	WgSize sz = pSkin->PreferredSize(m_scale);
+	WgSize sz = pSkin ? pSkin->PreferredSize(m_scale) : WgSize(0,0);
 	WgCoordF handleHotspot = slider.handleHotspot.x == -1.f ? m_defaultHandleHotspot : slider.handleHotspot;
 
 
