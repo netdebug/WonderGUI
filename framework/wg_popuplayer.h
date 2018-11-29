@@ -114,7 +114,7 @@ public:
 
 
 	int				NbPopups() const;
-	void			Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint = WgOrigo::WG_NORTHEAST, WgCoord attachOffset = { 0,0 }, bool bAutoClose = false, WgSize maxSize = WgSize(INT_MAX, INT_MAX));
+	void			Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint = WgOrigo::WG_NORTHEAST, WgCoord attachOffset = { 0,0 }, bool bAutoClose = false, bool bDelay = false, WgSize maxSize = WgSize(INT_MAX, INT_MAX));
 	void			Pop(int nb = 1);
 	void			Pop(WgWidget * pPopup);
 	void			Clear();
@@ -141,7 +141,7 @@ protected:
 	void			_removeSlots(int nb);
 	void			_removeSlot(WgPopupHook * p);
 
-	void			_addSlot(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, WgCoord attachOfs, bool bAutoClose, WgSize maxSize);
+	void			_addSlot(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, WgCoord attachOfs, bool bAutoClose, bool bDelay, WgSize maxSize);
 
 	void			_closeAutoOpenedUntil(WgWidget * pStayOpen);
 

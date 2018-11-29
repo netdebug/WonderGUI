@@ -152,12 +152,12 @@ int WgPopupLayer::NbPopups() const
 
 //____ Push() _________________________________________________________________
 
-void WgPopupLayer::Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, WgCoord attachOfs, bool bAutoClose, WgSize maxSize)
+void WgPopupLayer::Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, WgCoord attachOfs, bool bAutoClose, bool bDelay, WgSize maxSize)
 {
 	if (bAutoClose && !m_popupHooks.IsEmpty())
 		_closeAutoOpenedUntil(pOpener);
 
-	_addSlot(pPopup, pOpener, launcherGeo, attachPoint, attachOfs, bAutoClose, maxSize);
+	_addSlot(pPopup, pOpener, launcherGeo, attachPoint, attachOfs, bAutoClose, bDelay, maxSize);
 }
 
 //____ Pop() __________________________________________________________________
@@ -953,7 +953,7 @@ void WgPopupLayer::_childRequestResize(WgPopupHook * pHook)
 
 //____ _addSlot() ____________________________________________________________
 
-void WgPopupLayer::_addSlot(WgWidget * _pPopup, WgWidget * _pOpener, const WgRect& _launcherGeo, WgOrigo _attachPoint, WgCoord _attachOfs, bool _bAutoClose, WgSize _maxSize)
+void WgPopupLayer::_addSlot(WgWidget * _pPopup, WgWidget * _pOpener, const WgRect& _launcherGeo, WgOrigo _attachPoint, WgCoord _attachOfs, bool _bAutoClose, bool bDelay, WgSize _maxSize)
 {
 	WgPopupHook * pHook = new WgPopupHook(this);
 	pHook->_attachWidget(_pPopup);
@@ -964,7 +964,7 @@ void WgPopupLayer::_addSlot(WgWidget * _pPopup, WgWidget * _pOpener, const WgRec
 	pHook->attachPoint = _attachPoint;
 	pHook->attachOfs = _attachOfs;
 	pHook->bAutoClose = _bAutoClose;
-	pHook->state = WgPopupHook::State::OpeningDelay;
+	pHook->state = bDelay ? WgPopupHook::State::OpeningDelay : WgPopupHook::State::Opening;
 	pHook->stateCounter = 0;
 	pHook->maxSize = _maxSize;
 

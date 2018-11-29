@@ -516,7 +516,7 @@ void WgPopupOpener::_open()
 	auto pLayer = Parent()->_getPopupLayer();
 	if (pLayer && m_pPopup)
 	{
-		pLayer->Push(m_pPopup, this, ScreenPixelGeo(), m_attachPoint, m_popupOfs, m_bOpenOnHover);
+		pLayer->Push(m_pPopup, this, ScreenPixelGeo(), m_attachPoint, m_popupOfs, m_bOpenOnHover, m_bOpenOnHover );
 		m_bOpen = true;
 		m_closeState = m_state;
 	}
