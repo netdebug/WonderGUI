@@ -53,6 +53,14 @@
 
 #include "testwidget.h"
 
+
+//Filip test
+#include "wg_gizmo_seq_circle_meter.h"
+
+
+void manuBlendTest();
+
+
 #define USE_OPEN_GL
 
 
@@ -101,6 +109,8 @@ WgScrollChart * m_pScrollChart = nullptr;
 int				m_hWave1 = 0;
 
 WgFlexHook * g_pSpriteHook = nullptr;
+
+WgKnob *		g_pKnob = nullptr;
 
 
 volatile int	m_bGotVsync = 0;
@@ -261,14 +271,14 @@ int main ( int argc, char** argv )
 
 	WgRootPanel * pRoot = setupGUI( g_pGfxDevice );
 	
-	
+//	manuBlendTest();
 
 	// Setup debug overlays
-/*
+	
 	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
 	pOverlaySkin->SetStateColor( WG_STATE_NORMAL, WgColor::transparent, WgColor::red );	
-	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 0 );
-	*/
+	pRoot->SetUpdatedRectOverlay( pOverlaySkin,0);
+	
 
 //	WgColor lineColor = WgColor::transparent;
 	WgColor lineColor = WgColor::white;
@@ -391,7 +401,23 @@ int main ( int argc, char** argv )
 			updateOscilloscope( g_pOsc, counter, freq, amp );
 
 		}	
+
+		if (g_pKnob)
+		{
+			static float val = 0.f;
+
+			g_pKnob->SetValue(val);
+
+			val += 0.02f;
+
+			if (val > 1.f)
+				val = 0;
+
+		}
+
+
 /*
+
 		{
 			WgRect clip = { 100,100,200,200 };
 
@@ -514,6 +540,8 @@ int main ( int argc, char** argv )
 
 	IMG_Quit();
 
+	
+
     // all is well ;)
     printf("Exited cleanly\n");
     return 0;
@@ -532,6 +560,78 @@ void updateOscilloscope( WgOscilloscope * pOsc, int ofs, float freq, float ampli
 
 		pOsc->SetLinePoints(256,points);
 }
+
+
+//____ manuBlendTest() _________________________________________________________
+
+void manuBlendTest()
+{
+	WgSurfaceSoft * pCanvas = new WgSurfaceSoft({ 2800,2800 }, WG_PIXEL_BGR_8);
+
+	WgSurfaceFactory * pFactory = new WgSurfaceFactorySoft();
+
+	WgSurface * pBackImg = sdl_wglib::LoadSurface("../resources/BlendModes-layer1.png", *pFactory);
+	WgSurface * pFrontImg = sdl_wglib::LoadSurface("../resources/BlendModes-layer2.png", *pFactory);
+
+
+	WgGfxDevice * pDevice = new WgGfxDeviceSoft(pCanvas);
+
+
+	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->BeginRender();
+	pDevice->Blit(pBackImg);
+	pDevice->SetBlendMode(WG_BLENDMODE_BLEND);
+	pDevice->Blit(pFrontImg);
+	pDevice->EndRender();
+	sdl_wglib::SavePNG(pCanvas, "blendmodes_blend.png");
+
+	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->BeginRender();
+	pDevice->Blit(pBackImg);
+	pDevice->SetBlendMode(WG_BLENDMODE_ADD);
+	pDevice->Blit(pFrontImg);
+	pDevice->EndRender();
+	sdl_wglib::SavePNG(pCanvas, "blendmodes_add.png");
+
+	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->BeginRender();
+	pDevice->Blit(pBackImg);
+	pDevice->SetBlendMode(WG_BLENDMODE_INVERT);
+	pDevice->Blit(pFrontImg);
+	pDevice->EndRender();
+	sdl_wglib::SavePNG(pCanvas, "blendmodes_invert.png");
+
+	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->BeginRender();
+	pDevice->Blit(pBackImg);
+	pDevice->SetBlendMode(WG_BLENDMODE_MULTIPLY);
+	pDevice->Blit(pFrontImg);
+	pDevice->EndRender();
+	sdl_wglib::SavePNG(pCanvas, "blendmodes_multiply.png");
+
+	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->BeginRender();
+	pDevice->Blit(pBackImg);
+	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->Blit(pFrontImg);
+	pDevice->EndRender();
+	sdl_wglib::SavePNG(pCanvas, "blendmodes_opaque.png");
+
+	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->BeginRender();
+	pDevice->Blit(pBackImg);
+	pDevice->RealDevice()->setBlendMode( wg::BlendMode::Subtract);
+	pDevice->Blit(pFrontImg);
+	pDevice->EndRender();
+	sdl_wglib::SavePNG(pCanvas, "blendmodes_subtract.png");
+
+
+
+	delete pBackImg;
+	delete pFrontImg;
+	delete pDevice;
+}
+
 
 //____ setupGUI() ______________________________________________________________
 
@@ -612,12 +712,38 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pBottom->AddChild(pFlex, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(10));
 
 	// Background
-/*
+
 	WgImage * pBackground = new WgImage();
 	pBackground->SetSource(pBackBlock);
 	WgFlexHook * pHook = pFlex->AddChild(pBackground);
 	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
-*/
+	
+
+	// Test Knob
+
+	WgKnob * pKnob = new WgKnob( new WgGlSurfaceFactory() );
+	pKnob->SetOptimizeUpdateRect(true);
+
+	pHook = pFlex->AddChild(pKnob);
+	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
+
+	g_pKnob = pKnob;
+
+
+//SeqCircleMeter test Filip
+/*
+	WgFiller* pfiller = new WgFiller();
+	pfiller->SetColors(WgColorset::Create(WgColor::mediumvioletred));
+	
+	
+	int test3_size_h = 200;
+	int test3_size_w = 200;
+	WgGizmoSeqCircleMeter * testCircleMeter3 = new WgGizmoSeqCircleMeter();
+	pFlex->AddChild(pfiller, WgRect(0, 0, test3_size_w, test3_size_h));
+	pFlex->AddChild(testCircleMeter3, WgRect(0, 0, test3_size_w, test3_size_h)); //xpos, ypos, width, height
+	//testCircleMeter3->SetValue(0.125f);
+	*/
+
 
 	// BlendTest
 /*
@@ -1061,7 +1187,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	// Multislider widget
-
+/*
 	WgColor		normalBg = { 64,64,64 }; 
 	WgColor		hoveredBg = { 128,128,128 };
 	WgColor		pressedBg = { 192,192,192 };
@@ -1190,7 +1316,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	}, nullptr );
-
+*/
 
 	// Scroll chart widget
 
