@@ -420,8 +420,11 @@ namespace wg
 		if( m_accessMode != AccessMode::ReadOnly )
 		{
 			glBindTexture( GL_TEXTURE_2D, m_texture );
-        	glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, m_size.w, m_size.h, m_accessFormat, m_pixelDataType, m_pBlob->data() );
-	//		glTexSubImage2D( GL_TEXTURE_2D, 0, m_lockRegion.x, m_lockRegion.y, m_lockRegion.w, m_lockRegion.h, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
+    //    	glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, m_size.w, m_size.h, m_accessFormat, m_pixelDataType, m_pBlob->data() );
+
+			glPixelStorei(GL_UNPACK_ROW_LENGTH, m_pitch / m_pixelSize);
+			glTexSubImage2D( GL_TEXTURE_2D, 0, m_lockRegion.x, m_lockRegion.y, m_lockRegion.w, m_lockRegion.h, m_accessFormat, m_pixelDataType, m_pPixels );
+			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 		}
 		m_accessMode = AccessMode::None;
 		m_pPixels = 0;
