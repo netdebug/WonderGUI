@@ -67,7 +67,7 @@ public:
             m_kForeground = color;
             m_kBackground = color;
             m_kBackground.a = 64;
-            _requestRender();
+            _myRequestRender();
         }
     };
 
@@ -76,7 +76,7 @@ public:
         if(m_kForeground != color)
         {
             m_kForeground = color;
-            _requestRender();
+            _myRequestRender();
         }
     };
 
@@ -85,7 +85,7 @@ public:
         if(m_kBackground != color)
         {
             m_kBackground = color;
-            _requestRender();
+            _myRequestRender();
         }
     };
 
@@ -94,14 +94,23 @@ public:
         if(m_lineColor != color)
         {
             m_lineColor = color;
-            _requestRender();
+            _myRequestRender();
         }
     };
+
+	// Speeds up things significantly by only updating needed quadrants, but generates artifacts if gradiants are present.
+	void	SetOptimizeUpdateRect(bool bOptimize)
+	{
+		m_bOptimizeUpdateRect = bOptimize;
+	}
 
     void    SetNumSteps(int steps);
     void    SetWidth(float width) { m_iWidth = width; }
     void    SetAngles(float angleStart, float angleEnd);
-    void    SetAngleOffset(float offset) { m_fAngleOffset = offset; }
+	void    SetAngleOffset(float offset);
+
+    float   GetAngleStart() const { return m_fAngleStart; }
+    float   GetAngleEnd() const { return m_fAngleEnd; }
 
     WgSize    PreferredPixelSize() const;
     //    void    SetPreferredPixelSize(WgSize size);
@@ -110,11 +119,19 @@ public:
 
 protected:
     void    _onCloneContent( const WgWidget * _pOrg );
-    void    _onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip);
+	void	_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches);
+	void    _onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip);
     bool    _onAlphaTest( const WgCoord& ofs );
     void    _onEnable();
     void    _onDisable();
     void    _onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandler );
+	void	_onNewSize(const WgSize& size);
+
+
+	void	_myRequestRender();
+	void	_myRequestRender(const WgRect& rect);
+
+
 
 private:
 
@@ -129,7 +146,9 @@ private:
         eDrawBackgroundAAEnd,
     };
 
-    void _downsample(WgSurface* pSurf, int oversample);
+	WgRect	_calcUdateRect(float newAngleStart, float newAngleEnd, float newValue);
+	void	_redrawBackBuffer(WgRect region);
+	void	_downsample(WgSurface* pSurf, int oversample);
     WgColor Blend( const WgColor& start, const WgColor& dest, float grade );
 
     // Anti-alias
@@ -148,6 +167,7 @@ private:
     WgColor m_lineColor;
 
     WgSize m_preferredSize;
+	bool	m_bOptimizeUpdateRect = false;
 
     class WgSurface* m_pSurf = nullptr;
     class WgSurfaceFactory* m_pSurfaceFactory = nullptr;
@@ -169,6 +189,8 @@ private:
     float m_fAngleOffset = 0.0f;
 
     WgSize m_size = WgSize(0,0);
+
+	WgRect	m_backBufferDirtyRect;
 };
 
 

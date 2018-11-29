@@ -118,6 +118,41 @@ namespace sdl_wglib
 		g_pHandler->ProcessEvents();
 	}
 
+	//____ SavePNG() ________________________________________________________
+
+	bool SavePNG(WgSurface * pSurface, const char * path)
+	{
+		WgSize size = pSurface->PixelSize();
+		const WgPixelFormat * pFmt = pSurface->PixelFormat();
+
+		SDL_Surface * pOutput = SDL_CreateRGBSurface(0, size.w, size.h, pFmt->bits, pFmt->R_mask, pFmt->G_mask, pFmt->B_mask, pFmt->A_mask);
+
+
+		int err = SDL_LockSurface(pOutput);
+		if (err != 0)
+			return false;
+
+		char * pSrcPixels = (char *)pSurface->Lock(WG_READ_ONLY);
+
+		for (int y = 0; y < size.h; y++)
+		{
+			char * pDest = ((char *) pOutput->pixels) + pOutput->pitch * y;
+			char * pSource = pSrcPixels + pSurface->Pitch() * y;
+			memcpy(pDest, pSource, size.w * pFmt->bits / 8);
+		}
+
+		pSurface->Unlock();
+
+		SDL_UnlockSurface(pOutput);
+
+
+		int err2 = IMG_SavePNG(pOutput, path);
+		SDL_FreeSurface(pOutput);
+
+		return true;
+	}
+
+
 	//____ LoadSurface() __________________________________________________________
 
 	WgSurface * LoadSurface( const char * path, const WgSurfaceFactory& factory )

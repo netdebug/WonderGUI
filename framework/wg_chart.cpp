@@ -658,7 +658,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 		bottom.pWave = wave.resampledBottom.data();
 		bottom.hold = wave.resampledDefault;
 
-		int length = WgMax(top.length, bottom.length);
+		int length = WgMax(top.length, bottom.length)-1;
 
 		pDevice->ClipDrawHorrWave(waveClip, WgCoord(waveCanvas.x + xOfs, waveCanvas.y), length, top, bottom, wave.frontFill, wave.backFill);
 	}
@@ -806,7 +806,7 @@ void WgChart::_resampleWave(Wave * pWave)
 	float valueFactor = canvas.h / (m_bottomValue - m_topValue);
 
 	float floor;
-	int yOfs;
+	float yOfs;
 	if (valueFactor < 0)
 	{
 		floor = m_bottomValue;

@@ -22,6 +22,7 @@ namespace sdl_wglib
 	void 		EndEvents();
 
 	WgSurface * LoadSurface( const char * path, const WgSurfaceFactory& factory );
+	bool		SavePNG( WgSurface * pSurface, const char * path);
 
 	WgResDB *	LoadStdWidgets( const char * pImagePath, const char * pImagePathX2, const char * pImagePathX4, const WgSurfaceFactory& factory );
 

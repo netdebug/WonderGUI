@@ -255,14 +255,10 @@ WgCoord WgMultiSlider::HandlePixelPos( int sliderId )
     Slider * p = _findSlider(sliderId);
     if( p )
     {
-        WgRect canvas = m_pSkin ? m_pSkin->ContentRect( PixelSize(), m_state, m_scale ) : WgRect(PixelSize());
-        WgRect sliderGeo = _sliderGeo(*p, canvas);
+        WgRect sliderGeo = _sliderGeo(*p, PixelSize());
 
         pos.x = sliderGeo.x + (int)(sliderGeo.w * p->handlePos.x);
         pos.y = sliderGeo.y + (int)(sliderGeo.h * p->handlePos.y);
-
-        if( m_pSkin )
-            pos += m_pSkin->ContentOfs( m_state, m_scale );
     }
     return pos;
 }
@@ -831,8 +827,8 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 				if (!bHandlePressed)
 				{
-					WgSize widgetSize = PixelSize();
-					WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
+					WgSize widgetContentSize = m_pSkin ? PixelSize() - m_pSkin->ContentPadding(m_scale) : PixelSize();
+					WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetContentSize.w), markOfs.y / (pMarked->geo.h*widgetContentSize.h) };
 
 					if (pMarked->origo == WG_WEST || pMarked->origo == WG_EAST)		// Horizontal slider
 					{
@@ -885,14 +881,14 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 				}
 				else if (pMarked)
 				{
-					WgSize widgetSize = PixelSize();
+					WgSize widgetContentSize = m_pSkin ? PixelSize() - m_pSkin->ContentPadding(m_scale) : PixelSize();
 
 					m_selectedSlider = pMarked - &m_sliders.front();
 					m_selectedSliderHandle = -1;
 
 					// Convert the press offset to fraction.
 
-					WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetSize.w), markOfs.y / (pMarked->geo.h*widgetSize.h) };
+					WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetContentSize.w), markOfs.y / (pMarked->geo.h*widgetContentSize.h) };
 
 					// In PressMode SetValue and MultiSetValue we set the value directly.
 
@@ -1020,7 +1016,7 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 					else
 					{
 						movement.x = sliderGeo.w == 0 ? 0 : ((float) dragNow.x) / (sliderGeo.w-0.0001);
-						movement.y = sliderGeo.h == 0 ? 0 : ((float)dragNow.y) / (sliderGeo.h-0.0001);
+						movement.y = sliderGeo.h == 0 ? 0 : ((float) dragNow.y) / (sliderGeo.h-0.0001);
 
 						m_finetuneRemainder = { 0,0 };
 					}
@@ -1160,12 +1156,9 @@ void WgMultiSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 {
 	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
 
-	WgRect contentCanvas = m_pSkin ? m_pSkin->ContentRect(_canvas, m_state, m_scale) : _canvas;
-
-
 	for (auto& slider : m_sliders)
 	{
-		WgRect sliderGeo = _sliderGeo(slider, contentCanvas);
+		WgRect sliderGeo = _sliderGeo(slider, _canvas);
 
 		WgSkinPtr pBgSkin = slider.pBgSkin ? slider.pBgSkin : m_pDefaultBgSkin;
 		if (pBgSkin)
