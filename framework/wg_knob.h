@@ -33,7 +33,8 @@
 #	include <wg_widget.h>
 #endif
 
-#include <math.h>
+#include <cmath>
+#include <algorithm>
 
 //____ WgKnob ____________________________________________________________
 
@@ -149,15 +150,15 @@ private:
 	WgRect	_calcUdateRect(float newAngleStart, float newAngleEnd, float newValue);
 	void	_redrawBackBuffer(WgRect region);
 	void	_downsample(WgSurface* pSurf, int oversample);
-    WgColor Blend( const WgColor& start, const WgColor& dest, float grade );
+    static inline WgColor Blend( const WgColor& start, const WgColor& dest, float grade );
 
     // Anti-alias
     void drawCircle(const int centerX, const int centerY, const float radX, const float radY);
     void drawLine(const float x0, const float y0, const float x1, const float y1);
     void plot(const int x, const int y, const float alpha);
     void plot4(const int centerX, const int centerY, const int deltaX, const int deltaY, const float alpha);
-    static inline int ipart(double x) { return (int)floor(x); }
-    static inline float fpart(float x) { return fabsf(x) - ipart(x); }
+    static inline int ipart(double x) { return (int)std::floor(x); }
+    static inline float fpart(float x) { return std::abs(x) - ipart(x); }
     static inline float rfpart(float x) { return 1.0f - fpart(x); }
 
     // Anti-alias

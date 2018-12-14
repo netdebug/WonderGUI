@@ -65,6 +65,8 @@ namespace wg
 		//.____ Misc _______________________________________________________
 
 		SurfaceFactory_p		surfaceFactory();
+        void                    setFlush( bool bFlush );
+        bool                    isCanvasReady() const;
 
 		//.____ Geometry _________________________________________________
 
@@ -130,6 +132,7 @@ namespace wg
 
 		GLuint		m_framebufferId;
 		bool		m_bFlipY;
+		bool		m_bFlush = true;
 
 		Rect		m_defaultCanvasViewport;		// Viewport for the framebuffer outpout. Y-coord is inverted in GL fashion.
 		Rect		m_canvasViewport;				// Viewport for the current canvas. Y-coord is inverted in GL fashion.

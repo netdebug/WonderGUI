@@ -74,6 +74,21 @@ bool WgGlGfxDevice::SetCanvas( WgSize dimensions )
 	return ret;
 }
 
+//____ SetFlush() __________________________________________________________________
+
+void WgGlGfxDevice::SetFlush( bool bFlush )
+{
+    ((wg::GlGfxDevice*)m_pRealDevice.rawPtr())->setFlush(bFlush);
+}
+
+//____ IsCanvasReady() __________________________________________________________________
+
+bool WgGlGfxDevice::IsCanvasReady() const
+{
+    return ((wg::GlGfxDevice*)m_pRealDevice.rawPtr())->isCanvasReady();
+}
+
+
 //____ StretchBlitSubPixelWithInvert() _______________________________________________
 
 void WgGlGfxDevice::StretchBlitSubPixelWithInvert(const WgSurface * pSrc, float sx, float sy, float sw, float sh,

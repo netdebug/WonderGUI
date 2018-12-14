@@ -34,7 +34,6 @@
 #include <wg_textpropmanager.h>
 #include <wg_charseq.h>
 #include <wg_cursorinstance.h>
-#include <wg_resdb.h>
 #include <wg_base.h>
 #include <wg_pen.h>
 
@@ -643,7 +642,7 @@ Uint32 WgTextTool::getTextSizeStrippedUTF8( const Uint16 * pStr, Uint32 maxChars
 					destination is not null-terminated.
 */
 
-Uint32 WgTextTool::readFormattedString( const char * _pSrc, WgChar * pDst, Uint32 maxChars, const WgResDB * pResDB )
+Uint32 WgTextTool::readFormattedString( const char * _pSrc, WgChar * pDst, Uint32 maxChars )
 {
 	if( maxChars == 0 )
 		return 0;
@@ -806,23 +805,6 @@ Uint32 WgTextTool::readFormattedString( const char * _pSrc, WgChar * pDst, Uint3
 
 				case '(':					// SET PROP
 				{
-					if( pResDB )
-					{
-						// Read the prop id (as normal 7-bit ascii).
-
-						std::string id;
-						while( * pSrc != ')' )
-						{
-							assert( * pSrc != 0 );
-							id += * pSrc++;
-						}
-						pSrc++;
-
-						if( id == "null" )
-							myChar.SetProperties( WgTextpropPtr() );
-						else
-							myChar.SetProperties( pResDB->GetTextprop(id) );
-					}
 				}
 				break;
 
@@ -939,7 +921,7 @@ Uint32 WgTextTool::readFormattedString( const char * _pSrc, WgChar * pDst, Uint3
 					destination is not null-terminated.
 */
 
-Uint32 WgTextTool::readFormattedString( const Uint16 * _pSrc, WgChar * pDst, Uint32 maxChars, const WgResDB * pResDB )
+Uint32 WgTextTool::readFormattedString( const Uint16 * _pSrc, WgChar * pDst, Uint32 maxChars )
 {
 	if( maxChars == 0 )
 		return 0;
@@ -1091,23 +1073,6 @@ Uint32 WgTextTool::readFormattedString( const Uint16 * _pSrc, WgChar * pDst, Uin
 
 				case '(':					// SET PROP
 				{
-					if( pResDB )
-					{
-						// Read the prop id (as normal 7-bit ascii).
-
-						std::string id;
-						while( * pSrc != ')' )
-						{
-							assert( * pSrc != 0 );
-							id += (char) (* pSrc++);
-						}
-						pSrc++;
-
-						if( id == "null" )
-							myChar.SetProperties( WgTextpropPtr() );
-						else
-							myChar.SetProperties( pResDB->GetTextprop(id) );
-					}
 				}
 				break;
 
@@ -1205,12 +1170,12 @@ Uint32 WgTextTool::readFormattedString( const Uint16 * _pSrc, WgChar * pDst, Uin
 
 //____ getTextFormattedUTF8() __________________________________________________
 
-Uint32 WgTextTool::getTextFormattedUTF8( const WgChar * pSrc, char * pDst, Uint32 maxBytes, const WgResDB * pResDB )
+Uint32 WgTextTool::getTextFormattedUTF8( const WgChar * pSrc, char * pDst, Uint32 maxBytes )
 {
 	Uint32	ofs			= 0;
 	Uint16	hActiveProp = 0;
 
-	TextpropEncoder	enc(pResDB);
+	TextpropEncoder	enc;
 
 	Uint32 n = enc.BeginString();
 	assert( n == 0 );						// If this has changed we need to add some code here...
@@ -1285,12 +1250,12 @@ Uint32 WgTextTool::getTextFormattedUTF8( const WgChar * pSrc, char * pDst, Uint3
 
 //____ getTextFormatted() _____________________________________________________
 
-Uint32 WgTextTool::getTextFormatted( const WgChar * pSrc, Uint16 * pDst, Uint32 maxBytes, const WgResDB * pResDB )
+Uint32 WgTextTool::getTextFormatted( const WgChar * pSrc, Uint16 * pDst, Uint32 maxBytes )
 {
 	Uint32	ofs			= 0;
 	Uint16	hActiveProp = 0;
 
-	TextpropEncoder	enc(pResDB);
+	TextpropEncoder	enc;
 	Uint32 n = enc.BeginString();
 	assert( n == 0 );						// If this has changed we need to add some code here...
 
@@ -1342,7 +1307,7 @@ Uint32 WgTextTool::getTextFormatted( const WgChar * pSrc, Uint16 * pDst, Uint32 
 
 //____ getTextSizeFormattedUTF8() _____________________________________________
 
-Uint32 WgTextTool::getTextSizeFormattedUTF8( const WgChar * pSrc, Uint32 maxChars, const WgResDB * pResDB )
+Uint32 WgTextTool::getTextSizeFormattedUTF8( const WgChar * pSrc, Uint32 maxChars )
 {
 	Uint32 ofs = 0;
 	Uint32 charsRead = 0;
@@ -1350,7 +1315,7 @@ Uint32 WgTextTool::getTextSizeFormattedUTF8( const WgChar * pSrc, Uint32 maxChar
 	WgTextpropPtr	pActiveProp;
 	Uint16			hActiveProp = 0;
 
-	TextpropEncoder	enc(pResDB);
+	TextpropEncoder	enc;
 	ofs += enc.BeginString();
 
 
@@ -1390,7 +1355,7 @@ Uint32 WgTextTool::getTextSizeFormattedUTF8( const WgChar * pSrc, Uint32 maxChar
 
 //____ getTextSizeFormatted() _________________________________________________
 
-Uint32 WgTextTool::getTextSizeFormatted( const WgChar * pSrc, Uint32 maxChars, const WgResDB * pResDB )
+Uint32 WgTextTool::getTextSizeFormatted( const WgChar * pSrc, Uint32 maxChars )
 {
 	Uint32 ofs = 0;
 	Uint32 charsRead = 0;
@@ -1398,7 +1363,7 @@ Uint32 WgTextTool::getTextSizeFormatted( const WgChar * pSrc, Uint32 maxChars, c
 	WgTextpropPtr	pActiveProp;
 	Uint16			hActiveProp = 0;
 
-	TextpropEncoder	enc(pResDB);
+	TextpropEncoder	enc;
 	ofs += enc.BeginString();
 
 
@@ -2876,9 +2841,8 @@ WgTextpropPtr WgTextTool::GetLinkProperties( const WgText * pText )
 
 //____ TextpropEncoder::Constructor ___________________________________________
 
-WgTextTool::TextpropEncoder::TextpropEncoder( const WgResDB * pResDB )
+WgTextTool::TextpropEncoder::TextpropEncoder()
 {
-	m_pResDB = pResDB;
 }
 
 //____ TextpropEncoder::BeginString() _________________________________________
@@ -2914,70 +2878,9 @@ Uint32 WgTextTool::TextpropEncoder::SetProp( const WgTextpropPtr& pNewProp )
 
 		// nothing to do here, we are all setup.
 	}
-	else if( m_pResDB )
-	{
-		// Secondly, if nullprop isn't our current baseprop we see if we can do this using only nullprop
-		// + style/color/size/underline settings.
-
-		if( !m_pBaseProp && pNewProp->Font() == 0 && !pNewProp->Link() &&
-			pNewProp->IsColorStatic() && pNewProp->IsStyleStatic() && pNewProp->IsSizeStatic() && pNewProp->IsUnderlined() )
-		{
-			// Yes we can! Switch to nullprop as our baseprop
-
-			i += writeUTF8( WG_ESCAPE_CODE, m_temp+i );
-			strcpy( m_temp + i, "(null)" );
-			i += 6;
-
-			m_pBaseProp = 0;
-		}
-		else
-		{
-			// Thirdly, see if we have a perfect match
-
-			std::string id = m_pResDB->FindTextpropId( pNewProp );
-
-			if( id.length() > 0 )
-			{
-				// Yes, we have! Switch to this prop.
-
-				i += writeUTF8( WG_ESCAPE_CODE, m_temp+i );
-				strcpy( m_temp + i, id.c_str() );
-				i += id.length();
-
-				m_pBaseProp = m_pResDB->GetTextprop( id );
-			}
-			else
-			{
-				// Fourthly, look for the first possible match which can be combined with style/color/size/underline settings
-				// to make a perfect match.
-
-				WgResDB::TextpropRes * pRes = m_pResDB->GetFirstResTextprop();
-				while( pRes )
-				{
-					WgTextpropPtr pProp = pRes->res;
-
-					if( pNewProp->Font() == pProp->Font() && pNewProp->Link() == pProp->Link() &&
-						((pNewProp->IsColored() && pNewProp->IsColorStatic()) || pNewProp->CompareColorTo( pProp )) &&
-						(pNewProp->IsStyleStatic() || pNewProp->CompareStyleTo( pProp )) &&
-						(pNewProp->IsSizeStatic() || pNewProp->CompareSizeTo( pProp )) &&
-						((pNewProp->IsUnderlined() && pNewProp->IsUnderlineStatic()) || pNewProp->CompareUnderlineTo( pProp )) )
-					{
-						// This one works! Switch to this prop.
-
-						i += writeUTF8( WG_ESCAPE_CODE, m_temp+i );
-						strcpy( m_temp + i, pRes->id.c_str() );
-						i += pRes->id.length();
-
-						m_pBaseProp = pProp;
-
-					}
-
-					pRes = pRes->Next();
-				}
-			}
-		}
-
-	}
+//	else if( m_pResDB )
+//	{
+//	}
 	else
 	{
 		// Failure! We switch to nullprop and do the best of the situation with style/color/size/underline-settings.

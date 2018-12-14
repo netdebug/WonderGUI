@@ -55,10 +55,6 @@
 #	include <wg_cursorinstance.h>
 #endif
 
-#ifndef WG_RESDB_DOT_H
-#	include <wg_resdb.h>
-#endif
-
 #ifndef WG_EVENTHANDLER_DOT_H
 #	include <wg_eventhandler.h>
 #endif

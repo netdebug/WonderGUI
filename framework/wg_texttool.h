@@ -60,7 +60,6 @@ class WgGlyphset;
 class WgText;
 class WgChar;
 class WgCursorInstance;
-class WgResDB;
 class WgTextNode;
 class WgColorset;
 
@@ -113,8 +112,8 @@ public:
 
 
 
-	static Uint32	readFormattedString( const char * pSrc, WgChar * pDst, Uint32 maxChars = INT_MAX, const WgResDB * pResDB = 0 );
-	static Uint32	readFormattedString( const Uint16 * pSrc, WgChar * pDst, Uint32 maxChars = INT_MAX, const WgResDB * pResDB = 0 );
+	static Uint32	readFormattedString( const char * pSrc, WgChar * pDst, Uint32 maxChars = INT_MAX );
+	static Uint32	readFormattedString( const Uint16 * pSrc, WgChar * pDst, Uint32 maxChars = INT_MAX );
 
 	static Uint32	CopyChars( const WgChar * pSrc, WgChar * pDst, Uint32 maxChars = INT_MAX );
 
@@ -149,11 +148,11 @@ public:
 	static Uint32	getTextSizeUTF8( const Uint16 * pSrc, Uint32 maxChars = INT_MAX );
 	static Uint32	getTextSizeUTF8( const char * pSrc, WgCodePage codepage, int maxChars = INT_MAX );
 
-	static Uint32	getTextFormatted( const WgChar * pSrc, Uint16 * pDest, Uint32 maxChars, const WgResDB * pResDB = 0 );
-	static Uint32	getTextSizeFormatted( const WgChar * pSrc, Uint32 maxChars = INT_MAX, const WgResDB * pResDB = 0 );
+	static Uint32	getTextFormatted( const WgChar * pSrc, Uint16 * pDest, Uint32 maxChars );
+	static Uint32	getTextSizeFormatted( const WgChar * pSrc, Uint32 maxChars = INT_MAX );
 
-	static Uint32	getTextFormattedUTF8( const WgChar * pSrc, char * pDest, Uint32 maxBytes, const WgResDB * pResDB = 0 );
-	static Uint32	getTextSizeFormattedUTF8( const WgChar * pSrc, Uint32 maxChars = INT_MAX, const WgResDB * pResDB = 0 );
+	static Uint32	getTextFormattedUTF8( const WgChar * pSrc, char * pDest, Uint32 maxBytes );
+	static Uint32	getTextSizeFormattedUTF8( const WgChar * pSrc, Uint32 maxChars = INT_MAX );
 
 	static Uint32	getTextSizeStrippedUTF8( const char * pStr, Uint32 maxChars = INT_MAX );
 	static Uint32	getTextSizeStrippedUTF8( const Uint16 * pStr, Uint32 maxChars = INT_MAX );
@@ -363,7 +362,7 @@ public:
 	class TextpropEncoder
 	{
 	public:
-		TextpropEncoder( const WgResDB * pResDB );
+		TextpropEncoder();
 
 		Uint32	BeginString();
 		Uint32	SetProp( const WgTextpropPtr& pNewProp );
@@ -378,8 +377,6 @@ public:
 		bool			m_bStyleTagOpen;
 		bool			m_bSizeTagOpen;
 		bool			m_bUnderTagOpen;
-
-		const WgResDB *	m_pResDB;
 
 		WgTextpropPtr	m_pBaseProp;
 		WgTextpropPtr	m_pActiveProp;

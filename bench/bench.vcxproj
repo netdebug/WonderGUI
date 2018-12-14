@@ -107,10 +107,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\extras\sdl_wglib.cpp" />
+    <ClCompile Include="..\framework\wg_knob.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="wg_gizmo_seq_circle_meter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\extras\sdl_wglib.h" />
+    <ClInclude Include="..\framework\wg_knob.h" />
+    <ClInclude Include="wg_gizmo_seq_circle_meter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

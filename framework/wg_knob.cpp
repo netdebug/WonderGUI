@@ -74,7 +74,8 @@ WgKnob::WgKnob(WgSurfaceFactory * pFactory)
 
 WgKnob::~WgKnob()
 {
-
+	if(m_pSurf)
+		delete m_pSurf;
 }
 
 //____ Type() _________________________________________________________________
@@ -425,8 +426,8 @@ void WgKnob::_redrawBackBuffer(WgRect region)
 			a = 0.0f;
 
 			const bool USE_ANGLE_AA = true;
-			const float ANGLE_AA_WIDTH = 0.05f; // this should be dependent of the widget size.
-
+            const float ANGLE_AA_WIDTH = 3.0f / (float)(w * oversampling); //0.05f;
+            
 			if ((in > -rd) && (out > -rd))
 			{
 				// Calculate anti-aliasing on the inner and outer circle diameters ("CIRCLE AA")
@@ -723,12 +724,22 @@ WgColor WgKnob::Blend( const WgColor& start, const WgColor& dest, float grade )
 {
     WgColor col;
 
+    const unsigned int g = (unsigned int)(grade * 255.0f);
+    const unsigned int ig = 255 - g;
+    
     // Yes, it's backwards. Sue me.
+    /*
     col.r = (Uint8)( (float)start.r * grade + (1.0f-grade) * (float)dest.r );
     col.g = (Uint8)( (float)start.g * grade + (1.0f-grade) * (float)dest.g );
     col.b = (Uint8)( (float)start.b * grade + (1.0f-grade) * (float)dest.b );
     col.a = (Uint8)( (float)start.a * grade + (1.0f-grade) * (float)dest.a );
+    */
 
+    col.r = (start.r * g + ig * dest.r) >> 8;
+    col.g = (start.g * g + ig * dest.g) >> 8;
+    col.b = (start.b * g + ig * dest.b) >> 8;
+    col.a = (start.a * g + ig * dest.a) >> 8;
+    
     return col;
 }
 

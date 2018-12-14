@@ -193,11 +193,6 @@ public:
 	virtual WgMode	Mode() const;
 
 
-
-#ifdef WG_DEBUG_DIRTY_RECTS
-    bool update;
-#endif
-
 protected:
 
 	void			_onNewHook( WgHook * pHook );

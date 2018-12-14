@@ -1330,6 +1330,8 @@ bool WgResDB::RemoveSurface( const std::string& id )
 
 	SurfaceRes * pRes = it->second;
 	m_mapSurfaces.erase(it);
+	
+	//delete pRes->res;
 	delete pRes;
 
 	return true;
@@ -1346,7 +1348,10 @@ bool WgResDB::RemoveSurface( WgResDB::SurfaceRes * pRes )
 		assert( it != m_mapSurfaces.end() );
 		m_mapSurfaces.erase(it);
 	}
+
+	//delete pRes->res;
 	delete pRes;
+
 	return true;
 }
 
@@ -1362,6 +1367,8 @@ bool WgResDB::RemoveGlyphset( const std::string& id )
 
 	GlyphsetRes * pRes = it->second;
 	m_mapGlyphsets.erase(it);
+	
+	//delete pRes->res;
 	delete pRes;
 
 	return true;
@@ -1378,7 +1385,10 @@ bool WgResDB::RemoveGlyphset( WgResDB::GlyphsetRes * pRes )
 		assert( it != m_mapGlyphsets.end() );
 		m_mapGlyphsets.erase(it);
 	}
+
+	//delete pRes->res;
 	delete pRes;
+	
 	return true;
 }
 
@@ -1394,6 +1404,8 @@ bool WgResDB::RemoveFont( const std::string& id )
 
 	FontRes * pRes = it->second;
 	m_mapFonts.erase(it);
+	
+	//delete pRes->res;
 	delete pRes;
 
 	return true;
@@ -1410,7 +1422,10 @@ bool WgResDB::RemoveFont( WgResDB::FontRes * pRes )
 		assert( it != m_mapFonts.end() );
 		m_mapFonts.erase(it);
 	}
+	
+	//delete pRes->res;
 	delete pRes;
+	
 	return true;
 }
 
@@ -1426,6 +1441,8 @@ bool WgResDB::RemoveAnim( const std::string& id )
 
 	AnimRes * pRes = it->second;
 	m_mapAnims.erase(it);
+	
+	//delete pRes->res;
 	delete pRes;
 
 	return true;
@@ -1442,7 +1459,10 @@ bool WgResDB::RemoveAnim( WgResDB::AnimRes * pRes )
 		assert( it != m_mapAnims.end() );
 		m_mapAnims.erase(it);
 	}
+	
+	//delete pRes->res;
 	delete pRes;
+
 	return true;
 }
 
@@ -1458,6 +1478,8 @@ bool WgResDB::RemoveCursor( const std::string& id )
 
 	CursorRes * pRes = it->second;
 	m_mapCursors.erase(it);
+	
+	//delete pRes->res;
 	delete pRes;
 
 	return true;
@@ -1474,7 +1496,10 @@ bool WgResDB::RemoveCursor( WgResDB::CursorRes * pRes )
 		assert( it != m_mapCursors.end() );
 		m_mapCursors.erase(it);
 	}
+	
+	//delete pRes->res;
 	delete pRes;
+
 	return true;
 }
 
@@ -1490,6 +1515,7 @@ bool WgResDB::RemoveTextprop( const std::string& id )
 
 	TextpropRes * pRes = it->second;
 	m_mapTextprops.erase(it);
+
 	delete pRes;
 
 	return true;
@@ -1506,7 +1532,9 @@ bool WgResDB::RemoveTextprop( WgResDB::TextpropRes * pRes )
 		assert( it != m_mapTextprops.end() );
 		m_mapTextprops.erase(it);
 	}
+		
 	delete pRes;
+
 	return true;
 }
 
@@ -1522,6 +1550,7 @@ bool WgResDB::RemoveColor( const std::string& id )
 
 	ColorRes * pRes = it->second;
 	m_mapColors.erase(it);
+	
 	delete pRes;
 
 	return true;
@@ -1538,7 +1567,9 @@ bool WgResDB::RemoveColor( WgResDB::ColorRes * pRes )
 		assert( it != m_mapColors.end() );
 		m_mapColors.erase(it);
 	}
+		
 	delete pRes;
+
 	return true;
 }
 
@@ -1553,6 +1584,7 @@ bool WgResDB::RemoveColorset( const std::string& id )
 
 	ColorsetRes * pRes = it->second;
 	m_mapColorsets.erase(it);
+		
 	delete pRes;
 
 	return true;
@@ -1569,7 +1601,9 @@ bool WgResDB::RemoveColorset( WgResDB::ColorsetRes * pRes )
 		assert( it != m_mapColorsets.end() );
 		m_mapColorsets.erase(it);
 	}
+		
 	delete pRes;
+
 	return true;
 }
 
@@ -1586,7 +1620,9 @@ bool WgResDB::RemoveLegoSource( const std::string& id )
 
 	LegoSource * pRes = it->second;
 	m_mapLegoSources.erase(it);
+		
 	delete pRes;
+
 	return true;
 }
 
@@ -1601,7 +1637,9 @@ bool WgResDB::RemoveLegoSource( WgResDB::LegoSource * pRes )
 		assert( it != m_mapLegoSources.end() );
 		m_mapLegoSources.erase(it);
 	}
+		
 	delete pRes;
+
 	return true;
 }
 
@@ -1616,6 +1654,7 @@ bool WgResDB::RemoveBlockset( const std::string& id )
 
 	BlocksetRes * pRes = it->second;
 	m_mapBlocksets.erase(it);
+		
 	delete pRes;
 
 	return true;
@@ -1632,7 +1671,9 @@ bool WgResDB::RemoveBlockset( WgResDB::BlocksetRes * pRes )
 		assert( it != m_mapBlocksets.end() );
 		m_mapBlocksets.erase(it);
 	}
+		
 	delete pRes;
+	
 	return true;
 }
 
@@ -1647,6 +1688,7 @@ bool WgResDB::RemoveDataSet( const std::string& id )
 
 	DataSetRes * pRes = it->second;
 	m_mapDataSets.erase(it);
+		
 	delete pRes;
 
 	return true;
@@ -1663,7 +1705,9 @@ bool WgResDB::RemoveDataSet( WgResDB::DataSetRes * pRes )
 		assert( it != m_mapDataSets.end() );
 		m_mapDataSets.erase(it);
 	}
+		
 	delete pRes;
+
 	return true;
 }
 
@@ -1679,6 +1723,8 @@ bool WgResDB::RemoveWidget( const std::string& id )
 
 	WidgetRes * pRes = it->second;
 	m_mapWidgets.erase(it);
+	
+	//delete pRes->res;
 	delete pRes;
 
 	return true;
@@ -1695,7 +1741,10 @@ bool WgResDB::RemoveWidget( WgResDB::WidgetRes * pRes )
 		assert( it != m_mapWidgets.end() );
 		m_mapWidgets.erase(it);
 	}
+
+	//delete pRes->res;
 	delete pRes;
+
 	return true;
 }
 
@@ -1710,6 +1759,7 @@ bool WgResDB::RemoveMenuitem( const std::string& id )
 
 	MenuitemRes * pRes = it->second;
 	m_mapMenuitems.erase(it);
+
 	delete pRes;
 
 	return true;
@@ -1726,7 +1776,9 @@ bool WgResDB::RemoveMenuitem( WgResDB::MenuitemRes * pRes )
 		assert( it != m_mapMenuitems.end() );
 		m_mapMenuitems.erase(it);
 	}
+	
 	delete pRes;
+
 	return true;
 }
 
@@ -1741,6 +1793,7 @@ bool WgResDB::RemoveTab( const std::string& id )
 
 	TabRes * pRes = it->second;
 	m_mapTabs.erase(it);
+
 	delete pRes;
 
 	return true;
@@ -1757,7 +1810,9 @@ bool WgResDB::RemoveTab( WgResDB::TabRes * pRes )
 		assert( it != m_mapTabs.end() );
 		m_mapTabs.erase(it);
 	}
+	
 	delete pRes;
+
 	return true;
 }
 
@@ -1772,6 +1827,8 @@ bool WgResDB::RemoveTextManager( const std::string& id )
 
 	TextManagerRes * pRes = it->second;
 	m_mapTextManagers.erase(it);
+
+	//delete pRes->res;
 	delete pRes;
 
 	return true;
@@ -1788,7 +1845,10 @@ bool WgResDB::RemoveTextManager( WgResDB::TextManagerRes * pRes )
 		assert( it != m_mapTextManagers.end() );
 		m_mapTextManagers.erase(it);
 	}
+	
+	//delete pRes->res;
 	delete pRes;
+
 	return true;
 }
 
@@ -1803,6 +1863,7 @@ bool WgResDB::RemoveSkinManager( const std::string& id )
 
 	SkinManagerRes * pRes = it->second;
 	m_mapSkinManagers.erase(it);
+		
 	delete pRes;
 
 	return true;
@@ -1819,7 +1880,9 @@ bool WgResDB::RemoveSkinManager( WgResDB::SkinManagerRes * pRes )
 		assert( it != m_mapSkinManagers.end() );
 		m_mapSkinManagers.erase(it);
 	}
+		
 	delete pRes;
+
 	return true;
 }
 
@@ -1866,6 +1929,8 @@ bool WgResDB::RemoveResDB( const std::string& id )
 
 	ResDBRes * pRes = it->second;
 	m_mapResDBs.erase(it);
+
+	//delete pRes->res;
 	delete pRes;
 
 	return true;
@@ -1882,6 +1947,9 @@ bool WgResDB::RemoveResDB( WgResDB::ResDBRes * pRes )
 		assert( it != m_mapResDBs.end() );
 		m_mapResDBs.erase(it);
 	}
+	
+	//delete pRes->res;
 	delete pRes;
+
 	return true;
 }

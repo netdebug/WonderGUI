@@ -35,9 +35,7 @@ WgWidget::WgWidget():m_id(0), m_pHook(0), m_pointerStyle(WG_POINTER_DEFAULT),
 					m_markOpacity( 1 ), m_bEnabled(true), m_bOpaque(false),
 					m_bFocused(false), m_bSelected(false), m_bTabLock(false), m_bReceiveTick(false), m_scale(WG_SCALE_BASE)
 {
-#ifdef WG_DEBUG_DIRTY_RECTS
-    update = false;
-#endif
+
 }
 
 //____ Destructor _____________________________________________________________
@@ -384,17 +382,8 @@ void WgWidget::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canvas, con
 	for( const WgRect * pRect = _pPatches->Begin() ; pRect != _pPatches->End() ; pRect++ )
 	{
 		WgRect clip( _window, *pRect );
-		if( clip.w > 0 && clip.h > 0 ) {
+		if( clip.w > 0 && clip.h > 0 )
 			_onRender( pDevice, _canvas, _window, clip );
-#ifdef WG_DEBUG_DIRTY_RECTS
-            if(update)
-                pDevice->Fill(_canvas, WgColor(255,255,0,16));
-            else
-                pDevice->Fill(_canvas, WgColor(255,255,0,0));
-            
-            update = !update;
-#endif
-        }
 	}
 }
 

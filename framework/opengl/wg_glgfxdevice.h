@@ -50,6 +50,9 @@ public:
 
 	void    SetViewportOffset( WgCoord ofs );
     bool    SetCanvas( WgSize dimensions );
+    void    SetFlush( bool bFlush );
+    bool    IsCanvasReady() const;
+
     using   WgGfxDevice::SetCanvas;
     
     void    StretchBlitSubPixelWithInvert(const WgSurface * pSrc, float sx, float sy, float sw, float sh,

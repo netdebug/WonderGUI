@@ -29,6 +29,8 @@
 #include <wg3_base.h>
 #include <wg3_util.h>
 #include <assert.h>
+#include "debug.h"
+
 
 #ifdef SOFTUBE_USE_PACE_FUSION
 #include "PaceFusion.h"
@@ -358,16 +360,16 @@ namespace wg
 	{
 		m_bRendering = false;
 		m_bFlipY = true;
-        _initTables();
+		_initTables();
         
-        m_fillProg = _createGLProgram( fillVertexShader, fillFragmentShader );
-        m_fillProgColorLoc = glGetUniformLocation( m_fillProg, "color");
+		m_fillProg = _createGLProgram( fillVertexShader, fillFragmentShader );
+		m_fillProgColorLoc = glGetUniformLocation( m_fillProg, "color");
 
 		GLint err = glGetError();
 		assert( err == 0 );
     
-        m_aaFillProg = _createGLProgram( fillVertexShader, aaFillFragmentShader );
-        m_aaFillProgColorLoc = glGetUniformLocation( m_aaFillProg, "color");
+		m_aaFillProg = _createGLProgram( fillVertexShader, aaFillFragmentShader );
+		m_aaFillProgColorLoc = glGetUniformLocation( m_aaFillProg, "color");
         m_aaFillProgFrameLoc = glGetUniformLocation( m_aaFillProg, "frame");
         m_aaFillProgOutsideAALoc = glGetUniformLocation( m_aaFillProg, "outsideAA");
         
@@ -395,10 +397,10 @@ namespace wg
 		m_horrWaveProgFrontFillLoc = glGetUniformLocation(m_horrWaveProg, "frontColor");
 		m_horrWaveProgBackFillLoc = glGetUniformLocation(m_horrWaveProg, "backColor");
 
-        assert( glGetError() == 0 );
+       DBG_ASSERT( glGetError() == 0 );
         m_plotProg = _createGLProgram( plotVertexShader, plotFragmentShader );
         m_plotProgTintLoc = glGetUniformLocation( m_plotProg, "tint" );
-        assert( glGetError() == 0 );
+       DBG_ASSERT( glGetError() == 0 );
         
         glGenVertexArrays(1, &m_vertexArrayId);
         glBindVertexArray(m_vertexArrayId);
@@ -484,6 +486,13 @@ namespace wg
 		return m_pSurfaceFactory;
 	}
 
+	//____ surfaceFactory() ______________________________________________________
+
+	void GlGfxDevice::setFlush( bool bFlush )
+	{
+		m_bFlush = bFlush;
+	}
+    
 	//____ setCanvas() __________________________________________________________________
 
 	bool GlGfxDevice::setCanvas( const Rect& viewport )
@@ -561,7 +570,7 @@ namespace wg
 		glScissor(m_canvasViewport.x, m_canvasViewport.y, m_canvasViewport.w, m_canvasViewport.h);
 		glViewport(m_canvasViewport.x, m_canvasViewport.y, m_canvasViewport.w, m_canvasViewport.h);
 
-        assert( glGetError() == 0 );
+		DBG_ASSERT( glGetError() == 0 );
 		return true;
 	}
 
@@ -570,7 +579,7 @@ namespace wg
 
 	void GlGfxDevice::_updateProgramDimensions()
 	{
-        assert( glGetError() == 0 );
+		DBG_ASSERT( glGetError() == 0 );
 
 		glUseProgram(m_fillProg);
 		GLint dimLoc = glGetUniformLocation(m_fillProg, "dimensions");
@@ -601,7 +610,7 @@ namespace wg
 		dimLoc = glGetUniformLocation(m_horrWaveProg, "dimensions");
 		glUniform2f(dimLoc, (GLfloat)m_canvasSize.w, (GLfloat)m_canvasSize.h);
 
-        assert( glGetError() == 0 );
+		DBG_ASSERT( glGetError() == 0 );
 	}
 
 
@@ -636,6 +645,13 @@ namespace wg
 		return true;
 	}
 
+    //____ isCanvasReady() ___________________________________________________________
+
+    bool GlGfxDevice::isCanvasReady() const
+    {
+        return (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+    }
+    
 	//____ beginRender() ___________________________________________________________
 
 	bool GlGfxDevice::beginRender()
@@ -693,8 +709,6 @@ namespace wg
 		if( m_bRendering == false )
 			return false;
 
-        glFlush();
-
 		if( m_glDepthTest )
 			glEnable(GL_DEPTH_TEST);
 
@@ -711,7 +725,11 @@ namespace wg
 		glScissor(m_glScissorBox[0], m_glScissorBox[1], m_glScissorBox[2], m_glScissorBox[3]);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_glReadFrameBuffer);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_glDrawFrameBuffer);
-    	assert( glGetError() == 0 );
+
+        if( m_bFlush )
+            glFlush();
+
+        assert( glGetError() == 0 );
 
 		m_bRendering = false;
 		return true;
@@ -822,7 +840,7 @@ namespace wg
                               (void*)0            // array buffer offset
                               );
 
-        glBindBuffer(GL_ARRAY_BUFFER, m_texCoordArrayId);
+        glBindBuffer(GL_ARRAY_BUFFER, m_texCoordBufferId);
         glBufferData(GL_ARRAY_BUFFER, sizeof(m_texCoordBufferData), m_texCoordBufferData, GL_DYNAMIC_DRAW);
         glVertexAttribPointer(
                               1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
@@ -984,7 +1002,7 @@ namespace wg
                               (void*)0            // array buffer offset
                               );
         
-        glBindBuffer(GL_ARRAY_BUFFER, m_texCoordArrayId);
+        glBindBuffer(GL_ARRAY_BUFFER, m_texCoordBufferId);
         glBufferData(GL_ARRAY_BUFFER, sizeof(m_texCoordBufferData), m_texCoordBufferData, GL_DYNAMIC_DRAW);
         glVertexAttribPointer(
                               1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
@@ -1113,7 +1131,7 @@ namespace wg
 			(void*)0            // array buffer offset
 		);
 
-		glBindBuffer(GL_ARRAY_BUFFER, m_texCoordArrayId);
+		glBindBuffer(GL_ARRAY_BUFFER, m_texCoordBufferId);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(m_texCoordBufferData), m_texCoordBufferData, GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(
 			1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
@@ -1249,7 +1267,7 @@ namespace wg
                               (void*)0            // array buffer offset
                               );
         
-        glBindBuffer(GL_ARRAY_BUFFER, m_texCoordArrayId);
+        glBindBuffer(GL_ARRAY_BUFFER, m_texCoordBufferId);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Color)*nCoords, pColors, GL_DYNAMIC_DRAW);
         glVertexAttribPointer(
                               1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
