@@ -362,7 +362,8 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSliderHandle(WgCoord ofs, WgCoord 
 
 	Slider *	pSlightlyMarked = nullptr;
 	WgCoord		slightlyMarkedOfs;
-
+    WgCoord     slightlyMarkedDistance;
+    
 	Slider *	pFullyMarked = nullptr;
 	WgCoord		fullyMarkedOfs;
 
@@ -377,7 +378,9 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSliderHandle(WgCoord ofs, WgCoord 
 			WgRect sliderGeo = _sliderGeo(slider, PixelSize());
 			WgRect handleGeo = _sliderHandleGeo(slider, sliderGeo);
 
-			if (handleGeo.Contains(ofs) && pHandleSkin->MarkTest(ofs - handleGeo.Pos(), handleGeo.Size(), slider.handleState, m_markOpacity, m_scale))
+            // We are using WG_STATE_NORMAL on purpose here, so that hover hightlights are not included. Not perfect, but the lesser of two evils...
+            
+            if (handleGeo.Contains(ofs) && pHandleSkin->MarkTest(ofs - handleGeo.Pos(), handleGeo.Size(), WgStateEnum::WG_STATE_NORMAL, m_markOpacity, m_scale))
 			{
 				fullyMarkedOfs = ofs - handleGeo.Pos();
 				pFullyMarked = &slider;
@@ -391,8 +394,17 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSliderHandle(WgCoord ofs, WgCoord 
 
 				if (extendedGeo.Contains(ofs))
 				{
-					slightlyMarkedOfs = ofs - handleGeo.Pos();
-					pSlightlyMarked = &slider;
+                    WgCoord distance = ofs - handleGeo.Center();
+
+                    // This is our new slightly marked if ofs is closer to handleGeo than any previous slightly marked.
+                    
+                    if( !pSlightlyMarked || (distance.x*distance.x + distance.y*distance.y) < (slightlyMarkedDistance.x*slightlyMarkedDistance.x + slightlyMarkedDistance.y*slightlyMarkedDistance.y) )
+                    {
+                        slightlyMarkedOfs = ofs - handleGeo.Pos();
+                        pSlightlyMarked = &slider;
+                        slightlyMarkedDistance = distance;
+                    }
+                    
 				}
 			}
 		}
@@ -452,6 +464,8 @@ void WgMultiSlider::_selectSliderHandle(Slider * pSlider)
 
 void WgMultiSlider::_setSliderStates(Slider& slider, WgState newSliderState, WgState newHandleState)
 {
+    // Request render where needed
+    
 	WgSkin * pSliderSkin = slider.pBgSkin ? slider.pBgSkin.GetRealPtr() : m_pDefaultBgSkin.GetRealPtr();
 	WgSkin * pHandleSkin = slider.pHandleSkin ? slider.pHandleSkin.GetRealPtr() : m_pDefaultHandleSkin.GetRealPtr();
 
@@ -460,6 +474,26 @@ void WgMultiSlider::_setSliderStates(Slider& slider, WgState newSliderState, WgS
 	else if (pHandleSkin && !pHandleSkin->IsStateIdentical(slider.handleState, newHandleState))
 		_requestRenderHandle(&slider);
 
+    // Possibly send messages
+    
+    WgEventHandler * pHandler = _eventHandler();
+    if (pHandler)
+    {
+        if( !slider.sliderState.isHovered() && newSliderState.isHovered() )
+            pHandler->QueueEvent(new WgEvent::SliderEnter(this, slider.id));
+        
+        if( slider.sliderState.isHovered() && !newSliderState.isHovered() )
+            pHandler->QueueEvent(new WgEvent::SliderLeave(this, slider.id));
+
+        if( !slider.handleState.isHovered() && newHandleState.isHovered() )
+            pHandler->QueueEvent(new WgEvent::SliderHandleEnter(this, slider.id));
+        
+        if( slider.handleState.isHovered() && !newHandleState.isHovered() )
+            pHandler->QueueEvent(new WgEvent::SliderHandleLeave(this, slider.id));
+    }
+    
+    // Set the states
+    
 	slider.sliderState = newSliderState;
 	slider.handleState = newHandleState;
 }
@@ -552,7 +586,7 @@ void WgMultiSlider::_updateSliderStates()
 	{
 		// Fullfills the following rules:
 		// 1. If some HANDLE is SELECTED -> That sliders background is PRESSED, no other background is HOVERED.
-		// 2. If some SLIDER is PRESSED->That sliders background is PRESSED, no other background is HOVERED.
+		// 2. If some SLIDER is PRESSED -> That sliders background is PRESSED, no other background is HOVERED.
 
 		Slider& selected = m_sliders[m_selectedSliderHandle >= 0 ? m_selectedSliderHandle : m_selectedSlider];
 		for ( auto& slider : m_sliders )
@@ -573,7 +607,7 @@ void WgMultiSlider::_updateSliderStates()
 	else if (m_pressMode == PressMode::MultiSetValue && m_state.isPressed())
 	{
 		// Fullfills the following rules:
-		// 3. If DRAW MODE and mouse pressed over background or handle->background is PRESSED.
+		// 3. If DRAW MODE and mouse pressed over background or handle -> Background is PRESSED.
 
 		if (m_hoveredSlider >= 0 || m_hoveredSliderHandle >= 0)
 		{
@@ -604,7 +638,7 @@ void WgMultiSlider::_updateSliderStates()
 	else
 	{
 		// Fullfills the following rules:
-		// 4. If mouse over selection area OR handle->That sliders background is HOVERED.
+		// 4. If mouse over selection area OR handle -> That sliders background is HOVERED.
 
 		if( m_hoveredSlider >= 0 || m_hoveredSliderHandle >= 0 )
 		{
@@ -640,7 +674,7 @@ void WgMultiSlider::_updateSliderStates()
 	if (m_bGhostHandle)
 	{
 		// Fullfills the following rules:
-		// 1. If GHOST mode->All handles follows their backgrounds states.
+		// 1. If GHOST mode -> All handles follows their backgrounds states.
 
 		for (auto& slider : m_sliders)
 		{
@@ -651,7 +685,7 @@ void WgMultiSlider::_updateSliderStates()
 	else if (m_selectedSliderHandle >= 0)
 	{
 		// Fullfills the following rules:
-		// 2. If a handle is SELECTED->That handle is PRESSED, no other handle is HOVERED.
+		// 2. If a handle is SELECTED -> That handle is PRESSED, no other handle is HOVERED.
 
 		Slider& selected = m_sliders[m_selectedSliderHandle];
 		for (auto& slider : m_sliders)
@@ -672,7 +706,7 @@ void WgMultiSlider::_updateSliderStates()
 	else if (m_pressMode == PressMode::MultiSetValue && m_state.isPressed())
 	{
 		// Fullfills the following rules:
-		// 3. If DRAW MODE and mouse pressed over background or handle-> handle is PRESSED.
+		// 3. If DRAW MODE and mouse pressed over background or handle -> Handle is PRESSED.
 
 		if (m_hoveredSliderHandle >= 0)
 		{
@@ -704,7 +738,7 @@ void WgMultiSlider::_updateSliderStates()
 	else if (m_hoveredSliderHandle >= 0)
 	{
 		// Fullfills the following rules:
-		// 4. If a handle is HOVERED->That handle is HOVERED.
+		// 4. If a handle is HOVERED -> That handle is HOVERED.
 
 		Slider& hovered = m_sliders[m_hoveredSliderHandle];
 		for (auto& slider : m_sliders)
