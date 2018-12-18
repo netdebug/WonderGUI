@@ -399,3 +399,28 @@ bool WgRect::ClipLine(WgCoord * p1, WgCoord* p2, int precision) const
 
 	return true;
 }
+
+//____ Distance() ________________________________________________________
+
+WgCoord WgRect::Distance( WgCoord coord ) const
+{
+    int dx = coord.x - x;
+    int dy = coord.y - y;
+    
+    if( dx > 0 )
+    {
+        dx -= w;
+        if( dx < 0 )
+            dx = 0;
+    }
+    
+    if( dy > 0 )
+    {
+        dy -= h;
+        if( dy < 0 )
+            dy = 0;
+    }
+    
+    return { dx, dy};
+}
+

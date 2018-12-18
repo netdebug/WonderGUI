@@ -1655,6 +1655,8 @@ namespace wg
 		// Adjusted clip
 
 		Rect clip(_clip, outerRect);
+        if( clip.w == 0 || clip.h == 0 )
+            return;
 
 		int clipLeft = clip.x - outerRect.x;
 

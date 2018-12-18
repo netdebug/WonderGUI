@@ -365,6 +365,9 @@ public:
 	bool		IntersectsWithOrContains(WgCoord p1, WgCoord p2, int precision = 14) const;
 	bool		ClipLine(WgCoord * p1, WgCoord * p2, int precision = 14) const;
 
+    WgCoord     Distance( WgCoord coord ) const;                /// Distance between coord and rectangle. Returns 0,0 if coord is inside.
+    inline WgCoord     Center() const { return {x+w/2,y+h/2}; }
+    
 	inline int Width() const		{ return w; }
 	inline int Height() const	{ return h; }
 	inline WgSize Size() const		{ return WgSize(w,h); }
