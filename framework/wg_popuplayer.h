@@ -88,6 +88,7 @@ protected:
 	WgOrigo		attachPoint;
 	WgCoord		attachOfs;			// Offset in points from attachPoint.
 	bool		bAutoClose;			// Has been opened in auto-close mode.
+    bool        bOpened;            // Set once the popup has passed state OpeningDelay.
 	State		state;
 	int			stateCounter;		// Counts millisec the slot has been in a transitative state (Delay, Opening, Coundown and Closing).
 	WgSize		maxSize;
@@ -143,8 +144,8 @@ protected:
 
 	void			_addSlot(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, WgCoord attachOfs, bool bAutoClose, bool bDelay, WgSize maxSize);
 
-	void			_closeAutoOpenedUntil(WgWidget * pStayOpen);
-
+	void			_closeAutoOpenedUntil(WgWidget * pStayOpen, bool bCloseImmediately );
+    void            _beginClosing( WgPopupHook * p, bool bCloseImmediately );
 
 	// Overloaded from Panel
 
@@ -186,9 +187,9 @@ protected:
 	Widget_wp				m_pKeyFocus;	// Pointer at child that held focus before any menu was opened.
 
 
-	int				m_openingDelayMs = 200;
+	int				m_openingDelayMs = 150;
 	int				m_openingFadeMs = 100;
-	int				m_closingDelayMs = 200;
+	int				m_closingDelayMs = 100;
 	int				m_closingFadeMs = 100;
 };
 	

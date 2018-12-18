@@ -155,7 +155,7 @@ int WgPopupLayer::NbPopups() const
 void WgPopupLayer::Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint, WgCoord attachOfs, bool bAutoClose, bool bDelay, WgSize maxSize)
 {
 	if (bAutoClose && !m_popupHooks.IsEmpty())
-		_closeAutoOpenedUntil(pOpener);
+		_closeAutoOpenedUntil(pOpener, true);
 
 	_addSlot(pPopup, pOpener, launcherGeo, attachPoint, attachOfs, bAutoClose, bDelay, maxSize);
 }
@@ -408,7 +408,11 @@ WgWidget *  WgPopupLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 				else if( pSlot->m_pWidget->MarkTest( ofs - pSlot->m_geo.Pos() ) )
 					pResult = pSlot->m_pWidget;
 			}
-			pSlot = pSlot->Next();
+            
+            if( pSlot->state == WgPopupHook::State::Opening || pSlot->state == WgPopupHook::State::PeekOpen || pSlot->state == WgPopupHook::State::ClosingDelay )
+                pSlot = nullptr;
+            else
+                pSlot = pSlot->Next();
 		}
 	
 		if( pResult == 0 )
@@ -665,16 +669,17 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 					{
 						pHook->state = WgPopupHook::State::Opening;
 						pHook->stateCounter -= m_openingDelayMs;
+                        pHook->bOpened = true;
 						// No break here, let's continue down to opening...
 					}
 				case WgPopupHook::State::Opening:
 					pHook->stateCounter += ms;
-					_requestRender(pHook->m_geo);
 					if (pHook->stateCounter >= m_openingFadeMs)
 					{
 						pHook->stateCounter = 0;
 						pHook->state = pHook->bAutoClose ? WgPopupHook::State::PeekOpen : WgPopupHook::State::FixedOpen;
 					}
+                    _onRequestRender(pHook->m_geo, pHook);
 					break;
 
 				case WgPopupHook::State::ClosingDelay:
@@ -691,10 +696,12 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 					}
 				case WgPopupHook::State::Closing:
 					pHook->stateCounter += ms;
-					_requestRender(pHook->m_geo);
 
-					if (pHook->stateCounter >= m_closingFadeMs)
-						_removeSlot(pHook);
+                    if (pHook->stateCounter >= m_closingFadeMs)
+                        _removeSlot(pHook);
+                    else
+                        _onRequestRender(pHook->m_geo, pHook);
+
 					break;
 				default:
 					break;
@@ -718,23 +725,30 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 
 			WgCoord 	pointerPos = pEvent->PointerPixelPos() - ScreenPixelPos();
 
-			// Top popup can be in state PeekOpen, which needs special attention.
+            // Popups that are of type 'auto closing' needs special attention
 
 			WgPopupHook * pHook = m_popupHooks.First();
-			if (pHook && pHook->state == WgPopupHook::State::PeekOpen)
-			{
-				// Promote popup to state WeakOpen if pointer has entered its geo,
-				// otherwise begin delayed closing if pointer has left launcherGeo.
+            if (pHook && pHook->bAutoClose )
+            {
+                // Promote popup in state PeekOpen to state WeakOpen if pointer has entered its geo.
 
-				if (pHook->m_geo.Contains(pointerPos))
-					pHook->state = WgPopupHook::State::WeakOpen;
-				else if (!pHook->launcherGeo.Contains(pointerPos))
-				{
-					pHook->state = WgPopupHook::State::ClosingDelay;
-					pHook->stateCounter = 0;
-				}
-			}
-			
+                if( pHook->state == WgPopupHook::State::PeekOpen)
+                {
+                    if (pHook->m_geo.Contains(pointerPos))
+                        pHook->state = WgPopupHook::State::WeakOpen;
+                }
+                
+                // Close PeekOpen popups (and popups that are about to become PeekOpen) if pointer has left launcherGeo.
+                
+                if ( pHook->state == WgPopupHook::State::PeekOpen || pHook->state == WgPopupHook::State::Opening || pHook->state == WgPopupHook::State::OpeningDelay )
+                {
+                    if (!pHook->launcherGeo.Contains(pointerPos))
+                        _beginClosing(pHook, false);
+                }
+            }
+
+            
+            
 			// A popup in state ClosingDelay should be promoted to
 			// state PeekOpen if pointer has entered its launcherGeo and
 			// to state WeakOpen if pointer has entered its geo.
@@ -773,14 +787,17 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 			WgWidget * pMarked = FindWidget(pointerPos, WgSearchMode::WG_SEARCH_ACTION_TARGET);
 
 			if (pMarked != this && (pMarked->IsSelectable() && m_popupHooks.First()->bAutoClose))
-				_closeAutoOpenedUntil(pMarked);
+				_closeAutoOpenedUntil(pMarked, false);
 
 		}				
 		break;
 
-/*
-		case MsgType::MouseLeave:
+
+		case WG_EVENT_MOUSE_LEAVE:
 		{
+            if( !pEvent->ForwardedFrom() )
+                _closeAutoOpenedUntil(this, false);
+/*
 			// Top popup can be in state PeekOpen, which should begin closing when
 			// pointer has left.
 
@@ -790,9 +807,10 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 				pSlot->state = PopupSlot::State::ClosingDelay;
 				pSlot->stateCounter = 0;
 			}
+ */
 		}
 		break;
-*/
+
 
 		case WG_EVENT_MOUSEBUTTON_RELEASE:
 		{
@@ -860,7 +878,7 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 	
 //____ _closeAutoOpenedUntil() _________________________________________________
 
-void WgPopupLayer::_closeAutoOpenedUntil(WgWidget * pStayOpen)
+void WgPopupLayer::_closeAutoOpenedUntil(WgWidget * pStayOpen, bool bCloseImmediately)
 {
 	// Follow pStayOpen up the hierarchy to one of our popups or null.
 
@@ -871,28 +889,44 @@ void WgPopupLayer::_closeAutoOpenedUntil(WgWidget * pStayOpen)
 	// all will be removed.
 
 	auto p = m_popupHooks.First();
-	while (p->bAutoClose && p->m_pWidget != pStayOpen)
+	while (p && p->bAutoClose && p->m_pWidget != pStayOpen)
 	{
-		switch (p->state)
-		{
-			case WgPopupHook::State::OpeningDelay:
-				p->state = WgPopupHook::State::Closing;
-				p->stateCounter = m_closingFadeMs;
-				break;
-			case WgPopupHook::State::Opening:
-				p->state = WgPopupHook::State::Closing;
-				p->stateCounter = p->stateCounter * m_closingFadeMs / m_openingFadeMs;
-				break;
-			case WgPopupHook::State::Closing:
-				break;
-			default:
-				p->state = WgPopupHook::State::Closing;
-				p->stateCounter = 0;
-		}
+        _beginClosing(p, bCloseImmediately);
 		p = p->_next();
 	}
 
 }
+
+//____ _beginClosing() _____________________________________________________
+
+void WgPopupLayer::_beginClosing( WgPopupHook * p, bool bCloseImmediately )
+{
+    switch (p->state)
+    {
+        case WgPopupHook::State::OpeningDelay:
+            p->state = WgPopupHook::State::Closing;
+            p->stateCounter = m_closingFadeMs;
+            break;
+        case WgPopupHook::State::Opening:
+            p->state = WgPopupHook::State::Closing;
+            p->stateCounter = p->stateCounter * m_closingFadeMs / m_openingFadeMs;
+            break;
+        case WgPopupHook::State::Closing:
+            break;
+        case WgPopupHook::State::ClosingDelay:
+            if( bCloseImmediately )
+            {
+                p->state = WgPopupHook::State::Closing;
+                p->stateCounter = 0;
+            }
+            break;
+        default:
+            p->state = bCloseImmediately ? WgPopupHook::State::Closing : WgPopupHook::State::ClosingDelay;
+            p->stateCounter = 0;
+    }
+}
+
+
 
 //____ _stealKeyboardFocus() _________________________________________________
 	
@@ -965,6 +999,7 @@ void WgPopupLayer::_addSlot(WgWidget * _pPopup, WgWidget * _pOpener, const WgRec
 	pHook->attachOfs = _attachOfs;
 	pHook->bAutoClose = _bAutoClose;
 	pHook->state = bDelay ? WgPopupHook::State::OpeningDelay : WgPopupHook::State::Opening;
+    pHook->bOpened = !bDelay;
 	pHook->stateCounter = 0;
 	pHook->maxSize = _maxSize;
 
@@ -995,8 +1030,10 @@ void WgPopupLayer::_removeSlots(int nb)
 		if (pEH)
 			pEH->QueueEvent(new WgEvent::PopupClosed(p->Widget(), p->pOpener));
 
-		p->_requestRender();
-		p->_releaseWidget();
+        if( p->bOpened )
+            p->_requestRender();
+
+        p->_releaseWidget();
 		delete p;
 	}
 	_restoreKeyboardFocus();
@@ -1015,7 +1052,8 @@ void WgPopupLayer::_removeSlot(WgPopupHook * p)
 	if (pEH)
 		pEH->QueueEvent(new WgEvent::PopupClosed(p->Widget(), p->pOpener));
 
-	p->_requestRender();
+    if( p->bOpened )
+        p->_requestRender();
 	p->_releaseWidget();
 	delete p;
 
