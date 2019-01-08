@@ -920,6 +920,43 @@ namespace WgEvent
 
 	//____ MultiSlider event methods __________________________________________
 
+    SliderEnter::SliderEnter(WgMultiSlider * pSlider, int sliderId)
+    {
+        m_type        = WG_EVENT_SLIDER_ENTER;
+        m_pWidget    = pSlider;
+        m_id        = sliderId;
+    }
+
+    SliderLeave::SliderLeave(WgMultiSlider * pSlider, int sliderId)
+    {
+        m_type        = WG_EVENT_SLIDER_LEAVE;
+        m_pWidget    = pSlider;
+        m_id        = sliderId;
+    }
+
+    SliderHandleEnter::SliderHandleEnter(WgMultiSlider * pSlider, int sliderId)
+    {
+        m_type        = WG_EVENT_SLIDER_HANDLE_ENTER;
+        m_pWidget    = pSlider;
+        m_id        = sliderId;
+    }
+    
+    SliderHandleLeave::SliderHandleLeave(WgMultiSlider * pSlider, int sliderId)
+    {
+        m_type        = WG_EVENT_SLIDER_HANDLE_LEAVE;
+        m_pWidget    = pSlider;
+        m_id        = sliderId;
+    }
+
+    SliderPressed::SliderPressed(WgMultiSlider * pSlider, int sliderId, int button, WgOrigo offsetFromHandle)
+    {
+        m_type        = WG_EVENT_SLIDER_PRESS;
+        m_pWidget    = pSlider;
+        m_id        = sliderId;
+        m_button    = button;
+        m_offsetFromHandle = offsetFromHandle;
+    }
+
 	SliderMoved::SliderMoved(WgMultiSlider * pSlider, int sliderId, float value, float value2)
 	{
 		m_type		= WG_EVENT_SLIDER_MOVED;
@@ -929,14 +966,6 @@ namespace WgEvent
 		m_value2	= value2;
 	}
 
-	SliderPressed::SliderPressed(WgMultiSlider * pSlider, int sliderId, int button, WgOrigo offsetFromHandle)
-	{
-		m_type		= WG_EVENT_SLIDER_PRESS;
-		m_pWidget	= pSlider;
-		m_id		= sliderId;
-		m_button	= button;
-		m_offsetFromHandle = offsetFromHandle;
-	}
 
 
 	//____ Link event methods __________________________________________________

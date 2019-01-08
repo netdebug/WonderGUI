@@ -29,8 +29,7 @@
 #include <wg3_base.h>
 #include <wg3_util.h>
 #include <assert.h>
-#include "debug.h"
-
+#include "Debug.h"
 
 #ifdef SOFTUBE_USE_PACE_FUSION
 #include "PaceFusion.h"
@@ -422,6 +421,7 @@ namespace wg
         	glGenBuffers(1, &m_dummyBuffer);
 		
         }
+        m_tintColor = Color::Black;             // Escaping the early out in setTintColor();
         setTintColor( Color::White );        
 
 		assert( glGetError() == 0 );      
@@ -618,6 +618,9 @@ namespace wg
 
 	void GlGfxDevice::setTintColor( Color color )
 	{
+        if( color == m_tintColor )
+            return;                         // Early out
+        
 		GfxDevice::setTintColor(color);
 
         glUseProgram( m_blitProg );
@@ -630,7 +633,7 @@ namespace wg
 
 	bool GlGfxDevice::setBlendMode( BlendMode blendMode )
 	{
-        assert( glGetError() == 0 );
+       DBG_ASSERT( glGetError() == 0 );
 
 		if( blendMode != BlendMode::Blend && blendMode != BlendMode::Replace && 
 			blendMode != BlendMode::Add && blendMode != BlendMode::Subtract && blendMode != BlendMode::Multiply &&
@@ -641,7 +644,7 @@ namespace wg
 		if( m_bRendering )
 			_setBlendMode(blendMode);
 
-        assert( glGetError() == 0 );
+       DBG_ASSERT( glGetError() == 0 );
 		return true;
 	}
 

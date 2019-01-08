@@ -26,7 +26,7 @@
 #include <wg3_util.h>
 #include <wg3_blob.h>
 #include <assert.h>
-#include "debug.h"
+#include "Debug.h"
 
 
 

@@ -720,6 +720,71 @@ namespace WgEvent
 
 	//____ WgMultiSlider events _______________________________________________
 
+    class SliderEnter : public Event
+    {
+        friend class ::WgMultiSlider;
+    public:
+        int id() const { return m_id; }
+        
+    protected:
+        SliderEnter(WgMultiSlider * pSlider, int sliderId );
+        
+        int        m_id;
+    };
+
+    class SliderLeave : public Event
+    {
+        friend class ::WgMultiSlider;
+    public:
+        int id() const { return m_id; }
+        
+    protected:
+        SliderLeave(WgMultiSlider * pSlider, int sliderId );
+        
+        int        m_id;
+    };
+
+    class SliderHandleEnter : public Event
+    {
+        friend class ::WgMultiSlider;
+    public:
+        int id() const { return m_id; }
+        
+    protected:
+        SliderHandleEnter(WgMultiSlider * pSlider, int sliderId );
+        
+        int        m_id;
+    };
+    
+    class SliderHandleLeave : public Event
+    {
+        friend class ::WgMultiSlider;
+    public:
+        int id() const { return m_id; }
+        
+    protected:
+        SliderHandleLeave(WgMultiSlider * pSlider, int sliderId );
+        
+        int        m_id;
+    };
+    
+    class SliderPressed : public Event
+    {
+        friend class ::WgMultiSlider;
+    public:
+        int id() const { return m_id; }
+        
+        int        button() const { return m_button; }
+        WgOrigo    sideOfHandle() const { return m_offsetFromHandle; }
+        
+    protected:
+        SliderPressed(WgMultiSlider * pSlider, int sliderId, int button, WgOrigo offsetFromHandle );
+        
+        int        m_id;
+        int        m_button;
+        WgOrigo    m_offsetFromHandle;
+    };
+
 	class SliderMoved : public Event
 	{
 		friend class ::WgMultiSlider;
@@ -736,24 +801,6 @@ namespace WgEvent
 		float	m_value;
 		float	m_value2;
 	};
-
-	class SliderPressed : public Event
-	{
-		friend class ::WgMultiSlider;
-	public:
-		int id() const { return m_id; }
-
-		int		button() const { return m_button; }
-		WgOrigo	sideOfHandle() const { return m_offsetFromHandle; }
-
-	protected:
-		SliderPressed(WgMultiSlider * pSlider, int sliderId, int button, WgOrigo offsetFromHandle );
-
-		int		m_id;
-		int		m_button;
-		WgOrigo	m_offsetFromHandle;
-	};
-
 
 
 	//____ Link events _________________________________________________________

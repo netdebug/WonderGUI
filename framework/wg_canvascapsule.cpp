@@ -355,7 +355,7 @@ void WgCanvasCapsule::_onRenderRequested()
 void WgCanvasCapsule::_onRenderRequested(const WgRect& rect)
 {
     m_dirtyPatches.Add(rect);
-    _requestRender();
+    _requestRender(rect);
 }
 
 //____ _onCollectPatches() ____________________________________________________
