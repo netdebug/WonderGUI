@@ -477,6 +477,7 @@ namespace wg
 		inline bool contains( const Rect& rect ) const;			///< @brief Check if rectangle is fully within our rectangle.
 	
 		inline Coord limit( const Coord& coord ) const;			///< @brief Limit given coordinate to stay within rectangle.
+    	inline Coord center() const { return {x+w/2,y+h/2}; }
 	
 		inline bool intersectsWith( const Rect& rect ) const;	///< @brief Check for intersection (partial or full overlap) with specified rectangle.
 	

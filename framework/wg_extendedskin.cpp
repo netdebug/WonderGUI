@@ -142,7 +142,7 @@ WgRect WgExtendedSkin::ContentRect( const WgRect& canvas, WgState state, int sca
 	shift.x = shift.x * scale >> WG_SCALE_BINALS;
 	shift.y = shift.y * scale >> WG_SCALE_BINALS;
 
-	WgBorders padding(m_contentPadding.left *scale >> WG_SCALE_BINALS, m_contentPadding.top *scale >> WG_SCALE_BINALS, m_contentPadding.right *scale >> WG_SCALE_BINALS, m_contentPadding.bottom *scale >> WG_SCALE_BINALS);
+	WgBorders padding(m_contentPadding.top *scale >> WG_SCALE_BINALS, m_contentPadding.right *scale >> WG_SCALE_BINALS, m_contentPadding.bottom *scale >> WG_SCALE_BINALS, m_contentPadding.left *scale >> WG_SCALE_BINALS);
 	return (canvas - padding) + shift;
 }
 

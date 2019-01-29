@@ -113,8 +113,8 @@ void WgChart::SetSkin(const WgSkinPtr& pSkin)
 void WgChart::SetCanvasPadding(WgBorders padding)
 {
 	m_pointPadding = padding;
-	WgBorders pixelPadding( (padding.left * m_scale) >> WG_SCALE_BINALS, (padding.top * m_scale) >> WG_SCALE_BINALS, 
-							(padding.right * m_scale) >> WG_SCALE_BINALS, (padding.bottom * m_scale) >> WG_SCALE_BINALS );
+	WgBorders pixelPadding( (padding.top * m_scale) >> WG_SCALE_BINALS, (padding.right * m_scale) >> WG_SCALE_BINALS, 
+							(padding.bottom * m_scale) >> WG_SCALE_BINALS, (padding.left * m_scale) >> WG_SCALE_BINALS );
 
 	if (pixelPadding != m_pixelPadding)
 	{
@@ -385,7 +385,7 @@ int WgChart::NativeSampleRange() const
     if( m_pSkin )
         width -= m_pSkin->ContentPadding(m_scale).w;
 
-    width -= m_pixelPadding.Width();
+    width -= m_pixelPadding.width();
     
     return width > 0 ? width + 1 : 0;
 }

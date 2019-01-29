@@ -531,10 +531,10 @@ void WgFlexHook::_refreshRealGeo()
 
     int scale = m_pParent->m_scale;
 	
-	WgBorders scaledPadding( (m_padding.left * scale) >> WG_SCALE_BINALS,
-							 (m_padding.top * scale) >> WG_SCALE_BINALS,
+	WgBorders scaledPadding( (m_padding.top * scale) >> WG_SCALE_BINALS,
 							 (m_padding.right * scale) >> WG_SCALE_BINALS,
-							 (m_padding.bottom * scale) >> WG_SCALE_BINALS );
+							 (m_padding.bottom * scale) >> WG_SCALE_BINALS,
+							 (m_padding.left * scale) >> WG_SCALE_BINALS );
 
 	if( m_bFloating )
 	{
@@ -657,10 +657,10 @@ WgSize WgFlexHook::_sizeNeededForGeo()
     
     int scale = m_pParent->m_scale;
     
-    WgBorders scaledPadding( (m_padding.left * scale) >> WG_SCALE_BINALS,
-                            (m_padding.top * scale) >> WG_SCALE_BINALS,
+    WgBorders scaledPadding((m_padding.top * scale) >> WG_SCALE_BINALS,
                             (m_padding.right * scale) >> WG_SCALE_BINALS,
-                            (m_padding.bottom * scale) >> WG_SCALE_BINALS );
+                            (m_padding.bottom * scale) >> WG_SCALE_BINALS,
+    						(m_padding.left * scale) >> WG_SCALE_BINALS );
     
     if( m_bFloating )
     {

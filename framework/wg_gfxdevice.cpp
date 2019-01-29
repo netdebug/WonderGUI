@@ -1243,6 +1243,6 @@ void WgGfxDevice::_drawUnderline( const WgRect& clip, const WgText * pText, int 
 
 	const WgUnderline * pUnderline = pen.GetFont()->GetUnderline( pen.GetSize() );
 
-	ClipBlitHorrBar( clip, pUnderline->pSurf, pUnderline->rect, WgBorders( pUnderline->leftBorder, pUnderline->rightBorder, 0, 0 ), false,
+	ClipBlitHorrBar( clip, pUnderline->pSurf, pUnderline->rect, WgBorders( 0, pUnderline->rightBorder, 0, pUnderline->leftBorder ), false,
 					_x + pUnderline->bearingX, _y + pUnderline->bearingY, pen.GetPosX() );
 }

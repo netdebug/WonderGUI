@@ -325,10 +325,10 @@ void WgKnob::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas, const 
 	if (!m_pSurf)
 		return;
 
-	if( !m_backBufferDirtyRect.IsEmpty() )
+	if( !m_backBufferDirtyRect.isEmpty() )
 	{
 		_redrawBackBuffer(WgRect({ 0, 0, m_size.w, m_size.h}, m_backBufferDirtyRect));
-		m_backBufferDirtyRect.Clear();
+		m_backBufferDirtyRect.clear();
 	}
 	for (const WgRect * pRect = _pPatches->Begin(); pRect != _pPatches->End(); pRect++)
 	{
@@ -930,10 +930,10 @@ void  WgKnob::_myRequestRender()
 
 void  WgKnob::_myRequestRender(const WgRect& rect)
 {
-	if (m_backBufferDirtyRect.IsEmpty())
+	if (m_backBufferDirtyRect.isEmpty())
 		m_backBufferDirtyRect = rect;
 	else
-		m_backBufferDirtyRect.GrowToContain( rect );
+		m_backBufferDirtyRect.growToContain( rect );
 //	_requestRender();
 	_requestRender(rect);
 }

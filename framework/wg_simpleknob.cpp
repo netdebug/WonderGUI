@@ -38,7 +38,7 @@ WgSimpleKnob::WgSimpleKnob()
 {
 	m_bOpaque = false;
     m_iNextPixel = 0;
-    m_lineColor = WgColor::white;
+    m_lineColor = WgColor::White;
     m_fValue = 0.0f;
     m_preferredSize = WgSize(45,45);
 

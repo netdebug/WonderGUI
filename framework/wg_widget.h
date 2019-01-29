@@ -28,6 +28,11 @@
 #	include <wg_types.h>
 #endif
 
+#ifndef WG_GEO_DOT_H
+#	include <wg_geo.h>
+#endif
+
+
 #ifndef WG_STRING_DOT_H
 #	include <wg_string.h>
 #endif

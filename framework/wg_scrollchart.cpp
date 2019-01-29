@@ -174,8 +174,8 @@ void WgScrollChart::SetScrollFromStart(bool bScrollOnStart)
 void WgScrollChart::SetCanvasPadding(WgBorders padding)
 {
 	m_pointPadding = padding;
-	WgBorders pixelPadding( (padding.left * m_scale) >> WG_SCALE_BINALS, (padding.top * m_scale) >> WG_SCALE_BINALS, 
-							(padding.right * m_scale) >> WG_SCALE_BINALS, (padding.bottom * m_scale) >> WG_SCALE_BINALS );
+	WgBorders pixelPadding( (padding.top * m_scale) >> WG_SCALE_BINALS, (padding.right * m_scale) >> WG_SCALE_BINALS, 
+							(padding.bottom * m_scale) >> WG_SCALE_BINALS, (padding.left * m_scale) >> WG_SCALE_BINALS );
 
 	if (pixelPadding != m_pixelPadding)
 	{

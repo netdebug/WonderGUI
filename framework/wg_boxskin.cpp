@@ -161,7 +161,7 @@ void WgBoxSkin::Render( WgGfxDevice * pDevice, WgState state, const WgRect& _can
 	}
 	else
 	{
-		WgBorders frame(m_frame.left *scale >> WG_SCALE_BINALS, m_frame.top *scale >> WG_SCALE_BINALS, m_frame.right *scale >> WG_SCALE_BINALS, m_frame.bottom *scale >> WG_SCALE_BINALS);
+		WgBorders frame(m_frame.top *scale >> WG_SCALE_BINALS, m_frame.right *scale >> WG_SCALE_BINALS, m_frame.bottom *scale >> WG_SCALE_BINALS, m_frame.left *scale >> WG_SCALE_BINALS);
 
 		WgRect top( WgRect(_canvas.x, _canvas.y, _canvas.w, frame.top), _clip );
 		WgRect left( WgRect(_canvas.x, _canvas.y+frame.top, frame.left, _canvas.h - frame.height()), _clip );
