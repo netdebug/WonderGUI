@@ -128,7 +128,7 @@ int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord blockStartOfs, WgSize 
 
 	//
 
-	assert(bSlotUsed[WgUtil::_stateToIndex(WG_STATE_NORMAL)]);				// A block for state normal is required.
+	assert(bSlotUsed[WgUtil::_stateToIndex(WgStateEnum::Normal)]);				// A block for state normal is required.
 
 	// Fill in fallback states and update opacity flag
 

@@ -112,27 +112,27 @@ WgBlockSkinPtr WgBlockSkin::CreateClickSelectable( WgSurface * pSurface, WgSize 
 
 	WgCoord blockOfs = blockStartOfs;
 
-	pSkin->SetStateBlock( WG_STATE_NORMAL, blockOfs );				// Normal
-	pSkin->SetStateBlock( WG_STATE_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::Normal, blockOfs );				// Normal
+	pSkin->SetStateBlock( WgStateEnum::Focused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_HOVERED, blockOfs );				// Hovered, not selected
-	pSkin->SetStateBlock( WG_STATE_HOVERED_FOCUSED, blockOfs );
-	pSkin->SetStateBlock( WG_STATE_PRESSED, blockOfs );
-	pSkin->SetStateBlock( WG_STATE_PRESSED_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::Hovered, blockOfs );				// Hovered, not selected
+	pSkin->SetStateBlock( WgStateEnum::HoveredFocused, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::Pressed, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::PressedFocused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_SELECTED, blockOfs );			// Selected, not hovered
-	pSkin->SetStateBlock( WG_STATE_SELECTED_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::Selected, blockOfs );			// Selected, not hovered
+	pSkin->SetStateBlock( WgStateEnum::SelectedFocused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_SELECTED_HOVERED, blockOfs );	// Selected and hovered
-	pSkin->SetStateBlock( WG_STATE_SELECTED_HOVERED_FOCUSED, blockOfs );
-	pSkin->SetStateBlock( WG_STATE_SELECTED_PRESSED, blockOfs );
-	pSkin->SetStateBlock( WG_STATE_SELECTED_PRESSED_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::SelectedHovered, blockOfs );	// Selected and hovered
+	pSkin->SetStateBlock( WgStateEnum::SelectedHoveredFocused, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::SelectedPressed, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::SelectedPressedFocused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_DISABLED, blockOfs );			// Disabled
+	pSkin->SetStateBlock( WgStateEnum::Disabled, blockOfs );			// Disabled
 	return WgBlockSkinPtr(pSkin);
 }
 
@@ -146,31 +146,31 @@ WgBlockSkinPtr WgBlockSkin::CreateClickSelectableWidget( WgSurface * pSurface, W
 
 	WgCoord blockOfs = blockStartOfs;
 
-	pSkin->SetStateBlock( WG_STATE_NORMAL, blockOfs );				// Normal
-	pSkin->SetStateBlock( WG_STATE_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::Normal, blockOfs );				// Normal
+	pSkin->SetStateBlock( WgStateEnum::Focused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_HOVERED, blockOfs );				// Hovered
-	pSkin->SetStateBlock( WG_STATE_HOVERED_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::Hovered, blockOfs );				// Hovered
+	pSkin->SetStateBlock( WgStateEnum::HoveredFocused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_PRESSED, blockOfs );				// Pressed
-	pSkin->SetStateBlock( WG_STATE_PRESSED_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::Pressed, blockOfs );				// Pressed
+	pSkin->SetStateBlock( WgStateEnum::PressedFocused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_SELECTED, blockOfs );
-	pSkin->SetStateBlock( WG_STATE_SELECTED_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::Selected, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::SelectedFocused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_SELECTED_HOVERED, blockOfs );
-	pSkin->SetStateBlock( WG_STATE_SELECTED_HOVERED_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::SelectedHovered, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::SelectedHoveredFocused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_SELECTED_PRESSED, blockOfs );
-	pSkin->SetStateBlock( WG_STATE_SELECTED_PRESSED_FOCUSED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::SelectedPressed, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::SelectedPressedFocused, blockOfs );
 	blockOfs += WgCoord(blockPitch.w,blockPitch.h);
 
-	pSkin->SetStateBlock( WG_STATE_DISABLED, blockOfs );
+	pSkin->SetStateBlock( WgStateEnum::Disabled, blockOfs );
 
 	return WgBlockSkinPtr(pSkin);
 }
@@ -286,17 +286,17 @@ void WgBlockSkin::SetAllBlocks( const WgCoord& ofs )
 
 void WgBlockSkin::SetDisabledBlock( const WgCoord& ofs )
 {
-	m_state[WgUtil::_stateToIndex(WG_STATE_DISABLED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::Disabled)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
 }
 
 //____ setHoveredBlocks() _____________________________________________________
 
 void WgBlockSkin::SetHoveredBlocks( const WgCoord& ofs )
 {
-	m_state[WgUtil::_stateToIndex(WG_STATE_HOVERED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED_HOVERED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_HOVERED_FOCUSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED_HOVERED_FOCUSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::Hovered)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::SelectedHovered)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::HoveredFocused)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::SelectedHoveredFocused)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
 
 	SetPressedBlocks( ofs );
 }
@@ -305,22 +305,22 @@ void WgBlockSkin::SetHoveredBlocks( const WgCoord& ofs )
 
 void WgBlockSkin::SetPressedBlocks( const WgCoord& ofs )
 {
-	m_state[WgUtil::_stateToIndex(WG_STATE_PRESSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_PRESSED_FOCUSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED_FOCUSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::Pressed)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::SelectedPressed)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::PressedFocused)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::SelectedPressedFocused)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
 }
 
 //____ setSelectedBlocks() ____________________________________________________
 
 void WgBlockSkin::SetSelectedBlocks( const WgCoord& ofs )
 {
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED_FOCUSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED_HOVERED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED_HOVERED_FOCUSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
-	m_state[WgUtil::_stateToIndex(WG_STATE_SELECTED_PRESSED_FOCUSED)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::Selected)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::SelectedFocused)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::SelectedHovered)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::SelectedHoveredFocused)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::SelectedPressed)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
+	m_state[WgUtil::_stateToIndex(WgStateEnum::SelectedPressedFocused)].ofs = (ofs*m_scale)/WG_SCALE_BASE;
 }
 
 //____ setTiled() _____________________________________________________________

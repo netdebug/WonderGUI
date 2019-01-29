@@ -110,7 +110,7 @@ const char * WgFlowPanel::GetClass()
 /*
 void WgFlowPanel::SetOrientation( WgOrientation orientation )
 {
-	bool bHorizontal = orientation==WG_HORIZONTAL?true:false;
+	bool bHorizontal = orientation==WgOrientation::Horizontal?true:false;
 	if( m_bHorizontal != bHorizontal )
 	{
 		m_bHorizontal = bHorizontal;

@@ -418,7 +418,7 @@ void WgSimpleVolumeMeter::_renderBar( WgGfxDevice * pDevice, int nb, const WgRec
 			}
 
 			if (m_pHoldSkin)
-				m_pHoldSkin->Render(pDevice, WG_STATE_NORMAL, _rect, _clip, m_scale);
+				m_pHoldSkin->Render(pDevice, WgStateEnum::Normal, _rect, _clip, m_scale);
 			else
 				pDevice->Fill( WgRect( r, _clip ), c );
 		}
@@ -452,7 +452,7 @@ void WgSimpleVolumeMeter::_renderBar( WgGfxDevice * pDevice, int nb, const WgRec
 			break;
 		}
 
-		m_pPeakSkin->Render(pDevice, WG_STATE_NORMAL, r, _clip, m_scale);
+		m_pPeakSkin->Render(pDevice, WgStateEnum::Normal, r, _clip, m_scale);
 	}
 	else
 	{

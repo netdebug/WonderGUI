@@ -508,7 +508,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 {
 	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
 
-	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
+	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WgStateEnum::Normal, m_scale) : _canvas;
 
 	// Preparations for both grid and wave drawing
 
@@ -543,13 +543,13 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 				if (m_sampleLabelStyle.pSkin)
 				{
 					labelSize = m_sampleLabelStyle.pSkin->SizeForContent(labelSize, m_scale);
-					textOfs = m_sampleLabelStyle.pSkin->ContentRect(labelSize, WG_STATE_NORMAL, m_scale).pos();
+					textOfs = m_sampleLabelStyle.pSkin->ContentRect(labelSize, WgStateEnum::Normal, m_scale).pos();
 				}
 
 				WgCoord labelPos = _placeLabel({ xOfs,canvas.y+canvas.h }, m_sampleLabelStyle.alignment, m_sampleLabelStyle.offset, labelSize);
 
 				if (m_sampleLabelStyle.pSkin)
-					m_sampleLabelStyle.pSkin->Render(pDevice, WG_STATE_NORMAL, { labelPos,labelSize }, _clip, m_scale);
+					m_sampleLabelStyle.pSkin->Render(pDevice, WgStateEnum::Normal, { labelPos,labelSize }, _clip, m_scale);
 
 				pen.SetPos(labelPos + textOfs);
 				pDevice->PrintLine(pen, attr, line.label.Chars());
@@ -591,13 +591,13 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 				if (m_valueLabelStyle.pSkin)
 				{
 					labelSize = m_valueLabelStyle.pSkin->SizeForContent(labelSize, m_scale);
-					textOfs = m_valueLabelStyle.pSkin->ContentRect(labelSize, WG_STATE_NORMAL, m_scale).pos();
+					textOfs = m_valueLabelStyle.pSkin->ContentRect(labelSize, WgStateEnum::Normal, m_scale).pos();
 				}
 
 				WgCoord labelPos = _placeLabel({ canvas.x, yOfs }, m_valueLabelStyle.alignment, m_valueLabelStyle.offset, labelSize);
 
 				if (m_valueLabelStyle.pSkin)
-					m_valueLabelStyle.pSkin->Render(pDevice, WG_STATE_NORMAL, { labelPos,labelSize }, _clip, m_scale );
+					m_valueLabelStyle.pSkin->Render(pDevice, WgStateEnum::Normal, { labelPos,labelSize }, _clip, m_scale );
 
 				pen.SetPos(labelPos + textOfs);
 				pDevice->PrintLine(pen, attr, line.label.Chars());
@@ -765,7 +765,7 @@ void WgChart::_resampleWave(Wave * pWave)
 	WgSize	canvas = PixelSize();
 
 	if (m_pSkin)
-		canvas = m_pSkin->ContentRect(canvas, WG_STATE_NORMAL, m_scale);
+		canvas = m_pSkin->ContentRect(canvas, WgStateEnum::Normal, m_scale);
 
 
 	canvas -= m_pixelPadding;

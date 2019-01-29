@@ -82,7 +82,7 @@ Uint16 WgTextTool::parseChar( const char * pChar )
 void WgTextTool::clearBreakRules()
 {
 	for( int i = 0 ; i < 256 ; i++ )
-		breakRulesTab[i] = WG_NO_BREAK | 0xF;
+		breakRulesTab[i] = int(WgBreakRules::NoBreak) | 0xF;
 }
 
 
@@ -93,7 +93,7 @@ bool WgTextTool::setBreakRule( unsigned char character, int level, WgBreakRules 
 	if( level < 0 || level > 15 )
 		return false;
 
-	breakRulesTab[character] = rule | level;
+	breakRulesTab[character] = int(rule) | level;
 	return true;
 }
 
@@ -105,45 +105,45 @@ void WgTextTool::setDefaultBreakRules()
 
 	// Set level 1 breaks
 
-	breakRulesTab[WG_BREAK_PERMITTED] = WG_BREAK_ON | 0x1;
-	breakRulesTab[WG_HYPHEN_BREAK_PERMITTED] = WG_BREAK_ON | 0x1;
+	breakRulesTab[int(WgExtChar::BreakPermitted)] = int(int(WgBreakRules::BreakOn)) | 0x1;
+	breakRulesTab[int(WgExtChar::HyphenBreakPermitted)] = int(int(WgBreakRules::BreakOn)) | 0x1;
 
 	// Set level 2 breaks
 
-	breakRulesTab[0x20] = WG_BREAK_ON | 0x2;			// Whitespace
-	breakRulesTab[0x09] = WG_BREAK_ON | 0x2;			// Tab
+	breakRulesTab[0x20] = int(WgBreakRules::BreakOn) | 0x2;			// Whitespace
+	breakRulesTab[0x09] = int(WgBreakRules::BreakOn) | 0x2;			// Tab
 
 	// Set level 3 breaks
 
-	breakRulesTab['\\']	= WG_BREAK_AFTER | 0x3;
-	breakRulesTab['/']	= WG_BREAK_AFTER | 0x3;
-	breakRulesTab['-']	= WG_BREAK_AFTER | 0x3;
-	breakRulesTab['+']	= WG_BREAK_AFTER | 0x3;
-	breakRulesTab['*']	= WG_BREAK_AFTER | 0x3;
-	breakRulesTab['~']	= WG_BREAK_AFTER | 0x3;
-	breakRulesTab['=']	= WG_BREAK_AFTER | 0x3;
+	breakRulesTab['\\']	= int(WgBreakRules::BreakAfter) | 0x3;
+	breakRulesTab['/']	= int(WgBreakRules::BreakAfter) | 0x3;
+	breakRulesTab['-']	= int(WgBreakRules::BreakAfter) | 0x3;
+	breakRulesTab['+']	= int(WgBreakRules::BreakAfter) | 0x3;
+	breakRulesTab['*']	= int(WgBreakRules::BreakAfter) | 0x3;
+	breakRulesTab['~']	= int(WgBreakRules::BreakAfter) | 0x3;
+	breakRulesTab['=']	= int(WgBreakRules::BreakAfter) | 0x3;
 
-	breakRulesTab[')']	= WG_BREAK_AFTER | 0x3;
-	breakRulesTab['}']	= WG_BREAK_AFTER | 0x3;
-	breakRulesTab[']']	= WG_BREAK_AFTER | 0x3;
-	breakRulesTab['>']	= WG_BREAK_AFTER | 0x3;
+	breakRulesTab[')']	= int(WgBreakRules::BreakAfter) | 0x3;
+	breakRulesTab['}']	= int(WgBreakRules::BreakAfter) | 0x3;
+	breakRulesTab[']']	= int(WgBreakRules::BreakAfter) | 0x3;
+	breakRulesTab['>']	= int(WgBreakRules::BreakAfter) | 0x3;
 
-	breakRulesTab['(']	= WG_BREAK_BEFORE | 0x3;
-	breakRulesTab['{']	= WG_BREAK_BEFORE | 0x3;
-	breakRulesTab['[']	= WG_BREAK_BEFORE | 0x3;
-	breakRulesTab['<']	= WG_BREAK_BEFORE | 0x3;
+	breakRulesTab['(']	= int(WgBreakRules::BreakBefore) | 0x3;
+	breakRulesTab['{']	= int(WgBreakRules::BreakBefore) | 0x3;
+	breakRulesTab['[']	= int(WgBreakRules::BreakBefore) | 0x3;
+	breakRulesTab['<']	= int(WgBreakRules::BreakBefore) | 0x3;
 
 	// Set level 4 breaks
 
-	breakRulesTab[0xbf]	= WG_BREAK_BEFORE | 0x5;	// inverted question mark (beginning of question).
-	breakRulesTab['?']	= WG_BREAK_AFTER | 0x5;
-	breakRulesTab[':']	= WG_BREAK_AFTER | 0x4;
-	breakRulesTab[';']	= WG_BREAK_AFTER | 0x4;
-	breakRulesTab['.']	= WG_BREAK_AFTER | 0x5;
-	breakRulesTab[',']	= WG_BREAK_AFTER | 0x5;
-	breakRulesTab['!']	= WG_BREAK_AFTER | 0x5;
-	breakRulesTab['_']	= WG_BREAK_AFTER | 0x4;
-	breakRulesTab['|']	= WG_BREAK_AFTER | 0x4;
+	breakRulesTab[0xbf]	= int(WgBreakRules::BreakBefore) | 0x5;	// inverted question mark (beginning of question).
+	breakRulesTab['?']	= int(WgBreakRules::BreakAfter) | 0x5;
+	breakRulesTab[':']	= int(WgBreakRules::BreakAfter) | 0x4;
+	breakRulesTab[';']	= int(WgBreakRules::BreakAfter) | 0x4;
+	breakRulesTab['.']	= int(WgBreakRules::BreakAfter) | 0x5;
+	breakRulesTab[',']	= int(WgBreakRules::BreakAfter) | 0x5;
+	breakRulesTab['!']	= int(WgBreakRules::BreakAfter) | 0x5;
+	breakRulesTab['_']	= int(WgBreakRules::BreakAfter) | 0x4;
+	breakRulesTab['|']	= int(WgBreakRules::BreakAfter) | 0x4;
 }
 
 
@@ -152,12 +152,12 @@ void WgTextTool::setDefaultBreakRules()
 WgBreakRules WgTextTool::isBreakAllowed( Uint16 chr, int breakLevel )
 {
 	if( chr > 255 )
-		return WG_NO_BREAK;
+		return WgBreakRules::NoBreak;
 
 	if( breakLevel >= (breakRulesTab[chr] & 0xF) )
 		return (WgBreakRules) (breakRulesTab[chr] & 0xF0);
 
-	return WG_NO_BREAK;
+	return WgBreakRules::NoBreak;
 }
 
 
@@ -295,7 +295,7 @@ Uint32 WgTextTool::countWhitespaces( const char * pStr, Uint32 len )
 	Uint32 n = 0;
 	for( unsigned int i = 0 ; i < len && pStr[i] != 0 ; i++ )
 	{
-		if( pStr[i] == ' ' || pStr[i] == (char) WG_NO_BREAK_SPACE )
+		if( pStr[i] == ' ' || pStr[i] == (char) WgExtChar::NoBreakSpace )
 			n++;
 	}
 	return n;
@@ -309,7 +309,7 @@ Uint32 WgTextTool::countWhitespaces( const Uint16 * pStr, Uint32 len  )
 	Uint32 n = 0;
 	for( unsigned int i = 0 ; i < len && pStr[i] != 0 ; i++ )
 	{
-		if( pStr[i] == ' ' || pStr[i] == WG_NO_BREAK_SPACE )
+		if( pStr[i] == ' ' || pStr[i] == int(WgExtChar::NoBreakSpace) )
 			n++;
 	}
 	return n;

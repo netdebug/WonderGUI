@@ -189,7 +189,7 @@ void WgLineEditor::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 {
 	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
 
-	WgRect textCanvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
+	WgRect textCanvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WgStateEnum::Normal, m_scale) : _canvas;
 
 	WgText * pText = &m_text;
 	if( m_bPasswordMode )
@@ -269,7 +269,7 @@ void WgLineEditor::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHa
 			int y = 0;
 
 			if (m_pSkin)
-				x -= m_pSkin->ContentOfs(WG_STATE_NORMAL, m_scale).x;
+				x -= m_pSkin->ContentOfs(WgStateEnum::Normal, m_scale).x;
 
 			if( m_bPasswordMode )
 			{

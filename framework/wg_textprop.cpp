@@ -426,13 +426,13 @@ bool WgTextprop::SetCharVisibility( Uint16 specialCharacter, bool bVisible )
 		case '\t':
 			m_bShowTAB = bVisible;
 			break;
-		case WG_BREAK_PERMITTED:
+		case int(WgExtChar::BreakPermitted):
 			m_bShowBreakPermitted = bVisible;
 			break;
-		case WG_HYPHEN_BREAK_PERMITTED:
+		case int(WgExtChar::HyphenBreakPermitted):
 			m_bShowHyphenBreakPermitted = bVisible;
 			break;
-		case WG_NO_BREAK_SPACE:
+		case int(WgExtChar::NoBreakSpace):
 			m_bShowNoBreakSpace = bVisible;
 			break;
 
@@ -455,11 +455,11 @@ bool WgTextprop::CharVisibility( Uint16 specialCharacter ) const
 			return m_bShowLF;
 		case '\t':
 			return m_bShowTAB;
-		case WG_BREAK_PERMITTED:
+		case int(WgExtChar::BreakPermitted):
 			return m_bShowBreakPermitted;
-		case WG_HYPHEN_BREAK_PERMITTED:
+		case int(WgExtChar::HyphenBreakPermitted):
 			return m_bShowHyphenBreakPermitted;
-		case WG_NO_BREAK_SPACE:
+		case int(WgExtChar::NoBreakSpace):
 			return m_bShowNoBreakSpace;
 		default:
 			return true;		// All other characters are always visible

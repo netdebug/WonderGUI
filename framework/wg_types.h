@@ -23,17 +23,28 @@
 #ifndef	WG_TYPES_DOT_H
 #define WG_TYPES_DOT_H
 
-#ifdef WIN32
-#ifndef for
-//#	define		for		if(false){}else for
-#endif
-#endif
+#include <wg3_types.h>
 
-//#ifdef _MSC_VER // MS do not support C99
-//#include "WG/C99Compatibility/pstdint.h"
-//#else
+typedef wg::Orientation         WgOrientation;
+
+typedef wg::StateEnum           WgStateEnum;
+
+static const int    WG_NB_STATES = wg::StateEnum_Nb;
+static const int    WG_MAX_STATE_VALUE = wg::StateEnum_MaxValue;
+
+typedef wg::State               WgState;
+
+typedef wg::ExtChar     WgExtChar;
+
+typedef wg::CodePage    WgCodePage;
+
+const static int   WG_NB_CODEPAGES = wg::CodePage_size;
+
+typedef wg::BreakRules  WgBreakRules;
+
+
+
 #	include <stdint.h>			// Use the C99 official header
-//#endif
 
 
 #ifndef Uint8
@@ -115,67 +126,6 @@ enum WgMode //: Uint8
 #define	WG_NB_MODES		5		// Number of modes (excluding WG_MODE_ALL )
 
 
-enum WgStateEnum
-{
-	WG_STATE_NORMAL						= 0,
-	WG_STATE_FOCUSED					= 1,
-	WG_STATE_HOVERED					= 4,
-	WG_STATE_HOVERED_FOCUSED			= 4 + 1,
-	WG_STATE_PRESSED					= 4 + 2,
-	WG_STATE_PRESSED_FOCUSED			= 4 + 2 + 1,
-	WG_STATE_SELECTED					= 8,
-	WG_STATE_SELECTED_FOCUSED			= 8 + 1,
-	WG_STATE_SELECTED_HOVERED			= 8 + 4,
-	WG_STATE_SELECTED_HOVERED_FOCUSED	= 8 + 4 + 1,
-	WG_STATE_SELECTED_PRESSED			= 8 + 4 + 2,
-	WG_STATE_SELECTED_PRESSED_FOCUSED	= 8 + 4 + 2 + 1,
-	WG_STATE_DISABLED					= 16,
-	WG_STATE_DISABLED_SELECTED			= 16 + 8,
-};
-
-#define	WG_NB_STATES		14			// Number of states
-#define	WG_MAX_STATE_VALUE	24			// Highest value for WgStateEnum
-
-class WgState 
-{
-public:
-	WgState() { m_state = WG_STATE_NORMAL; }
-	WgState( WgStateEnum state ) { m_state = state; }
-
-//	void		set( WgModeEnum state ) { m_state = state; }
-//	WgModeEnum	getEnum() const { return (WgModeEnum) m_state; }
-
-	bool	setEnabled(bool bEnabled) { if(bEnabled) m_state &= ~WG_STATE_DISABLED; else m_state = (m_state & WG_STATE_SELECTED) | WG_STATE_DISABLED; return true; }
-	bool	setSelected(bool bSelected) { if( m_state == WG_STATE_DISABLED ) return false; if(bSelected) m_state |= WG_STATE_SELECTED; else m_state &= ~WG_STATE_SELECTED; return true; }
-	bool	setFocused(bool bFocused) { if( m_state == WG_STATE_DISABLED ) return false; if(bFocused) m_state |= WG_STATE_FOCUSED; else m_state &= ~WG_STATE_FOCUSED; return true; }
-	bool	setHovered(bool bHovered) { if( m_state == WG_STATE_DISABLED ) return false; if(bHovered) m_state |= WG_STATE_HOVERED; else m_state &= ~WG_STATE_PRESSED; return true; }
-	bool	setPressed(bool bPressed) { if( m_state == WG_STATE_DISABLED ) return false; if(bPressed) m_state |= WG_STATE_PRESSED; else m_state &= ~(WG_STATE_PRESSED - WG_STATE_HOVERED); return true; }
-
-
-	bool	isEnabled() { return (m_state & WG_STATE_DISABLED) == WG_STATE_NORMAL; }
-	bool	isSelected() { return (m_state & WG_STATE_SELECTED) == WG_STATE_SELECTED; }
-	bool	isFocused() { return (m_state & WG_STATE_FOCUSED) == WG_STATE_FOCUSED; }
-	bool	isHovered() { return (m_state & WG_STATE_HOVERED) == WG_STATE_HOVERED; }
-	bool	isPressed() { return (m_state & WG_STATE_PRESSED) == WG_STATE_PRESSED; }
-
-	inline bool operator==(WgStateEnum state) const { return m_state == state; }
-	inline bool operator!=(WgStateEnum state) const { return m_state != state; }
-
-	inline void operator=(WgStateEnum state) { m_state = state; }
-
-	inline WgState operator+(WgStateEnum state) const { int s = m_state | state; if (s & WG_STATE_DISABLED) s &= WG_STATE_DISABLED_SELECTED; return (WgStateEnum) s; }
-	inline WgState operator-(WgStateEnum state) const { if ((state & WG_STATE_PRESSED) == WG_STATE_PRESSED) state = (WgStateEnum)(state & ~WG_STATE_HOVERED); int s = (m_state & ~state); if ((s & WG_STATE_HOVERED) == 0) s &= ~WG_STATE_PRESSED;  return (WgStateEnum)s; }
-
-	inline WgState& operator+=(WgStateEnum state) { m_state |= state; if (m_state & WG_STATE_DISABLED) m_state &= WG_STATE_DISABLED_SELECTED; return *this; }
-	inline WgState& operator-=(WgStateEnum state) { if ((state & WG_STATE_PRESSED) == WG_STATE_PRESSED) state = (WgStateEnum) (state & ~WG_STATE_HOVERED); m_state &= ~state; if ((m_state & WG_STATE_HOVERED) == 0) m_state &= ~WG_STATE_PRESSED; return *this;
-}
-
-	operator WgStateEnum() const { return (WgStateEnum) m_state; }
-
-private:
-	int		m_state;
-};
-
 //____ WgTxtAttr ______________________________________________________________
 
 // Bitmask for various text attributes.
@@ -184,135 +134,6 @@ enum WgTxtAttr
 {
 	WG_TXT_UNDERLINED	= 0x1,
 	WG_TXT_SELECTED		= 0x2
-};
-
-
-//____ WgExtChar __________________________________________________________
-
-
-//0x1b
-
-// Double escape codes should give the escape-code character.
-
-/*
-		NEW ONES
-
-		{prop}		Set the named property. Named properties should start with a-z/A-Z.
-					If property is unnamed you get {123} where the number is the current handle for the prop.
-
-		-			break permitted
-		=			hyphen break permitted
-		n			linebreak (like \n).
-
-		Predefined properties
-
-		{n}			empty property (normal/default)
-		{b}			bold
-		{i}			italic
-		{u}			underlined
-		{b-i}		bold italic
-		{b-u}		bold underlined
-		{b-i-u}		bold italic underlined
-		{i-u}		italic underlined
-		{h1}		heading 1
-		{h2}		heading 2
-		{h3}		heading 3
-		{h4}		heading 4
-		{h5}		heading 5
-		{u1}		user defined style 1
-		{u2}		user defined style 2
-		{u3}		user defined style 3
-		{u4}		user defined style 4
-		{u5}		user defined style 5
-
-		{super}		superscript		// Includes top positioning
-		{sub}		subscript		// Includes bottom positioning
-		{mono}		monospaced		// Includes monospacing
-
-		{black}		black text
-		{white}		white text
-
-*/
-
-
-
-/*
-	{[rrggbbaa]		begin color
-	}				end color
-
-	[123			begin size, exactly 3 decimal digits sets the size.
-	]				end size
-
-	_				begin underlined
-	| 				end underlined
-
-	:[0-4]			set break level
-	;				end break level
-
-
-	-				break permitted
-	=				hyphen break permitted
-
-	d				begin normal (default)
-	b				begin bold
-	i				begin italic
-	I				begin bold italic
-	s				begin subscript
-	S				begin superscript
-	m				begin monospace
-	h[1-5]			begin heading
-	u[1-5]			begin userdefined style
-
-	#				end style
-
-	(prop)			set a new text property, looked up from a ResDB.
-					Other style/color settings are applied ontop of this text property.
-					Setting prop as (null) sets an empty prop.
-
-
-
-*/
-
-
-enum WgExtChar
-{
-	// Code inside WonderGUI assumes these are all
-	// in the range 0x80-0xA0, but that might change in the future.
-
-	WG_BREAK_PERMITTED			= 0x82,
-	WG_HYPHEN_BREAK_PERMITTED	= 0x83,
-	WG_NO_BREAK_SPACE			= 0xA0,
-
-	WG_ELLIPSIS					= 0x2026
-};
-
-//____ WgCodePage ______________________________________________________________
-
-enum WgCodePage
-{
-	WG_CODEPAGE_LATIN1 = 0,
-	WG_CODEPAGE_1250 = 1,		// Windows Cental Europe
-	WG_CODEPAGE_1251 = 2,		// Windows Cyrillic
-	WG_CODEPAGE_1252 = 3,		// Windows Latin-1 extended
-	WG_CODEPAGE_1253 = 4,		// Windows Greek
-	WG_CODEPAGE_1254 = 5,		// Windows Turkish
-	WG_CODEPAGE_1255 = 6,		// Windows Hebrew
-	WG_CODEPAGE_1256 = 7,		// Windows Arabic
-	WG_CODEPAGE_1257 = 8,		// Windows Baltic
-	WG_CODEPAGE_1258 = 9,		// Windows Vietnam
-	WG_CODEPAGE_874 = 10,		// Windows Thai
-};
-
-#define WG_NB_CODEPAGES 11
-
-//____ WgBreakRules ____________________________________________________________
-
-enum WgBreakRules
-{
-	WG_NO_BREAK		= 0,
-	WG_BREAK_BEFORE	= 16,
-	WG_BREAK_ON		= 32,
-	WG_BREAK_AFTER	= 64
 };
 
 //____ WgBlendMode ____________________________________________________________
@@ -463,14 +284,6 @@ enum WgDirection
 	WG_DOWN,
 	WG_LEFT,
 	WG_RIGHT
-};
-
-//____ WgOrientation __________________________________________________________
-
-enum WgOrientation
-{
-	WG_HORIZONTAL,
-	WG_VERTICAL
 };
 
 //____ WgSizePolicy ___________________________________________________________

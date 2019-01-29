@@ -822,10 +822,10 @@ void WgGfxDevice::_printTextSpan( WgPen& pen, const WgText * pText, int ofs, int
 
 	if( bLineEnding )
 	{
-		// If character after line-end was a WG_HYPHEN_BREAK_PERMITTED we need
+		// If character after line-end was a WgExtChar::HyphenBreakPermitted we need
 		// to render a normal hyphen.
 
-		if( pChars[ofs+len].Glyph() == WG_HYPHEN_BREAK_PERMITTED )
+		if( pChars[ofs+len].Glyph() == int(WgExtChar::HyphenBreakPermitted) )
 		{
 			if( pen.SetChar( '-' ) )
 			{
@@ -866,9 +866,9 @@ void WgGfxDevice::_printEllipsisTextSpan( WgPen& pen, const WgText * pText, int 
 	pText->GetBaseAttr( baseAttr );	// Ellipsis are always rendered using the base attributes.
 	pen.SetAttributes( baseAttr );
 
-	Uint16	ellipsisChar = WG_ELLIPSIS;
+	Uint16	ellipsisChar = int(WgExtChar::Ellipsis);
 	ellipsisWidth = 0;
-	WgGlyphPtr pEllipsis = pen.GetFont()->GetGlyph( WG_ELLIPSIS, pen.GetStyle(), pen.GetSize() );
+	WgGlyphPtr pEllipsis = pen.GetFont()->GetGlyph( int(WgExtChar::Ellipsis), pen.GetStyle(), pen.GetSize() );
 
 	if( !pEllipsis )
 	{
@@ -881,7 +881,7 @@ void WgGfxDevice::_printEllipsisTextSpan( WgPen& pen, const WgText * pText, int 
 		const WgGlyphBitmap * pBitmap = pEllipsis->GetBitmap();
 		if( pBitmap )
 		{
-			if( ellipsisChar == WG_ELLIPSIS )
+			if( ellipsisChar == int(WgExtChar::Ellipsis) )
 				ellipsisWidth = pBitmap->rect.w + pBitmap->bearingX;
 			else
 				ellipsisWidth = pEllipsis->Advance()*2+pBitmap->rect.w + pBitmap->bearingX;

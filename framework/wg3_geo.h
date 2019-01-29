@@ -676,9 +676,9 @@ namespace wg
 	 *
 	 * @return True if coordinate is within the bounds of the rectangle.
 	 **/
-	inline bool Rect::contains( int _x, int _y ) const
+	inline bool Rect::contains( int x, int y ) const
 	{
-		if( _x >= x && _x < x + w && _y >= y && _y < y + h )
+		if( x >= this->x && x < this->x + this->w && y >= this->y && y < this->y + this->h )
 			return true;
 		return false;
 	}
@@ -692,9 +692,9 @@ namespace wg
 	 *
 	 * @return True if coordinate is within the bounds of the rectangle.
 	 **/
-	inline bool Rect::contains( const Coord& _coord ) const
+	inline bool Rect::contains( const Coord& coord ) const
 	{
-		if( _coord.x >= x && _coord.x < x + w && _coord.y >= y && _coord.y < y + h )
+		if( coord.x >= x && coord.x < x + w && coord.y >= y && coord.y < y + h )
 			return true;
 		return false;
 	}
@@ -707,9 +707,9 @@ namespace wg
 	 *
 	 * @return True if the parameter rectangle is fully within the bounds of our rectangle.
 	 **/
-	inline bool Rect::contains( const Rect& _rect ) const
+	inline bool Rect::contains( const Rect& rect ) const
 	{
-		if( _rect.x >= x && _rect.y >= y && _rect.x + _rect.w <= x + w &&  _rect.y + _rect.h <= y + h )
+		if( rect.x >= x && rect.y >= y && rect.x + rect.w <= x + w &&  rect.y + rect.h <= y + h )
 			return true;
 		return false;
 	}
@@ -722,9 +722,9 @@ namespace wg
 	 *
 	 * @return Coordinate limited to the rectangles geometry.
 	 **/
-	 inline Coord Rect::limit( const Coord& _coord ) const
+	 inline Coord Rect::limit( const Coord& coord ) const
 	{
-		Coord out = _coord;
+		Coord out = coord;
 		if( out.x < x )
 			out.x = x;
 		if( out.y < y )
@@ -746,12 +746,12 @@ namespace wg
 	 *
 	 * @return True if rectangles intersects.
 	 **/
-	inline bool Rect::intersectsWith( const Rect& _rect ) const
+	inline bool Rect::intersectsWith( const Rect& rect ) const
 	{
-		if(left() >= _rect.right()) return false;
-		if(right() <= _rect.left()) return false;
-		if(top() >= _rect.bottom()) return false;
-		if(bottom() <= _rect.top()) return false;
+		if(left() >= rect.right()) return false;
+		if(right() <= rect.left()) return false;
+		if(top() >= rect.bottom()) return false;
+		if(bottom() <= rect.top()) return false;
 	
 		return true;
 	}

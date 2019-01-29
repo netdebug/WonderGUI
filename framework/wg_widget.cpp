@@ -438,7 +438,7 @@ void WgWidget::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pHandle
 bool WgWidget::_onAlphaTest( const WgCoord& ofs )
 {
 	if (m_pSkin)
-		return m_pSkin->MarkTest(ofs, PixelSize(), WG_STATE_NORMAL, m_markOpacity, m_scale);
+		return m_pSkin->MarkTest(ofs, PixelSize(), WgStateEnum::Normal, m_markOpacity, m_scale);
 	else
 		return false;
 }

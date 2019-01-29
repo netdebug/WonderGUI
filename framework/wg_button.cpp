@@ -221,7 +221,7 @@ void WgButton::_onNewSize( const WgSize& size )
 	WgRect	contentRect(0,0, PixelSize());
 
 	if (m_pSkin)
-		contentRect = m_pSkin->ContentRect(contentRect, WG_STATE_NORMAL, m_scale);
+		contentRect = m_pSkin->ContentRect(contentRect, WgStateEnum::Normal, m_scale);
 	else if( m_pBgGfx )
 		contentRect.shrink(m_pBgGfx->Padding(m_scale));
 

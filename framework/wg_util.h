@@ -30,7 +30,7 @@ namespace WgUtil
 
 	int 		SizeFromPolicy( int defaultSize, int specifiedSize, WgSizePolicy policy );
 
-    inline WgOrientation DirToOrient( WgDirection dir ) { return (dir == WG_UP || dir == WG_DOWN) ? WG_VERTICAL : WG_HORIZONTAL; }
+    inline WgOrientation DirToOrient( WgDirection dir ) { return (dir == WG_UP || dir == WG_DOWN) ? WgOrientation::Vertical : WgOrientation::Horizontal; }
     
 	WgState		FallbackState(WgState state, int step = 0);
 
@@ -48,9 +48,9 @@ namespace WgUtil
 
 	inline WgStateEnum _indexToState(int index)
 	{
-		static WgStateEnum	s_indexToStateTable[WG_NB_STATES] = { WG_STATE_NORMAL, WG_STATE_FOCUSED, WG_STATE_HOVERED, WG_STATE_HOVERED_FOCUSED, WG_STATE_PRESSED,
-			WG_STATE_PRESSED_FOCUSED, WG_STATE_SELECTED, WG_STATE_SELECTED_FOCUSED, WG_STATE_SELECTED_HOVERED, WG_STATE_SELECTED_HOVERED_FOCUSED,
-			WG_STATE_SELECTED_PRESSED, WG_STATE_SELECTED_PRESSED_FOCUSED, WG_STATE_DISABLED, WG_STATE_DISABLED_SELECTED };
+		static WgStateEnum	s_indexToStateTable[WG_NB_STATES] = { WgStateEnum::Normal, WgStateEnum::Focused, WgStateEnum::Hovered, WgStateEnum::HoveredFocused, WgStateEnum::Pressed,
+			WgStateEnum::PressedFocused, WgStateEnum::Selected, WgStateEnum::SelectedFocused, WgStateEnum::SelectedHovered, WgStateEnum::SelectedHoveredFocused,
+			WgStateEnum::SelectedPressed, WgStateEnum::SelectedPressedFocused, WgStateEnum::Disabled, WgStateEnum::DisabledSelected };
 
 		return s_indexToStateTable[index];
 	}

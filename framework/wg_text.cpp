@@ -1583,7 +1583,7 @@ int WgText::_countWriteSoftLines( int maxWidth, const WgChar * pStart, WgTextLin
 		const WgChar * 	pLineStart = p;
 		const WgChar *	pbp = 0;				// BreakPoint-pointer.
 		bool			bBreakSkips = false;	// Set if the character on the breakpoint should be skipped.
-		bool			bBreakAfterPrev = false;// Set if we can break here due to a WG_BREAK_BEFORE on previous character.
+		bool			bBreakAfterPrev = false;// Set if we can break here due to a WgBreakRules::BreakBefore on previous character.
 
 		while( true )
 		{
@@ -1626,14 +1626,14 @@ int WgText::_countWriteSoftLines( int maxWidth, const WgChar * pStart, WgTextLin
 			WgBreakRules breakStatus = WgTextTool::isBreakAllowed( p->glyph, attr.breakLevel );
 			switch( breakStatus )
 			{
-			case WG_BREAK_BEFORE:
+			case WgBreakRules::BreakBefore:
 				pbp = p;
 				bBreakSkips = false;
 				break;
 
-			case WG_BREAK_ON:
+			case WgBreakRules::BreakOn:
 
-				if( p->Glyph() == WG_HYPHEN_BREAK_PERMITTED )
+				if( p->Glyph() == int(WgExtChar::HyphenBreakPermitted) )
 				{
 					// Check so a hyphen will fit on the line as well, otherwise we can't break here.
 					// We don't take kerning into account here, not so important.
@@ -1647,7 +1647,7 @@ int WgText::_countWriteSoftLines( int maxWidth, const WgChar * pStart, WgTextLin
 				bBreakSkips = true;
 				break;
 
-			case WG_BREAK_AFTER:
+			case WgBreakRules::BreakAfter:
 				if( bBreakAfterPrev )
 				{
 					pbp = p;
@@ -1656,7 +1656,7 @@ int WgText::_countWriteSoftLines( int maxWidth, const WgChar * pStart, WgTextLin
 				bBreakAfterPrev = true;
 				break;
 
-			default:				// WG_NO_BREAK
+			default:				// WgBreakRules::NoBreak
 				break;
 
 			}

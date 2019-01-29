@@ -113,7 +113,7 @@ void WgImage::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 {
 	WgWidget::_onRender(pDevice, _canvas, _window, _clip);
 
-	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale) : _canvas;
+	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(_canvas, WgStateEnum::Normal, m_scale) : _canvas;
 
 	if( !m_pGfx )
 		return;

@@ -143,7 +143,7 @@ Uint32 WgPopupOpener::GetTextAreaWidth()
 	WgRect	contentRect(0,0, PixelSize());
 
 	if( m_pSkin )
-		m_pSkin->ContentRect(contentRect, WG_STATE_NORMAL, m_scale);
+		m_pSkin->ContentRect(contentRect, WgStateEnum::Normal, m_scale);
 
 	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx, m_scale ) );
 
@@ -246,7 +246,7 @@ void WgPopupOpener::_onNewSize( const WgSize& size )
 	WgRect	contentRect(0,0, PixelSize());
 
 	if (m_pSkin)
-		contentRect = m_pSkin->ContentRect(contentRect, WG_STATE_NORMAL, m_scale);
+		contentRect = m_pSkin->ContentRect(contentRect, WgStateEnum::Normal, m_scale);
 
 	WgRect textRect = _getTextRect( contentRect, _getIconRect( contentRect, m_pIconGfx, m_scale ) );
 

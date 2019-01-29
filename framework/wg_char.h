@@ -240,9 +240,9 @@ public:
 	inline bool				IsEndOfText() const { if( glyph == 0 ) return true; return false; }
 
 							/// Checks if the character is a whitespace.
-							/// @return True if the glyph portion of the characer contains a space or WG_NO_BREAK_SPACE.
+							/// @return True if the glyph portion of the characer contains a space or WgExtChar::NoBreakSpace.
 
-	inline bool 			IsWhitespace() const { if( glyph == ' ' || glyph == WG_NO_BREAK_SPACE ) return true; return false; }
+	inline bool 			IsWhitespace() const { if( glyph == ' ' || glyph == int(WgExtChar::NoBreakSpace) ) return true; return false; }
 
 protected:
 

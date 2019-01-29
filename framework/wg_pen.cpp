@@ -61,7 +61,7 @@ void WgPen::_init()
 
 	m_pGlyph = &m_dummyGlyph;
 	m_pPrevGlyph = &m_dummyGlyph;
-	m_color = 0xFFFFFFFF,
+    m_color = 0xFFFFFFFF;
 
 	m_bShowSpace = false;
 	m_bShowCRLF = false;
@@ -209,7 +209,7 @@ bool WgPen::SetChar( Uint32 chr )
 		}
 	}
 
-	if( chr == WG_BREAK_PERMITTED || chr == WG_HYPHEN_BREAK_PERMITTED )
+	if( chr == int(WgExtChar::BreakPermitted) || chr == int(WgExtChar::HyphenBreakPermitted) )
 	{
 		m_dummyGlyph.SetAdvance(0);
 		m_pGlyph = &m_dummyGlyph;

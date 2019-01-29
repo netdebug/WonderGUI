@@ -1066,7 +1066,7 @@ void WgScrollChart::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, cons
 	{
 		if (m_chartColor.a == 255)
 		{
-			WgRect coverage = m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale);
+			WgRect coverage = m_pSkin->ContentRect(_canvas, WgStateEnum::Normal, m_scale);
 
 			if ( !coverage.contains( _clip) )
 			{
@@ -1075,17 +1075,17 @@ void WgScrollChart::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, cons
 				WgRect rightSection(coverage.x + coverage.w, coverage.y, canvas.x + canvas.w - (coverage.x + coverage.w), coverage.h);
 				WgRect bottomSection(canvas.x, coverage.y + coverage.h, canvas.w, canvas.y + canvas.h - (coverage.y + coverage.h));
 
-				m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, WgRect(topSection, _clip), m_scale);
-				m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, WgRect(leftSection, _clip), m_scale);
-				m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, WgRect(rightSection, _clip), m_scale);
-				m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, WgRect(bottomSection, _clip), m_scale);
+				m_pSkin->Render(pDevice, WgStateEnum::Normal, _canvas, WgRect(topSection, _clip), m_scale);
+				m_pSkin->Render(pDevice, WgStateEnum::Normal, _canvas, WgRect(leftSection, _clip), m_scale);
+				m_pSkin->Render(pDevice, WgStateEnum::Normal, _canvas, WgRect(rightSection, _clip), m_scale);
+				m_pSkin->Render(pDevice, WgStateEnum::Normal, _canvas, WgRect(bottomSection, _clip), m_scale);
 			}
 
 		}
 		else
-			m_pSkin->Render(pDevice, WG_STATE_NORMAL, _canvas, _clip, m_scale);
+			m_pSkin->Render(pDevice, WgStateEnum::Normal, _canvas, _clip, m_scale);
 
-		canvas = m_pSkin->ContentRect(_canvas, WG_STATE_NORMAL, m_scale);
+		canvas = m_pSkin->ContentRect(_canvas, WgStateEnum::Normal, m_scale);
 	}
 	else
 		canvas = _canvas;
@@ -1151,13 +1151,13 @@ void WgScrollChart::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, cons
 				if (m_valueLabelStyle.pSkin)
 				{
 					labelSize = m_valueLabelStyle.pSkin->SizeForContent(labelSize, m_scale);
-					textOfs = m_valueLabelStyle.pSkin->ContentRect(labelSize, WG_STATE_NORMAL, m_scale).pos();
+					textOfs = m_valueLabelStyle.pSkin->ContentRect(labelSize, WgStateEnum::Normal, m_scale).pos();
 				}
 
 				WgCoord labelPos = _placeLabel({ canvas.x, yOfs }, m_valueLabelStyle.alignment, m_valueLabelStyle.offset, labelSize);
 
 				if (m_valueLabelStyle.pSkin)
-					m_valueLabelStyle.pSkin->Render(pDevice, WG_STATE_NORMAL, { labelPos,labelSize }, _clip, m_scale);
+					m_valueLabelStyle.pSkin->Render(pDevice, WgStateEnum::Normal, { labelPos,labelSize }, _clip, m_scale);
 
 				pen.SetPos(labelPos + textOfs);
 				pDevice->PrintLine(pen, attr, line.label.Chars());
@@ -1292,7 +1292,7 @@ WgRect WgScrollChart::_getScrollWindow() const
 	WgRect r = PixelSize();
 
 	if (m_pSkin)
-		r = m_pSkin->ContentRect(r, WG_STATE_NORMAL, m_scale).size();
+		r = m_pSkin->ContentRect(r, WgStateEnum::Normal, m_scale).size();
 
 	r -= m_pixelPadding;
 

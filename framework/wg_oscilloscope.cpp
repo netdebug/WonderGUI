@@ -423,7 +423,7 @@ void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 {
 	// Render background
 	if( m_pBG )
-		m_pBG->Render( pDevice, WG_STATE_NORMAL, _canvas, _clip, m_scale );
+		m_pBG->Render( pDevice, WgStateEnum::Normal, _canvas, _clip, m_scale );
 
 	float centerX = _canvas.x + _canvas.w/2.f;
 	float centerY = _canvas.y + _canvas.h/2.f;

@@ -151,8 +151,8 @@ int WgMultiSlider::AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, f
 	s.pSetGeoFunc = pSetGeoFunc;
 
 	s.handleHotspot = handleHotspot;
-	s.sliderState = WG_STATE_NORMAL;
-	s.handleState = WG_STATE_NORMAL;
+	s.sliderState = WgStateEnum::Normal;
+	s.handleState = WgStateEnum::Normal;
 
 	_updateHandlePos(s);
 	_updateGeo(s);
@@ -201,8 +201,8 @@ int WgMultiSlider::AddSlider2D( int id, WgOrigo origo, SetGeoFunc pSetGeoFunc, f
 	s.pSetGeoFunc = pSetGeoFunc;
 
 	s.handleHotspot = handleHotspot;
-	s.sliderState = WG_STATE_NORMAL;
-	s.handleState = WG_STATE_NORMAL;
+	s.sliderState = WgStateEnum::Normal;
+	s.handleState = WgStateEnum::Normal;
 
 	_updateHandlePos(s);
 	_updateGeo(s);
@@ -378,9 +378,9 @@ WgMultiSlider::Slider * WgMultiSlider::_markedSliderHandle(WgCoord ofs, WgCoord 
 			WgRect sliderGeo = _sliderGeo(slider, PixelSize());
 			WgRect handleGeo = _sliderHandleGeo(slider, sliderGeo);
 
-            // We are using WG_STATE_NORMAL on purpose here, so that hover hightlights are not included. Not perfect, but the lesser of two evils...
+            // We are using WgStateEnum::Normal on purpose here, so that hover hightlights are not included. Not perfect, but the lesser of two evils...
             
-            if (handleGeo.contains(ofs) && pHandleSkin->MarkTest(ofs - handleGeo.pos(), handleGeo.size(), WgStateEnum::WG_STATE_NORMAL, m_markOpacity, m_scale))
+            if (handleGeo.contains(ofs) && pHandleSkin->MarkTest(ofs - handleGeo.pos(), handleGeo.size(), WgStateEnum::Normal, m_markOpacity, m_scale))
 			{
 				fullyMarkedOfs = ofs - handleGeo.pos();
 				pFullyMarked = &slider;
@@ -575,7 +575,7 @@ void WgMultiSlider::_updateSliderStates()
 		for (auto& slider : m_sliders)
 		{
 			if (slider.sliderState.isEnabled())
-				_setSliderStates(slider, WG_STATE_DISABLED, WG_STATE_DISABLED);
+				_setSliderStates(slider, WgStateEnum::Disabled, WgStateEnum::Disabled);
 		}
 		return;
 	}
@@ -594,12 +594,12 @@ void WgMultiSlider::_updateSliderStates()
 			if (&slider == &selected)
 			{
 				if(!slider.sliderState.isPressed() )
-					_setSliderStates(slider, slider.sliderState + WG_STATE_PRESSED, slider.handleState );
+					_setSliderStates(slider, slider.sliderState + WgStateEnum::Pressed, slider.handleState );
 			}
 			else
 			{
 				if( slider.sliderState.isHovered())
-					_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+					_setSliderStates(slider, slider.sliderState - WgStateEnum::Hovered, slider.handleState);
 			}
 		}
 
@@ -617,12 +617,12 @@ void WgMultiSlider::_updateSliderStates()
 				if (&slider == &hovered)
 				{
 					if (!slider.sliderState.isPressed())
-						_setSliderStates(slider, slider.sliderState + WG_STATE_PRESSED, slider.handleState);
+						_setSliderStates(slider, slider.sliderState + WgStateEnum::Pressed, slider.handleState);
 				}
 				else
 				{
 					if (slider.sliderState.isHovered())
-						_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+						_setSliderStates(slider, slider.sliderState - WgStateEnum::Hovered, slider.handleState);
 				}
 			}
 		}
@@ -631,7 +631,7 @@ void WgMultiSlider::_updateSliderStates()
 			for (auto& slider : m_sliders)
 			{
 				if (slider.sliderState.isHovered())
-					_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+					_setSliderStates(slider, slider.sliderState - WgStateEnum::Hovered, slider.handleState);
 			}
 		}
 	}
@@ -648,14 +648,14 @@ void WgMultiSlider::_updateSliderStates()
 				if (&slider == &hovered)
 				{
 					if( slider.sliderState.isPressed() )
-						_setSliderStates(slider, slider.sliderState - WG_STATE_PRESSED, slider.handleState);
+						_setSliderStates(slider, slider.sliderState - WgStateEnum::Pressed, slider.handleState);
 					else if (!slider.sliderState.isHovered())
-						_setSliderStates(slider, slider.sliderState + WG_STATE_HOVERED, slider.handleState);
+						_setSliderStates(slider, slider.sliderState + WgStateEnum::Hovered, slider.handleState);
 				}
 				else
 				{
 					if (slider.sliderState.isHovered())
-						_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+						_setSliderStates(slider, slider.sliderState - WgStateEnum::Hovered, slider.handleState);
 				}
 			}
 		}
@@ -664,7 +664,7 @@ void WgMultiSlider::_updateSliderStates()
 			for (auto& slider : m_sliders)
 			{
 				if (slider.sliderState.isHovered())
-					_setSliderStates(slider, slider.sliderState - WG_STATE_HOVERED, slider.handleState);
+					_setSliderStates(slider, slider.sliderState - WgStateEnum::Hovered, slider.handleState);
 			}
 		}
 	}
@@ -693,12 +693,12 @@ void WgMultiSlider::_updateSliderStates()
 			if (&slider == &selected)
 			{
 				if (!slider.handleState.isPressed())
-					_setSliderStates(slider, slider.sliderState, slider.handleState + WG_STATE_PRESSED );
+					_setSliderStates(slider, slider.sliderState, slider.handleState + WgStateEnum::Pressed );
 			}
 			else
 			{
 				if (slider.handleState.isHovered())
-					_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+					_setSliderStates(slider, slider.sliderState, slider.handleState - WgStateEnum::Hovered);
 			}
 		}
 
@@ -716,12 +716,12 @@ void WgMultiSlider::_updateSliderStates()
 				if (&slider == &hovered)
 				{
 					if (!slider.handleState.isPressed())
-						_setSliderStates(slider, slider.sliderState, slider.handleState + WG_STATE_PRESSED );
+						_setSliderStates(slider, slider.sliderState, slider.handleState + WgStateEnum::Pressed );
 				}
 				else
 				{
 					if (slider.handleState.isHovered())
-						_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+						_setSliderStates(slider, slider.sliderState, slider.handleState - WgStateEnum::Hovered);
 				}
 			}
 		}
@@ -730,7 +730,7 @@ void WgMultiSlider::_updateSliderStates()
 			for (auto& slider : m_sliders)
 			{
 				if (slider.handleState.isHovered())
-					_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+					_setSliderStates(slider, slider.sliderState, slider.handleState - WgStateEnum::Hovered);
 			}
 		}
 	}
@@ -746,14 +746,14 @@ void WgMultiSlider::_updateSliderStates()
 			if (&slider == &hovered)
 			{
 				if (slider.handleState.isPressed())
-					_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_PRESSED);
+					_setSliderStates(slider, slider.sliderState, slider.handleState - WgStateEnum::Pressed);
 				if (!slider.handleState.isHovered())
-					_setSliderStates(slider, slider.sliderState, slider.handleState + WG_STATE_HOVERED);
+					_setSliderStates(slider, slider.sliderState, slider.handleState + WgStateEnum::Hovered);
 			}
 			else
 			{
 				if (slider.handleState.isHovered())
-					_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+					_setSliderStates(slider, slider.sliderState, slider.handleState - WgStateEnum::Hovered);
 			}
 		}
 	}
@@ -762,7 +762,7 @@ void WgMultiSlider::_updateSliderStates()
 		for (auto& slider : m_sliders)
 		{
 			if (slider.handleState.isHovered())
-				_setSliderStates(slider, slider.sliderState, slider.handleState - WG_STATE_HOVERED);
+				_setSliderStates(slider, slider.sliderState, slider.handleState - WgStateEnum::Hovered);
 		}
 	}
 }
@@ -1402,7 +1402,7 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 	}
 
 	WgSkinPtr pBgSkin = slider.pBgSkin ? slider.pBgSkin : m_pDefaultBgSkin;
-	if (pBgSkin && !pBgSkin->IsStateIdentical(slider.handleState, slider.handleState + WG_STATE_SELECTED))
+	if (pBgSkin && !pBgSkin->IsStateIdentical(slider.handleState, slider.handleState + WgStateEnum::Selected))
 	{	
 		WgRect sliderSkinGeo = _sliderSkinGeo(slider, sliderGeo);
 		_requestRender(sliderSkinGeo);

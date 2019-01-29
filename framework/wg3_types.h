@@ -80,23 +80,23 @@ namespace wg
 	enum class StateEnum : uint8_t
 	{
 		Normal					= 0,			///< Element is neither hovered, pressed, selected or focused.
-		Selected				= 1,			///< Element is in a selected state, like a selected checkbox or item in a list. 
-		Focused					= 2,			///< Element has keyboard focus
-		FocusedSelected			= 2+1,
-		Hovered					= 4,			///< Mouse pointer is hovering over element.
-		HoveredSelected			= 4+1,
-		HoveredFocused			= 4+2,
-		HoveredFocusedSelected	= 4+2+1,
-		Pressed					= 8+4,			///< Mouse button (usually left one) is pressed on element.
-		PressedSelected			= 8+4+1,
-		PressedFocused			= 8+4+2,
-		PressedFocusedSelected	= 8+4+2+1,
+        Focused                 = 1,            ///< Element has keyboard focus
+        Hovered                 = 4,            ///< Mouse pointer is hovering over element.
+        HoveredFocused          = 4+1,
+        Pressed                 = 4+2,          ///< Mouse button (usually left one) is pressed on element.
+        PressedFocused          = 4+2+1,
+		Selected				= 8,			///< Element is in a selected state, like a selected checkbox or item in a list.
+		SelectedFocused			= 8+1,
+		SelectedHovered			= 8+4,
+		SelectedHoveredFocused	= 8+4+1,
+		SelectedPressed			= 8+4+2,
+		SelectedPressedFocused	= 8+4+2+1,
 		Disabled				= 16,			///< Element is disabled and can't be focused or pressed.
-		DisabledSelected		= 16+1,
+		DisabledSelected		= 16+8,
 	};
 	
-	static const int	StateEnum_Nb	= 14;			// Number of states
-	static const int	StateEnum_MaxValue	= 17;			// Highest value for StateEnum
+	static const int	StateEnum_Nb	    = 14;	// Number of states
+	static const int	StateEnum_MaxValue	= 24;	// Highest value for StateEnum
 	
 	class State 
 	{
@@ -130,7 +130,14 @@ namespace wg
 		inline void operator=(StateEnum state) { m_state = ((uint8_t)state); }
 	
 		operator StateEnum() const { return (StateEnum) m_state; }
-	
+
+        inline State operator+(StateEnum state) const { int s = m_state | (uint8_t) state; if (s & (int) StateEnum::Disabled) s &= (int) StateEnum::DisabledSelected; return (StateEnum) s; }
+        inline State operator-(StateEnum state) const { if ((int(state) & int(StateEnum::Pressed)) == int(StateEnum::Pressed)) state = (StateEnum)(int(state) & ~int(StateEnum::Hovered)); int s = (m_state & ~int(state)); if ((s & int(StateEnum::Hovered)) == 0) s &= ~int(StateEnum::Pressed);  return (StateEnum)s; }
+        
+        inline State& operator+=(StateEnum state) { m_state |= (uint8_t) state; if (int(m_state) & int(StateEnum::Disabled)) m_state &= int(StateEnum::DisabledSelected); return *this; }
+        inline State& operator-=(StateEnum state) { if ((int(state) & int(StateEnum::Pressed)) == int(StateEnum::Pressed)) state = (StateEnum) (int(state) & ~int(StateEnum::Hovered)); m_state &= ~int(state); if ((m_state & int(StateEnum::Hovered)) == 0) m_state &= ~int(StateEnum::Pressed); return *this;
+        }
+        
 	private:
 		uint8_t		m_state;
 	};
@@ -142,92 +149,7 @@ namespace wg
 		
 	
 	//____ ExtChar __________________________________________________________
-	
-	
-	//0x1b
-	
-	// Double escape codes should give the escape-code character.
-	
-	/*
-			NEW ONES
-	
-			{prop}		Set the named property. Named properties should start with a-z/A-Z.
-						If property is unnamed you get {123} where the number is the current handle for the prop.
-	
-			-			break permitted
-			=			hyphen break permitted
-			n			linebreak (like \n).
-	
-			Predefined properties
-	
-			{n}			empty property (normal/default)
-			{b}			bold
-			{i}			italic
-			{u}			underlined
-			{b-i}		bold italic
-			{b-u}		bold underlined
-			{b-i-u}		bold italic underlined
-			{i-u}		italic underlined
-			{h1}		heading 1
-			{h2}		heading 2
-			{h3}		heading 3
-			{h4}		heading 4
-			{h5}		heading 5
-			{u1}		user defined style 1
-			{u2}		user defined style 2
-			{u3}		user defined style 3
-			{u4}		user defined style 4
-			{u5}		user defined style 5
-	
-			{super}		superscript		// Includes top positioning
-			{sub}		subscript		// Includes bottom positioning
-			{mono}		monospaced		// Includes monospacing
-	
-			{black}		black text
-			{white}		white text
-	
-	*/
-	
-	
-	
-	/*
-		{[rrggbbaa]		begin color
-		}				end color
-	
-		[123			begin size, exactly 3 decimal digits sets the size.
-		]				end size
-	
-		_				begin underlined
-		| 				end underlined
-	
-		:[0-4]			set break level
-		;				end break level
-	
-	
-		-				break permitted
-		=				hyphen break permitted
-	
-		d				begin normal (default)
-		b				begin bold
-		i				begin italic
-		I				begin bold italic
-		s				begin subscript
-		S				begin superscript
-		m				begin monospace
-		h[1-5]			begin heading
-		u[1-5]			begin userdefined style
-	
-		#				end style
-	
-		(prop)			set a new text property, looked up from a ResDB.
-						Other style/color settings are applied ontop of this text property.
-						Setting prop as (null) sets an empty prop.
-	
-	
-	
-	*/
-	
-	
+		
 	enum class ExtChar : uint16_t
 	{
 		BreakPermitted			= 0x82,
@@ -557,7 +479,7 @@ namespace wg
 	};
 
 
-	//____ int ____________________________________________________________
+	//____ SurfaceHint ____________________________________________________________
 	
 	namespace SurfaceHint
 	{
