@@ -67,7 +67,7 @@ WgSize WgSurface::PointSize() const
 
 void WgSurface::setScaleMode(WgScaleMode mode)
 {
-	wg::ScaleMode m = mode == WG_SCALEMODE_INTERPOLATE ? wg::ScaleMode::Interpolate : wg::ScaleMode::Nearest;
+	wg::ScaleMode m = mode == WgScaleMode::Interpolate ? wg::ScaleMode::Interpolate : wg::ScaleMode::Nearest;
 	m_pRealSurface->setScaleMode(m);
 }
 
@@ -76,7 +76,7 @@ void WgSurface::setScaleMode(WgScaleMode mode)
 WgScaleMode WgSurface::scaleMode() const 
 { 
 	wg::ScaleMode m = m_pRealSurface->scaleMode();
-	return m == wg::ScaleMode::Interpolate ? WG_SCALEMODE_INTERPOLATE : WG_SCALEMODE_NEAREST;
+	return m == wg::ScaleMode::Interpolate ? WgScaleMode::Interpolate : WgScaleMode::Nearest;
 }
 
 //____ GetPixel() _____________________________________________________________
@@ -97,14 +97,14 @@ Uint8 WgSurface::GetOpacity(WgCoord coord) const
 
 void * WgSurface::Lock(WgAccessMode mode) 
 { 
-	return m_pRealSurface->lock(_convert(mode)); 
+	return m_pRealSurface->lock(mode);
 }
 
 //____ LockRegion() ___________________________________________________________
 
 void * WgSurface::LockRegion(WgAccessMode mode, const WgRect& region) 
 { 
-	return m_pRealSurface->lockRegion(_convert(mode), _convert(region)); 
+	return m_pRealSurface->lockRegion(mode, _convert(region));
 }
 
 
@@ -113,7 +113,7 @@ void * WgSurface::LockRegion(WgAccessMode mode, const WgRect& region)
 
 WgAccessMode WgSurface::GetLockStatus() const 
 { 
-    return _convert(m_pRealSurface->lockStatus());
+    return m_pRealSurface->lockStatus();
 }
 
 //____ GetLockRegion() ________________________________________________________

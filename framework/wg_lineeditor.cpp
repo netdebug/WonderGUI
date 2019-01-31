@@ -38,11 +38,11 @@ WgLineEditor::WgLineEditor()
 	m_text.setHolder( this );
 	m_text.SetWrap(false);
 	m_text.SetAutoEllipsis(IsAutoEllipsisDefault());
-	m_text.SetEditMode( WG_TEXT_EDITABLE );
+	m_text.SetEditMode( WgTextEditMode::Editable );
 	m_bPasswordMode = false;
 	m_pwGlyph		= '*';
 	m_viewOfs		= 0;
-	m_pointerStyle	= WG_POINTER_IBEAM;
+	m_pointerStyle	= WgPointerStyle::Ibeam;
 	m_bResetCursorOnFocus = true;
 }
 
@@ -87,11 +87,11 @@ void WgLineEditor::SetEditMode(WgTextEditMode mode)
 
 	if( _isSelectable() )
 	{
-		m_pointerStyle = WG_POINTER_IBEAM;
+		m_pointerStyle = WgPointerStyle::Ibeam;
 	}
 	else
 	{
-		m_pointerStyle = WG_POINTER_DEFAULT;
+		m_pointerStyle = WgPointerStyle::Default;
 	}
 }
 

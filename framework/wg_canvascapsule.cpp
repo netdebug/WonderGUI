@@ -28,7 +28,7 @@ static const char    c_widgetType[] = {"CanvasCapsule"};
 
 //____ Constructor ____________________________________________________________
 
-WgCanvasCapsule::WgCanvasCapsule() : m_tintColor(0xFFFFFFFF), m_tintMode(WG_TINTMODE_OPAQUE), m_blendMode(WG_BLENDMODE_BLEND), m_pFactory(nullptr), m_pCanvas(nullptr),
+WgCanvasCapsule::WgCanvasCapsule() : m_tintColor(0xFFFFFFFF), m_tintMode(WG_TINTMODE_OPAQUE), m_blendMode(WgBlendMode::Blend), m_pFactory(nullptr), m_pCanvas(nullptr),
 m_fadeStartColor(0xFFFFFFFF), m_fadeEndColor(0xFFFFFFFF), m_fadeTime(0), m_fadeTimeCounter(0)
 {
     m_bOpaque = false;
@@ -137,7 +137,7 @@ void WgCanvasCapsule::StopFade()
 
 WgWidget * WgCanvasCapsule::FindWidget(const WgCoord& ofs, WgSearchMode mode)
 {
-	if (mode == WG_SEARCH_GEOMETRY || m_tintColor.a > 0 || m_blendMode == WG_BLENDMODE_OPAQUE)
+	if (mode == WgSearchMode::Geometry || m_tintColor.a > 0 || m_blendMode == WgBlendMode::Replace)
 		return WgCapsule::FindWidget(ofs, mode);
 
 	return nullptr;
@@ -223,7 +223,7 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
         if (_canvas.w > maxSize.w || _canvas.h > maxSize.h)
             return;                            // Can't create a canvas of the required size!
 
-        m_pCanvas = m_pFactory->CreateSurface(_canvas.size(), WG_PIXEL_BGRA_8);
+        m_pCanvas = m_pFactory->CreateSurface(_canvas.size(), WgPixelType::BGRA_8);
         m_dirtyPatches.Clear();
         m_dirtyPatches.Add(_canvas.size());
     }
@@ -270,7 +270,7 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
         WgSurface * pOldCanvas = pDevice->Canvas();
         pDevice->SetCanvas(m_pCanvas);
 
-        pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+        pDevice->SetBlendMode(WgBlendMode::Replace);
         pDevice->SetTintColor(WgColor::White);
 
         for( const WgRect * pRect = renderStack.Begin() ; pRect != renderStack.End() ; pRect++ )
@@ -278,7 +278,7 @@ void WgCanvasCapsule::_renderPatches( WgGfxDevice * pDevice, const WgRect& _canv
             pDevice->Fill(*pRect, WgColor::Transparent);
         }
 
-        pDevice->SetBlendMode(WG_BLENDMODE_BLEND);
+        pDevice->SetBlendMode(WgBlendMode::Blend);
 
         m_hook.Widget()->_renderPatches(pDevice, _canvas.size(), _canvas.size(), &renderStack);
         pDevice->SetCanvas(pOldCanvas);
@@ -362,7 +362,7 @@ void WgCanvasCapsule::_onRenderRequested(const WgRect& rect)
 
 void WgCanvasCapsule::_onCollectPatches( WgPatches& container, const WgRect& geo, const WgRect& clip )
 {
-	if (m_tintColor.a > 0 || m_blendMode == WG_BLENDMODE_OPAQUE)
+	if (m_tintColor.a > 0 || m_blendMode == WgBlendMode::Replace)
 		container.Add( WgRect( geo, clip ) );
 }
 
@@ -372,7 +372,7 @@ void WgCanvasCapsule::_onMaskPatches( WgPatches& patches, const WgRect& geo, con
 {
 	//TODO: Support recursive masking.
 
-	if( m_pCanvas && ((m_tintColor.a == 255 && m_pCanvas->PixelFormat()->A_bits == 0) || m_blendMode == WG_BLENDMODE_OPAQUE) )
+	if( m_pCanvas && ((m_tintColor.a == 255 && m_pCanvas->PixelFormat()->A_bits == 0) || m_blendMode == WgBlendMode::Replace) )
 		patches.Sub(WgRect(geo, clip));
 
     return;

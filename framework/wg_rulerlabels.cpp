@@ -9,7 +9,7 @@ static const char	c_widgetType[] = {"RulerLabels"};
 
 WgRulerLabels::WgRulerLabels()
 {
-	m_direction = WG_RIGHT;
+	m_direction = WgDirection::Right;
     m_pTextManager = 0;
 }
 
@@ -89,7 +89,7 @@ WgSize WgRulerLabels::PreferredPixelSize() const
     
     WgSize preferred;
  
-    if( m_direction == WG_UP || m_direction == WG_DOWN )
+    if( m_direction == WgDirection::Up || m_direction == WgDirection::Down )
     {
 		Label * pLabel = m_labels.First();
 		while( pLabel )
@@ -125,30 +125,30 @@ WgSize WgRulerLabels::PreferredPixelSize() const
 
 void WgRulerLabels::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	if( m_direction == WG_UP || m_direction == WG_DOWN )
+	if( m_direction == WgDirection::Up || m_direction == WgDirection::Down )
 	{
 		Label * pLabel = m_labels.First();
 		while( pLabel )
 		{
 			int height = pLabel->text.height();
 			int ofs = (int) (_canvas.h * pLabel->offset);
-			if( m_direction == WG_UP )
+			if( m_direction == WgDirection::Up )
 				ofs = _canvas.h - ofs;
 			
 			switch( pLabel->text.alignment() )
 			{
-				case WG_NORTHWEST:
-				case WG_NORTH:
-				case WG_NORTHEAST:				
+				case WgOrigo::NorthWest:
+				case WgOrigo::North:
+				case WgOrigo::NorthEast:				
 					break;
-				case WG_SOUTHEAST:
-				case WG_SOUTH:
-				case WG_SOUTHWEST:
+				case WgOrigo::SouthEast:
+				case WgOrigo::South:
+				case WgOrigo::SouthWest:
 					ofs -= height;
 					break;
-				case WG_EAST:
-				case WG_WEST:
-				case WG_CENTER:
+				case WgOrigo::East:
+				case WgOrigo::West:
+				case WgOrigo::Center:
 					ofs -= height/2;
 					break;
 			}
@@ -164,23 +164,23 @@ void WgRulerLabels::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 		{
 			int width = pLabel->text.width();
 			int ofs = (int) (_canvas.w * pLabel->offset);
-			if( m_direction == WG_LEFT )
+			if( m_direction == WgDirection::Left )
 				ofs = _canvas.w - ofs;
 			
 			switch( pLabel->text.alignment() )
 			{
-				case WG_NORTHWEST:
-				case WG_SOUTHWEST:
-				case WG_WEST:
+				case WgOrigo::NorthWest:
+				case WgOrigo::SouthWest:
+				case WgOrigo::West:
 					break;
-				case WG_SOUTHEAST:
-				case WG_NORTHEAST:				
-				case WG_EAST:
+				case WgOrigo::SouthEast:
+				case WgOrigo::NorthEast:				
+				case WgOrigo::East:
 					ofs -= width;
 					break;
-				case WG_NORTH:
-				case WG_CENTER:
-				case WG_SOUTH:
+				case WgOrigo::North:
+				case WgOrigo::Center:
+				case WgOrigo::South:
 					ofs -= width/2;
 					break;
 			}

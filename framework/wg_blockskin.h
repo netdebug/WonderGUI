@@ -129,7 +129,7 @@ private:
 	int 			m_scale = WG_SCALE_BASE;
 	
 	WgColor			m_tintColor = WgColor::White;
-	WgBlendMode		m_blendMode = WG_BLENDMODE_BLEND;
+	WgBlendMode		m_blendMode = WgBlendMode::Blend;
 	bool			m_bHasBlendMode = false;
 
 	StateData		m_state[WG_NB_STATES];

@@ -35,12 +35,12 @@ static const char	c_widgetType[] = {"PopupOpener"};
 
 //____ Constructor ____________________________________________________________
 
-WgPopupOpener::WgPopupOpener() : m_attachPoint(WG_SOUTHWEST), m_bOpenOnHover(false), m_bOpen(false)
+WgPopupOpener::WgPopupOpener() : m_attachPoint(WgOrigo::SouthWest), m_bOpenOnHover(false), m_bOpen(false)
 {
 	m_bSelectable = false;
 
 	m_pText = &m_text;
-	m_text.setAlignment( WG_CENTER );
+	m_text.setAlignment( WgOrigo::Center );
 	m_text.setLineWidth(PixelSize().w);					// We start with no textborders...
 	m_text.SetAutoEllipsis(IsAutoEllipsisDefault());
 

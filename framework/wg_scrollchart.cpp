@@ -70,10 +70,10 @@ WgScrollChart::WgScrollChart()
 	m_sampleBeginTimestamp = 0;
 	m_sampleEndTimestamp = 0;
 
-	m_sampleLabelStyle.alignment = WG_SOUTH;
+	m_sampleLabelStyle.alignment = WgOrigo::South;
 	m_sampleLabelStyle.offset = { 0,0 };
 
-	m_valueLabelStyle.alignment = WG_WEST;
+	m_valueLabelStyle.alignment = WgOrigo::West;
 	m_valueLabelStyle.offset = { 0,0 };
 
 	m_chartColor = WgColor::White;
@@ -1051,7 +1051,7 @@ void WgScrollChart::_renderGridLines(WgGfxDevice * pDevice, const WgRect& _canva
 		for (auto& line : m_valueGridLines)
 		{
 			int yOfs = startOfs + (int)((line.pos - top) * mul + 0.5f);
-			pDevice->ClipDrawLine(_clip, { _canvas.x, yOfs }, WG_RIGHT, _canvas.w, line.color, line.thickness * m_scale / WG_SCALE_BASE);
+			pDevice->ClipDrawLine(_clip, { _canvas.x, yOfs }, WgDirection::Right, _canvas.w, line.color, line.thickness * m_scale / WG_SCALE_BASE);
 		}
 	}
 }
@@ -1216,7 +1216,7 @@ void WgScrollChart::_regenCanvas()
 		if (sz.w <= 0 && sz.h <= 0)
 			return;
 
-		m_pCanvas = m_pFactory->CreateSurface(sz, WG_PIXEL_BGR_8);
+		m_pCanvas = m_pFactory->CreateSurface(sz, WgPixelType::BGR_8);
 //		m_pCanvas->Fill(m_chartColor);
 		m_canvasOfs = 0;
 		m_bRefreshCanvas = true;

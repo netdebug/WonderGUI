@@ -36,7 +36,7 @@ static const char	c_widgetType[] = {"Button"};
 WgButton::WgButton()
 {
 	m_pText = &m_text;
-	m_text.setAlignment( WG_CENTER );
+	m_text.setAlignment( WgOrigo::Center );
 	m_text.setLineWidth(PixelSize().w);					// We start with no textborders...
 	m_text.SetAutoEllipsis(IsAutoEllipsisDefault());
 

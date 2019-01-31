@@ -327,46 +327,46 @@ void WgBlockSkin::SetSelectedBlocks( const WgCoord& ofs )
 
 void WgBlockSkin::SetTiled( bool bTiled )
 {
-	_setBitFlag( m_tiledSections, (int)WG_NORTH, bTiled );
-	_setBitFlag( m_tiledSections, (int)WG_SOUTH, bTiled );
-	_setBitFlag( m_tiledSections, (int)WG_EAST, bTiled );
-	_setBitFlag( m_tiledSections, (int)WG_WEST, bTiled );
-	_setBitFlag( m_tiledSections, (int)WG_CENTER, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::North, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::South, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::East, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::West, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::Center, bTiled );
 }
 
 //____ setTiledTopBorder() ____________________________________________________
 
 void WgBlockSkin::SetTiledTopBorder( bool bTiled )
 {
-	_setBitFlag( m_tiledSections, (int)WG_NORTH, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::North, bTiled );
 }
 
 //____ setTiledBottomBorder() _________________________________________________
 
 void WgBlockSkin::SetTiledBottomBorder( bool bTiled )
 {
-	_setBitFlag( m_tiledSections, (int)WG_SOUTH, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::South, bTiled );
 }
 
 //____ setTiledLeftBorder() ___________________________________________________
 
 void WgBlockSkin::SetTiledLeftBorder( bool bTiled )
 {
-	_setBitFlag( m_tiledSections, (int)WG_WEST, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::West, bTiled );
 }
 
 //____ setTiledRightBorder() __________________________________________________
 
 void WgBlockSkin::SetTiledRightBorder( bool bTiled )
 {
-	_setBitFlag( m_tiledSections, (int)WG_EAST, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::East, bTiled );
 }
 
 //____ setTiledCenter() _______________________________________________________
 
 void WgBlockSkin::SetTiledCenter( bool bTiled )
 {
-	_setBitFlag( m_tiledSections, (int)WG_CENTER, bTiled );
+	_setBitFlag( m_tiledSections, (int)WgOrigo::Center, bTiled );
 }
 
 //____ setTint() ______________________________________________________________
@@ -419,7 +419,7 @@ void WgBlockSkin::OptimizeRenderMethods()
 
 	//
 
-	m_pSurface->Lock( WG_READ_ONLY );
+	m_pSurface->Lock( WgAccessMode::ReadOnly );
 
 	for( int i = 0 ; i < WG_NB_STATES ; i++ )
 	{
@@ -437,34 +437,34 @@ void WgBlockSkin::OptimizeRenderMethods()
 		if( m_frame.top > 0 )
 		{
 			if( m_frame.left > 0 )
-				_scanStateBlockSectionArea( &m_state[i], WG_NORTHWEST, WgRect(x1, y1, m_frame.left, m_frame.top) );
+				_scanStateBlockSectionArea( &m_state[i], WgOrigo::NorthWest, WgRect(x1, y1, m_frame.left, m_frame.top) );
 
-			_scanStateBlockSectionArea( &m_state[i], WG_NORTH, WgRect(x2, y1, centerW, m_frame.top) );
+			_scanStateBlockSectionArea( &m_state[i], WgOrigo::North, WgRect(x2, y1, centerW, m_frame.top) );
 
 			if( m_frame.right > 0 )
-				_scanStateBlockSectionArea( &m_state[i], WG_NORTHEAST, WgRect(x3, y1, m_frame.right, m_frame.top) );
+				_scanStateBlockSectionArea( &m_state[i], WgOrigo::NorthEast, WgRect(x3, y1, m_frame.right, m_frame.top) );
 		}
 
 		if( centerH > 0 )
 		{
 			if( m_frame.left > 0 )
-				_scanStateBlockSectionArea( &m_state[i], WG_WEST, WgRect(x1, y2, m_frame.left, centerH) );
+				_scanStateBlockSectionArea( &m_state[i], WgOrigo::West, WgRect(x1, y2, m_frame.left, centerH) );
 
-			_scanStateBlockSectionArea( &m_state[i], WG_CENTER, WgRect(x2, y2, centerW, centerH) );
+			_scanStateBlockSectionArea( &m_state[i], WgOrigo::Center, WgRect(x2, y2, centerW, centerH) );
 
 			if( m_frame.right > 0 )
-				_scanStateBlockSectionArea( &m_state[i], WG_EAST, WgRect(x3, y2, m_frame.right, centerH) );
+				_scanStateBlockSectionArea( &m_state[i], WgOrigo::East, WgRect(x3, y2, m_frame.right, centerH) );
 		}
 
 		if( m_frame.bottom > 0 )
 		{
 			if( m_frame.left > 0 )
-				_scanStateBlockSectionArea( &m_state[i], WG_SOUTHWEST, WgRect(x1, y3, m_frame.left, m_frame.bottom) );
+				_scanStateBlockSectionArea( &m_state[i], WgOrigo::SouthWest, WgRect(x1, y3, m_frame.left, m_frame.bottom) );
 
-			_scanStateBlockSectionArea( &m_state[i], WG_SOUTH, WgRect(x2, y3, centerW, m_frame.bottom) );
+			_scanStateBlockSectionArea( &m_state[i], WgOrigo::South, WgRect(x2, y3, centerW, m_frame.bottom) );
 
 			if( m_frame.right > 0 )
-				_scanStateBlockSectionArea( &m_state[i], WG_SOUTHEAST, WgRect(x3, y3, m_frame.right, m_frame.bottom) );
+				_scanStateBlockSectionArea( &m_state[i], WgOrigo::SouthEast, WgRect(x3, y3, m_frame.right, m_frame.bottom) );
 		}
 	}
 
@@ -478,7 +478,7 @@ void WgBlockSkin::_scanStateBlockSectionArea( StateData * pState, WgOrigo sectio
 	const WgPixelFormat * pFormat = m_pSurface->PixelFormat();
 	int pitch = m_pSurface->Pitch();
 
-	if( pFormat->type != WG_PIXEL_BGRA_8 )
+	if( pFormat->type != WgPixelType::BGRA_8 )
 		return;												// Only supports ARGB_8 for the moment.
 
 	unsigned char * p = ((unsigned char*)m_pSurface->Pixels()) + sectionArea.x * pFormat->bits/8 + sectionArea.y * pitch;
@@ -673,11 +673,11 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
 			bool bTile;
 
 			if( ySection == 0 )
-				bTile = (m_tiledSections & (1 << (int)WG_NORTH)) != 0;
+				bTile = (m_tiledSections & (1 << (int)WgOrigo::North)) != 0;
 			else if( ySection == 1 )
-				bTile = (m_tiledSections & (1 << (int)WG_CENTER)) != 0;
+				bTile = (m_tiledSections & (1 << (int)WgOrigo::Center)) != 0;
 			else
-				bTile = (m_tiledSections & (1 << (int)WG_SOUTH)) != 0;
+				bTile = (m_tiledSections & (1 << (int)WgOrigo::South)) != 0;
 
 			if( bTile )
             {
@@ -715,11 +715,11 @@ bool WgBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgState s
 			bool bTile;
 
 			if( xSection == 0 )
-				bTile = (m_tiledSections & (1 << (int)WG_WEST)) != 0;
+				bTile = (m_tiledSections & (1 << (int)WgOrigo::West)) != 0;
 			else if( xSection == 1 )
-				bTile = (m_tiledSections & (1 << (int)WG_CENTER)) != 0;
+				bTile = (m_tiledSections & (1 << (int)WgOrigo::Center)) != 0;
 			else
-				bTile = (m_tiledSections & (1 << (int)WG_EAST)) != 0;
+				bTile = (m_tiledSections & (1 << (int)WgOrigo::East)) != 0;
 
 			if( bTile )
             {
@@ -776,7 +776,7 @@ bool WgBlockSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgStat
 
 	WgRect center = WgRect(canvasSize) - m_frame.scale(scale);
 	if( center.contains(rect) )
-        return ( m_state[index].opaqueSections & (1<<(int)WG_CENTER) ) != 0;
+        return ( m_state[index].opaqueSections & (1<<(int)WgOrigo::Center) ) != 0;
 
 	//
 /*
@@ -807,31 +807,31 @@ bool WgBlockSkin::IsOpaque( const WgRect& rect, const WgSize& canvasSize, WgStat
 	if( rect.y < center.y )
 	{
 		if( rect.x < center.x )
-			bitmask |= (1<<(int)WG_NORTHWEST);
+			bitmask |= (1<<(int)WgOrigo::NorthWest);
 		if( rect.x < center.x + center.w && rect.x + rect.w > center.x )
-			bitmask |= (1<<(int)WG_NORTH);
+			bitmask |= (1<<(int)WgOrigo::North);
 		if( rect.x + rect.w > center.x + center.w )
-			bitmask |= (1<<(int)WG_NORTHEAST);
+			bitmask |= (1<<(int)WgOrigo::NorthEast);
 	}
 
 	if( rect.y < center.y + center.h && rect.y + rect.h > center.y )
 	{
 		if( rect.x < center.x )
-			bitmask |= (1<<(int)WG_WEST);
+			bitmask |= (1<<(int)WgOrigo::West);
 		if( rect.x < center.x + center.w && rect.x + rect.w > center.x )
-			bitmask |= (1<<(int)WG_CENTER);
+			bitmask |= (1<<(int)WgOrigo::Center);
 		if( rect.x + rect.w > center.x + center.w )
-			bitmask |= (1<<(int)WG_EAST);
+			bitmask |= (1<<(int)WgOrigo::East);
 	}
 
 	if( rect.y + rect.h > center.y + center.h )
 	{
 		if( rect.x < center.x )
-			bitmask |= (1<<(int)WG_SOUTHWEST);
+			bitmask |= (1<<(int)WgOrigo::SouthWest);
 		if( rect.x < center.x + center.w && rect.x + rect.w > center.x )
-			bitmask |= (1<<(int)WG_SOUTH);
+			bitmask |= (1<<(int)WgOrigo::South);
 		if( rect.x + rect.w > center.x + center.w )
-			bitmask |= (1<<(int)WG_SOUTHEAST);
+			bitmask |= (1<<(int)WgOrigo::SouthEast);
 	}
 
 

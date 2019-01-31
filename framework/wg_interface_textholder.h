@@ -39,7 +39,7 @@ class Wg_Interface_TextHolder : protected WgTextHolder
 {
 
 public:
-	virtual WgTextEditMode GetEditMode() const  { return WG_TEXT_STATIC; }
+	virtual WgTextEditMode GetEditMode() const  { return WgTextEditMode::Static; }
 
 	virtual void			SetTextManager( WgTextManager * pManager ) { m_pText->setManager( pManager ); _textModified(); }
 	inline WgTextManager * GetTextManager() const { return m_pText->getManager(); }

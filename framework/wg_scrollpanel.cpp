@@ -46,9 +46,9 @@ WgScrollPanel::WgScrollPanel()
 	m_sliderTargets[1].m_pParent = this;
 
 	m_bgColor = WgColor::White;
-	m_contentOrigo = WG_NORTHWEST;
-	m_widthPolicy = WG_DEFAULT;
-	m_heightPolicy = WG_DEFAULT;
+	m_contentOrigo = WgOrigo::NorthWest;
+	m_widthPolicy = WgSizePolicy::Default;
+	m_heightPolicy = WgSizePolicy::Default;
 
 
 	m_stepSizeX		= 1;
@@ -668,7 +668,7 @@ WgWidget * WgScrollPanel::FindWidget( const WgCoord& pos, WgSearchMode mode )
 	WgScrollHook * p = &m_elements[XDRAG];
 	if( p->IsVisible() && p->m_pWidget && p->m_windowGeo.contains( pos ) )
 	{
-		if( mode != WG_SEARCH_MARKPOLICY || p->m_pWidget->MarkTest( pos - p->m_windowGeo.pos() ) )
+		if( mode != WgSearchMode::MarkPolicy || p->m_pWidget->MarkTest( pos - p->m_windowGeo.pos() ) )
 			return p->m_pWidget;
 	}
 
@@ -677,7 +677,7 @@ WgWidget * WgScrollPanel::FindWidget( const WgCoord& pos, WgSearchMode mode )
 	p = &m_elements[YDRAG];
 	if( p->IsVisible() && p->m_pWidget && p->m_windowGeo.contains( pos ) )
 	{
-		if( mode != WG_SEARCH_MARKPOLICY || p->m_pWidget->MarkTest( pos - p->m_windowGeo.pos() ) )
+		if( mode != WgSearchMode::MarkPolicy || p->m_pWidget->MarkTest( pos - p->m_windowGeo.pos() ) )
 			return p->m_pWidget;
 	}
 
@@ -692,7 +692,7 @@ WgWidget * WgScrollPanel::FindWidget( const WgCoord& pos, WgSearchMode mode )
 			if( pFound )
 				return pFound;
 		}
-		else if( mode != WG_SEARCH_MARKPOLICY || p->m_pWidget->MarkTest( pos - p->m_canvasGeo.pos() ) )
+		else if( mode != WgSearchMode::MarkPolicy || p->m_pWidget->MarkTest( pos - p->m_canvasGeo.pos() ) )
 			return p->m_pWidget;
 	}
 
@@ -704,7 +704,7 @@ WgWidget * WgScrollPanel::FindWidget( const WgCoord& pos, WgSearchMode mode )
 
 	// Check our little corner square and geometry
 
-	if( mode == WG_SEARCH_GEOMETRY || MarkTest( pos ) )
+	if( mode == WgSearchMode::Geometry || MarkTest( pos ) )
 		return this;
 
 	//
@@ -1251,7 +1251,7 @@ void WgScrollPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const
 {
 	switch( m_maskOp )
 	{
-		case WG_MASKOP_RECURSE:
+		case WgMaskOp::Recurse:
 		{
 			// Mask against view
 
@@ -1279,9 +1279,9 @@ void WgScrollPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const
 
 			break;
 		}
-		case WG_MASKOP_SKIP:
+		case WgMaskOp::Skip:
 			break;
-		case WG_MASKOP_MASK:
+		case WgMaskOp::Mask:
 			patches.Sub( WgRect(geo,clip) );
 			break;
 	}

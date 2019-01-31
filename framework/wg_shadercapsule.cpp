@@ -27,7 +27,7 @@ static const char	c_widgetType[] = {"ShaderCapsule"};
 
 //____ Constructor ____________________________________________________________
 
-WgShaderCapsule::WgShaderCapsule() : m_tintColor(0xFFFFFFFF), m_tintMode(WG_TINTMODE_OPAQUE), m_blendMode(WG_BLENDMODE_BLEND)
+WgShaderCapsule::WgShaderCapsule() : m_tintColor(0xFFFFFFFF), m_tintMode(WG_TINTMODE_OPAQUE), m_blendMode(WgBlendMode::Blend)
 {
 }
 
@@ -88,7 +88,7 @@ void WgShaderCapsule::SetBlendMode( WgBlendMode mode )
 
 WgWidget * WgShaderCapsule::FindWidget(const WgCoord& ofs, WgSearchMode mode)
 {
-	if (mode == WG_SEARCH_GEOMETRY || m_tintColor.a > 0 || m_blendMode == WG_BLENDMODE_OPAQUE)
+	if (mode == WgSearchMode::Geometry || m_tintColor.a > 0 || m_blendMode == WgBlendMode::Replace)
 		return WgCapsule::FindWidget(ofs, mode);
 
 	return nullptr;
@@ -144,7 +144,7 @@ void WgShaderCapsule::_onCollectPatches(WgPatches& container, const WgRect& geo,
 {
 	//TODO: This causes trouble if another shader capsule further down the hierarchy undo the shading.
 
-	if (m_tintColor.a > 0 || m_blendMode == WG_BLENDMODE_OPAQUE)
+	if (m_tintColor.a > 0 || m_blendMode == WgBlendMode::Replace)
 		WgCapsule::_onCollectPatches(container, geo, clip);
 }
 
@@ -154,7 +154,7 @@ void WgShaderCapsule::_onMaskPatches(WgPatches& patches, const WgRect& geo, cons
 {
 	//TODO: This causes trouble if another shader capsule further down the hierarchy undo the shading.
 
-	if (m_tintColor.a == 255 || m_blendMode == WG_BLENDMODE_OPAQUE)
+	if (m_tintColor.a == 255 || m_blendMode == WgBlendMode::Replace)
 		WgCapsule::_onMaskPatches(patches, geo, clip, blendMode);		
 }
 

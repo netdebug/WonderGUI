@@ -1,9 +1,9 @@
-#include <sdl_wglib.h>
+#include "sdl_wglib.h"
 //#include <wg_surface_sdl.h>
 #include <wg_surface_soft.h>
 #include <wg_surfacefactory_soft.h>
 #include <wondergui.h>
-
+#include <wg_resdb.h>
 
 namespace sdl_wglib
 {
@@ -105,7 +105,7 @@ namespace sdl_wglib
 					g_pHandler->QueueEvent( new WgEvent::MouseButtonRelease( event.button.button ) );	
 				break;
 			case SDL_TEXTINPUT:
-				g_pHandler->QueueEvent(new WgEvent::Character((short)event.text.text));
+//				g_pHandler->QueueEvent(new WgEvent::Character((short)event.text.text));
 				break;
 
 		}
@@ -132,7 +132,7 @@ namespace sdl_wglib
 		if (err != 0)
 			return false;
 
-		char * pSrcPixels = (char *)pSurface->Lock(WG_READ_ONLY);
+        char * pSrcPixels = (char *)pSurface->Lock(WgAccessMode::ReadOnly);
 
 		for (int y = 0; y < size.h; y++)
 		{
@@ -169,9 +169,9 @@ namespace sdl_wglib
 		WgPixelType type;
 		
 		if( bmp->format->Amask == 0 )
-			type = WG_PIXEL_BGR_8;
+            type = WgPixelType::BGR_8;
 		else
-			type = WG_PIXEL_BGRA_8;
+            type = WgPixelType::BGRA_8;
 
 		WgSize dimensions( bmp->w, bmp->h );
 
@@ -488,7 +488,7 @@ namespace sdl_wglib
 
 	void ConvertPixelFormat( WgPixelFormat * pWGFormat, const SDL_PixelFormat * pSDLFormat )
 	{
-		pWGFormat->type = WG_PIXEL_CUSTOM;
+        pWGFormat->type = WgPixelType::Custom;
 		pWGFormat->bits = pSDLFormat->BitsPerPixel;
 
 		pWGFormat->R_mask = pSDLFormat->Rmask;

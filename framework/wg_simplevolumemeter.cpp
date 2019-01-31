@@ -9,7 +9,7 @@ static const char	c_widgetType[] = {"SimpleVolumeMeter"};
 
 WgSimpleVolumeMeter::WgSimpleVolumeMeter()
 {
-	m_direction = WG_UP;
+	m_direction = WgDirection::Up;
 
 	m_sectionColors[0] = WgColor::Green;
 	m_sectionColors[1] = WgColor::Yellow;
@@ -137,7 +137,7 @@ void WgSimpleVolumeMeter::SetValue( float peak, float hold )
 
 	WgSize sz = PixelSize();
 
-    int length = (m_direction == WG_LEFT || m_direction == WG_RIGHT) ? sz.w : sz.h;
+    int length = (m_direction == WgDirection::Left || m_direction == WgDirection::Right) ? sz.w : sz.h;
 
 	int	iPeak = (int) (peak * length);
 	int iHold = _calcIHold(hold, sz);
@@ -170,7 +170,7 @@ void WgSimpleVolumeMeter::SetValue( float leftPeak, float leftHold, float rightP
 
 	WgSize sz = PixelSize();
 
-    int length = (m_direction == WG_LEFT || m_direction == WG_RIGHT) ? sz.w : sz.h;
+    int length = (m_direction == WgDirection::Left || m_direction == WgDirection::Right) ? sz.w : sz.h;
 
 	int	iPeakL = (int) (leftPeak * length);
 	int	iPeakR = (int) (rightPeak * length);
@@ -265,16 +265,16 @@ void WgSimpleVolumeMeter::_requestRenderPartial( WgSize sz, int newLeftPeak, int
 
 	switch( m_direction )
 	{ 
-		case WG_UP:
+		case WgDirection::Up:
 			_requestRender(WgRect(0, sz.h - end, sz.w, end - beg));
 			break;
-		case WG_DOWN:
+		case WgDirection::Down:
 			_requestRender(WgRect(0, beg, sz.w, end - beg));
 			break;
-		case WG_LEFT:
+		case WgDirection::Left:
 			_requestRender(WgRect(sz.w - end, 0, end - beg, sz.h));
 			break;
-		case WG_RIGHT:
+		case WgDirection::Right:
 			_requestRender(WgRect(beg, 0, end - beg, sz.h));
 			break;
 	}
@@ -290,7 +290,7 @@ int WgSimpleVolumeMeter::_calcIHold( float holdValue, WgSize canvas )
 
 	int height = m_iHoldHeight;
 	
-	int canvasLength = m_direction == WG_UP || m_direction == WG_DOWN ? canvas.h : canvas.w;
+	int canvasLength = m_direction == WgDirection::Up || m_direction == WgDirection::Down ? canvas.h : canvas.w;
 
 	int ofs = (int) (holdValue * canvasLength);
 
@@ -312,7 +312,7 @@ int WgSimpleVolumeMeter::_calcIHold( float holdValue, WgSize canvas )
 
 WgSize WgSimpleVolumeMeter::PreferredPixelSize() const
 {
-	return m_direction == WG_UP || m_direction == WG_DOWN ? WgSize(9,20) : WgSize(20,9);
+	return m_direction == WgDirection::Up || m_direction == WgDirection::Down ? WgSize(9,20) : WgSize(20,9);
 }
 
 //____ _onNewSize() ____________________________________________________________________
@@ -335,7 +335,7 @@ void WgSimpleVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canva
 	{
 		WgRect r = _canvas;
 
-		if (m_direction == WG_UP || m_direction == WG_DOWN)
+		if (m_direction == WgDirection::Up || m_direction == WgDirection::Down)
 		{
 			r.w = (r.w - m_iGap) / 2 - m_iSidePadding;
 			r.x += m_iSidePadding;
@@ -348,7 +348,7 @@ void WgSimpleVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canva
 
 		_renderBar( pDevice, 0, r, _clip );
 
-		if (m_direction == WG_UP || m_direction == WG_DOWN)
+		if (m_direction == WgDirection::Up || m_direction == WgDirection::Down)
 			r.x += r.w + m_iGap;
 		else
 			r.y += r.h + m_iGap;
@@ -360,7 +360,7 @@ void WgSimpleVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canva
 	{
         WgRect r = _canvas;
 
-		if (m_direction == WG_UP || m_direction == WG_DOWN)
+		if (m_direction == WgDirection::Up || m_direction == WgDirection::Down)
 		{
 			r.w = r.w - 2 * m_iSidePadding;
 			r.x += m_iSidePadding;
@@ -399,19 +399,19 @@ void WgSimpleVolumeMeter::_renderBar( WgGfxDevice * pDevice, int nb, const WgRec
 			WgRect r = _rect;
 			switch (m_direction)
 			{
-			case WG_UP:
+			case WgDirection::Up:
 				r.y += _rect.h - holdOfs;
 				r.h = m_iHoldHeight;
 				break;
-			case WG_DOWN:
+			case WgDirection::Down:
 				r.y += holdOfs - m_iHoldHeight;
 				r.h = m_iHoldHeight;
 				break;
-			case WG_LEFT:
+			case WgDirection::Left:
 				r.x += _rect.w - holdOfs;
 				r.w = m_iHoldHeight;
 				break;
-			case WG_RIGHT:
+			case WgDirection::Right:
 				r.x += holdOfs - m_iHoldHeight;
 				r.w = m_iHoldHeight;
 				break;
@@ -436,18 +436,18 @@ void WgSimpleVolumeMeter::_renderBar( WgGfxDevice * pDevice, int nb, const WgRec
 		WgRect r = _rect;
 		switch (m_direction)
 		{
-		case WG_UP:
+		case WgDirection::Up:
 			r.y += _rect.h - peakHeight;
 			r.h = peakHeight;
 			break;
-		case WG_DOWN:
+		case WgDirection::Down:
 			r.h = peakHeight;
 			break;
-		case WG_LEFT:
+		case WgDirection::Left:
 			r.x += _rect.w - peakHeight;
 			r.w = peakHeight;
 			break;
-		case WG_RIGHT:
+		case WgDirection::Right:
 			r.w = peakHeight;
 			break;
 		}
@@ -470,19 +470,19 @@ void WgSimpleVolumeMeter::_renderBar( WgGfxDevice * pDevice, int nb, const WgRec
 			WgRect r = _rect;
 			switch (m_direction)
 			{
-			case WG_UP:
+			case WgDirection::Up:
 				r.y += _rect.h - ofs - sectionHeight;
 				r.h = sectionHeight;
 				break;
-			case WG_DOWN:
+			case WgDirection::Down:
 				r.y += ofs;
 				r.h = sectionHeight;
 				break;
-			case WG_LEFT:
+			case WgDirection::Left:
 				r.x += _rect.w - ofs - sectionHeight;
 				r.w = sectionHeight;
 				break;
-			case WG_RIGHT:
+			case WgDirection::Right:
 				r.x += ofs;
 				r.w = sectionHeight;
 				break;
@@ -505,7 +505,7 @@ void WgSimpleVolumeMeter::_updateIValues( WgSize sz )
 	int length = sz.h;
 	int width = sz.w;
 
-	if (m_direction == WG_LEFT || m_direction == WG_RIGHT)
+	if (m_direction == WgDirection::Left || m_direction == WgDirection::Right)
 		std::swap(length, width);
 
     m_iGap = (int) (width * m_fGap);

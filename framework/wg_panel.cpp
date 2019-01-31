@@ -32,7 +32,7 @@
 
 //____ Constructor _____________________________________________________________
 
-WgPanel::WgPanel() : m_bFocusGroup(false), m_bRadioGroup(false), m_bTooltipGroup(false), m_maskOp(WG_MASKOP_RECURSE)
+WgPanel::WgPanel() : m_bFocusGroup(false), m_bRadioGroup(false), m_bTooltipGroup(false), m_maskOp(WgMaskOp::Recurse)
 {
 }
 
@@ -110,7 +110,7 @@ void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRec
 
     switch( m_maskOp )
     {
-        case WG_MASKOP_RECURSE:
+        case WgMaskOp::Recurse:
         {
             WgRect childGeo;
             WgPanelHook * p = static_cast<WgPanelHook*>(_firstHookWithGeo( childGeo ));
@@ -124,9 +124,9 @@ void WgPanel::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRec
             }
             break;
         }
-        case WG_MASKOP_SKIP:
+        case WgMaskOp::Skip:
             break;
-        case WG_MASKOP_MASK:
+        case WgMaskOp::Mask:
             patches.Sub( WgRect(geo,clip) );
             break;
     }
@@ -182,16 +182,16 @@ WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPol
 
 	switch( widthPolicy )
 	{
-		case WG_DEFAULT:
+		case WgSizePolicy::Default:
 		{
 			sz.h = WgUtil::SizeFromPolicy( defaultSize.h, specifiedSize.h, heightPolicy );
 			sz.w = _paddedMatchingPixelWidth(sz.h, scale);
 			break;
-		case WG_BOUND:
+		case WgSizePolicy::Bound:
 			sz.w = specifiedSize.w;
 			sz.h = WgUtil::SizeFromPolicy( _paddedMatchingPixelHeight(sz.w, scale), specifiedSize.h, heightPolicy );
 			break;
-		case WG_CONFINED:
+		case WgSizePolicy::Confined:
 			if( defaultSize.w > specifiedSize.w )
 			{
 				sz.w = specifiedSize.w;
@@ -205,7 +205,7 @@ WgSize WgPanelHook::_sizeFromPolicy( WgSize specifiedSize, WgSizePolicy widthPol
 					sz.w = specifiedSize.w;
 			}
 			break;
-		case WG_EXPANDED:
+		case WgSizePolicy::Expanded:
 			if( defaultSize.w < specifiedSize.w )
 			{
 				sz.w = specifiedSize.w;

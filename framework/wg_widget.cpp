@@ -31,7 +31,7 @@
 
 //____ Constructor ____________________________________________________________
 
-WgWidget::WgWidget():m_id(0), m_pHook(0), m_pointerStyle(WG_POINTER_DEFAULT),
+WgWidget::WgWidget():m_id(0), m_pHook(0), m_pointerStyle(WgPointerStyle::Default),
 					m_markOpacity( 1 ), m_bEnabled(true), m_bOpaque(false),
 					m_bFocused(false), m_bSelected(false), m_bTabLock(false), m_bReceiveTick(false), m_scale(WG_SCALE_BASE)
 {
@@ -354,7 +354,7 @@ WgBlendMode WgWidget::_getBlendMode() const
 	if( pParent )
 		return pParent->_getBlendMode();
 	else
-		return WG_BLENDMODE_BLEND;		// We always start out with WG_BLENDMODE_BLEND.
+		return WgBlendMode::Blend;		// We always start out with WgBlendMode::Blend.
 }
 
 //____ _queueEvent() __________________________________________________________
@@ -396,7 +396,7 @@ void WgWidget::_onCollectPatches( WgPatches& container, const WgRect& geo, const
 
 void WgWidget::_onMaskPatches( WgPatches& patches, const WgRect& geo, const WgRect& clip, WgBlendMode blendMode )
 {
-	if( (m_bOpaque && blendMode == WG_BLENDMODE_BLEND) || blendMode == WG_BLENDMODE_OPAQUE )
+	if( (m_bOpaque && blendMode == WgBlendMode::Blend) || blendMode == WgBlendMode::Replace )
 	{
 		patches.Sub( WgRect( geo, clip ) );
 	}

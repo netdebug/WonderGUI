@@ -65,7 +65,7 @@ void WgGfxDevice::SetTintColor( WgColor color )
 
 bool WgGfxDevice::SetBlendMode( WgBlendMode blendMode )
 {
-	return m_pRealDevice->setBlendMode(_convert(blendMode));
+	return m_pRealDevice->setBlendMode(blendMode);
 	return false;				// Not implemented.
 }
 
@@ -80,7 +80,7 @@ const WgColor WgGfxDevice::GetTintColor() const
 
 WgBlendMode WgGfxDevice::GetBlendMode() const 
 { 
-	return _convert(m_pRealDevice->blendMode()); 
+	return m_pRealDevice->blendMode();
 }
 
 //____ SetCanvas() ____________________________________________________________
@@ -144,7 +144,7 @@ void WgGfxDevice::Fill(const WgRect& rect, const WgColor& col)
 
 void WgGfxDevice::ClipDrawLine(const WgRect& clip, const WgCoord& _begin, WgDirection dir, int length, WgColor _col, float thickness)
 {
-	m_pRealDevice->clipDrawLine(_convert(clip), _convert(_begin), _convert(dir), length, _convert(_col), thickness);
+	m_pRealDevice->clipDrawLine(_convert(clip), _convert(_begin), dir, length, _convert(_col), thickness);
 }
 
 //____ ClipPlotPixels() _______________________________________________________

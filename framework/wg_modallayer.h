@@ -41,8 +41,8 @@ public:
 
 	void	Top();								// Put us ontop of all our siblings.
 
-	bool	SetGeo( const WgRect& geometry, WgOrigo origo = WG_NORTHWEST );
-	bool	SetGeo( const WgCoord& ofs, WgOrigo origo = WG_NORTHWEST );
+	bool	SetGeo( const WgRect& geometry, WgOrigo origo = WgOrigo::NorthWest );
+	bool	SetGeo( const WgCoord& ofs, WgOrigo origo = WgOrigo::NorthWest );
 
 	bool	SetOfs( const WgCoord& ofs );
 	bool	SetOfsX( int x );
@@ -102,8 +102,8 @@ public:
 	static const char * GetClass();
 	virtual WgWidget * NewOfMyType() const { return new WgModalLayer(); };
 
-	WgModalHook *	AddModal( WgWidget * pWidget, const WgRect& geometry, WgOrigo origo = WG_NORTHWEST );
-	WgModalHook *	AddModal( WgWidget * pWidget, const WgCoord& pos, WgOrigo origo = WG_NORTHWEST ) { return AddModal( pWidget, WgRect(pos,0,0), origo); }
+	WgModalHook *	AddModal( WgWidget * pWidget, const WgRect& geometry, WgOrigo origo = WgOrigo::NorthWest );
+	WgModalHook *	AddModal( WgWidget * pWidget, const WgCoord& pos, WgOrigo origo = WgOrigo::NorthWest ) { return AddModal( pWidget, WgRect(pos,0,0), origo); }
 
 	bool			DeleteAllModal();
 	bool			ReleaseAllModal();

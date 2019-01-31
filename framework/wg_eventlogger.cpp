@@ -582,36 +582,36 @@ string WgEventLogger::_formatPointerStyle( const WgEvent::PointerChange * _pEven
 {
 	switch( _pEvent->Style() )
 	{
-		case WG_POINTER_ARROW:
-			return "WG_POINTER_ARROW";
-		case WG_POINTER_HOURGLASS:
-			return "WG_POINTER_HOURGLASS";
-		case WG_POINTER_HAND:
-			return "WG_POINTER_HAND";
-		case WG_POINTER_CROSSHAIR:
-			return "WG_POINTER_CROSSHAIR";
-		case WG_POINTER_HELP:
-			return "WG_POINTER_HELP";
-		case WG_POINTER_IBEAM:
-			return "WG_POINTER_IBEAM";
-		case WG_POINTER_STOP:
-			return "WG_POINTER_STOP";
-		case WG_POINTER_UP_ARROW:
-			return "WG_POINTER_UP_ARROW";
-		case WG_POINTER_SIZE_ALL:
-			return "WG_POINTER_SIZE_ALL";
-		case WG_POINTER_SIZE_NE_SW:
-			return "WG_POINTER_SIZE_NE_SW";
-		case WG_POINTER_SIZE_NW_SE:
-			return "WG_POINTER_SIZE_NW_SE";
-		case WG_POINTER_SIZE_N_S:
-			return "WG_POINTER_SIZE_N_S";
-		case WG_POINTER_SIZE_W_E:
-			return "WG_POINTER_SIZE_W_E";
+		case WgPointerStyle::Arrow:
+			return "PointerStyle::Arrow";
+		case WgPointerStyle::Hourglass:
+			return "PointerStyle::Hourglass";
+		case WgPointerStyle::Hand:
+			return "PointerStyle::Hand";
+		case WgPointerStyle::Crosshair:
+			return "PointerStyle::Crosshair";
+		case WgPointerStyle::Help:
+			return "PointerStyle::Help";
+		case WgPointerStyle::Ibeam:
+			return "PointerStyle::Ibeam";
+		case WgPointerStyle::Stop:
+			return "PointerStyle::Stop";
+		case WgPointerStyle::UpArrow:
+			return "PointerStyle::UpArrow";
+		case WgPointerStyle::ResizeAll:
+			return "PointerStyle::ResizeAll";
+		case WgPointerStyle::ResizeNeSw:
+			return "PointerStyle::ResizeNeSW";
+		case WgPointerStyle::ResizeNwSe:
+			return "PointerStyle::ResizeNwSe";
+		case WgPointerStyle::ResizeNS:
+			return "PointerStyle::ResizeNS";
+		case WgPointerStyle::ResizeWE:
+			return "PointerStyle::ResizeWE";
 		default:
 		{
 			char	temp[64];
-			sprintf( temp, "%d (unkown enum)", _pEvent->Style() );
+			sprintf( temp, "%d (unkown enum)", (int) _pEvent->Style() );
 			return string(temp);
 		}
 	}

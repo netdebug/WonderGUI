@@ -130,7 +130,7 @@ void WgRefreshButton::StartRefresh()
 		m_bStopping = false;
 		m_refreshProgress = 0.f;
 		m_animTimer = 0;
-		m_pRefreshAnim->SetPlayMode( WG_FORWARD_LOOPING );		//UGLY! Should change once the animation system has been updated.
+		m_pRefreshAnim->SetPlayMode( WgAnimMode::Looping );		//UGLY! Should change once the animation system has been updated.
 		_startReceiveTicks();
 		_requestRender();
 	}
@@ -143,7 +143,7 @@ void WgRefreshButton::StopRefresh()
 	{
 		m_bStopping = true;
 		m_animTimer = m_animTimer % m_pRefreshAnim->DurationScaled();	// So it doesn't stop immmediately.
-		m_pRefreshAnim->SetPlayMode( WG_FORWARD_ONCE );	//UGLY! Should change once the animation system has been updated.
+		m_pRefreshAnim->SetPlayMode( WgAnimMode::Forward );	//UGLY! Should change once the animation system has been updated.
 	}
 	else
 	{

@@ -59,7 +59,7 @@ public:
 protected:
 	PROTECTED_LINK_METHODS(WgPopupHook);
 
-	WgPopupHook(WgPopupLayer * pParent) : m_pParent(pParent), attachPoint(WgOrigo::WG_NORTHWEST), maxSize(INT_MAX,INT_MAX) {}
+	WgPopupHook(WgPopupLayer * pParent) : m_pParent(pParent), attachPoint(WgOrigo::NorthWest), maxSize(INT_MAX,INT_MAX) {}
 
 	void		_requestRender();
 	void		_requestRender(const WgRect& rect);
@@ -115,7 +115,7 @@ public:
 
 
 	int				NbPopups() const;
-	void			Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint = WgOrigo::WG_NORTHEAST, WgCoord attachOffset = { 0,0 }, bool bAutoClose = false, bool bDelay = false, WgSize maxSize = WgSize(INT_MAX, INT_MAX));
+	void			Push(WgWidget * pPopup, WgWidget * pOpener, const WgRect& launcherGeo, WgOrigo attachPoint = WgOrigo::NorthEast, WgCoord attachOffset = { 0,0 }, bool bAutoClose = false, bool bDelay = false, WgSize maxSize = WgSize(INT_MAX, INT_MAX));
 	void			Pop(int nb = 1);
 	void			Pop(WgWidget * pPopup);
 	void			Clear();

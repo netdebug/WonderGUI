@@ -30,7 +30,7 @@ namespace WgUtil
 
 	int 		SizeFromPolicy( int defaultSize, int specifiedSize, WgSizePolicy policy );
 
-    inline WgOrientation DirToOrient( WgDirection dir ) { return (dir == WG_UP || dir == WG_DOWN) ? WgOrientation::Vertical : WgOrientation::Horizontal; }
+    inline WgOrientation DirToOrient( WgDirection dir ) { return (dir == WgDirection::Up || dir == WgDirection::Down) ? WgOrientation::Vertical : WgOrientation::Horizontal; }
     
 	WgState		FallbackState(WgState state, int step = 0);
 
@@ -110,23 +110,23 @@ namespace WgUtil
 	{
 		switch( value )
 		{
-			case WG_NORTHWEST:
+			case WgOrigo::NorthWest:
 				return "northwest";
-			case WG_NORTH:
+			case WgOrigo::North:
 				return "north";
-			case WG_NORTHEAST:
+			case WgOrigo::NorthEast:
 				return "northeast";
-			case WG_EAST:
+			case WgOrigo::East:
 				return "east";
-			case WG_SOUTHEAST:
+			case WgOrigo::SouthEast:
 				return "southeast";
-			case WG_SOUTH:
+			case WgOrigo::South:
 				return "south";
-			case WG_SOUTHWEST:
+			case WgOrigo::SouthWest:
 				return "southwest";
-			case WG_WEST:
+			case WgOrigo::West:
 				return "west";
-			case WG_CENTER:
+			case WgOrigo::Center:
 				return "center";
 		}
 
@@ -228,18 +228,18 @@ namespace WgUtil
 	template<>
 	inline bool FromString(const std::string& str, WgOrigo& a)
 	{
-		if(str.empty() || str == "northwest") a = WG_NORTHWEST;
-		else if(str == "north") a = WG_NORTH;
-		else if(str == "northeast") a = WG_NORTHEAST;
-		else if(str == "east") a = WG_EAST;
-		else if(str == "southeast") a = WG_SOUTHEAST;
-		else if(str == "south") a = WG_SOUTH;
-		else if(str == "southwest") a = WG_SOUTHWEST;
-		else if(str == "west") a = WG_WEST;
-		else if(str == "center") a = WG_CENTER;
+		if(str.empty() || str == "northwest") a = WgOrigo::NorthWest;
+		else if(str == "north") a = WgOrigo::North;
+		else if(str == "northeast") a = WgOrigo::NorthEast;
+		else if(str == "east") a = WgOrigo::East;
+		else if(str == "southeast") a = WgOrigo::SouthEast;
+		else if(str == "south") a = WgOrigo::South;
+		else if(str == "southwest") a = WgOrigo::SouthWest;
+		else if(str == "west") a = WgOrigo::West;
+		else if(str == "center") a = WgOrigo::Center;
 		else
 		{
-			a = WG_NORTHWEST;
+			a = WgOrigo::NorthWest;
 			return false;
 		}
 		return true;

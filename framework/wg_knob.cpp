@@ -58,7 +58,7 @@ WgKnob::WgKnob(WgSurfaceFactory * pFactory)
     m_fValue = 0.0f;
     m_preferredSize = WgSize(100,100);
 
-    m_pSurf = pFactory->CreateSurface(PixelSize()*m_iOversampleX, WG_PIXEL_BGRA_8);
+    m_pSurf = pFactory->CreateSurface(PixelSize()*m_iOversampleX, WgPixelType::BGRA_8);
     m_pSurf->Fill(WgColor::Transparent);
     m_pSurfaceFactory = pFactory;
 
@@ -312,7 +312,7 @@ void WgKnob::_onNewSize(const WgSize& size)
 	if (m_size != newSize )
 	{
 		delete m_pSurf;
-		m_pSurf = m_pSurfaceFactory->CreateSurface(newSize*m_iOversampleX, WG_PIXEL_BGRA_8);
+		m_pSurf = m_pSurfaceFactory->CreateSurface(newSize*m_iOversampleX, WgPixelType::BGRA_8);
 		m_size = newSize;
 	}
 	_myRequestRender();
@@ -393,7 +393,7 @@ void WgKnob::_redrawBackBuffer(WgRect region)
 
 	WgColor col;
 
-	unsigned char* dest = (unsigned char*)m_pSurf->LockRegion(WG_WRITE_ONLY, region );
+	unsigned char* dest = (unsigned char*)m_pSurf->LockRegion(WgAccessMode::WriteOnly, region );
 
 	float x = 0.0f, y = 0.0f;
 	float y_inv = 0.0f;
@@ -752,7 +752,7 @@ void WgKnob::_downsample(WgSurface* pSurf, const int oversample)
     int h = pSurf->PixelSize().h; //Height();
     unsigned int col = (255) | (2<<8) | (1<<16) | (192<<24);
 
-    unsigned int* data = (unsigned int*)pSurf->Lock(WG_READ_WRITE);
+    unsigned int* data = (unsigned int*)pSurf->Lock(WgAccessMode::ReadWrite);
     int i=0, j=0;
 
     // Loop over small size

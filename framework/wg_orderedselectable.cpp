@@ -27,14 +27,14 @@ bool WgOrdSelHook::SetSelected( bool bSelected )
 {
 	switch( Parent()->m_selectMode )
 	{
-		case WG_SELECT_NONE:
+		case WgSelectMode::Unselectable:
 		{
 			if( bSelected )
 				return false;
 
 			break;
 		}
-		case WG_SELECT_SINGLE:
+		case WgSelectMode::SingleEntry:
 		{
 			if( bSelected && !m_bSelectable )
 				return false;
@@ -64,7 +64,7 @@ bool WgOrdSelHook::SetSelected( bool bSelected )
 			}
 			break;
 		}
-		case WG_SELECT_MULTI:
+		case WgSelectMode::MultiEntries:
 		{
 			if( bSelected && !m_bSelectable )
 				return false;
@@ -133,7 +133,7 @@ WgOrdSelHook *	WgOrdSelHook::_nextSelectedHook() const
 WgOrdSelLayout::WgOrdSelLayout()
 {
 	m_bScrollOnSelect = false;
-	m_selectMode = WG_SELECT_SINGLE;
+	m_selectMode = WgSelectMode::SingleEntry;
 	m_nbSelected = 0;
 
 }
@@ -150,10 +150,10 @@ int WgOrdSelLayout::SelectAll()
 {
 	switch( m_selectMode )
 	{
-		case WG_SELECT_NONE:
+		case WgSelectMode::Unselectable:
 			break;
 
-		case WG_SELECT_SINGLE:
+		case WgSelectMode::SingleEntry:
 		{
 			WgOrdSelHook * p = FirstHook();
 			while( p && m_nbSelected < 1 )
@@ -168,7 +168,7 @@ int WgOrdSelLayout::SelectAll()
 			break;
 		}
 
-		case WG_SELECT_MULTI:
+		case WgSelectMode::MultiEntries:
 		{
 			WgOrdSelHook * p = FirstHook();
 			while( p )

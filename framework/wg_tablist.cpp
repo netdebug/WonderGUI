@@ -21,7 +21,7 @@ WgTab::WgTab( int id )
 	m_id = id;
 	m_bAlert = false;
 	m_width = 1;
-	m_text.setAlignment(WG_CENTER);
+	m_text.setAlignment(WgOrigo::Center);
 	m_text.SetWrap(false);
 	m_bVisible = true;
 }
@@ -59,7 +59,7 @@ WgTablist::WgTablist()
 	m_tabExpandMode		= NO_EXPAND;
 	m_tabCompressMode	= NO_COMPRESS;
 
-	m_textAlignment		= WG_CENTER;
+	m_textAlignment		= WgOrigo::Center;
 
 	m_bTabOpaqueForMouse = false;
 	m_widestTab		= 0;

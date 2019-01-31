@@ -71,8 +71,8 @@ public:
 
     void resample(WgSurface* src, WgSurface* dest)
     {
-        unsigned char* pSrc = (unsigned char*)src->Lock(WG_READ_ONLY);
-        unsigned char* pDest = (unsigned char*)dest->Lock(WG_WRITE_ONLY);
+        unsigned char* pSrc = (unsigned char*)src->Lock(WgAccessMode::ReadOnly);
+        unsigned char* pDest = (unsigned char*)dest->Lock(WgAccessMode::WriteOnly);
 
         bool quit = false;
         Resize_HQ_4ch(pSrc,

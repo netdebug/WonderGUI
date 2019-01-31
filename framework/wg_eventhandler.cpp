@@ -35,7 +35,7 @@ WgEventHandler::WgEventHandler( WgRootPanel * pRoot )
 	m_pRoot					= pRoot;
 	m_time					= 0;
 	m_modKeys				= WG_MODKEY_NONE;
-	m_pointerStyle			= WG_POINTER_DEFAULT;
+	m_pointerStyle			= WgPointerStyle::Default;
 
 	m_bIsProcessing			= false;
 	m_bWindowFocus			= true;
@@ -1108,7 +1108,7 @@ void WgEventHandler::_processMousePosition( WgEvent::MousePosition * pEvent )
 void WgEventHandler::_updateMarkedWidget(bool bPostMouseMoveEvents)
 {
 
-	WgWidget * pWidgetTarget = m_pRoot->FindWidget( m_pointerPos, WG_SEARCH_ACTION_TARGET );
+	WgWidget * pWidgetTarget = m_pRoot->FindWidget( m_pointerPos, WgSearchMode::ActionTarget );
 
 	// Figure out which button of currently pressed has been pressed the longest.
 	// Mouse is only allowed to mark Widgets that were marked on press of that button.
@@ -1185,7 +1185,7 @@ void WgEventHandler::_updateMarkedWidget(bool bPostMouseMoveEvents)
 	else if (pNowMarked && pNowMarked->IsEnabled())
 		newStyle = pNowMarked->GetPointerStyle();
 	else 
-		newStyle = WG_POINTER_DEFAULT;
+		newStyle = WgPointerStyle::Default;
 
 	if( newStyle != m_pointerStyle )
 	{

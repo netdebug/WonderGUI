@@ -29,7 +29,7 @@
 
 WgIconHolder::WgIconHolder()
 {
-	m_iconOrigo	= WG_NORTHWEST;
+	m_iconOrigo	= WgOrigo::NorthWest;
 	m_iconScale			= 0.f;
 	m_bIconPushText		= true;
 }
@@ -152,9 +152,9 @@ WgRect WgIconHolder::_getTextRect( const WgRect& contentRect, const WgRect& icon
 	{
 		switch( m_iconOrigo )
 		{
-			case WG_NORTHWEST:
-			case WG_SOUTHWEST:
-			case WG_WEST:
+			case WgOrigo::NorthWest:
+			case WgOrigo::SouthWest:
+			case WgOrigo::West:
 			{
 				int diff = iconRect.x - contentRect.x + iconRect.w + m_iconBorders.right;
 				textRect.x += diff;
@@ -163,9 +163,9 @@ WgRect WgIconHolder::_getTextRect( const WgRect& contentRect, const WgRect& icon
 					textRect.w = 0;
 				break;
 			}
-			case WG_NORTHEAST:
-			case WG_EAST:
-			case WG_SOUTHEAST:
+			case WgOrigo::NorthEast:
+			case WgOrigo::East:
+			case WgOrigo::SouthEast:
 			{
 				textRect.w = iconRect.x - contentRect.x - m_iconBorders.left;
 				if( textRect.w < 0 )
@@ -173,8 +173,8 @@ WgRect WgIconHolder::_getTextRect( const WgRect& contentRect, const WgRect& icon
 				break;
 			}
 
-			case WG_NORTH:
-			case WG_CENTER:
+			case WgOrigo::North:
+			case WgOrigo::Center:
 			{
 				int diff = iconRect.y - contentRect.y + iconRect.h + m_iconBorders.bottom;
 				textRect.y += diff;
@@ -183,7 +183,7 @@ WgRect WgIconHolder::_getTextRect( const WgRect& contentRect, const WgRect& icon
 					textRect.h = 0;
 				break;
 			}
-			case WG_SOUTH:
+			case WgOrigo::South:
 			{
 				textRect.h = iconRect.y - contentRect.y - m_iconBorders.top;
 				if( textRect.h < 0 )
@@ -207,7 +207,7 @@ WgSize WgIconHolder::_expandTextRect(WgSize textRectSize, WgBlocksetPtr pIconBlo
 
 	if (m_bIconPushText)
 	{
-		if (m_iconOrigo == WG_NORTH || m_iconOrigo == WG_CENTER || m_iconOrigo == WG_SOUTH )
+		if (m_iconOrigo == WgOrigo::North || m_iconOrigo == WgOrigo::Center || m_iconOrigo == WgOrigo::South )
 			return { std::max(textRectSize.w, iconSize.w), textRectSize.h + iconSize.h };
 		else
 			return { textRectSize.w + iconSize.w , std::max(textRectSize.h, iconSize.h) };

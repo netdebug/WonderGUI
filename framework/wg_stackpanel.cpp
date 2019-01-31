@@ -48,7 +48,7 @@ void WgStackHook::SetOrigo( WgOrigo origo )
 	}
 }
 
-WgStackHook::WgStackHook( WgStackPanel * pParent ): m_pParent(pParent), m_origo( WG_NORTHWEST ), m_sizePolicy( STRETCH )
+WgStackHook::WgStackHook( WgStackPanel * pParent ): m_pParent(pParent), m_origo( WgOrigo::NorthWest ), m_sizePolicy( STRETCH )
 {
 }
 

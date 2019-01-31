@@ -46,10 +46,10 @@ WgChart::WgChart()
 	m_firstSample		= 0.f;
 	m_lastSample		= 0.f;
 
-	m_sampleLabelStyle.alignment = WG_SOUTH;
+	m_sampleLabelStyle.alignment = WgOrigo::South;
 	m_sampleLabelStyle.offset = { 0,0 };
 
-	m_valueLabelStyle.alignment = WG_WEST;
+	m_valueLabelStyle.alignment = WgOrigo::West;
 	m_valueLabelStyle.offset = { 0,0 };
 
 	m_waveIdCounter = 1;
@@ -522,7 +522,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 		for (auto& line : m_sampleGridLines)
 		{
 			int xOfs = waveCanvas.x + (int) ((line.pos - m_firstSample) * sampleScale);
-			pDevice->ClipDrawLine(_clip, { xOfs, canvas.y }, WG_DOWN, canvas.h, line.color, line.thickness * m_scale / WG_SCALE_BASE);
+			pDevice->ClipDrawLine(_clip, { xOfs, canvas.y }, WgDirection::Down, canvas.h, line.color, line.thickness * m_scale / WG_SCALE_BASE);
 
 			if (!line.label.IsEmpty())
 			{
@@ -570,7 +570,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 		for (auto& line : m_valueGridLines)
 		{
 			int yOfs = startOfs + (int)((line.pos - top) * mul + 0.5f);
-			pDevice->ClipDrawLine(_clip, { canvas.x, yOfs }, WG_RIGHT, canvas.w, line.color, line.thickness * m_scale / WG_SCALE_BASE );
+			pDevice->ClipDrawLine(_clip, { canvas.x, yOfs }, WgDirection::Right, canvas.w, line.color, line.thickness * m_scale / WG_SCALE_BASE );
 
 			if (!line.label.IsEmpty())
 			{

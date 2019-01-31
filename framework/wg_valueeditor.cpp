@@ -46,11 +46,11 @@ WgValueEditor::WgValueEditor()
 	m_maxInputChars = 256;
 	m_viewOfs = WgCoord(0,0);
 
-	m_pointerStyle	= WG_POINTER_IBEAM;
+	m_pointerStyle	= WgPointerStyle::Ibeam;
 
 	m_text.SetWrap(false);
 	m_text.SetAutoEllipsis(false);
-	m_text.SetEditMode( WG_TEXT_EDITABLE );
+	m_text.SetEditMode( WgTextEditMode::Editable );
 }
 
 //____ ~WgValueEditor() ___________________________________________________________

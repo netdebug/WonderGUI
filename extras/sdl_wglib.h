@@ -3,8 +3,12 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #else
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#       pragma clang diagnostic push
+#       pragma clang diagnostic ignored "-Wdocumentation"
+#       include <SDL2/SDL.h>
+#       include <SDL2_image/SDL_image.h>
+#       pragma clang diagnostic pop
+//#include <SDL2/SDL_image.h>
 #endif
 
 class WgEventHandler;

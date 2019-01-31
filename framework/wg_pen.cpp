@@ -328,7 +328,7 @@ bool WgPen::BlitCursor( const WgCursorInstance& instance ) const
 			break;
 		case WgCursor::INVERT_BG:
 			blendMode = m_pDevice->GetBlendMode();
-			m_pDevice->SetBlendMode(WG_BLENDMODE_INVERT);
+			m_pDevice->SetBlendMode(WgBlendMode::Invert);
 			break;
 	}
 

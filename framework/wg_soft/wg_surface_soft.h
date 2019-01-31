@@ -35,7 +35,7 @@ class WgSurfaceSoft : public WgSurface
 	friend class WgGfxDeviceSoft;
 
  public:
-	WgSurfaceSoft( WgSize size, WgPixelType type = WG_PIXEL_BGRA_8 );
+	WgSurfaceSoft( WgSize size, WgPixelType type = WgPixelType::BGRA_8 );
 	WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, int pitch );
     WgSurfaceSoft( WgSize size, WgPixelType type, uint8_t * pPixels, int pitch, const WgPixelFormat& pixelFormat );
 	WgSurfaceSoft( const WgSurfaceSoft * pOther );

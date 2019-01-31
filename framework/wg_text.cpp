@@ -84,7 +84,7 @@ void WgText::Init()
 
 	m_markedLinkMode = WG_MODE_NORMAL;
 
-	m_alignment		= WG_NORTHWEST;
+	m_alignment		= WgOrigo::NorthWest;
 	m_tintMode		= WG_TINTMODE_MULTIPLY;
 	m_lineSpaceAdj	= 1.f;
 
@@ -104,7 +104,7 @@ void WgText::Init()
 	m_bWrap			= true;
 	m_bAutoEllipsis = true;
 
-	m_editMode		= WG_TEXT_STATIC;
+	m_editMode		= WgTextEditMode::Static;
 
 	_refreshAllLines();
 	clearSelection();
@@ -1878,7 +1878,7 @@ int WgText::_cursorMaxWidth() const
 {
 	WgCursor * p = m_pCursorStyle?m_pCursorStyle:WgBase::GetDefaultCursor();
 
-	if( p && m_editMode == WG_TEXT_EDITABLE )
+	if( p && m_editMode == WgTextEditMode::Editable )
 	{
 		int lenInsert = p->Advance(WgCursor::INS);
 		int lenOvr = p->Advance(WgCursor::OVR);
@@ -1953,7 +1953,7 @@ int WgText::LineStartY( int line, const WgRect& container ) const
 {
 	int		ofs = 0;
 
-	if( m_alignment != WG_NORTHWEST && m_alignment != WG_NORTH && m_alignment != WG_NORTHEAST )
+	if( m_alignment != WgOrigo::NorthWest && m_alignment != WgOrigo::North && m_alignment != WgOrigo::NorthEast )
 	{
 		ofs = WgUtil::OrigoToRect( m_alignment, container.size(), WgSize(0,height() )).y;
 		if( ofs < 0 )
@@ -1974,7 +1974,7 @@ int WgText::LineStartX( int line, const WgRect& container ) const
 {
 	int		ofs = 0;
 
-	if( m_alignment != WG_NORTHWEST && m_alignment != WG_WEST && m_alignment != WG_SOUTHWEST )
+	if( m_alignment != WgOrigo::NorthWest && m_alignment != WgOrigo::West && m_alignment != WgOrigo::SouthWest )
 	{
 		ofs = WgUtil::OrigoToRect( m_alignment, container.size(), WgSize(getSoftLineWidth(line),0 )).x;
 		if( ofs < 0 )

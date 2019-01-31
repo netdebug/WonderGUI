@@ -42,6 +42,25 @@ const static int   WG_NB_CODEPAGES = wg::CodePage_size;
 
 typedef wg::BreakRules  WgBreakRules;
 
+typedef wg::BlendMode   WgBlendMode;
+
+typedef wg::PointerStyle WgPointerStyle;
+
+typedef wg::SearchMode  WgSearchMode;
+typedef wg::Origo       WgOrigo;
+typedef wg::Direction   WgDirection;
+typedef wg::SizePolicy  WgSizePolicy;
+
+typedef wg::AccessMode  WgAccessMode;
+
+typedef wg::ScaleMode   WgScaleMode;
+typedef wg::PixelFormat WgPixelType;
+
+typedef wg::SortOrder   WgSortOrder;
+typedef wg::SelectMode  WgSelectMode;
+typedef wg::TextEditMode WgTextEditMode;
+typedef wg::MaskOp      WgMaskOp;
+typedef wg::AnimMode    WgAnimMode;
 
 
 #	include <stdint.h>			// Use the C99 official header
@@ -136,19 +155,6 @@ enum WgTxtAttr
 	WG_TXT_SELECTED		= 0x2
 };
 
-//____ WgBlendMode ____________________________________________________________
-
-// BlendModes control how blits and fills are blended against the background.
-
-enum WgBlendMode //: Uint8
-{
-	WG_BLENDMODE_OPAQUE,			///< Completely opaque blitting, ignoring alpha of source and tint-color.
-	WG_BLENDMODE_BLEND,				///< Normal mode, alpha of source and tint-color is taken into account.
-	WG_BLENDMODE_ADD,				///< RGBA Additive, alpha of source and tint-color is taken into account.
-	WG_BLENDMODE_MULTIPLY,			///< RGBA Multiply, alpha of source and tint-color is taken into account.
-	WG_BLENDMODE_INVERT				///< Inverts destination RGB values where alpha of source is non-zero. Ignores RBG components. Uses alpha of tint-color.
-};
-
 //____ WgFontStyle ____________________________________________________________
 
 enum WgFontStyle
@@ -177,39 +183,6 @@ enum WgFontStyle
 };
 
 #define WG_NB_FONTSTYLES	17
-
-
-//____ WgPointerStyle __________________________________________________________
-
-enum WgPointerStyle
-{
-	WG_POINTER_ARROW,						// default arrow
-	WG_POINTER_DEFAULT = WG_POINTER_ARROW,	// default arrow
-	WG_POINTER_HOURGLASS,					// hourglass
-	WG_POINTER_HAND,							// hand
-	WG_POINTER_CROSSHAIR,					// crosshair
-	WG_POINTER_HELP,							// help
-	WG_POINTER_IBEAM,						// I-beam
-	WG_POINTER_STOP,							// slashed circle
-	WG_POINTER_UP_ARROW,						// arrow pointing up
-	WG_POINTER_SIZE_ALL,						// four-pointed arrow in all directions
-	WG_POINTER_SIZE_NE_SW,					// double-pointed arrow pointing northeast and southwest
-	WG_POINTER_SIZE_NW_SE,					// double-pointed arrow pointing northwest and southeast
-	WG_POINTER_SIZE_N_S,						// double-pointed arrow pointing north and south
-	WG_POINTER_SIZE_W_E,						// double-pointed arrow pointing west and east
-};
-
-//____ WgAnimMode _____________________________________________________________
-
-enum WgAnimMode
-{
-	WG_FORWARD_ONCE,
-	WG_BACKWARD_ONCE,
-	WG_FORWARD_LOOPING,
-	WG_BACKWARD_LOOPING,
-	WG_FORWARD_PINGPONG,
-	WG_BACKWARD_PINGPONG
-};
 
 
 //____ WgTintMode _____________________________________________________________
@@ -250,51 +223,6 @@ enum	WgExtChar
 */
 
 
-//____ WgSearchMode _____________________________________________________________
-
-enum WgSearchMode
-{
-	WG_SEARCH_MARKPOLICY,			// Perform a mark test on Widget.
-	WG_SEARCH_GEOMETRY,				// Goes strictly on geometry, ignores alpha.
-	WG_SEARCH_ACTION_TARGET,		// Like MARKPOLICY, but takes modality into account.
-};
-
-//____ WgOrigo _____________________________________________________________
-
-enum WgOrigo
-{
-	// Clockwise from upper left corner, center last. Must be in range 0-8
-
-	WG_NORTHWEST	= 0,
-	WG_NORTH		= 1,
-	WG_NORTHEAST	= 2,
-	WG_EAST			= 3,
-	WG_SOUTHEAST	= 4,
-	WG_SOUTH		= 5,
-	WG_SOUTHWEST	= 6,
-	WG_WEST			= 7,
-	WG_CENTER		= 8
-};
-
-//____ WgDirection ____________________________________________________________
-
-enum WgDirection
-{
-	WG_UP,
-	WG_DOWN,
-	WG_LEFT,
-	WG_RIGHT
-};
-
-//____ WgSizePolicy ___________________________________________________________
-
-enum WgSizePolicy
-{
-	WG_DEFAULT = 0,
-	WG_BOUND,
-	WG_CONFINED,
-	WG_EXPANDED,
-};
 
 //____ WgEventType ______________________________________________________________
 
@@ -406,41 +334,6 @@ enum	WgEventType
 };
 
 
-//____ WgSortOrder ____________________________________________________________
-
-enum WgSortOrder
-{
-	WG_SORT_ASCENDING,
-	WG_SORT_DESCENDING
-};
-
-//____ WgUnit ____________________________________________________________
-
-enum WgUnit
-{
-	WG_PIXELS,
-	WG_FRACTION
-};
-
-
-//____ WgSelectMode ___________________________________________________________
-
-enum WgSelectMode
-{
-	WG_SELECT_NONE,
-	WG_SELECT_SINGLE,
-	WG_SELECT_MULTI
-};
-
-//____ WgTextEditMode _________________________________________________________
-
-enum WgTextEditMode
-{
-	WG_TEXT_STATIC,
-	WG_TEXT_SELECTABLE,
-	WG_TEXT_EDITABLE,
-};
-
 
 //____ WgTextPos ______________________________________________________________
 
@@ -478,60 +371,6 @@ public:
 	bool	bAscend;
 };
 
-//____ WgAccessMode ____________________________________________________________
-
-enum WgAccessMode
-{
-	WG_NO_ACCESS,
-	WG_READ_ONLY,
-	WG_WRITE_ONLY,
-	WG_READ_WRITE
-};
-
-//____ DownsampleMethod _______________________________________________________
-
-enum WgDownsampleMethod
-{
-	WG_DOWNSAMPLE_NEAREST,
-	WG_DOWNSAMPLE_AVERAGE,
-	WG_DOWNSAMPLE_PEAK				// Keep the "peak value", highest or lowest value depending or situation
-};
-
-//____ WgUpsampleMethod _______________________________________________________
-
-enum WgUpsampleMethod
-{
-	WG_UPSAMPLE_NEAREST,
-	WG_UPSAMPLE_INTERPOLATE
-};
-
-
-//____ ScaleMode ____________________________________________________________
-
-enum WgScaleMode
-{
-	WG_SCALEMODE_NEAREST,
-	WG_SCALEMODE_INTERPOLATE,
-};
-
-
-
-//____ WgPixelType _____________________________________________________________
-
-enum WgPixelType
-{
-	WG_PIXEL_UNKNOWN,			///< Pixelformat is unkown or can't be expressed in a PixelFormat struct.
-	WG_PIXEL_CUSTOM,			///< Pixelformat has no PixelType enum, but is fully specified through the PixelFormat struct.
-    WG_PIXEL_BGR_8,				///< One byte of blue, green and red in exactly that order in memory.
-    WG_PIXEL_BGRX_8,			///< One byte of blue, green, red and padding in exactly that order in memory.
-    WG_PIXEL_BGRA_8,			///< One byte of blue, green, red and alpha in exactly that order in memory.
-    WG_PIXEL_BGRA_4,			///< 4 bits each of blue, green, red and alpha in exactly that order in memory.
-    WG_PIXEL_BGR_565,			///< 5 bits of blue, 6 bits of green and 5 bits of red in exactly that order in memory.
-    WG_PIXEL_I8,				///< 8 bits of index into the CLUT (Color Lookup Table).
-    WG_PIXEL_A8					///< 8 bits of alpha only.
-
-};
-
 
 //____ WgPixelFormat __________________________________________________________
 /**
@@ -562,15 +401,6 @@ struct WgPixelFormat
 	Uint8	A_bits;				///< number of bits for alpha in the pixel
 };
 
-
-//____ WgMaskOp ____________________________________________________________
-
-enum WgMaskOp
-{
-	WG_MASKOP_RECURSE = 0,	///< Recurse through children, let them mask background individually.
-	WG_MASKOP_SKIP = 1,		///< Do not mask background against container or children.
-	WG_MASKOP_MASK = 2		///< Mask background against whole container.
-};
 
 
 #endif // WG_TYPES_DOT_H

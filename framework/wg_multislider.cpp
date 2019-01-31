@@ -111,17 +111,17 @@ int WgMultiSlider::AddSlider(	int id, WgDirection dir, SetGeoFunc pSetGeoFunc, f
 
 	switch (dir)
 	{
-	case WG_UP:
-		origo = WG_SOUTH;
+	case WgDirection::Up:
+		origo = WgOrigo::South;
 		break;
-	case WG_DOWN:
-		origo = WG_NORTH;
+	case WgDirection::Down:
+		origo = WgOrigo::North;
 		break;
-	case WG_LEFT:
-		origo = WG_EAST;
+	case WgDirection::Left:
+		origo = WgOrigo::East;
 		break;
-	case WG_RIGHT:
-		origo = WG_WEST;
+	case WgDirection::Right:
+		origo = WgOrigo::West;
 		break;
 	}
 
@@ -167,7 +167,7 @@ int WgMultiSlider::AddSlider2D( int id, WgOrigo origo, SetGeoFunc pSetGeoFunc, f
 								SetValueFunc2D pSetValueFunc,
 								const WgSkinPtr& pBgSkin, const WgSkinPtr& pHandleSkin, WgCoordF handleHotspot, WgBorders handleMarkExtension, WgBorders sliderMarkExtension)
 {
-	if (origo != WG_NORTHWEST && origo != WG_NORTHEAST && origo != WG_SOUTHEAST && origo != WG_SOUTHWEST)
+	if (origo != WgOrigo::NorthWest && origo != WgOrigo::NorthEast && origo != WgOrigo::SouthEast && origo != WgOrigo::SouthWest)
 		return -1;
 
 	m_sliders.emplace_back();
@@ -548,21 +548,21 @@ void WgMultiSlider::_updatePointerStyle(WgCoord pointerOfs)
 	{
 		switch (pMarked->origo)
 		{
-		case WG_NORTH:
-		case WG_SOUTH:
-			m_pointerStyle = WG_POINTER_SIZE_N_S;
+		case WgOrigo::North:
+		case WgOrigo::South:
+			m_pointerStyle = WgPointerStyle::ResizeNS;
 			break;
-		case WG_WEST:
-		case WG_EAST:
-			m_pointerStyle = WG_POINTER_SIZE_W_E;
+		case WgOrigo::West:
+		case WgOrigo::East:
+			m_pointerStyle = WgPointerStyle::ResizeWE;
 			break;
 		default:
-			m_pointerStyle = WG_POINTER_SIZE_ALL;
+			m_pointerStyle = WgPointerStyle::ResizeAll;
 			break;
 		}
 	}
 	else
-		m_pointerStyle = WG_POINTER_DEFAULT;
+		m_pointerStyle = WgPointerStyle::Default;
 }
 
 //____ _updateSliderStates() __________________________________________________
@@ -857,42 +857,42 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 			{
 				// Set pressOfs for the event
 
-				WgOrigo pressOfs = WG_CENTER;
+				WgOrigo pressOfs = WgOrigo::Center;
 
 				if (!bHandlePressed)
 				{
 					WgSize widgetContentSize = m_pSkin ? PixelSize() - m_pSkin->ContentPadding(m_scale) : PixelSize();
 					WgCoordF relPos = { markOfs.x / (pMarked->geo.w*widgetContentSize.w), markOfs.y / (pMarked->geo.h*widgetContentSize.h) };
 
-					if (pMarked->origo == WG_WEST || pMarked->origo == WG_EAST)		// Horizontal slider
+					if (pMarked->origo == WgOrigo::West || pMarked->origo == WgOrigo::East)		// Horizontal slider
 					{
 						if (relPos.x < pMarked->handlePos.x)
-							pressOfs = WG_WEST;
+							pressOfs = WgOrigo::West;
 						else
-							pressOfs = WG_EAST;
+							pressOfs = WgOrigo::East;
 					}
-					else if (pMarked->origo == WG_NORTH || pMarked->origo == WG_SOUTH)		// Vertical slider
+					else if (pMarked->origo == WgOrigo::North || pMarked->origo == WgOrigo::South)		// Vertical slider
 					{
 						if (relPos.y < pMarked->handlePos.y)
-							pressOfs = WG_NORTH;
+							pressOfs = WgOrigo::North;
 						else
-							pressOfs = WG_SOUTH;
+							pressOfs = WgOrigo::South;
 					}
 					else																// 2D slider
 					{
 						if (relPos.y < pMarked->handlePos.y)
 						{
 							if (relPos.x < pMarked->handlePos.x)
-								pressOfs = WG_NORTHWEST;
+								pressOfs = WgOrigo::NorthWest;
 							else
-								pressOfs = WG_NORTHEAST;
+								pressOfs = WgOrigo::NorthEast;
 						}
 						else
 						{
 							if (relPos.x < pMarked->handlePos.x)
-								pressOfs = WG_SOUTHWEST;
+								pressOfs = WgOrigo::SouthWest;
 							else
-								pressOfs = WG_SOUTHEAST;
+								pressOfs = WgOrigo::SouthEast;
 						}
 					}
 				}
@@ -1214,39 +1214,39 @@ void WgMultiSlider::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 
 					switch (slider.origo)
 					{
-					case WG_NORTHWEST:
+					case WgOrigo::NorthWest:
 						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,divider.y - bgGeo.y }), m_scale);
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, divider.y - bgGeo.y }), m_scale);
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
-					case WG_NORTH:
+					case WgOrigo::North:
 						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w,divider.y - bgGeo.y }), m_scale);
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x, divider.y, bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
-					case WG_NORTHEAST:
+					case WgOrigo::NorthEast:
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,divider.y - bgGeo.y }), m_scale);
 						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, divider.y - bgGeo.y }), m_scale);
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
-					case WG_EAST:
+					case WgOrigo::East:
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,bgGeo.h }), m_scale);
 						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.h }), m_scale);
 						break;
-					case WG_SOUTHEAST:
+					case WgOrigo::SouthEast:
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w, divider.y - bgGeo.y }), m_scale);
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,divider.x - bgGeo.x,bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { divider.x, divider.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
-					case WG_SOUTH:
+					case WgOrigo::South:
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w,divider.y - bgGeo.y }), m_scale);
 						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x, divider.y, bgGeo.w, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
-					case WG_SOUTHWEST:
+					case WgOrigo::SouthWest:
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,bgGeo.w, divider.y - bgGeo.y }), m_scale);
 						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x,divider.y,divider.x - bgGeo.x,bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { divider.x, divider.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.y + bgGeo.h - divider.y }), m_scale);
 						break;
-					case WG_WEST:
+					case WgOrigo::West:
 						pBgSkin->Render(pDevice, filledPartState, bgGeo, WgRect(_clip, { bgGeo.x,bgGeo.y,divider.x - bgGeo.x,bgGeo.h }), m_scale);
 						pBgSkin->Render(pDevice, emptyPartState, bgGeo, WgRect(_clip, { divider.x, bgGeo.y, bgGeo.x + bgGeo.w - divider.x, bgGeo.h }), m_scale);
 						break;
@@ -1326,18 +1326,18 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 
 		switch (slider.origo)
 		{
-		case WG_NORTHWEST:
+		case WgOrigo::NorthWest:
 			handlePos = values;
 			break;
-		case WG_NORTHEAST:
+		case WgOrigo::NorthEast:
 			handlePos.x = 1.f - values.x;
 			handlePos.y = values.y;
 			break;
-		case WG_SOUTHEAST:
+		case WgOrigo::SouthEast:
 			handlePos.x = 1.f - values.x;
 			handlePos.y = 1.f - values.y;
 			break;
-		case WG_SOUTHWEST:
+		case WgOrigo::SouthWest:
 			handlePos.x = values.x;
 			handlePos.y = 1.f - values.y;
 			break;
@@ -1353,16 +1353,16 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 
 		switch (slider.origo)
 		{
-		case WG_WEST:
+		case WgOrigo::West:
 			handlePos.x = value;
 			break;
-		case WG_EAST:
+		case WgOrigo::East:
 			handlePos.x = 1.f -value;
 			break;
-		case WG_NORTH:
+		case WgOrigo::North:
 			handlePos.y = value;
 			break;
-		case WG_SOUTH:
+		case WgOrigo::South:
 			handlePos.y = 1.f - value;
 			break;
         default:
@@ -1583,20 +1583,20 @@ WgCoordF WgMultiSlider::_alignPosToStep(Slider& slider, WgCoordF pos) const
 
 	switch (slider.origo)
 	{
-	case WG_WEST:
-	case WG_EAST:
+	case WgOrigo::West:
+	case WgOrigo::East:
 		x = 0;
 		break;
 
-	case WG_NORTH:
-	case WG_SOUTH:
+	case WgOrigo::North:
+	case WgOrigo::South:
 		y = 0;
 		break;
 
-	case WG_NORTHWEST:
-	case WG_NORTHEAST:
-	case WG_SOUTHEAST:
-	case WG_SOUTHWEST:
+	case WgOrigo::NorthWest:
+	case WgOrigo::NorthEast:
+	case WgOrigo::SouthEast:
+	case WgOrigo::SouthWest:
 		x = 0;
 		y = 1;
 		break;
@@ -1671,7 +1671,7 @@ WgCoordF WgMultiSlider::_calcSendValue(Slider& slider, WgCoordF pos)
 	}
 	else
 	{
-		if (slider.origo == WG_WEST || slider.origo == WG_EAST )
+		if (slider.origo == WgOrigo::West || slider.origo == WgOrigo::East )
 			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.x;
 		else
 			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.y;
@@ -1743,7 +1743,7 @@ WgCoordF WgMultiSlider::_setHandlePosition(Slider& slider, WgCoordF pos)
 	}
 	else
 	{
-		if (slider.origo == WG_WEST || slider.origo == WG_EAST)
+		if (slider.origo == WgOrigo::West || slider.origo == WgOrigo::East)
 			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.x;
 		else
 			value = slider.bounds[0].min + (slider.bounds[0].max - slider.bounds[0].min)*handleFactor.y;
@@ -1766,23 +1766,23 @@ WgCoordF WgMultiSlider::_convertFactorPos(WgCoordF in, WgOrigo origo)
 
 	switch (origo)
 	{
-	case WG_WEST:
-	case WG_NORTH:
-	case WG_NORTHWEST:
+	case WgOrigo::West:
+	case WgOrigo::North:
+	case WgOrigo::NorthWest:
 		break;
 
-	case WG_NORTHEAST:
-	case WG_EAST:
+	case WgOrigo::NorthEast:
+	case WgOrigo::East:
 		pos.x = 1.f - pos.x;
 		break;
 
-	case WG_SOUTHEAST:
+	case WgOrigo::SouthEast:
 		pos.x = 1.f - pos.x;
 		pos.y = 1.f - pos.y;
 		break;
 
-	case WG_SOUTH:
-	case WG_SOUTHWEST:
+	case WgOrigo::South:
+	case WgOrigo::SouthWest:
 		pos.y = 1.f - pos.y;
 		break;
     default:

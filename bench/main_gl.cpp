@@ -98,12 +98,12 @@ int main ( int argc, char** argv )
 	WgGfxAnim * pCursorEOL = new WgGfxAnim();
 	pCursorEOL->SetSize( WgSize(8,8) );
 	pCursorEOL->AddFrames(pCursorImg, WgCoord(0,0), WgSize(2,1), 200 );
-	pCursorEOL->SetPlayMode( WG_FORWARD_LOOPING );
+	pCursorEOL->SetPlayMode( WgAnimMode::Looping );
 
 	WgGfxAnim * pCursorINS = new WgGfxAnim();
 	pCursorINS->SetSize( WgSize(8,8) );
 	pCursorINS->AddFrames( pCursorImg, WgCoord(0,8), WgSize(2,1), 200 );
-	pCursorINS->SetPlayMode( WG_FORWARD_LOOPING );
+	pCursorINS->SetPlayMode( WgAnimMode::Looping );
 
 	WgCursor * pCursor = new WgCursor();
 	pCursor->SetAnim(WgCursor::EOL, pCursorEOL);
@@ -128,7 +128,7 @@ int main ( int argc, char** argv )
 
 	WgRootPanel * pRoot = setupGUI( pGfxDevice );
 
-	pRoot->FindWidget( WgCoord(10,10), WG_SEARCH_ACTION_TARGET );
+	pRoot->FindWidget( WgCoord(10,10), WgSearchMode::ActionTarget );
 
    // program main loop
 
@@ -226,13 +226,13 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	pBackground->SetSource( pBackBlock );
 
 	WgFlexHook * pHook = pBottom->AddChild( pBackground );
-	pHook->SetAnchored( WG_NORTHWEST, WG_SOUTHEAST );
+	pHook->SetAnchored( WgOrigo::NorthWest, WgOrigo::SouthEast );
 
 
 	// Test Widget
 	
 	TestWidget * pTest = new TestWidget();
-	pBottom->AddChild( pTest, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(10) );
+	pBottom->AddChild( pTest, WgOrigo::NorthWest, WgOrigo::SouthEast, WgBorders(10) );
 
 
 

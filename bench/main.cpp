@@ -1,6 +1,6 @@
 #include <cstdlib>
 
-#include <dwmapi.h>
+//#include <dwmapi.h>
 #undef min
 #undef max
 
@@ -11,8 +11,11 @@
 #	include <GL/glew.h>
 #else
 #	ifdef __APPLE__
+#       pragma clang diagnostic push
+#       pragma clang diagnostic ignored "-Wdocumentation"
 #		include <SDL2/SDL.h>
 #		include <SDL2_image/SDL_image.h>
+#       pragma clang diagnostic pop
 #	else
 #		include <SDL2/SDL.h>
 #		include <SDL2/SDL_image.h>
@@ -21,9 +24,9 @@
 
 #include <wondergui.h>
 
-#include <wg_glsurface.h>
-#include <wg_glsurfacefactory.h>
-#include <wg_glgfxdevice.h>
+//#include <wg_glsurface.h>
+//#include <wg_glsurfacefactory.h>
+//#include <wg_glgfxdevice.h>
 
 
 #include <wg_bitmapglyphs.h>
@@ -37,7 +40,7 @@
 #include <wg_gfxdevice_soft.h>
 #include <wg_glgfxdevice.h>
 #include <wg_surfacefactory_soft.h>
-#include <sdl_wglib.h>
+#include "sdl_wglib.h"
 #include <wg_boxskin.h>
 #include <wg_volumemeter.h>
 #include <wg_simplevolumemeter.h>
@@ -61,7 +64,7 @@
 void manuBlendTest();
 
 
-#define USE_OPEN_GL
+//#define USE_OPEN_GL
 
 
 WgSurfaceFactory *	g_pSurfaceFactory = nullptr;
@@ -113,8 +116,9 @@ WgFlexHook * g_pSpriteHook = nullptr;
 WgKnob *		g_pKnob = nullptr;
 
 
-volatile int	m_bGotVsync = 0;
+//volatile int	m_bGotVsync = 0;
 
+/*
 static int TestThread(void *ptr)
 {
 	while (true)
@@ -125,7 +129,7 @@ static int TestThread(void *ptr)
 
 	return 0;
 }
-
+*/
 
 //____ main() _________________________________________________________________
 
@@ -178,9 +182,9 @@ int main ( int argc, char** argv )
 	int res = IMG_Init( IMG_INIT_PNG | IMG_INIT_JPG );
 
 
-	SDL_Thread *thread;
-	int         threadReturnValue;
-	thread = SDL_CreateThread(TestThread, "TestThread", (void *)NULL);
+//	SDL_Thread *thread;
+//	int         threadReturnValue;
+//	thread = SDL_CreateThread(TestThread, "TestThread", (void *)NULL);
 
 
 	// Init WonderGUI
@@ -189,7 +193,7 @@ int main ( int argc, char** argv )
 	sdl_wglib::MapKeys();
 
 
-	WgBase::InitFreeType();
+//	WgBase::InitFreeType();
 
 	// Setup gfxdevice and gui
 
@@ -199,12 +203,12 @@ int main ( int argc, char** argv )
 #else
 	SDL_Surface * pScreen = SDL_GetWindowSurface(pWin);
 
-	WgPixelType type = WG_PIXEL_UNKNOWN;
+    WgPixelType type = WgPixelType::Unknown;
 
 	if (pScreen->format->BitsPerPixel == 32)
-		type = WG_PIXEL_BGRA_8;
+		type = WgPixelType::BGRA_8;
 	else if (pScreen->format->BitsPerPixel == 24)
-		type = WG_PIXEL_BGR_8;
+		type = WgPixelType::BGR_8;
 
 
 	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(width,height), type, (unsigned char *) pScreen->pixels, pScreen->pitch );
@@ -218,7 +222,7 @@ int main ( int argc, char** argv )
 
 
 	// Load TTF-font
-
+/*
 	WgVectorGlyphs::SetSurfaceFactory( g_pSurfaceFactory );
 
 	char	ttfname[] = { "../resources/DroidSans.ttf" };
@@ -229,10 +233,10 @@ int main ( int argc, char** argv )
 
 	WgFont * pFont = new WgFont();
 	pFont->SetDefaultVectorGlyphs( pGlyphs );
-
+*/
 	// Load bitmap font
 
-//	WgFont * pFont = sdl_wglib::LoadBitmapFont( "../resources/anuvverbubbla_8x8.png", "../resources/anuvverbubbla_8x8.fnt", * g_pSurfaceFactory );
+	WgFont * pFont = sdl_wglib::LoadBitmapFont( "../resources/anuvverbubbla_8x8.png", "../resources/anuvverbubbla_8x8.fnt", * g_pSurfaceFactory );
 
 	// Load and setup cursor
 
@@ -241,12 +245,12 @@ int main ( int argc, char** argv )
 	WgGfxAnim * pCursorEOL = new WgGfxAnim();
 	pCursorEOL->SetSize( WgSize(8,8) );
 	pCursorEOL->AddFrames(pCursorImg, WgCoord(0,0), WgSize(2,1), 200 );
-	pCursorEOL->SetPlayMode( WG_FORWARD_LOOPING );
+	pCursorEOL->SetPlayMode( WgAnimMode::Looping );
 
 	WgGfxAnim * pCursorINS = new WgGfxAnim();
 	pCursorINS->SetSize( WgSize(8,8) );
 	pCursorINS->AddFrames( pCursorImg, WgCoord(0,8), WgSize(2,1), 200 );
-	pCursorINS->SetPlayMode( WG_FORWARD_LOOPING );
+	pCursorINS->SetPlayMode( WgAnimMode::Looping );
 
 	WgCursor * pCursor = new WgCursor();
 	pCursor->SetAnim(WgCursor::EOL, pCursorEOL);
@@ -275,8 +279,8 @@ int main ( int argc, char** argv )
 
 	// Setup debug overlays
 	
-	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
-	pOverlaySkin->SetStateColor( WG_STATE_NORMAL, WgColor::transparent, WgColor::red );	
+	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::Black);
+    pOverlaySkin->SetStateColor( WgStateEnum::Normal, WgColor::Transparent, WgColor::Red );
 	pRoot->SetUpdatedRectOverlay( pOverlaySkin,0);
 	
 
@@ -430,11 +434,11 @@ int main ( int argc, char** argv )
 			pos.y = clip.y + clip.h / 2 - lineLength / 2 + sin(counter / 150.0)*clip.h * 2 / 3;
 
 
-			g_pGfxDevice->ClipDrawLine(clip, pos, WgDirection::WG_DOWN, lineLength, WgColor::white, 1.f );
+			g_pGfxDevice->ClipDrawLine(clip, pos, WgDirection::WgDirection::Down, lineLength, WgColor::white, 1.f );
 
 
 //			for (int i = 0; i < 20; i++)
-//				g_pGfxDevice->ClipDrawLine(clip, { clip.x + 1, clip.y + i * 15 }, WgDirection::WG_RIGHT, 50, WgColor::white, i*0.25 );
+//				g_pGfxDevice->ClipDrawLine(clip, { clip.x + 1, clip.y + i * 15 }, WgDirection::WgDirection::Right, 50, WgColor::white, i*0.25 );
 
 		}
 */
@@ -514,15 +518,15 @@ int main ( int argc, char** argv )
  
         // Pause for a while
 
-//		SDL_Delay(32);
+		SDL_Delay(32);
 
-		while (!m_bGotVsync)
-		{
-			SDL_Delay(1);
-		}
-		m_bGotVsync = 0;
+//		while (!m_bGotVsync)
+//		{
+//			SDL_Delay(1);
+//		}
+//		m_bGotVsync = 0;
 
-		DwmFlush();
+//		DwmFlush();
 
 //		SDL_RenderPresent(pRenderer);
 
@@ -566,7 +570,7 @@ void updateOscilloscope( WgOscilloscope * pOsc, int ofs, float freq, float ampli
 
 void manuBlendTest()
 {
-	WgSurfaceSoft * pCanvas = new WgSurfaceSoft({ 2800,2800 }, WG_PIXEL_BGR_8);
+    WgSurfaceSoft * pCanvas = new WgSurfaceSoft({ 2800,2800 }, WgPixelType::BGR_8);
 
 	WgSurfaceFactory * pFactory = new WgSurfaceFactorySoft();
 
@@ -577,47 +581,47 @@ void manuBlendTest()
 	WgGfxDevice * pDevice = new WgGfxDeviceSoft(pCanvas);
 
 
-	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+    pDevice->SetBlendMode(WgBlendMode::Replace);
 	pDevice->BeginRender();
 	pDevice->Blit(pBackImg);
-	pDevice->SetBlendMode(WG_BLENDMODE_BLEND);
+    pDevice->SetBlendMode(WgBlendMode::Blend);
 	pDevice->Blit(pFrontImg);
 	pDevice->EndRender();
 	sdl_wglib::SavePNG(pCanvas, "blendmodes_blend.png");
 
-	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->SetBlendMode(WgBlendMode::Replace);
 	pDevice->BeginRender();
 	pDevice->Blit(pBackImg);
-	pDevice->SetBlendMode(WG_BLENDMODE_ADD);
+    pDevice->SetBlendMode(WgBlendMode::Add);
 	pDevice->Blit(pFrontImg);
 	pDevice->EndRender();
 	sdl_wglib::SavePNG(pCanvas, "blendmodes_add.png");
 
-	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->SetBlendMode(WgBlendMode::Replace);
 	pDevice->BeginRender();
 	pDevice->Blit(pBackImg);
-	pDevice->SetBlendMode(WG_BLENDMODE_INVERT);
+    pDevice->SetBlendMode(WgBlendMode::Invert);
 	pDevice->Blit(pFrontImg);
 	pDevice->EndRender();
 	sdl_wglib::SavePNG(pCanvas, "blendmodes_invert.png");
 
-	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->SetBlendMode(WgBlendMode::Replace);
 	pDevice->BeginRender();
 	pDevice->Blit(pBackImg);
-	pDevice->SetBlendMode(WG_BLENDMODE_MULTIPLY);
+    pDevice->SetBlendMode(WgBlendMode::Multiply);
 	pDevice->Blit(pFrontImg);
 	pDevice->EndRender();
 	sdl_wglib::SavePNG(pCanvas, "blendmodes_multiply.png");
 
-	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->SetBlendMode(WgBlendMode::Replace);
 	pDevice->BeginRender();
 	pDevice->Blit(pBackImg);
-	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->SetBlendMode(WgBlendMode::Replace);
 	pDevice->Blit(pFrontImg);
 	pDevice->EndRender();
 	sdl_wglib::SavePNG(pCanvas, "blendmodes_opaque.png");
 
-	pDevice->SetBlendMode(WG_BLENDMODE_OPAQUE);
+	pDevice->SetBlendMode(WgBlendMode::Replace);
 	pDevice->BeginRender();
 	pDevice->Blit(pBackImg);
 	pDevice->RealDevice()->setBlendMode( wg::BlendMode::Subtract);
@@ -709,23 +713,23 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	// Main Flex
 
 	WgFlexPanel * pFlex = new WgFlexPanel();
-	pBottom->AddChild(pFlex, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(10));
+    pBottom->AddChild(pFlex, (int) WgOrigo::NorthWest, (int) WgOrigo::SouthEast, WgBorders(10));
 
 	// Background
 
 	WgImage * pBackground = new WgImage();
 	pBackground->SetSource(pBackBlock);
 	WgFlexHook * pHook = pFlex->AddChild(pBackground);
-	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
+	pHook->SetAnchored( (int) WgOrigo::NorthWest, (int) WgOrigo::SouthEast);
 	
 
 	// Test Knob
 
-	WgKnob * pKnob = new WgKnob( new WgGlSurfaceFactory() );
+	WgKnob * pKnob = new WgKnob( new WgSurfaceFactorySoft() );
 	pKnob->SetOptimizeUpdateRect(true);
 
 	pHook = pFlex->AddChild(pKnob);
-	pHook->SetAnchored(WG_NORTHWEST, WG_SOUTHEAST);
+	pHook->SetAnchored( (int) WgOrigo::NorthWest, (int) WgOrigo::SouthEast);
 
 	g_pKnob = pKnob;
 
@@ -755,7 +759,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 		WgShaderCapsule * pShader = new WgShaderCapsule();
 		pShader->SetChild(pImage);
-//		pShader->SetBlendMode(WgBlendMode::WG_BLENDMODE_OPAQUE);
+//		pShader->SetBlendMode(WgBlendMode::WgBlendMode::Replace);
 
 		WgCanvasCapsule * pCapsule = new WgCanvasCapsule();
 		pCapsule->SetSurfaceFactory(g_pSurfaceFactory);
@@ -835,10 +839,10 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 /*
 	{
 		auto pSkin = WgBoxSkin::Create(WgColor::cornsilk, 2, WgColor::deeppink);
-		pSkin->SetStateColor(WG_STATE_HOVERED, WgColor::white, WgColor::red );
-		pSkin->SetStateColor(WG_STATE_PRESSED, WgColor::yellow, WgColor::red);
+		pSkin->SetStateColor(WgStateEnum::Hovered, WgColor::white, WgColor::red );
+		pSkin->SetStateColor(WgStateEnum::Pressed, WgColor::yellow, WgColor::red);
 		pSkin->SetContentPadding(3 );
-		pSkin->SetContentShift(WG_STATE_PRESSED, { 2,2 });
+		pSkin->SetContentShift(WgStateEnum::Pressed, { 2,2 });
 
 		auto pButton = new WgButton();
 		pButton->SetSkin(pSkin);
@@ -862,7 +866,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		auto pPack = new WgPackPanel();
 		pPack->SetSkin(WgColorSkin::Create(WgColor::blue));
 		pFlex->AddChild(pPack, { 0,0,300,100 });
-		pPack->SetOrientation(WG_VERTICAL);
+		pPack->SetOrientation(WgOrientation::Vertical);
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -937,7 +941,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 		p->SetValue(0.8f, 1.0f, 0.7f, 0.8f);
 
-		p->SetDirection((WgDirection) (WgDirection::WG_UP + i));
+		p->SetDirection((WgDirection) (WgDirection::WgDirection::Up + i));
 
 		pFlex->AddChild(p, { 10 + i * 110, 10, 100, 100 });
 	}
@@ -958,7 +962,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 		auto pMenu = new WgPackPanel();
-		pMenu->SetOrientation(WG_VERTICAL);
+		pMenu->SetOrientation(WgOrientation::Vertical);
 //		pMenu->setSelectable(false);
 
 		auto pSkin = WgBoxSkin::Create(WgColor::Red, WgBorders(0), WgColor::Red );
@@ -986,13 +990,13 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pSubMenuOpener->SetText("Sub Menu");
 		pSubMenuOpener->SetSkin(pPressablePlateSkin);
 		pSubMenuOpener->SetOpenOnHover(true);
-		pSubMenuOpener->SetAttachPoint(WG_NORTHEAST);
+		pSubMenuOpener->SetAttachPoint(WgOrigo::NorthEast);
 		pSubMenuOpener->SetPopupOffset({ -10,5 });
 		pMenu->AddChild(pSubMenuOpener);
 
 
 		auto pSubMenu = new WgPackPanel();
-		pSubMenu->SetOrientation(WG_VERTICAL);
+		pSubMenu->SetOrientation(WgOrientation::Vertical);
 		pSubMenu->SetSkin(pSkin);
 
 		auto pSubEntry1 = new WgTextDisplay();
@@ -1018,12 +1022,12 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pSubMenuOpener2->SetText("Sub Menu 2");
 		pSubMenuOpener2->SetSkin(pPressablePlateSkin);
 		pSubMenuOpener2->SetOpenOnHover(true);
-		pSubMenuOpener2->SetAttachPoint(WG_NORTHEAST);
+		pSubMenuOpener2->SetAttachPoint(WgOrigo::NorthEast);
 		pMenu->AddChild(pSubMenuOpener2);
 
 
 		auto pSubMenu2 = new WgPackPanel();
-		pSubMenu2->SetOrientation(WG_VERTICAL);
+		pSubMenu2->SetOrientation(WgOrientation::Vertical);
 		pSubMenu2->SetSkin(pSkin);
 
 		auto pSubEntry21 = new WgTextDisplay();
@@ -1071,16 +1075,16 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	auto pSkin = WgMultiBlockSkin::Create({ 10,10 }, WgBorders(2));
 
-	int hLayer = pSkin->AddLayer(pPlateImg_x2, { 0,0 }, { 10,0 }, { WG_STATE_NORMAL } );
-	pSkin->SetLayerTint(hLayer, { { WG_STATE_HOVERED, WgColor::red}, { WG_STATE_PRESSED, WgColor( 0,255,0,128 ) } } );
+	int hLayer = pSkin->AddLayer(pPlateImg_x2, { 0,0 }, { 10,0 }, { WgStateEnum::Normal } );
+	pSkin->SetLayerTint(hLayer, { { WgStateEnum::Hovered, WgColor::red}, { WgStateEnum::Pressed, WgColor( 0,255,0,128 ) } } );
 
 	hLayer = pSkin->AddLayer(pPlateImg_x2, { 5,0 } );
-	pSkin->SetLayerTint(hLayer, { { WG_STATE_NORMAL, WgColor::transparent },{ WG_STATE_PRESSED, WgColor(255,0,0,128) } });
-	pSkin->SetLayerBlendMode(hLayer, WgBlendMode::WG_BLENDMODE_ADD);
+	pSkin->SetLayerTint(hLayer, { { WgStateEnum::Normal, WgColor::transparent },{ WgStateEnum::Pressed, WgColor(255,0,0,128) } });
+	pSkin->SetLayerBlendMode(hLayer, WgBlendMode::WgBlendMode::Add);
 
 	auto pSkin2 = WgBlockSkin::CreateClickable( pPlateImg_x2, { 10,10 }, { 0,0 }, { 10,0 }, WgBorders(2) );
 //	pSkin->SetContentPadding(3);
-//	pSkin->SetContentShift(WG_STATE_PRESSED, { 2,2 });
+//	pSkin->SetContentShift(WgStateEnum::Pressed, { 2,2 });
 
 	auto pButton = new WgButton();
 	pButton->SetSkin(pSkin);
@@ -1098,7 +1102,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 // PackPanel Scale Test
 /*
 	auto pMyFlex = new WgFlexPanel();
-	pFlex->AddChild(pMyFlex, WG_NORTHWEST, WG_SOUTHEAST );
+	pFlex->AddChild(pMyFlex, WgOrigo::NorthWest, WgOrigo::SouthEast );
 	pMyFlex->SetScale(WG_SCALE_BASE * 2);
 
 	auto p1 = new WgPackPanel();
@@ -1127,15 +1131,15 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 /*
 	WgBlockSkinPtr pSkin = WgBlockSkin::CreateStatic(pPlateImg, { 0,0,10,10 }, 3);
-	pSkin->SetStateBlock(WG_STATE_FOCUSED, { 10,0 });
+	pSkin->SetStateBlock(WgStateEnum::Focused, { 10,0 });
 
 //	WgBoxSkinPtr pSkin = WgBoxSkin::Create(WgColor::antiquewhite, 1, WgColor::black );
-//	pSkin->SetStateColor(WG_STATE_FOCUSED, WgColor::seagreen, WgColor::red);
+//	pSkin->SetStateColor(WgStateEnum::Focused, WgColor::seagreen, WgColor::red);
 
 
 	WgTextDisplay * pDisplay1 = new WgTextDisplay();
 	pDisplay1->SetText("DISPLAY 1 WITH A LONG LINE THAT NEEDS TO AUTOWRAP SOONER OR LATER");
-	pDisplay1->SetEditMode(WG_TEXT_EDITABLE);
+	pDisplay1->SetEditMode(WgTextEditMode::Editable);
 	pDisplay1->SetSkin(pSkin);
 
 	WgTextprop selectionProp;
@@ -1157,7 +1161,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	WgScrollPanel * pScroll = new WgScrollPanel();
-	pScroll->SetContentSizePolicy(WG_BOUND, WG_DEFAULT);
+	pScroll->SetContentSizePolicy(WgSizePolicy::Bound, WgSizePolicy::Default);
 	pFlex->AddChild(pScroll, WgRect(0, 110, 200, 100));
 
 	WgTextDisplay * pDisplay2 = new WgTextDisplay();
@@ -1168,7 +1172,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pDisplay2->AddText("Line X\nAnother Line\n");
 	}
 
-	pDisplay2->SetEditMode(WG_TEXT_EDITABLE);
+	pDisplay2->SetEditMode(WgTextEditMode::Editable);
 	pDisplay2->SetSkin(pSkin);
 	pDisplay2->SetSelectionProperties(selectionProp.Register());
 
@@ -1198,18 +1202,18 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 
 	WgBoxSkinPtr pSliderBgSkin = WgBoxSkin::Create(normalBg, 1, normalBg);
-	pSliderBgSkin->SetStateColor(WG_STATE_HOVERED, hoveredBg, hoveredBg);
-	pSliderBgSkin->SetStateColor(WG_STATE_PRESSED, pressedBg, pressedBg);
+	pSliderBgSkin->SetStateColor(WgStateEnum::Hovered, hoveredBg, hoveredBg);
+	pSliderBgSkin->SetStateColor(WgStateEnum::Pressed, pressedBg, pressedBg);
 
-	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED, selectedBg, selectedBg);
-	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED_HOVERED, selectedHoveredBg, selectedHoveredBg);
-	pSliderBgSkin->SetStateColor(WG_STATE_SELECTED_PRESSED, selectedPressedBg, selectedPressedBg);
+	pSliderBgSkin->SetStateColor(WgStateEnum::Selected, selectedBg, selectedBg);
+	pSliderBgSkin->SetStateColor(WgStateEnum::SelectedHovered, selectedHoveredBg, selectedHoveredBg);
+	pSliderBgSkin->SetStateColor(WgStateEnum::SelectedPressed, selectedPressedBg, selectedPressedBg);
 
 
 	WgBoxSkinPtr pSliderHandleSkin = WgBoxSkin::Create(WgColor::White, 1, WgColor::Red);
 	pSliderHandleSkin->SetContentPadding(10);
-	pSliderHandleSkin->SetStateColor(WG_STATE_HOVERED, WgColor::Blue);
-	pSliderHandleSkin->SetStateColor(WG_STATE_PRESSED, WgColor::Red);
+	pSliderHandleSkin->SetStateColor(WgStateEnum::Hovered, WgColor::Blue);
+	pSliderHandleSkin->SetStateColor(WgStateEnum::Pressed, WgColor::Red);
 
 
 	auto pMultiSlider = new WgMultiSlider();
@@ -1232,7 +1236,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 //	}
 //	);
 
-	pMultiSlider->AddSlider2D(0, WG_NORTHWEST, 
+	pMultiSlider->AddSlider2D(0, WgOrigo::NorthWest, 
 						[](WgMultiSlider::SetGeoVisitor& visitor) {
 							return WgRectF( 0.1f, 0.1f, 0.8f, 0.1f ); 
 						},
@@ -1240,7 +1244,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 						nullptr
 						);
 
-	pMultiSlider->AddSlider(1, WG_UP,
+	pMultiSlider->AddSlider(1, WgDirection::Up,
 						[](WgMultiSlider::SetGeoVisitor& visitor) { 
 			
 							WgRectF r = visitor.geo(0);
@@ -1270,7 +1274,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 							return visitor.value();
 						});
 
-	pMultiSlider->AddSlider(2, WG_UP,
+	pMultiSlider->AddSlider(2, WgDirection::Up,
 						[](WgMultiSlider::SetGeoVisitor& visitor) { 
 	
 							WgRectF r = visitor.geo(1);
@@ -1281,7 +1285,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 							return visitor.value(); 
 						});
 	
-	pMultiSlider->AddSlider(3, WG_UP,
+	pMultiSlider->AddSlider(3, WgDirection::Up,
 						[](WgMultiSlider::SetGeoVisitor& visitor) {
 
 							WgRectF r = visitor.geo(1);
@@ -1344,14 +1348,14 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pLabelSkin->SetContentPadding(3);
 
 	m_pScrollChart->SetValueGridLines(3, valueGrid);
-	m_pScrollChart->SetValueLabelStyle(WG_NORTHWEST, { -10,0 }, pLabelSkin, 0);
+	m_pScrollChart->SetValueLabelStyle(WgOrigo::NorthWest, { -10,0 }, pLabelSkin, 0);
 //	m_pScrollChart->SetCanvasPadding(WgBorders(50, 0, 0, 0));
 
 
 
 
 	auto pWindowContent = new WgPackPanel();
-	pWindowContent->SetOrientation(WG_VERTICAL);
+	pWindowContent->SetOrientation(WgOrientation::Vertical);
 	pWindowContent->SetSizeBroker(new WgUniformSizeBroker());
 
 	pWindowContent->AddChild(m_pScrollChart)->SetWeight(2);
@@ -1495,16 +1499,16 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	pChart->SetValueGridLines(3, valueGrid);
 	pChart->SetSampleGridLines(2, sampleGrid);
-	pChart->SetSampleLabelStyle(WG_CENTER, { 0,0 }, pLabelSkin, 0 );
+	pChart->SetSampleLabelStyle(WgOrigo::Center, { 0,0 }, pLabelSkin, 0 );
 
-	pChart->SetValueLabelStyle(WG_SOUTHEAST, { 0,0 }, pLabelSkin, 0);
+	pChart->SetValueLabelStyle(WgOrigo::SouthEast, { 0,0 }, pLabelSkin, 0);
 
 
 //	pChart->SetFixedValueRange(-1, 1);
 
 
 	auto pWindow = new WgPackPanel();
-	pWindow->SetOrientation(WG_VERTICAL);
+	pWindow->SetOrientation(WgOrientation::Vertical);
 	pWindow->SetSizeBroker(new WgUniformSizeBroker());
 
 	pWindow->AddChild(pChart)->SetWeight(2);
@@ -1592,7 +1596,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pHook = pFlex->AddChild( pMeter1,WgRect(10,10,40,100) );
 
 	pMeter1->SetValue( 0.7f, 1.0f );
-	pMeter1->SetDirection( WG_RIGHT );
+	pMeter1->SetDirection( WgDirection::Right );
 	m_pVolMeter = pMeter1;
 */
 
@@ -1638,7 +1642,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pFlex->AddChild( pExtraFlex, WgRect(20,20,100,100) );
 		
 		WgImage * pPlate = (WgImage*) pDB->CloneWidget( "plate" );
-		pExtraFlex->AddChild( pPlate, WG_NORTHWEST, WG_SOUTHEAST, WgBorders(30) );
+		pExtraFlex->AddChild( pPlate, WgOrigo::NorthWest, WgOrigo::SouthEast, WgBorders(30) );
 		
 	}
 */
@@ -1692,7 +1696,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 /*
 	{
 		WgShaderCapsule * pShader = new WgShaderCapsule();
-		pShader->SetBlendMode(WG_BLENDMODE_MULTIPLY);
+		pShader->SetBlendMode(WgBlendMode::Multiply);
 		pShader->SetColor( WgColor(0xFF0000FF) );
 
 		WgStackPanel * pStack = new WgStackPanel();
@@ -1702,11 +1706,11 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		pStack->AddChild( pBg );
 
 		WgShaderCapsule * pShader2 = new WgShaderCapsule();
-		pShader2->SetBlendMode(WG_BLENDMODE_ADD);
+		pShader2->SetBlendMode(WgBlendMode::Add);
 		pShader2->SetColor( WgColor(0xFFFFFFFF) );
 		WgStackHook * pHook = pStack->AddChild( pShader2 );
 		pHook->SetSizePolicy( WgStackHook::SCALE );
-		pHook->SetOrigo( WG_CENTER );
+		pHook->SetOrigo( WgOrigo::Center );
 		pHook->SetPadding( WgBorders(2) );
 
 
@@ -1789,7 +1793,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 		addResizablePanel( pFlex, pMenu, pEventHandler );
 		pMenu->GrabFocus();
 
-//		pMenuPanel->OpenMenu( pMenu, WgRect(10,10,100,10), WG_SOUTHWEST );
+//		pMenuPanel->OpenMenu( pMenu, WgRect(10,10,100,10), WgOrigo::SouthWest );
 	}
 */
 	// Test menubar and menus
@@ -1900,7 +1904,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	WgButton * pButton = (WgButton*) pDB->CloneWidget( "button" );
 	pEventHandler->AddCallback( WgEventFilter::MouseButtonPress(pButton, 1), cbOpenModal, pModalButton );
 
-	pHook = pFlex->AddChild( pButton, WgRect(0,0,100,100), WG_NORTHWEST );
+	pHook = pFlex->AddChild( pButton, WgRect(0,0,100,100), WgOrigo::NorthWest );
 
 	//
 
@@ -1908,7 +1912,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pFlag1->SetSource( pSplashBlock );
 	pEventHandler->AddCallback( WgEventFilter::MouseButtonPress(pFlag1, 1), cbInitDrag, pFlag1 );
 
-	pHook = pFlex->AddChild( pFlag1, WgCoord(0,0), WG_CENTER );
+	pHook = pFlex->AddChild( pFlag1, WgCoord(0,0), WgOrigo::Center );
 
 
 
@@ -1916,13 +1920,13 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pFlag2->SetSource( pFlagBlock );
 	pEventHandler->AddCallback( WgEventFilter::MouseButtonDrag(pFlag1, 1), cbDragWidget, pFlag1 );
 
-	pHook = pFlex->AddChild( pFlag2, WgCoord(100,100), WG_CENTER );
+	pHook = pFlex->AddChild( pFlag2, WgCoord(100,100), WgOrigo::Center );
 
 	//
 
 
 	WgListPanel * pVBox = new WgListPanel();
-//	pFlex->AddChild( pVBox, WgCoord(50,50), WG_NORTHWEST );
+//	pFlex->AddChild( pVBox, WgCoord(50,50), WgOrigo::NorthWest );
 
 
 	WgImage * pFlag3 = new WgImage();
@@ -1938,7 +1942,7 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 	pVBox->AddChild(pFlag3);
 //	pVBox->AddChild(pFlag4);
 
-	pHook = pFlex->AddChild( pVBox, WgCoord(50,50), WG_NORTHWEST );
+	pHook = pFlex->AddChild( pVBox, WgCoord(50,50), WgOrigo::NorthWest );
 	pHook->SetMaxSize( WgSize(120, INT_MAX) );
 
 	//
@@ -1952,12 +1956,12 @@ WgRootPanel * setupGUI(WgGfxDevice * pDevice)
 
 	WgTextDisplay * pText1 = new WgTextDisplay();
 	pText1->SetText("TEXTA1");
-	pText1->SetEditMode(WG_TEXT_EDITABLE);
+	pText1->SetEditMode(WgTextEditMode::Editable);
 	pTabBox->AddChild(pText1);
 
 	WgTextDisplay * pText2 = new WgTextDisplay();
 	pText2->SetText("TEXTB234ABC sajfas kjfaljsras kjasdfkasd kajfd fkajfa fkdjfa dfasfda asdkfj");
-	pText2->SetEditMode(WG_TEXT_EDITABLE);
+	pText2->SetEditMode(WgTextEditMode::Editable);
 	pTabBox->AddChild(pText2);
 
 	pText1->GrabFocus();
@@ -2070,7 +2074,7 @@ void cbDragWidget( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 
 void cbOpenModal( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 {
-//	g_pModal->AddModal( pWidget, WgCoord(), WG_SOUTHEAST );
+//	g_pModal->AddModal( pWidget, WgCoord(), WgOrigo::SouthEast );
 }
 
 //____ cbCloseModal() __________________________________________________________
@@ -2167,7 +2171,7 @@ m_bIsVisible(false)
     int iTopLeft = pkRootPanel->AddAnchor(fCenterX-fHalfWidth, fTopY);
     int iBottomRight = pkRootPanel->AddAnchor(fCenterX + fHalfWidth, fTopY + fStepHeight*iRows + 2.0f*fHalfHeightOffset);
     m_pHook = pkRootPanel->AddChild(this, iTopLeft, iBottomRight);
-    //m_pHook = pkRootPanel->AddChild(this, WgRect(500, 500, 100, 200), WG_WEST);
+    //m_pHook = pkRootPanel->AddChild(this, WgRect(500, 500, 100, 200), WgOrigo::West);
     DBG_ASSERT(m_pHook != NULL);
 
     // Create background image
@@ -2186,7 +2190,7 @@ m_bIsVisible(false)
     for(int i = 0; i<pPresets.size(); i++)
     {
         WgGizmoTextButton* pkTextButton;
-        pkTextButton = pkModule->AddTextButton(pPresets[i].GetPresetName(), pWgProp, WgCoord(iBorder, i*(iTextHeight+iSpacing)+iBorder), WgCoord(iTextWidth, iTextHeight), i, WG_NORTHWEST, this);
+        pkTextButton = pkModule->AddTextButton(pPresets[i].GetPresetName(), pWgProp, WgCoord(iBorder, i*(iTextHeight+iSpacing)+iBorder), WgCoord(iTextWidth, iTextHeight), i, WgOrigo::NorthWest, this);
         
         pkTextButton->SetSkin(pTextSkin);
         pkTextButton->SetHoverSkin(pTextSkin);
@@ -2194,7 +2198,7 @@ m_bIsVisible(false)
         pkTextButton->SetSelectedHoverSkin(pTextSkin);
         pkTextButton->SetDisabledSkin(pTextSkin);
         pkTextButton->SetTextManager(pTextManager);
-        pkTextButton->SetTextAlignment(WG_WEST);
+        pkTextButton->SetTextAlignment(WgOrigo::West);
         pkTextButton->SetParam(pPresets[i].GetPresetParam());
         m_pTextButtons.push_back(pkTextButton);
         

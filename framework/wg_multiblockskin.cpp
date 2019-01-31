@@ -62,7 +62,7 @@ int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord ofs)
 	m_layers.emplace_back();
 	auto& layer = m_layers.back();
 
-	layer.blendMode = WG_BLENDMODE_BLEND;
+	layer.blendMode = WgBlendMode::Blend;
 	layer.pSurface = pSurf;
 
 	if (pSurf->IsOpaque())
@@ -98,7 +98,7 @@ int WgMultiBlockSkin::AddLayer(WgSurface * pSurf, WgCoord blockStartOfs, WgSize 
 	m_layers.emplace_back();
 	auto& layer = m_layers.back();
 
-	layer.blendMode = WG_BLENDMODE_BLEND;
+	layer.blendMode = WgBlendMode::Blend;
 	layer.pSurface = pSurf;
 
 	if (pSurf->IsOpaque())
@@ -387,7 +387,7 @@ bool WgMultiBlockSkin::MarkTest( const WgCoord& _ofs, const WgSize& canvas, WgSt
 		int alpha = 0;
 		if (IsOpaque(state))
 			alpha = 255;
-		else if( layer.blendMode == WG_BLENDMODE_BLEND )
+		else if( layer.blendMode == WgBlendMode::Blend )
 		{
 			WgCoord ofs = _ofs;
 
@@ -509,7 +509,7 @@ void WgMultiBlockSkin::_updateStateOpacity(int stateIdx)
 
 	for (auto& layer : m_layers)
 	{
-		if (layer.blendMode == WG_BLENDMODE_OPAQUE || (layer.blendMode == WG_BLENDMODE_BLEND && layer.pSurface->IsOpaque() && layer.tintColor[stateIdx].a == 255) )
+		if (layer.blendMode == WgBlendMode::Replace || (layer.blendMode == WgBlendMode::Blend && layer.pSurface->IsOpaque() && layer.tintColor[stateIdx].a == 255) )
 		{
 			bOpaque = true;
 			break;

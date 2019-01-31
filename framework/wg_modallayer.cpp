@@ -411,7 +411,7 @@ WgWidget *  WgModalLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 	// In search mode ACTION_TARGET we always return either the topmost non-hidden modal Widget (or its children),
 	// or us.
 
-	if( mode == WG_SEARCH_ACTION_TARGET )
+	if( mode == WgSearchMode::ActionTarget )
 	{
 		WgModalHook * pHook = m_modalHooks.Last();
 
@@ -564,7 +564,7 @@ void WgModalLayer::_onCloneContent( const WgWidget * _pOrg )
 void WgModalLayer::_onEvent( const WgEvent::Event * _pEvent, WgEventHandler * pHandler )
 {
 
-	if( !m_modalHooks.IsEmpty() && FindWidget( _pEvent->PointerPixelPos(), WG_SEARCH_ACTION_TARGET ) == this )
+	if( !m_modalHooks.IsEmpty() && FindWidget( _pEvent->PointerPixelPos(), WgSearchMode::ActionTarget ) == this )
 	{
 		switch( _pEvent->Type() )
 		{

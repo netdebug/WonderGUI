@@ -106,12 +106,12 @@ int main ( int argc, char** argv )
 
 	// Setup gfxdevice and gui
 
-	WgPixelType type = WG_PIXEL_UNKNOWN;
+	WgPixelType type = WgPixelType::Unknown;
 
 	if (pScreen->format->BitsPerPixel == 32)
-		type = WG_PIXEL_BGRA_8;
+		type = WgPixelType::BGRA_8;
 	else if (pScreen->format->BitsPerPixel == 24)
-		type = WG_PIXEL_BGR_8;
+		type = WgPixelType::BGR_8;
 
 
 	WgSurfaceSoft * pCanvas = new WgSurfaceSoft( WgSize(width,height), type, (unsigned char *) pScreen->pixels, pScreen->pitch );
@@ -142,12 +142,12 @@ int main ( int argc, char** argv )
 	WgGfxAnim * pCursorEOL = new WgGfxAnim();
 	pCursorEOL->SetSize( WgSize(8,8) );
 	pCursorEOL->AddFrames(pCursorImg, WgCoord(0,0), WgSize(2,1), 200 );
-	pCursorEOL->SetPlayMode( WG_FORWARD_LOOPING );
+	pCursorEOL->SetPlayMode( WgAnimMode::Looping );
 
 	WgGfxAnim * pCursorINS = new WgGfxAnim();
 	pCursorINS->SetSize( WgSize(8,8) );
 	pCursorINS->AddFrames( pCursorImg, WgCoord(0,8), WgSize(2,1), 200 );
-	pCursorINS->SetPlayMode( WG_FORWARD_LOOPING );
+	pCursorINS->SetPlayMode( WgAnimMode::Looping );
 
 	WgCursor * pCursor = new WgCursor();
 	pCursor->SetAnim(WgCursor::EOL, pCursorEOL);
@@ -176,7 +176,7 @@ int main ( int argc, char** argv )
 	// Setup debug overlays
 /*	
 	WgBoxSkinPtr pOverlaySkin = WgBoxSkin::Create( WgColor(255,0,0,128), WgBorders(1), WgColor::black);
-	pOverlaySkin->SetStateColor( WG_STATE_NORMAL, WgColor::transparent, WgColor::red );	
+	pOverlaySkin->SetStateColor( WgStateEnum::Normal, WgColor::transparent, WgColor::red );	
 	pRoot->SetUpdatedRectOverlay( pOverlaySkin, 0 );
 */	
 
@@ -434,17 +434,17 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 	WgPackPanel * pSidePanel = new WgPackPanel();
 
 	pSidePanel->SetSkin( WgColorSkin::Create(WgColor::wheat) );
-	pSidePanel->SetOrientation( WgOrientation::WG_VERTICAL );
+	pSidePanel->SetOrientation( WgOrientation::WgOrientation::Vertical );
 
 	WgFlexHook * pHook = pBase->AddChild( pSidePanel );
-	pHook->SetAnchored( WG_NORTHWEST, pBase->AddAnchor(0.f,1.f, WgCoord(sidepanelWidth,0)) );
+	pHook->SetAnchored( WgOrigo::NorthWest, pBase->AddAnchor(0.f,1.f, WgCoord(sidepanelWidth,0)) );
 
 
 	// Add Button panel to SidePanel
 	
 	{
 		WgPackPanel * pButtons = new WgPackPanel();
-		pButtons->SetOrientation( WgOrientation::WG_HORIZONTAL );
+		pButtons->SetOrientation( WgOrientation::WgOrientation::Horizontal );
 
 		WgButton * p100 = (WgButton*) pDB->CloneWidget("button");
 		p100->SetText( "100%");
@@ -542,7 +542,7 @@ WgRootPanel * setupGUI( WgGfxDevice * pDevice )
 		pView->SetContent( pSizer );
 		
 		int anchor = pBase->AddAnchor( 0,0, WgCoord( sidepanelWidth, 0) );		
-		pBase->AddChild( pView, anchor, WG_SOUTHEAST );
+		pBase->AddChild( pView, anchor, WgOrigo::SouthEast );
 	}
 
 
@@ -661,7 +661,7 @@ void cbDragWidget( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 
 void cbOpenModal( const WgEvent::Event* _pEvent, WgWidget * pWidget )
 {
-	g_pModal->AddModal( pWidget, WgCoord(), WG_SOUTHEAST );
+	g_pModal->AddModal( pWidget, WgCoord(), WgOrigo::SouthEast );
 }
 
 //____ cbCloseModal() __________________________________________________________

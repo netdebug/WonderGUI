@@ -26,7 +26,7 @@ WgVolumeMeter::WgVolumeMeter()
 	
 	m_nLEDs = m_nSectionLEDs[0] + m_nSectionLEDs[1] + m_nSectionLEDs[2];
 	m_LEDSpacing = 0.33f;
-	m_direction = WG_UP;
+	m_direction = WgDirection::Up;
 	
 	m_iPeak = 0;
 	m_iHold = 0; 
@@ -169,7 +169,7 @@ void WgVolumeMeter::SetValue( float fPeak, float fHold )
 
 WgSize WgVolumeMeter::PreferredPixelSize() const
 {
-	if( m_direction == WG_UP || m_direction == WG_DOWN )
+	if( m_direction == WgDirection::Up || m_direction == WgDirection::Down )
 		return WgSize((10*m_scale)>>WG_SCALE_BINALS,(5*m_nLEDs*m_scale)>>WG_SCALE_BINALS);
 	else
 		return WgSize((5*m_nLEDs*m_scale)>>WG_SCALE_BINALS,(10*m_scale)>>WG_SCALE_BINALS);
@@ -181,12 +181,12 @@ void WgVolumeMeter::_onNewSize( const WgSize& size )
 {
     switch (m_direction)
     {
-        case WG_LEFT:
-        case WG_RIGHT:
+        case WgDirection::Left:
+        case WgDirection::Right:
             m_iSidePadding = (int) ((float)size.h * m_fSidePadding);
             break;
-        case WG_UP:
-        case WG_DOWN:
+        case WgDirection::Up:
+        case WgDirection::Down:
         default:
             m_iSidePadding = (int) ((float)size.w * m_fSidePadding);
             break;
@@ -275,14 +275,14 @@ void WgVolumeMeter::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 				WgSize sz = PixelSize();
 				WgRect rect;
 
-				int meterLen = (m_direction == WG_UP || m_direction == WG_DOWN) ? sz.h : sz.w; 
+				int meterLen = (m_direction == WgDirection::Up || m_direction == WgDirection::Down) ? sz.h : sz.w; 
 
 				int dirtBeg = firstRenderLED*meterLen/m_nLEDs;
 				int dirtLen = (lastRenderLED+1)*meterLen/m_nLEDs + 1 - dirtBeg;	// One pixels margin, due to subpixel precision one LED can end on same that the next start
 								
 				switch( m_direction )
 				{
-					case WG_UP:
+					case WgDirection::Up:
 
 						rect.x = 0;
 						rect.y = sz.h - (dirtBeg+dirtLen);
@@ -290,21 +290,21 @@ void WgVolumeMeter::_onEvent( const WgEvent::Event * pEvent, WgEventHandler * pH
 						rect.h = dirtLen;
 					break;
 					
-					case WG_DOWN:
+					case WgDirection::Down:
 						rect.x = 0;
 						rect.y = dirtBeg;
 						rect.w = sz.w;
 						rect.h = dirtLen;
 					break;
 					
-					case WG_LEFT:
+					case WgDirection::Left:
 						rect.x = sz.w - (dirtBeg+dirtLen);
 						rect.y = 0;
 						rect.w = dirtLen;
 						rect.h = sz.h;
 					break;
 					
-					case WG_RIGHT:
+					case WgDirection::Right:
 						rect.x = dirtBeg;
 						rect.y = 0;
 						rect.w = dirtLen;
@@ -330,7 +330,7 @@ void WgVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 {
 	int p = m_iSidePadding;
 	
-	float ledSize = ((m_direction == WG_UP || m_direction == WG_DOWN)?_canvas.h:_canvas.w) / (float)(m_nLEDs + (m_nLEDs-1)*m_LEDSpacing);
+	float ledSize = ((m_direction == WgDirection::Up || m_direction == WgDirection::Down)?_canvas.h:_canvas.w) / (float)(m_nLEDs + (m_nLEDs-1)*m_LEDSpacing);
 	float stepSize = ledSize * (1.f+m_LEDSpacing);
 
 	WgRectF ledRect;
@@ -339,22 +339,22 @@ void WgVolumeMeter::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, con
 	
 	switch( m_direction )
 	{
-		case WG_UP:
+		case WgDirection::Up:
 			ledRect = WgRectF( (float) (_canvas.x + p), _canvas.y + _canvas.h - ledSize, (float) (_canvas.w - 2*p), ledSize );
 			stepX = 0.f;
 			stepY = -stepSize;
 			break;
-		case WG_DOWN:
+		case WgDirection::Down:
 			ledRect = WgRectF( (float) (_canvas.x+p), (float) _canvas.y, (float) (_canvas.w - 2*p), ledSize );
 			stepX = 0.f;
 			stepY = stepSize;
 			break;
-		case WG_LEFT:
+		case WgDirection::Left:
 			ledRect = WgRectF( _canvas.x + _canvas.w - ledSize, (float) (_canvas.y + p), ledSize, (float) (_canvas.h - 2*p));
 			stepX = -stepSize;
 			stepY = 0.f;
 			break;
-		case WG_RIGHT:
+		case WgDirection::Right:
 			ledRect = WgRectF( (float) _canvas.x, (float) (_canvas.y + p), ledSize, (float) (_canvas.h - 2*p));
 			stepX = stepSize;
 			stepY = 0.f;

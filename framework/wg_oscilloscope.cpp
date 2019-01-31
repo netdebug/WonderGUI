@@ -434,14 +434,14 @@ void WgOscilloscope::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, co
 	for( int i = 0; i < m_nHGridLines; i++ )
 	{
 		int ofsY = (int) (m_pHGridLines[i] * scaleY + centerY);
-		pDevice->ClipDrawLine( _clip, WgCoord(_canvas.x,ofsY), WG_RIGHT, _canvas.w, m_gridColor );
+		pDevice->ClipDrawLine( _clip, WgCoord(_canvas.x,ofsY), WgDirection::Right, _canvas.w, m_gridColor );
 	}
 
 	// Draw VGridLines
 	for( int i = 0; i < m_nVGridLines; i++ )
 	{
 		int ofsX = (int) (m_pVGridLines[i] * scaleX + centerX);
-		pDevice->ClipDrawLine( _clip, WgCoord(ofsX,_canvas.y), WG_DOWN, _canvas.h, m_gridColor );
+		pDevice->ClipDrawLine( _clip, WgCoord(ofsX,_canvas.y), WgDirection::Down, _canvas.h, m_gridColor );
 	}
 
     // Nothing to draw (yet)

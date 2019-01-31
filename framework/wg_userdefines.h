@@ -60,7 +60,7 @@ static inline const float wg_round(const float x) {return floorf(x+0.5f);}
 
 #define WG_ESCAPE_CODE		0xA4
 
-#define WG_DEFAULT_CODEPAGE WgCodePage::_1252
+#define  WG2_DEFAULT_CODEPAGE WgCodePage::_1252
 
 //____ input related defines __________________________________________________
 
@@ -107,7 +107,7 @@ enum WgModifierKeys
 };
 
 //____ layer constants ____________________________________________________
-#define WG_DEFAULT_LAYER 128
+#define WG2_DEFAULT_LAYER 128
 
 
 //=============================================================================

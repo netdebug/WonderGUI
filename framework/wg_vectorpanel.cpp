@@ -178,7 +178,7 @@ WgHook * WgVectorHook::_nextHook() const
 
 //____ Constructor() __________________________________________________________
 
-WgVectorPanel::WgVectorPanel() : m_sortOrder(WG_SORT_ASCENDING), m_pSortFunc(0), m_nChildPanels(0)
+WgVectorPanel::WgVectorPanel() : m_sortOrder(WgSortOrder::Ascending), m_pSortFunc(0), m_nChildPanels(0)
 {
 
 }

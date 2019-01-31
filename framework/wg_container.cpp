@@ -153,7 +153,7 @@ WgWidget * WgContainer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 			{
 				pResult = pHook->Widget()->CastToContainer()->FindWidget( ofs - childGeo.pos(), mode );
 			}
-			else if( mode == WG_SEARCH_GEOMETRY || pHook->Widget()->MarkTest( ofs - childGeo.pos() ) )
+			else if( mode == WgSearchMode::Geometry || pHook->Widget()->MarkTest( ofs - childGeo.pos() ) )
 			{
 				pResult = pHook->Widget();
 			}
@@ -163,7 +163,7 @@ WgWidget * WgContainer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 
 	// Return us if search mode is GEOMETRY
 
-	if( !pResult && (mode == WG_SEARCH_GEOMETRY || MarkTest(ofs)) )
+	if( !pResult && (mode == WgSearchMode::Geometry || MarkTest(ofs)) )
 		pResult = this;
 
 	return pResult;

@@ -29,7 +29,7 @@ WgAnim::WgAnim()
 {
 	m_scale			= 1.f;
 	m_duration		= 0;
-	m_playMode	= WG_FORWARD_ONCE;
+	m_playMode	= WgAnimMode::Forward;
 }
 
 //____ ~WgAnim() ______________________________________________________________
@@ -134,7 +134,7 @@ WgAnimPlayPos WgAnim::_playPos( int64_t ticks, WgKeyFrame * pProximity ) const
 
 	switch( m_playMode )
 	{
-		case WG_FORWARD_ONCE:
+		case WgAnimMode::Forward:
 		{
 			if( ticks >= m_duration )
 			{
@@ -157,7 +157,7 @@ WgAnimPlayPos WgAnim::_playPos( int64_t ticks, WgKeyFrame * pProximity ) const
 			break;
 		}
 
-		case WG_BACKWARD_ONCE:
+		case WgAnimMode::Backward:
 		{
 			if( ticks >= m_duration )
 			{
@@ -180,7 +180,7 @@ WgAnimPlayPos WgAnim::_playPos( int64_t ticks, WgKeyFrame * pProximity ) const
 			break;
 		}
 	
-		case WG_FORWARD_LOOPING:
+		case WgAnimMode::Looping:
 		{
 			ticks = ticks % m_duration;
 
@@ -195,7 +195,7 @@ WgAnimPlayPos WgAnim::_playPos( int64_t ticks, WgKeyFrame * pProximity ) const
 			break;
 		}
 
-		case WG_BACKWARD_LOOPING:
+		case WgAnimMode::BackwardLooping:
 		{
 			ticks = ticks % m_duration;
 
@@ -211,7 +211,7 @@ WgAnimPlayPos WgAnim::_playPos( int64_t ticks, WgKeyFrame * pProximity ) const
 		}
 
 
-		case WG_FORWARD_PINGPONG:
+		case WgAnimMode::PingPong:
 		{
 			int64_t	ts;
 
@@ -244,7 +244,7 @@ WgAnimPlayPos WgAnim::_playPos( int64_t ticks, WgKeyFrame * pProximity ) const
 			break;
 		}
 
-		case WG_BACKWARD_PINGPONG:
+		case WgAnimMode::BackwardPingPong:
 		{
 			int64_t		ts;
 
@@ -324,32 +324,32 @@ int WgAnim::TimeToOfs( int64_t ticks )
 	
 	switch( m_playMode )
 	{
-		case WG_FORWARD_ONCE:
+		case WgAnimMode::Forward:
 			if( ticks >= m_duration )
 				return m_duration;
 
 			return (int) ticks;
 
-		case WG_BACKWARD_ONCE:
+		case WgAnimMode::Backward:
 			if( ticks >= m_duration )
 				return 0;
 
 			return m_duration - (int)ticks;
 	
-		case WG_FORWARD_LOOPING:
+		case WgAnimMode::Looping:
 			return (int) (ticks % m_duration);
 
-		case WG_BACKWARD_LOOPING:
+		case WgAnimMode::BackwardLooping:
 			return m_duration - (int)(ticks % m_duration);
 
 
-		case WG_FORWARD_PINGPONG:
+		case WgAnimMode::PingPong:
 			if( ((ticks/m_duration) % 2) == 0 )
 				return (int) (ticks % m_duration);
 			else
 				return m_duration - (int)(ticks % m_duration);
 
-		case WG_BACKWARD_PINGPONG:
+		case WgAnimMode::BackwardPingPong:
 			if( ((ticks/m_duration) % 2) == 1 )
 				return (int) (ticks % m_duration);
 			else

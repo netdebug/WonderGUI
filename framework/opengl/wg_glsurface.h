@@ -53,7 +53,7 @@ class WgGlSurface : public WgSurface
     friend class WgGlSurfaceFactory;
 
 public:
-    WgGlSurface( WgSize size, WgPixelType type = WG_PIXEL_BGRA_8 );
+    WgGlSurface( WgSize size, WgPixelType type = WgPixelType::BGRA_8 );
     WgGlSurface( WgSize size, WgPixelType type, uint8_t * pPixels, int pitch, const WgPixelFormat& pixelFormat );
     WgGlSurface( WgSurface * pOther );
     ~WgGlSurface();

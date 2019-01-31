@@ -41,7 +41,7 @@ WgTextDisplay::WgTextDisplay()
 
 	m_text.setLineWidth( PixelSize().w );
 	m_text.SetAutoEllipsis(IsAutoEllipsisDefault());
-	m_text.SetEditMode( WG_TEXT_STATIC );
+	m_text.SetEditMode( WgTextEditMode::Static );
 	m_bResetCursorOnFocus = true;
     m_str.assign("");
 }
@@ -157,7 +157,7 @@ WgSize WgTextDisplay::PreferredPixelSize() const
 WgPointerStyle WgTextDisplay::GetPointerStyle() const
 {
 	if( m_text.GetMarkedLink() )
-		return WG_POINTER_HAND;
+		return WgPointerStyle::Hand;
 
 	return m_pointerStyle;
 }

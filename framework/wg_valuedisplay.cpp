@@ -33,7 +33,7 @@ static const char c_widgetType[] = {"ValueDisplay"};
 
 WgValueDisplay::WgValueDisplay()
 {
-	m_text.setAlignment( WG_EAST );
+	m_text.setAlignment( WgOrigo::East );
 	m_text.SetWrap(false);
 }
 

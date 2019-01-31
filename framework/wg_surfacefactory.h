@@ -45,7 +45,7 @@ class WgSurfaceFactory
 {
 public:
 	virtual WgSize MaxSize() const = 0;
-    virtual WgSurface * CreateSurface( const WgSize& size, WgPixelType type = WG_PIXEL_BGRA_8 ) const = 0;
+    virtual WgSurface * CreateSurface( const WgSize& size, WgPixelType type = WgPixelType::BGRA_8 ) const = 0;
 	virtual WgSurface * CreateSurface(const WgSize& size, WgPixelType type, uint8_t * pPixels, int pitch, const WgPixelFormat& pPixelFormat) const = 0; 
 	virtual ~WgSurfaceFactory() {}
 };

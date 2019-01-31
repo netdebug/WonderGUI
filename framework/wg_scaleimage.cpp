@@ -38,7 +38,7 @@ WgScaleImage::WgScaleImage()
 	m_pSurfaceFactory = 0;
 	m_bScale = false;
 	m_maxImgSize = WgSize(2048,2048);//WgSize(1024,1024);
-	m_imgOrigo = WG_NORTHWEST;
+	m_imgOrigo = WgOrigo::NorthWest;
 }
 
 //____ Destructor _____________________________________________________________
@@ -180,7 +180,7 @@ void WgScaleImage::_regenerateSurface()
 
 	if( m_pSurfaceFactory )
 	{
-		m_pGenSurface = m_pSurfaceFactory->CreateSurface( m_imgRect.size(), WG_PIXEL_BGRA_8 );
+		m_pGenSurface = m_pSurfaceFactory->CreateSurface( m_imgRect.size(), WgPixelType::BGRA_8 );
 
 		// Insert code here to stretch-copy content from m_pOrgSurface to m_pGenSurface
         resample(m_pOrgSurface, m_pGenSurface);

@@ -215,49 +215,49 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
 	
 	switch( pSlot->attachPoint )
 	{
-		case WgOrigo::WG_NORTHEAST:					// Right side of launcherGeo, going down.
+		case WgOrigo::NorthEast:					// Right side of launcherGeo, going down.
 		{
 			geo.x = pSlot->launcherGeo.right();
 			geo.y = pSlot->launcherGeo.top();
 			break;
 		}
 	
-		case WgOrigo::WG_SOUTHEAST:					// Right side of launcherGeo, going up.
+		case WgOrigo::SouthEast:					// Right side of launcherGeo, going up.
 		{
 			geo.x = pSlot->launcherGeo.right();
 			geo.y = pSlot->launcherGeo.bottom() - geo.h;
 			break;
 		}
 	
-		case WgOrigo::WG_NORTHWEST:					// Left-aligned above launcher.
+		case WgOrigo::NorthWest:					// Left-aligned above launcher.
 		{
 			geo.x = pSlot->launcherGeo.left();
 			geo.y = pSlot->launcherGeo.top() - geo.h;
 			break;
 		}
 	
-		case WgOrigo::WG_SOUTHWEST:					// Left-aligned below launcher.
+		case WgOrigo::SouthWest:					// Left-aligned below launcher.
 		{
 			geo.x = pSlot->launcherGeo.left();
 			geo.y = pSlot->launcherGeo.bottom();
 			break;
 		}
 	
-		case WgOrigo::WG_WEST:						// Centered left of launcherGeo.
+		case WgOrigo::West:						// Centered left of launcherGeo.
 		{
 			geo.x = pSlot->launcherGeo.left() - geo.w;
 			geo.y = pSlot->launcherGeo.top() + pSlot->launcherGeo.h/2 - geo.h/2;
 			break;
 		}
 	
-		case WgOrigo::WG_NORTH:						// Centered above launcherGeo.
+		case WgOrigo::North:						// Centered above launcherGeo.
 		{
 			geo.x = pSlot->launcherGeo.left() + pSlot->launcherGeo.w/2 + geo.w/2;
 			geo.y = pSlot->launcherGeo.top() - geo.h;
 			break;
 		}
 	
-		case WgOrigo::WG_EAST:						// Centered right of launcherGeo.
+		case WgOrigo::East:						// Centered right of launcherGeo.
 		{
 			geo.x = pSlot->launcherGeo.right();
 			geo.y = pSlot->launcherGeo.top() + pSlot->launcherGeo.h/2 - geo.h/2;
@@ -269,7 +269,7 @@ bool WgPopupLayer::_updateGeo(WgPopupHook* pSlot, bool bInitialUpdate )
             assert(false);
         }
 	
-		case WgOrigo::WG_SOUTH:						// Centered below launcherGeo.
+		case WgOrigo::South:						// Centered below launcherGeo.
 		{
 			geo.x = pSlot->launcherGeo.left() + pSlot->launcherGeo.w/2 + geo.w/2;
 			geo.y = pSlot->launcherGeo.bottom();
@@ -392,7 +392,7 @@ WgWidget *  WgPopupLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 	// MenuPanel has its own _findWidget() method since we need special treatment of
 	// searchmode ACTION_TARGET when a menu is open.
 	
-	if( mode == WgSearchMode::WG_SEARCH_ACTION_TARGET && !m_popupHooks.IsEmpty() )
+	if( mode == WgSearchMode::ActionTarget && !m_popupHooks.IsEmpty() )
 	{
 		// In search mode ACTION_TARGET we limit our target to us, our menu-branches and the menu-opener if a menu is open.
 	
@@ -784,7 +784,7 @@ void WgPopupLayer::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHan
 			// and all widgets between them have bAutoClose=true, they should all enter
 			// state ClosingDelay (unless already in state Closing).
 
-			WgWidget * pMarked = FindWidget(pointerPos, WgSearchMode::WG_SEARCH_ACTION_TARGET);
+			WgWidget * pMarked = FindWidget(pointerPos, WgSearchMode::ActionTarget);
 
 			if (pMarked != this && (pMarked->IsSelectable() && m_popupHooks.First()->bAutoClose))
 				_closeAutoOpenedUntil(pMarked, false);

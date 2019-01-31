@@ -43,13 +43,13 @@ WgSize WgSurfaceSoft::MaxSize()
 
 WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type )
 {
-	m_pRealSurface = wg::SoftSurface::create(_convert(size), _convert(type));
+	m_pRealSurface = wg::SoftSurface::create(_convert(size), type);
 }
 
 WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, int pitch )
 {
 	auto pBlob = wg::Blob::create(pPixels, nullptr);
-	m_pRealSurface = wg::SoftSurface::create(_convert(size), _convert(type), pBlob, pitch);
+	m_pRealSurface = wg::SoftSurface::create(_convert(size), type, pBlob, pitch);
 }
 
 WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, int pitch, const WgPixelFormat& pixelFormat )
@@ -57,7 +57,7 @@ WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, in
 	wg::PixelDescription format;
 	_convert(pixelFormat, format);
 
-	m_pRealSurface = wg::SoftSurface::create(_convert(size), _convert(type), pPixels, pitch, &format);
+	m_pRealSurface = wg::SoftSurface::create(_convert(size), type, pPixels, pitch, &format);
 }
 
 

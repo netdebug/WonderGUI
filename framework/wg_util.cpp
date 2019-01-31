@@ -175,7 +175,7 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 {
 	switch( type )
 	{
-		case WG_PIXEL_BGR_8:
+		case WgPixelType::BGR_8:
 			wFormat.type = type;
 			wFormat.bits = 24;
 
@@ -208,7 +208,7 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 
 			return true;
 
-		case WG_PIXEL_BGRA_8:
+		case WgPixelType::BGRA_8:
 			wFormat.type = type;
 			wFormat.bits = 32;
 
@@ -242,7 +242,7 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 			return true;
 
 		default:
-			wFormat.type = WG_PIXEL_UNKNOWN;
+			wFormat.type = WgPixelType::Unknown;
 			wFormat.bits = 0;
 
 			wFormat.R_mask = 0;
@@ -269,14 +269,14 @@ int WgUtil::SizeFromPolicy( int defaultSize, int specifiedSize, WgSizePolicy pol
 {
 	switch( policy )
 	{
-		case WG_DEFAULT:
+		case WgSizePolicy::Default:
 			return defaultSize;
-		case WG_BOUND:
+		case WgSizePolicy::Bound:
 			return specifiedSize;
-		case WG_CONFINED:
+		case WgSizePolicy::Confined:
 			if( defaultSize > specifiedSize )
 				return specifiedSize;
-		case WG_EXPANDED:
+		case WgSizePolicy::Expanded:
 			if( defaultSize < specifiedSize )
 				return specifiedSize;
 	}
@@ -385,31 +385,31 @@ WgCoord WgUtil::OrigoToOfs( WgOrigo origo, WgSize base )
 	switch( origo )
 	{
 		default:
-		case WG_NORTHWEST:
+		case WgOrigo::NorthWest:
 			return WgCoord(0,0);
 
-		case WG_NORTH:
+		case WgOrigo::North:
 			return WgCoord( base.w/2,0 );
 
-		case WG_NORTHEAST:
+		case WgOrigo::NorthEast:
 			return WgCoord( base.w,0 );
 
-		case WG_EAST:
+		case WgOrigo::East:
 			return WgCoord( base.w, base.h/2 );
 
-		case WG_SOUTHEAST:
+		case WgOrigo::SouthEast:
 			return WgCoord( base.w, base.h );
 
-		case WG_SOUTH:
+		case WgOrigo::South:
 			return WgCoord( base.w/2, base.h );
 
-		case WG_SOUTHWEST:
+		case WgOrigo::SouthWest:
 			return WgCoord( 0, base.h );
 
-		case WG_WEST:
+		case WgOrigo::West:
 			return WgCoord( 0, base.h/2 );
 
-		case WG_CENTER:
+		case WgOrigo::Center:
 			return WgCoord( base.w/2, base.h/2 );
 	}
 }
@@ -421,31 +421,31 @@ WgRect WgUtil::OrigoToRect( WgOrigo origo, WgSize base, WgSize rect )
 	switch( origo )
 	{
 		default:
-		case WG_NORTHWEST:
+		case WgOrigo::NorthWest:
 			return WgRect(0,0, rect);
 
-		case WG_NORTH:
+		case WgOrigo::North:
 			return WgRect( base.w/2 - rect.w/2, 0, rect );
 
-		case WG_NORTHEAST:
+		case WgOrigo::NorthEast:
 			return WgRect( base.w - rect.w, 0, rect );
 
-		case WG_EAST:
+		case WgOrigo::East:
 			return WgRect( base.w - rect.w, base.h/2 - rect.h/2, rect );
 
-		case WG_SOUTHEAST:
+		case WgOrigo::SouthEast:
 			return WgRect( base.w - rect.w, base.h - rect.h, rect );
 
-		case WG_SOUTH:
+		case WgOrigo::South:
 			return WgRect( base.w/2 - rect.w/2, base.h - rect.h, rect );
 
-		case WG_SOUTHWEST:
+		case WgOrigo::SouthWest:
 			return WgRect( 0, base.h - rect.h, rect );
 
-		case WG_WEST:
+		case WgOrigo::West:
 			return WgRect( 0, base.h/2 - rect.h/2, rect );
 
-		case WG_CENTER:
+		case WgOrigo::Center:
 			return WgRect( base.w/2 - rect.w/2, base.h/2 - rect.h/2, rect );
 	}
 }
