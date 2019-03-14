@@ -113,3 +113,6 @@ WG_ELLIPSIS 						= WgExtChar::Ellipsis
 	WG_BACKWARD_LOOPING 	= WgAnimMode::BackwardLooping
 	WG_FORWARD_PINGPONG		= WgAnimMode::PingPong
 	WG_BACKWARD_PINGPONG 	= WgAnimMode::BackwardPingPong
+	WG_LIMIT				= wg::limit
+	WgMax					= std::max
+	WgMin 					= std::min

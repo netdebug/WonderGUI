@@ -525,7 +525,7 @@ void WgLineEditor::_adjustViewOfs()
 				maxOfs = m_pText->getSoftLineWidthPart( 0, 0, cursCol-1 );
 
 			if( lineWidth < maxOfs + geoWidth )
-				maxOfs = WgMax( lineWidth - geoWidth, 0 );
+				maxOfs = std::max( lineWidth - geoWidth, 0 );
 		}
 		else
 			maxOfs = cursOfs;

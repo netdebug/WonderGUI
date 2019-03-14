@@ -1884,7 +1884,7 @@ int WgText::_cursorMaxWidth() const
 		int lenOvr = p->Advance(WgCursor::OVR);
 		int lenEOL = p->BearingX(WgCursor::EOL) + p->Width(WgCursor::EOL);
 
-		return WgMax( lenEOL, WgMax(lenInsert,lenOvr) );
+		return std::max( lenEOL, std::max(lenInsert,lenOvr) );
 	}
 	else
 		return 0;
@@ -2384,7 +2384,7 @@ WgCoord WgText::FocusWindowOnRange( const WgSize& canvas, const WgRect& _window,
 				maxOfs = m_pText->getSoftLineWidthPart( 0, 0, cursCol-1 );
 
 			if( lineWidth < maxOfs + geoWidth )
-				maxOfs = WgMax( lineWidth - geoWidth, 0 );
+				maxOfs = std::max( lineWidth - geoWidth, 0 );
 		}
 		else
 			maxOfs = cursOfs;

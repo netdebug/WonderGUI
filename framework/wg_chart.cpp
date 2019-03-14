@@ -561,8 +561,8 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 
 	if (!m_valueGridLines.empty())
 	{
-		float top = WgMin(m_topValue, m_bottomValue);
-		float bottom = WgMax(m_topValue, m_bottomValue);
+        float top = std::min(m_topValue, m_bottomValue);
+        float bottom = std::max(m_topValue, m_bottomValue);
 
 		float mul = waveCanvas.h / (m_bottomValue - m_topValue);
 		int	  startOfs = mul > 0 ? waveCanvas.y : waveCanvas.y + waveCanvas.h;
@@ -631,7 +631,7 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 		bottom.pWave = wave.resampledBottom.data();
 		bottom.hold = wave.resampledDefault;
 
-		int length = WgMax(top.length, bottom.length)-1;
+		int length = std::max(top.length, bottom.length)-1;
 
 		pDevice->ClipDrawHorrWave(waveClip, WgCoord(waveCanvas.x + xOfs, waveCanvas.y), length, top, bottom, wave.frontFill, wave.backFill);
 	}

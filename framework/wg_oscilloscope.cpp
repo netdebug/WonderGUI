@@ -175,7 +175,7 @@ void WgOscilloscope::SetLineColor( WgColor color )
 
 void WgOscilloscope::SetLineThickness( float thickness )
 {
-	WG_LIMIT( thickness, 1.f, 2.f );
+	wg::limit( thickness, 1.f, 2.f );
 	if( thickness != m_lineThickness )
 	{
 		m_lineThickness = thickness;

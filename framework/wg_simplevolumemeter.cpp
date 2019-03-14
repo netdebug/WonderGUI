@@ -69,8 +69,8 @@ void WgSimpleVolumeMeter::SetColors( WgColor bottom, WgColor middle, WgColor top
 
 void WgSimpleVolumeMeter::SetSections( float bottomFraction, float topFraction )
 {
-	WG_LIMIT( bottomFraction, 0.f, 1.f );
-	WG_LIMIT( topFraction, 0.f, 1.f - bottomFraction );
+	wg::limit( bottomFraction, 0.f, 1.f );
+	wg::limit( topFraction, 0.f, 1.f - bottomFraction );
 		
 	float middleFraction = 1.f - bottomFraction - topFraction;
 	
@@ -88,7 +88,7 @@ void WgSimpleVolumeMeter::SetSections( float bottomFraction, float topFraction )
 
 void WgSimpleVolumeMeter::SetHoldHeight( float fraction )
 {
-	WG_LIMIT( fraction, 0.f, 0.25f );
+	wg::limit( fraction, 0.f, 0.25f );
 	
 	if( m_fHoldHeight != fraction )
 	{
@@ -129,8 +129,8 @@ void WgSimpleVolumeMeter::SetHoldSkin(const WgSkinPtr& pSkin)
 
 void WgSimpleVolumeMeter::SetValue( float peak, float hold )
 {
-	WG_LIMIT( peak, 0.f, 1.f );
-	WG_LIMIT( hold, 0.f, 1.f );
+	wg::limit( peak, 0.f, 1.f );
+	wg::limit( hold, 0.f, 1.f );
 
  	m_fPeak[0] = peak;
 	m_fHold[0] = hold;
@@ -158,10 +158,10 @@ void WgSimpleVolumeMeter::SetValue( float peak, float hold )
 
 void WgSimpleVolumeMeter::SetValue( float leftPeak, float leftHold, float rightPeak, float rightHold )
 {
-	WG_LIMIT( leftPeak, 0.f, 1.f );
-	WG_LIMIT( leftHold, 0.f, 1.f );
-	WG_LIMIT( rightPeak, 0.f, 1.f );
-	WG_LIMIT( rightHold, 0.f, 1.f );
+	wg::limit( leftPeak, 0.f, 1.f );
+	wg::limit( leftHold, 0.f, 1.f );
+	wg::limit( rightPeak, 0.f, 1.f );
+	wg::limit( rightHold, 0.f, 1.f );
 
  	m_fPeak[0] = leftPeak;
 	m_fPeak[1] = rightPeak;
@@ -215,17 +215,17 @@ void WgSimpleVolumeMeter::_requestRenderPartial( WgSize sz, int newLeftPeak, int
 
 	if( newLeftPeak != m_iPeak[0] )
 	{
-		beg = WgMin(newLeftPeak,m_iPeak[0]);
-		end = WgMax(newLeftPeak,m_iPeak[0]);
+        beg = std::min(newLeftPeak,m_iPeak[0]);
+        end = std::max(newLeftPeak,m_iPeak[0]);
 	}
 
 	if( m_bStereo && newRightPeak != m_iPeak[1] )
 	{
-		int b = WgMin(newRightPeak,m_iPeak[1]);
+		int b = std::min(newRightPeak,m_iPeak[1]);
 		if(beg>b)
 			beg = b;
 
-		int e = WgMax(newRightPeak,m_iPeak[1]);
+		int e = std::max(newRightPeak,m_iPeak[1]);
 		if(end<e)
 			end = e;
 	}
@@ -234,22 +234,22 @@ void WgSimpleVolumeMeter::_requestRenderPartial( WgSize sz, int newLeftPeak, int
 	{
 		if( newLeftHold != m_iHold[0] )
 		{
-			int b = WgMin(newLeftHold,m_iHold[0]) - m_iHoldHeight;
+			int b = std::min(newLeftHold,m_iHold[0]) - m_iHoldHeight;
 			if(beg>b)
 				beg = b;
 
-			int e = WgMax(newLeftHold,m_iHold[0]);
+			int e = std::max(newLeftHold,m_iHold[0]);
 			if(end<e)
 				end = e;
 		}
 		
 		if( m_bStereo && newRightHold != m_iHold[1] )
 		{
-			int b = WgMin(newRightHold,m_iHold[1]) - m_iHoldHeight;
+			int b = std::min(newRightHold,m_iHold[1]) - m_iHoldHeight;
 			if(beg>b)
 				beg = b;
 
-			int e = WgMax(newRightHold,m_iHold[1]);
+			int e = std::max(newRightHold,m_iHold[1]);
 			if(end<e)
 				end = e;
 		}

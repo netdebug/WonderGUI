@@ -127,7 +127,7 @@ void WgSwitch::_onCloneContent( const WgWidget * _pOrg )
 
 void WgSwitch::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
 {
-	int sz = WgMin( _canvas.w,_canvas.h );
+	int sz = std::min( _canvas.w,_canvas.h );
 
     WgColor color;
 	if( sz > 12 )

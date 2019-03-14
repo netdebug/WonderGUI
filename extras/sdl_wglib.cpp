@@ -488,7 +488,7 @@ namespace sdl_wglib
 
 	void ConvertPixelFormat( WgPixelFormat * pWGFormat, const SDL_PixelFormat * pSDLFormat )
 	{
-        pWGFormat->type = WgPixelType::Custom;
+        pWGFormat->format = WgPixelType::Custom;
 		pWGFormat->bits = pSDLFormat->BitsPerPixel;
 
 		pWGFormat->R_mask = pSDLFormat->Rmask;

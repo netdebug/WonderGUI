@@ -100,7 +100,7 @@ void WgSimpleKnob::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, cons
 {
 //    pDevice->Fill( _clip, WgColor::black );
 
-    int rad = (WgMin( _canvas.w,_canvas.h ) - 1) / 2;
+    int rad = (std::min( _canvas.w,_canvas.h ) - 1) / 2;
     int sz = 2*rad + 1; // Rad is the radius (even). Total size will be 2*radius + 1 middle point
     
 	if( sz > 1 )

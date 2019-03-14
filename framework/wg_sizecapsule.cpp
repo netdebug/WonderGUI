@@ -212,14 +212,14 @@ int WgSizeCapsule::MatchingPixelHeight( int width ) const
 		{
 			int max = m_hook.Widget()->MaxPixelSize().h;
 			int min = m_hook.Widget()->MinPixelSize().h;
-			WG_LIMIT( h, min, max );
+			wg::limit( h, min, max );
 		}
 		return h;
 	}
 	else if( m_hook.Widget() )
 	{
 		int h = m_hook.Widget()->MatchingPixelHeight(width);
-		WG_LIMIT( h, m_pixelsMin.h, m_pixelsMax.h );
+		wg::limit( h, m_pixelsMin.h, m_pixelsMax.h );
 		return h;
 	}
 	else
@@ -238,14 +238,14 @@ int WgSizeCapsule::MatchingPixelWidth( int height ) const
 		{
 			int max = m_hook.Widget()->MaxPixelSize().w;
 			int min = m_hook.Widget()->MinPixelSize().w;
-			WG_LIMIT( w, min, max );
+			wg::limit( w, min, max );
 		}
 		return w;
 	}
 	else if( m_hook.Widget() )
 	{
 		int w = m_hook.Widget()->MatchingPixelWidth(height);
-		WG_LIMIT( w, m_pixelsMin.w, m_pixelsMax.w );
+		wg::limit( w, m_pixelsMin.w, m_pixelsMax.w );
 		return w;
 	}
 	else

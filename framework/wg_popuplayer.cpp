@@ -451,10 +451,10 @@ WgWidget *  WgPopupLayer::FindWidget( const WgCoord& ofs, WgSearchMode mode )
 
 void WgPopupLayer::SetDelays(int popupOpenDelay, int popupFadeInDelay, int popupCloseDelay, int popupFadeOutDelay)
 {
-	WG_LIMIT(popupOpenDelay, 0, 2000);
-	WG_LIMIT(popupFadeInDelay, 0, 2000);
-	WG_LIMIT(popupCloseDelay, 0, 2000);
-	WG_LIMIT(popupFadeOutDelay, 0, 2000);
+	wg::limit(popupOpenDelay, 0, 2000);
+	wg::limit(popupFadeInDelay, 0, 2000);
+	wg::limit(popupCloseDelay, 0, 2000);
+	wg::limit(popupFadeOutDelay, 0, 2000);
 
 	m_openingDelayMs = popupOpenDelay;
 	m_openingFadeMs = popupFadeInDelay;

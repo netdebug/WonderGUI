@@ -478,7 +478,7 @@ void WgBlockSkin::_scanStateBlockSectionArea( StateData * pState, WgOrigo sectio
 	const WgPixelFormat * pFormat = m_pSurface->PixelFormat();
 	int pitch = m_pSurface->Pitch();
 
-	if( pFormat->type != WgPixelType::BGRA_8 )
+	if( pFormat->format != WgPixelType::BGRA_8 )
 		return;												// Only supports ARGB_8 for the moment.
 
 	unsigned char * p = ((unsigned char*)m_pSurface->Pixels()) + sectionArea.x * pFormat->bits/8 + sectionArea.y * pitch;
@@ -601,7 +601,7 @@ WgSize WgBlockSkin::MinSize(int scale) const
 {
 	WgSize content = WgExtendedSkin::MinSize(scale);
 	WgSize frame = m_frame.scale(scale).size();
-	return WgSize( WgMax(content.w, frame.w), WgMax(content.h, frame.h) );
+	return WgSize( std::max(content.w, frame.w), std::max(content.h, frame.h) );
 }
 
 //____ preferredSize() ________________________________________________________
@@ -609,7 +609,7 @@ WgSize WgBlockSkin::MinSize(int scale) const
 WgSize WgBlockSkin::PreferredSize(int scale) const
 {
 	WgSize sz = WgExtendedSkin::PreferredSize(scale);
-	return WgSize( WgMax((m_dimensions.w*scale) / m_scale,sz.w), WgMax((m_dimensions.h*scale) / m_scale,sz.h) );
+	return WgSize( std::max((m_dimensions.w*scale) / m_scale,sz.w), std::max((m_dimensions.h*scale) / m_scale,sz.h) );
 }
 
 //____ sizeForContent() _______________________________________________________
@@ -619,7 +619,7 @@ WgSize WgBlockSkin::SizeForContent( const WgSize contentSize, int scale ) const
 	WgSize sz = WgExtendedSkin::SizeForContent(contentSize, scale);
 	WgSize min = m_frame.scale(scale).size();
 
-	return WgSize( WgMax(sz.w,min.w), WgMax(sz.h,min.h) );
+	return WgSize( std::max(sz.w,min.w), std::max(sz.h,min.h) );
 }
 
 //____ markTest() _____________________________________________________________

@@ -11,12 +11,13 @@
 //#include <SDL2/SDL_image.h>
 #endif
 
+#include <wg_types.h>
+
 class WgEventHandler;
 class WgSurface;
 class WgSurfaceFactory;
 class WgResDB;
 class WgFont;
-struct WgPixelFormat;
 
 namespace sdl_wglib
 {

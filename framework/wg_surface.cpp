@@ -142,7 +142,7 @@ WgColor WgSurface::Pixel2Col( Uint32 pixel ) const
 
 const WgPixelFormat *  WgSurface::PixelFormat()
 {
-	_convert(*(m_pRealSurface->pixelDescription()), m_format);
+	m_format = * m_pRealSurface->pixelDescription();
 	return &m_format;
 }
 

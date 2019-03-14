@@ -186,7 +186,7 @@ WgSize WgBoxSkin::MinSize(int scale) const
 	WgSize content = WgExtendedSkin::MinSize(scale);
 	WgSize frame = _scaledFrame(scale);
 
-	return WgSize( WgMax(content.w,frame.w), WgMax(content.h,frame.h) );
+	return WgSize( std::max(content.w,frame.w), std::max(content.h,frame.h) );
 }
 
 //____ PreferredSize() ________________________________________________________
@@ -196,7 +196,7 @@ WgSize WgBoxSkin::PreferredSize(int scale) const
 	WgSize content = WgExtendedSkin::PreferredSize(scale);
 	WgSize frame = _scaledFrame(scale);
 
-	return WgSize( WgMax(content.w,frame.w), WgMax(content.h,frame.h) );
+	return WgSize( std::max(content.w,frame.w), std::max(content.h,frame.h) );
 }
 
 //____ SizeForContent() _______________________________________________________
@@ -206,7 +206,7 @@ WgSize WgBoxSkin::SizeForContent( const WgSize contentSize, int scale ) const
 	WgSize content = WgExtendedSkin::SizeForContent(contentSize, scale);
 	WgSize frame = _scaledFrame(scale);
 
-	return WgSize( WgMax(content.w,frame.w), WgMax(content.h,frame.h) );
+	return WgSize( std::max(content.w,frame.w), std::max(content.h,frame.h) );
 }
 
 //____ MarkTest() _____________________________________________________________

@@ -352,7 +352,7 @@ WgSize WgMultiBlockSkin::MinSize(int scale) const
 {
 	WgSize content = WgExtendedSkin::MinSize(scale);
 	WgSize frame = m_frame.scale(scale).size();
-	return WgSize( WgMax(content.w, frame.w), WgMax(content.h, frame.h) );
+	return WgSize( std::max(content.w, frame.w), std::max(content.h, frame.h) );
 }
 
 //____ preferredSize() ________________________________________________________
@@ -360,7 +360,7 @@ WgSize WgMultiBlockSkin::MinSize(int scale) const
 WgSize WgMultiBlockSkin::PreferredSize(int scale) const
 {
 	WgSize sz = WgExtendedSkin::PreferredSize(scale);
-	return WgSize( WgMax((m_blockSize.w*scale) / m_scale,sz.w), WgMax((m_blockSize.h*scale) / m_scale,sz.h) );
+	return WgSize( std::max((m_blockSize.w*scale) / m_scale,sz.w), std::max((m_blockSize.h*scale) / m_scale,sz.h) );
 }
 
 //____ sizeForContent() _______________________________________________________
@@ -370,7 +370,7 @@ WgSize WgMultiBlockSkin::SizeForContent( const WgSize contentSize, int scale ) c
 	WgSize sz = WgExtendedSkin::SizeForContent(contentSize, scale);
 	WgSize min = m_frame.scale(scale).size();
 
-	return WgSize( WgMax(sz.w,min.w), WgMax(sz.h,min.h) );
+	return WgSize( std::max(sz.w,min.w), std::max(sz.h,min.h) );
 }
 
 //____ markTest() _____________________________________________________________

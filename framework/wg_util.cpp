@@ -176,7 +176,7 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 	switch( type )
 	{
 		case WgPixelType::BGR_8:
-			wFormat.type = type;
+			wFormat.format = type;
 			wFormat.bits = 24;
 
 			wFormat.R_bits = 8;
@@ -209,7 +209,7 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 			return true;
 
 		case WgPixelType::BGRA_8:
-			wFormat.type = type;
+			wFormat.format = type;
 			wFormat.bits = 32;
 
 			wFormat.R_bits = 8;
@@ -242,7 +242,7 @@ bool WgUtil::PixelTypeToFormat( WgPixelType type, WgPixelFormat& wFormat )
 			return true;
 
 		default:
-			wFormat.type = WgPixelType::Unknown;
+			wFormat.format = WgPixelType::Unknown;
 			wFormat.bits = 0;
 
 			wFormat.R_mask = 0;

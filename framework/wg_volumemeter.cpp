@@ -148,8 +148,8 @@ void WgVolumeMeter::SetLEDSpacing( float spacing )
 
 void WgVolumeMeter::SetValue( float fPeak, float fHold )
 {
-	WG_LIMIT( fPeak, 0.f, 1.f );
-	WG_LIMIT( fHold, 0.f, 1.f );
+	wg::limit( fPeak, 0.f, 1.f );
+	wg::limit( fHold, 0.f, 1.f );
 
     int iPeak = (int)wg_round(fPeak * m_nLEDs);
     int iHold = (int)wg_round(fHold * m_nLEDs);

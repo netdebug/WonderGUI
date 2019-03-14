@@ -54,10 +54,7 @@ WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, in
 
 WgSurfaceSoft::WgSurfaceSoft( WgSize size, WgPixelType type, Uint8 * pPixels, int pitch, const WgPixelFormat& pixelFormat )
 {
-	wg::PixelDescription format;
-	_convert(pixelFormat, format);
-
-	m_pRealSurface = wg::SoftSurface::create(_convert(size), type, pPixels, pitch, &format);
+	m_pRealSurface = wg::SoftSurface::create(_convert(size), type, pPixels, pitch, &pixelFormat);
 }
 
 

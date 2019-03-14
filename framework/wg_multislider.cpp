@@ -949,8 +949,8 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
                         {
                             relPos = _alignPosToStep(*pMarked, relPos);
 
-                            WG_LIMIT(relPos.x, 0.f, 1.f);
-                            WG_LIMIT(relPos.y, 0.f, 1.f);
+                            wg::limit(relPos.x, 0.f, 1.f);
+                            wg::limit(relPos.y, 0.f, 1.f);
 
                             m_dragStartFraction = relPos;
                         }
@@ -1096,8 +1096,8 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 
 					fraction = m_dragStartFraction + m_dragFraction;
 
-					WG_LIMIT(fraction.x, 0.f, 1.f);
-					WG_LIMIT(fraction.y, 0.f, 1.f);
+					wg::limit(fraction.x, 0.f, 1.f);
+					wg::limit(fraction.y, 0.f, 1.f);
 
 					if (m_bDeltaDrag)
 						m_dragFraction = fraction - m_dragStartFraction;
@@ -1134,8 +1134,8 @@ void WgMultiSlider::_onEvent(const WgEvent::Event * pEvent, WgEventHandler * pHa
 								fraction.x = sliderGeo.w == 0 ? 0 : handlePos.x / (float)sliderGeo.w;
 								fraction.y = sliderGeo.h == 0 ? 0 : handlePos.y / (float)sliderGeo.h;
 
-								WG_LIMIT(fraction.x, 0.f, 1.f);
-								WG_LIMIT(fraction.y, 0.f, 1.f);
+								wg::limit(fraction.x, 0.f, 1.f);
+								wg::limit(fraction.y, 0.f, 1.f);
 
 								if (m_bPassive)
 									_calcSendValue(slider, fraction);
@@ -1376,8 +1376,8 @@ void WgMultiSlider::_updateHandlePos(Slider& slider)
 
 	// Limit range
 
-	WG_LIMIT(handlePos.x, 0.f, 1.f);
-	WG_LIMIT(handlePos.y, 0.f, 1.f);
+	wg::limit(handlePos.x, 0.f, 1.f);
+	wg::limit(handlePos.y, 0.f, 1.f);
 
 	// Early out if nothing has changed
 
@@ -1532,7 +1532,7 @@ void WgMultiSlider::_invokeSetValueCallback(Slider& slider, float& value, float&
 
 float WgMultiSlider::_setValue(Slider& slider, float value, float value2, bool bSendOnUpdate )
 {
-	WG_LIMIT(value, slider.bounds[0].min, slider.bounds[0].max);
+	wg::limit(value, slider.bounds[0].min, slider.bounds[0].max);
 
 	bool bUpdate = false;
 
@@ -1544,7 +1544,7 @@ float WgMultiSlider::_setValue(Slider& slider, float value, float value2, bool b
 
 	if ( !isnan(value2) )
 	{
-		WG_LIMIT(value2, slider.bounds[1].min, slider.bounds[1].max);
+		wg::limit(value2, slider.bounds[1].min, slider.bounds[1].max);
 
         if(value2 != slider.value[1] )
         {
@@ -1642,8 +1642,8 @@ WgCoordF WgMultiSlider::_calcSendValue(Slider& slider, WgCoordF pos)
 
 	// Limit range
 
-	WG_LIMIT(pos.x, 0.f, 1.f);
-	WG_LIMIT(pos.y, 0.f, 1.f);
+	wg::limit(pos.x, 0.f, 1.f);
+	wg::limit(pos.y, 0.f, 1.f);
 
 	// Early out if nothing has changed
 
@@ -1715,8 +1715,8 @@ WgCoordF WgMultiSlider::_setHandlePosition(Slider& slider, WgCoordF pos)
 
 	// Limit range
 
-	WG_LIMIT(pos.x, 0.f, 1.f);
-	WG_LIMIT(pos.y, 0.f, 1.f);
+	wg::limit(pos.x, 0.f, 1.f);
+	wg::limit(pos.y, 0.f, 1.f);
 
 	// Early out if nothing has changed
 
