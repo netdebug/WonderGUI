@@ -114,6 +114,7 @@ protected:
 		WgLayer * 	m_pParent;
 	};
 
+	void			_onNewSize(const WgSize& size) override;
 	virtual	void	_onRequestRender( const WgRect& rect, const WgLayerHook * pHook );	// rect is in our coordinate system.
 	virtual WgLayerHook * _firstLayerHook() const = 0;
 	virtual void	 _onBaseChanged();

@@ -40,9 +40,9 @@ WgFlexAnchor		WgFlexPanel::g_baseAnchors[9] = { WgFlexAnchor(0.f, 0.f, WgCoord(0
 
 WgFlexHook::WgFlexHook( WgFlexPanel * pParent, const WgRect& placementGeo, WgBorders padding ) : m_pParent(pParent),
 	m_bFloating(false), m_widthPolicy(WgSizePolicy::Bound), m_heightPolicy(WgSizePolicy::Bound),
-	m_anchor((int)WgOrigo::NorthWest), m_hotspot(WgOrigo::NorthWest),
-	m_placementGeo(placementGeo), m_anchorTopLeft((int)WgOrigo::NorthWest),
-	m_anchorBottomRight((int)WgOrigo::SouthEast)
+	m_anchor(int(WgOrigo::NorthWest)), m_hotspot(WgOrigo::NorthWest),
+	m_placementGeo(placementGeo), m_anchorTopLeft(int(WgOrigo::NorthWest)),
+	m_anchorBottomRight(int(WgOrigo::SouthEast))
 {
     m_padding = padding;
 }
@@ -101,7 +101,7 @@ bool WgFlexHook::SetFloating()
 
 bool WgFlexHook::SetFloating( const WgCoord& pos, WgOrigo origo )
 {
-	return SetFloating( pos, (int) origo, origo );
+	return SetFloating( pos, int(origo), origo );
 }
 
 bool WgFlexHook::SetFloating( const WgCoord& pos, int anchor, WgOrigo hotspot )
@@ -122,7 +122,7 @@ bool WgFlexHook::SetFloating( const WgCoord& pos, int anchor, WgOrigo hotspot )
 
 bool WgFlexHook::SetFloating( const WgRect& geometry, WgOrigo origo )
 {
-	return SetFloating( geometry, (int) origo, origo );
+	return SetFloating( geometry, int(origo), origo );
 }
 
 bool WgFlexHook::SetFloating( const WgRect& geometry, int anchor, WgOrigo hotspot )
@@ -826,7 +826,7 @@ WgFlexHook * WgFlexPanel::AddChild( WgWidget * pWidget, int anchorTopLeft, int a
 
 WgFlexHook * WgFlexPanel::AddChild( WgWidget * pWidget, const WgCoord& pos, WgOrigo origo, WgBorders padding )
 {
-	return AddChild( pWidget, pos, (int)origo, origo, padding );
+	return AddChild( pWidget, pos, int(origo), origo, padding );
 }
 
 WgFlexHook * WgFlexPanel::AddChild( WgWidget * pWidget, const WgCoord& pos, int anchor, WgOrigo hotspot, WgBorders padding )
@@ -845,7 +845,7 @@ WgFlexHook * WgFlexPanel::AddChild( WgWidget * pWidget, const WgCoord& pos, int 
 
 WgFlexHook * WgFlexPanel::AddChild( WgWidget * pWidget, const WgRect& geometry, WgOrigo origo, WgBorders padding )
 {
-	return AddChild( pWidget, geometry, (int)origo, origo, padding );
+	return AddChild( pWidget, geometry, int(origo), origo, padding );
 }
 
 WgFlexHook * WgFlexPanel::AddChild( WgWidget * pWidget, const WgRect& geometry, int anchor, WgOrigo hotspot, WgBorders padding )
@@ -893,7 +893,7 @@ WgFlexHook * WgFlexPanel::InsertChild( WgWidget * pWidget, WgWidget * pSibling, 
 
 WgFlexHook * WgFlexPanel::InsertChild( WgWidget * pWidget, WgWidget * pSibling, const WgRect& geometry, WgOrigo origo, WgBorders padding )
 {
-	return InsertChild( pWidget, pSibling, geometry, (int)origo, origo, padding );
+	return InsertChild( pWidget, pSibling, geometry, int(origo), origo, padding );
 }
 
 WgFlexHook * WgFlexPanel::InsertChild( WgWidget * pWidget, WgWidget * pSibling, const WgRect& geometry, int anchor, WgOrigo hotspot, WgBorders padding )
@@ -910,7 +910,7 @@ WgFlexHook * WgFlexPanel::InsertChild( WgWidget * pWidget, WgWidget * pSibling, 
 
 WgFlexHook * WgFlexPanel::InsertChild( WgWidget * pWidget, WgWidget * pSibling, const WgCoord& pos, WgOrigo origo, WgBorders padding )
 {
-	return InsertChild( pWidget, pSibling, pos, (int)origo, origo, padding );
+	return InsertChild( pWidget, pSibling, pos, int(origo), origo, padding );
 }
 
 WgFlexHook * WgFlexPanel::InsertChild( WgWidget * pWidget, WgWidget * pSibling, const WgCoord& pos, int anchor, WgOrigo hotspot, WgBorders padding )
@@ -1012,7 +1012,7 @@ bool WgFlexPanel::ReleaseAllChildren()
 int WgFlexPanel::AddAnchor( float relativeX, float relativeY, const WgCoord& pixelOfs )
 {
 	m_anchors.push_back( WgFlexAnchor( relativeX, relativeY, pixelOfs ) );
-	return m_anchors.size()+9-1;
+	return int(m_anchors.size())+9-1;
 }
 
 //____ ReplaceAnchor() ________________________________________________________
@@ -1065,17 +1065,17 @@ bool WgFlexPanel::DeleteAnchor( int index )
 		// Update hooks anchor references.
 
 		if( pHook->m_anchor == index )
-			pHook->m_anchor = (int)WgOrigo::NorthWest;
+			pHook->m_anchor = int(WgOrigo::NorthWest);
 		else if( pHook->m_anchor > index )
 			pHook->m_anchor--;
 
 		if( pHook->m_anchorTopLeft == index )
-			pHook->m_anchorTopLeft = (int)WgOrigo::NorthWest;
+			pHook->m_anchorTopLeft = int(WgOrigo::NorthWest);
 		else if( pHook->m_anchorTopLeft > index )
 			pHook->m_anchorTopLeft--;
 
 		if( pHook->m_anchorBottomRight == index )
-			pHook->m_anchorBottomRight = (int)WgOrigo::SouthEast;
+			pHook->m_anchorBottomRight = int(WgOrigo::SouthEast);
 		else if( pHook->m_anchorBottomRight > index )
 			pHook->m_anchorBottomRight--;
 
@@ -1116,13 +1116,13 @@ void WgFlexPanel::DeleteAllAnchors()
 		// Update hooks anchor references.
 
 		if( pHook->m_anchor >= 9 )
-			pHook->m_anchor = (int)WgOrigo::NorthWest;
+			pHook->m_anchor = int(WgOrigo::NorthWest);
 
 		if( pHook->m_anchorTopLeft >= 9 )
-			pHook->m_anchorTopLeft = (int)WgOrigo::NorthWest;
+			pHook->m_anchorTopLeft = int(WgOrigo::NorthWest);
 
 		if( pHook->m_anchorBottomRight >= 9 )
-			pHook->m_anchorBottomRight = (int)WgOrigo::SouthEast;
+			pHook->m_anchorBottomRight = int(WgOrigo::SouthEast);
 
 		pHook = pHook->Next();
 	}

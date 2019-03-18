@@ -106,6 +106,7 @@ const char * WgPackPanel::GetClass()
 	return c_widgetType;
 }
 
+
 //____ SetOrientation() ______________________________________________________
 
 void WgPackPanel::SetOrientation( WgOrientation orientation )
@@ -535,8 +536,12 @@ void WgPackPanel::_refreshChildGeo()
     if( m_hooks.IsEmpty() )
         return;
     
-	WgSize size = PixelSize();
-	
+	WgRect contentRect = PixelSize();
+	if (m_pSkin)
+		contentRect = m_pSkin->ContentRect(contentRect, WgStateEnum::Normal, m_scale);
+
+	WgSize size = contentRect.size();
+
 	int wantedLength = m_bHorizontal?m_preferredSize.w:m_preferredSize.h;
 	int givenLength = m_bHorizontal?size.w:size.h;
 	int givenBreadth = m_bHorizontal?size.h:size.w;
@@ -546,7 +551,7 @@ void WgPackPanel::_refreshChildGeo()
 
 	if( !m_pSizeBroker || (wantedLength == givenLength && !m_pSizeBroker->MayAlterPreferredLengths()) )
 	{
-		WgCoord pos;
+		WgCoord pos = contentRect.pos();
 		WgPackHook * p = FirstHook();
         WgRect geo;
 		while( p )
@@ -583,9 +588,6 @@ void WgPackPanel::_refreshChildGeo()
 			}
 			else
 			{
-				if( p->m_geo.w != 0 && p->m_geo.h != 0 )
-					_requestRender(p->m_geo);
-
 				p->m_geo.x = pos.x;
 				p->m_geo.y = pos.y;
 				if( m_bHorizontal )
@@ -598,8 +600,15 @@ void WgPackPanel::_refreshChildGeo()
 					geo.w = size.w;
 					geo.h = 0;
 				}
+                
+                if( p->m_geo.w != 0 && p->m_geo.h != 0 )
+                {
+                   _requestRender(p->m_geo);
+                    p->m_geo.w = geo.w;
+                    p->m_geo.h = geo.h;
+                    p->m_pWidget->_onNewSize( geo.size() );
+                }
 			}
-
 			p = p->Next();
 		}
 	}
@@ -619,7 +628,7 @@ void WgPackPanel::_refreshChildGeo()
 		WgPackHook * pH = FirstHook();
 		WgSizeBrokerItem * pI = pItemArea;
 
-		WgCoord pos;
+		WgCoord pos = contentRect.pos();
 		WgRect geo;
 		while( pH )
 		{
@@ -656,9 +665,6 @@ void WgPackPanel::_refreshChildGeo()
 			}
 			else
 			{
-				if( pH->m_geo.w != 0 && pH->m_geo.h != 0 )
-					_requestRender(pH->m_geo);
-
 				pH->m_geo.x = pos.x;
 				pH->m_geo.y = pos.y;
 				if( m_bHorizontal )
@@ -671,6 +677,14 @@ void WgPackPanel::_refreshChildGeo()
 					geo.w = size.w;
 					geo.h = 0;
 				}
+                
+                if( pH->m_geo.w != 0 && pH->m_geo.h != 0 )
+                {
+                    _requestRender(pH->m_geo);
+                    pH->m_geo.w = geo.w;
+                    pH->m_geo.h = geo.h;
+                    pH->m_pWidget->_onNewSize( geo.size() );
+                }
 			}
 			pH = pH->Next();
 		}

@@ -154,12 +154,6 @@ int WgUniformSizeBroker::_findLongestUnified( WgSizeBrokerItem * pItems, int nIt
     return longest;
 }
 
-void WgUniformSizeBroker::_setOutputs( WgSizeBrokerItem * pItems, int nItems, int value ) const
-{
-    for( int i = 0 ; i < nItems ; i++ )
-        pItems[i].output = value;
-}
-
 
 int WgScalePreferredSizeBroker::SetItemLengths( WgSizeBrokerItem * pItems, int nItems, int totalLength ) const
 {
@@ -181,4 +175,91 @@ int WgScalePreferredSizeBroker::SetPreferredLengths( WgSizeBrokerItem * pItems, 
 bool  WgScalePreferredSizeBroker::MayAlterPreferredLengths() const
 {
     return true;
+}
+
+int WgScaleWeightSizeBroker::SetItemLengths(WgSizeBrokerItem * pItems, int nItems, int totalLength) const
+{
+	if (nItems == 0)
+		return 0;
+
+	// Gather some data we need
+
+	int staticLength = 0;               // Total preferred length of all static (non-stretching) items
+	float totalWeight = 0;                // Total weight of all items.
+
+	for (int i = 0; i < nItems; i++)
+	{
+		if (pItems[i].weight <= 0.f)
+			staticLength += pItems[i].preferred;
+		else
+			totalWeight += pItems[i].weight;
+	}
+
+	// Calculate baseLength and extraLengthPerWeightUnit
+
+	float lengthPerWeightUnit = totalWeight > 0 ? (totalLength - staticLength) / totalWeight : 0;
+
+	if (lengthPerWeightUnit < 0.f)
+		lengthPerWeightUnit = 0;
+
+
+	// Loop through items and set their length
+
+	int total = 0;
+	int length;
+
+	for (int i = 0; i < nItems; i++)
+	{
+		if (pItems[i].weight <= 0)
+			length = pItems[i].preferred;
+		else
+			length = pItems[i].weight * lengthPerWeightUnit;
+
+		pItems[i].output = length;
+		total += length;
+	}
+	return total;
+}
+
+int WgScaleWeightSizeBroker::SetPreferredLengths(WgSizeBrokerItem * pItems, int nItems) const
+{
+	if (nItems == 0)
+		return 0;
+
+	float lengthPerWeight = _findNeededLengthPerWeight(pItems, nItems);
+	int total = 0;
+	int length;
+
+	for (int i = 0; i < nItems; i++)
+	{
+		if (pItems[i].weight <= 0.f)
+			length = pItems[i].preferred;
+		else
+			length = int(lengthPerWeight*pItems[i].weight);
+
+		pItems[i].output = length;
+		total += length;
+	}
+
+	return total;
+}
+
+bool WgScaleWeightSizeBroker::MayAlterPreferredLengths() const
+{
+	return false; //true;
+}
+
+float WgScaleWeightSizeBroker::_findNeededLengthPerWeight(WgSizeBrokerItem * pItems, int nItems) const
+{
+	float largest = 0;
+	for (int i = 0; i < nItems; i++)
+	{
+		if (pItems[i].weight > 0)
+		{
+			int unifiedLengthNeeded = pItems[i].preferred / pItems[i].weight;
+			if (unifiedLengthNeeded  > largest)
+				largest = unifiedLengthNeeded;
+		}
+	}
+	return largest;
 }

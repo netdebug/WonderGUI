@@ -27,6 +27,8 @@
 #include <wg_texttool.h>
 #include <wg_util.h>
 
+#include <algorithm>
+
 static const char	c_widgetType[] = {"Chart"};
 
 //____ Constructor ____________________________________________________________
@@ -53,6 +55,7 @@ WgChart::WgChart()
 	m_valueLabelStyle.offset = { 0,0 };
 
 	m_waveIdCounter = 1;
+	m_renderSectionWidth = 220;			// Keep a high value until we have upgraded to new GfxDevice with multi-clip support.
 }
 
 //____ Destructor _____________________________________________________________
@@ -311,11 +314,13 @@ bool WgChart::_setWaveSamples(int waveId, int firstSample, int nSamples, float *
 
 	bool bResampleAll = _updateDynamics();
 	if ( bResampleAll )
+	{
 		_resampleAllWaves();
+		_requestRender();
+	}
 	else
-		_resampleWave(pWave);
+		_resampleWave(pWave, true);
 
-	_requestRender();			//TODO: Optimize, only render rectangle with modifications.
 	return true;
 }
 
@@ -354,6 +359,18 @@ void WgChart::SetDynamicValueRange()
 //			m_valueRangeResponder(this, m_topValue, m_bottomValue);
 	}
 }
+
+//____ SetRenderSectionWidth() _________________________________________________________
+
+bool WgChart::SetRenderSectionWidth( int pointWidth )
+{
+    if( pointWidth < 16 || pointWidth > 4096 )
+        return false;
+    
+    m_renderSectionWidth = pointWidth;
+    return true;
+}
+
 
 //____ SetFixedSampleRange() __________________________________________________
 
@@ -502,6 +519,7 @@ void WgChart::_onCloneContent( const WgWidget * _pOrg )
 	m_defaultSize = pOrg->m_defaultSize;
 }
 
+
 //____ _onRender() _____________________________________________________________
 
 void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, const WgRect& _clip )
@@ -561,15 +579,15 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 
 	if (!m_valueGridLines.empty())
 	{
-        float top = std::min(m_topValue, m_bottomValue);
-        float bottom = std::max(m_topValue, m_bottomValue);
+		float top = std::min(m_topValue, m_bottomValue);
+		float bottom = std::max(m_topValue, m_bottomValue);
 
 		float mul = waveCanvas.h / (m_bottomValue - m_topValue);
 		int	  startOfs = mul > 0 ? waveCanvas.y : waveCanvas.y + waveCanvas.h;
 
 		for (auto& line : m_valueGridLines)
 		{
-			int yOfs = startOfs + (int)((line.pos - top) * mul + 0.5f);
+			int yOfs = startOfs + (int)((line.pos - top) * mul); // +0.5f);
 			pDevice->ClipDrawLine(_clip, { canvas.x, yOfs }, WgDirection::Right, canvas.w, line.color, line.thickness * m_scale / WG_SCALE_BASE );
 
 			if (!line.label.IsEmpty())
@@ -612,10 +630,10 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 
 	for (auto& wave : m_waves)
 	{
-		if (wave.bHidden)
+		if (wave.bHidden || wave.nSamples == 0)
 			continue;
 
-		int xOfs = (int) ((wave.firstSample - m_firstSample) * sampleScale);
+		int xOfs = wave.resampledFirst;
 
 		WgWaveLine top, bottom;
 
@@ -633,7 +651,10 @@ void WgChart::_onRender( WgGfxDevice * pDevice, const WgRect& _canvas, const WgR
 
 		int length = std::max(top.length, bottom.length)-1;
 
-		pDevice->ClipDrawHorrWave(waveClip, WgCoord(waveCanvas.x + xOfs, waveCanvas.y), length, top, bottom, wave.frontFill, wave.backFill);
+        if(length >= 1)
+        {
+            pDevice->ClipDrawHorrWave(waveClip, WgCoord(waveCanvas.x + xOfs, waveCanvas.y), length, top, bottom, wave.frontFill, wave.backFill);
+        }
 	}
 
 }
@@ -760,7 +781,7 @@ void WgChart::_resampleAllWaves()
 
 //____ _resampleWave() ________________________________________________________
 
-void WgChart::_resampleWave(Wave * pWave)
+void WgChart::_resampleWave(Wave * pWave, bool bRequestRenderOnChanges )
 {
 	WgSize	canvas = PixelSize();
 
@@ -791,20 +812,31 @@ void WgChart::_resampleWave(Wave * pWave)
 		yOfs = 0;
 	}
 
-	pWave->resampledDefault = yOfs + (int)((pWave->defaultSample - floor) * valueFactor * 256);
+	int newDefault = yOfs + (int)((pWave->defaultSample - floor) * valueFactor * 256);
+	int newFirst = (int)((pWave->firstSample - m_firstSample) * sampleScale);
 
-	if (pWave->orgTopSamples.empty())
+
+	int *	pNewTopSamples = nullptr;
+	int *	pNewBottomSamples = nullptr;
+	int		nbNewTopSamples = 0;
+	int		nbNewBottomSamples = 0;
+
+	if (pWave->orgTopSamples.size() > 0)
 	{
-		pWave->resampledTop.clear();
-	}
-	else
-	{
-		pWave->resampledTop.resize(nResampled);
+		nbNewTopSamples = nResampled;
+
+		if( bRequestRenderOnChanges )
+			pNewTopSamples = (int*) WgBase::MemStackAlloc( nResampled * sizeof(int) );
+		else
+		{
+			pWave->resampledTop.resize(nResampled);
+			pNewTopSamples = &pWave->resampledTop[0];
+		}
 
 		if (nResampled == pWave->nSamples)
 		{
 			for (int i = 0; i < nResampled; i++)
-				pWave->resampledTop[i] = yOfs + (int)((pWave->orgTopSamples[i] - floor) * valueFactor * 256);
+				pNewTopSamples[i] = yOfs + (int)((pWave->orgTopSamples[i] - floor) * valueFactor * 256);
 		}
 		else
 		{
@@ -820,23 +852,27 @@ void WgChart::_resampleWave(Wave * pWave)
 				int val1 = (int)((pWave->orgTopSamples[ofs] - floor) * valueFactor * 256);
 				int val2 = (int)((pWave->orgTopSamples[ofs+1] - floor) * valueFactor * 256);
 
-				pWave->resampledTop[i] = yOfs + ((val1*frac1 + val2*frac2) >> 8) ;
+				pNewTopSamples[i] = yOfs + ((val1*frac1 + val2*frac2) >> 8) ;
 			}
 		}
 	}
 
-	if (pWave->orgBottomSamples.empty())
+	if (pWave->orgBottomSamples.size() > 0)
 	{
-		pWave->resampledBottom.clear();
-	}
-	else
-	{
-		pWave->resampledBottom.resize(nResampled);
+		nbNewBottomSamples = nResampled;
+
+		if (bRequestRenderOnChanges)
+			pNewBottomSamples = (int*) WgBase::MemStackAlloc(nResampled * sizeof(int));
+		else
+		{
+			pWave->resampledBottom.resize(nResampled);
+			pNewBottomSamples = &pWave->resampledBottom[0];
+		}
 
 		if (nResampled == pWave->nSamples)
 		{
 			for (int i = 0; i < nResampled; i++)
-				pWave->resampledBottom[i] = yOfs + (int)((pWave->orgBottomSamples[i] - floor) * valueFactor * 256);
+				pNewBottomSamples[i] = yOfs + (int)((pWave->orgBottomSamples[i] - floor) * valueFactor * 256);
 		}
 		else
 		{
@@ -852,8 +888,263 @@ void WgChart::_resampleWave(Wave * pWave)
 				int val1 = (int)((pWave->orgBottomSamples[ofs] - floor) * valueFactor * 256);
 				int val2 = (int)((pWave->orgBottomSamples[ofs + 1] - floor) * valueFactor * 256);
 
-				pWave->resampledBottom[i] = yOfs + ((val1*frac1 + val2*frac2) >> 8);
+				pNewBottomSamples[i] = yOfs + ((val1*frac1 + val2*frac2) >> 8);
 			}
 		}
 	}
+
+	// Request render on the changes
+
+	if (bRequestRenderOnChanges)
+	{
+		int begOrgSamples = pWave->resampledFirst;
+		int begNewSamples = newFirst;
+		float maxLineThickness = std::max(pWave->topLineThickness, pWave->bottomLineThickness)*m_scale / WG_SCALE_BASE;
+
+		_requestRenderOnNewSamples(	begOrgSamples, pWave->resampledTop.size(), &pWave->resampledTop[0], pWave->resampledBottom.size(), &pWave->resampledBottom[0],
+									begNewSamples, nbNewTopSamples, pNewTopSamples, nbNewBottomSamples, pNewBottomSamples,
+									pWave->resampledDefault, newDefault, maxLineThickness );
+
+		// Replace old samples with new. Reversed order of Bottom/Top samples so that we free stack memory in right order.
+
+		if( nbNewBottomSamples > 0 )
+		{
+			pWave->resampledBottom.resize(nResampled);
+			memcpy(&pWave->resampledBottom[0], pNewBottomSamples, nbNewBottomSamples * sizeof(int));
+			WgBase::MemStackRelease(nbNewBottomSamples * sizeof(int));
+		}
+
+		if( nbNewTopSamples > 0 )
+		{
+			pWave->resampledTop.resize(nResampled);
+			memcpy(&pWave->resampledTop[0], pNewTopSamples, nbNewTopSamples * sizeof(int));
+			WgBase::MemStackRelease(nbNewTopSamples * sizeof(int));
+		}
+	}
+
+	// Finish up
+
+	pWave->resampledDefault = newDefault;
+	pWave->resampledFirst = newFirst;
+
+	if (nbNewBottomSamples == 0)
+		pWave->resampledBottom.clear();
+
+	if (nbNewTopSamples == 0)
+		pWave->resampledTop.clear();
+
+
+}
+
+//____ _requestRenderOnNewSamples() ___________________________________________
+
+void WgChart::_requestRenderOnNewSamples(   int begOrgSamples, int nbOrgTopSamples, int * pOrgTopSamples, int nbOrgBottomSamples, int * pOrgBottomSamples,
+											int begNewSamples, int nbNewTopSamples, int * pNewTopSamples, int nbNewBottomSamples, int * pNewBottomSamples,
+											int orgDefaultSample, int newDefaultSample, float maxLineThickness ) 
+{
+	// Calculate size of our sample canvas
+
+	WgRect canvas = m_pSkin ? m_pSkin->ContentRect(PixelSize(), WgStateEnum::Normal, m_scale).size() : PixelSize();
+	canvas -= m_pixelPadding;
+
+	// Calculate needed margin (in pixels) for line thickness
+
+	int margin = int(maxLineThickness) / 2 + 2;
+
+	// Calculate what section we need to start in 
+
+
+	int sectionBeg = (std::min(begOrgSamples,begNewSamples) / m_renderSectionWidth) * m_renderSectionWidth;
+
+
+
+	while (sectionBeg < canvas.w)
+	{
+		int topDirtOfs = 0, topDirtHeight = 0;
+		int bottomDirtOfs = 0, bottomDirtHeight = 0;
+
+		int sectionWidth = std::min(m_renderSectionWidth, canvas.w - sectionBeg);
+
+		int orgSampleOfs = sectionBeg - begOrgSamples - margin;
+		int newSampleOfs = sectionBeg - begNewSamples - margin;
+		int nSamples = m_renderSectionWidth + margin * 2;
+
+		int min1, max1;
+		int min2, max2;
+
+		// Create dirty rect covering all old and new top samples
+
+		if (nbOrgTopSamples > 0 || nbNewTopSamples > 0 || orgDefaultSample != newDefaultSample)
+		{
+			if (_lineFragmentMinMax(orgSampleOfs, nSamples, nbOrgTopSamples, pOrgTopSamples, orgDefaultSample, &min1, &max1))
+			{
+				topDirtOfs = min1 / 256 - margin;
+				topDirtHeight = max1 / 256 + 2 + margin - topDirtOfs;
+			}
+
+			if (_lineFragmentMinMax(newSampleOfs, nSamples, nbNewTopSamples, pNewTopSamples, newDefaultSample, &min2, &max2))
+			{
+				if (min1 == max1 && min2 == max2 && min1 == min2)
+				{
+					// Totally flat line section with no movement, no need to render it
+
+					topDirtOfs = 0;
+					topDirtHeight = 0;
+				}
+				else
+				{
+					int newOfs = min2 / 256 - margin;
+					int newHeight = max2 / 256 + 2 + margin - topDirtOfs;
+
+					if (newOfs < topDirtOfs)
+					{
+						topDirtHeight += topDirtOfs - newOfs;
+						topDirtOfs = newOfs;
+					}
+
+					if (newOfs + newHeight > topDirtOfs + topDirtHeight)
+						topDirtHeight = newOfs + newHeight - topDirtOfs;
+
+				}
+			}
+		}
+
+		// Calculate dirty height covering all old and new bottom samples
+
+		if (nbOrgBottomSamples > 0 || nbNewBottomSamples > 0 || orgDefaultSample != newDefaultSample)
+		{
+			if (_lineFragmentMinMax(orgSampleOfs, nSamples, nbOrgBottomSamples, pOrgBottomSamples, orgDefaultSample, &min1, &max1))
+			{
+				bottomDirtOfs = min1 / 256 - margin;
+				bottomDirtHeight = max1 / 256 + 2 + margin - topDirtOfs;
+			}
+
+			if (_lineFragmentMinMax(newSampleOfs, nSamples, nbNewBottomSamples, pNewBottomSamples, newDefaultSample, &min2, &max2))
+			{
+				if (min1 == max1 && min2 == max2 && min1 == min2)
+				{
+					// Totally flat line section with no movement, no need to render it
+
+					topDirtOfs = 0;
+					topDirtHeight = 0;
+				}
+				else
+				{
+					int newOfs = min2 / 256 - margin;
+					int newHeight = max2 / 256 + 2 + margin - bottomDirtOfs;
+
+					if (newOfs < bottomDirtOfs)
+					{
+						bottomDirtHeight += bottomDirtOfs - newOfs;
+						bottomDirtOfs = newOfs;
+					}
+
+					if (newOfs + newHeight > bottomDirtOfs + bottomDirtHeight)
+						bottomDirtHeight = newOfs + newHeight - bottomDirtOfs;
+				}
+			}
+		}
+
+		// Do some clipping on height
+
+		if (topDirtOfs >= canvas.h)
+		{
+			topDirtOfs = 0;
+			topDirtHeight = 0;
+		}
+
+		if (topDirtOfs < 0)
+		{
+			topDirtHeight = std::max( topDirtHeight + topDirtOfs, 0 );
+			topDirtOfs = 0;
+		}
+
+		if (topDirtOfs + topDirtHeight > canvas.h)
+			topDirtHeight = canvas.h - topDirtOfs;
+
+		if (bottomDirtOfs >= canvas.h)
+		{
+			bottomDirtOfs = 0;
+			bottomDirtHeight = 0;
+		}
+
+		if (bottomDirtOfs < 0)
+		{
+			bottomDirtHeight = std::max(bottomDirtHeight + bottomDirtOfs, 0);
+			bottomDirtOfs = 0;
+		}
+
+		if (bottomDirtOfs + bottomDirtHeight > canvas.h)
+			bottomDirtHeight = canvas.h - bottomDirtOfs;
+
+
+		// Generate dirty rect(s) and request render as needed
+
+		if (bottomDirtOfs < topDirtOfs + topDirtHeight && bottomDirtOfs + bottomDirtHeight > topDirtOfs)
+		{
+			int dirtTop = std::min(topDirtOfs, bottomDirtOfs);
+			int dirtHeight = std::max(topDirtOfs + topDirtHeight, bottomDirtOfs + bottomDirtHeight) - dirtTop;
+
+			if (dirtHeight > 0)
+				_requestRender({ canvas.x + sectionBeg, canvas.y + dirtTop, sectionWidth, dirtHeight });
+		}
+		else
+		{
+			if (topDirtHeight > 0)
+				_requestRender({ canvas.x + sectionBeg, canvas.y + topDirtOfs, sectionWidth, topDirtHeight });
+
+			if (bottomDirtHeight > 0)
+				_requestRender({ canvas.x + sectionBeg, canvas.y + bottomDirtOfs, sectionWidth, bottomDirtHeight });
+		}
+
+
+		//
+
+		sectionBeg += m_renderSectionWidth;
+	}
+
+}
+
+//____ _lineFragmentMinMax() ______________________________________________________
+
+bool WgChart::_lineFragmentMinMax(int begin, int length, int nbSamples, int * pSamples, int defaultSample, int * wpMin, int * wpMax)
+{
+	int min, max;
+
+	// Special case: Having 0 samples means that default sample is used.
+
+	if (length == 0)
+	{
+		*wpMin = defaultSample;
+		*wpMax = defaultSample;
+		return true;
+	}
+
+	//
+
+	if (begin < 0)
+	{
+		length += begin;
+		begin = 0;
+	}
+
+	if (begin + length > nbSamples)
+		length = nbSamples - begin;
+
+	if (length <= 0)
+		return false;
+
+	max = min = pSamples[begin];
+	length--;
+
+	for (int i = begin+1; i < begin + length; i++)
+	{
+		int s = pSamples[i];
+		min = std::min(s, min);
+		max = std::max(s, max);
+	}
+
+	*wpMin = min;
+	*wpMax = max;
+	return true;
 }

@@ -1040,8 +1040,8 @@ void WgScrollChart::_renderGridLines(WgGfxDevice * pDevice, const WgRect& _canva
 	{
 		// Preparations for both lines and labels
 
-        top = std::min(m_topValue, m_bottomValue);
-        bottom = std::max(m_topValue, m_bottomValue);
+		top = std::min(m_topValue, m_bottomValue);
+		bottom = std::max(m_topValue, m_bottomValue);
 
 		mul = _canvas.h / (m_bottomValue - m_topValue);
 		startOfs = mul > 0 ? _canvas.y : _canvas.y + _canvas.h;
@@ -1123,8 +1123,8 @@ void WgScrollChart::_onRender(WgGfxDevice * pDevice, const WgRect& _canvas, cons
 	{
 		float top, bottom, mul, startOfs;
 
-        top = std::min(m_topValue, m_bottomValue);
-        bottom = std::max(m_topValue, m_bottomValue);
+		top = std::min(m_topValue, m_bottomValue);
+		bottom = std::max(m_topValue, m_bottomValue);
 
 		mul = scrollCanvas.h / (m_bottomValue - m_topValue);
 		startOfs = mul > 0 ? scrollCanvas.y : scrollCanvas.y + scrollCanvas.h;

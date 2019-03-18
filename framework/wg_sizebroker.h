@@ -60,7 +60,6 @@ public:
 
 protected:
     int     _findLongestUnified( WgSizeBrokerItem * pItems, int nItems ) const;
-    void    _setOutputs( WgSizeBrokerItem * pItems, int nItems, int value ) const;
 
     
 };
@@ -80,6 +79,21 @@ protected:
     
 };
 
+class WgScaleWeightSizeBroker : public WgSizeBroker
+{
+public:
+	WgScaleWeightSizeBroker() {};
+	~WgScaleWeightSizeBroker() {};
+
+	int SetItemLengths(WgSizeBrokerItem * pItems, int nItems, int totalLength) const;
+	int SetPreferredLengths(WgSizeBrokerItem * pItems, int nItems) const;
+	bool MayAlterPreferredLengths() const;
+
+protected:
+	float   _findNeededLengthPerWeight(WgSizeBrokerItem * pItems, int nItems) const;
+
+
+};
 
 
 #endif //WG_SIZEBROKER_DOT_H

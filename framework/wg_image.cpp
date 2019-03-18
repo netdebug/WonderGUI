@@ -96,6 +96,29 @@ WgSize WgImage::PreferredPixelSize() const
 	return WgSize(1,1);
 }
 
+//____ MatchingPixelHeight() _____________________________________________________________
+
+int  WgImage::MatchingPixelHeight(int pixelWidth) const
+{
+	if (!m_pGfx)
+		return 1;
+
+	WgSize imageSize = m_pGfx->Size(WG_SCALE_BASE);
+	return pixelWidth * imageSize.h / imageSize.w;
+}
+
+//____ MatchingPixelWeight() _____________________________________________________________
+
+int  WgImage::MatchingPixelWidth(int pixelHeight) const
+{
+	if (!m_pGfx)
+		return 1;
+
+	WgSize imageSize = m_pGfx->Size(WG_SCALE_BASE);
+	return pixelHeight * imageSize.w / imageSize.h;
+}
+
+
 
 
 //____ _onCloneContent() _______________________________________________________

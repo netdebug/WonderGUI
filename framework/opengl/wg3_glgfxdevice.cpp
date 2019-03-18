@@ -1475,7 +1475,7 @@ namespace wg
 		}
 
 		top = begin.y + (top >> 8);
-        bottom = begin.y + ((bottom + 255) >> 8); // + 1;			//TODO: We should not need +1 here, but we do... What is wrong here?
+        bottom = begin.y + ((bottom + 255) >> 8) + 1;			//TODO: We should not need +1 here, but we do... What is wrong here?
 
 
 		box.y = top > clip.y ? top : clip.y;

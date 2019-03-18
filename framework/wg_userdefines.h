@@ -60,7 +60,7 @@ static inline const float wg_round(const float x) {return floorf(x+0.5f);}
 
 #define WG_ESCAPE_CODE		0xA4
 
-#define  WG2_DEFAULT_CODEPAGE WgCodePage::_1252
+#define WG2_DEFAULT_CODEPAGE WgCodePage::_1252
 
 //____ input related defines __________________________________________________
 

@@ -97,14 +97,14 @@ Uint8 WgSurface::GetOpacity(WgCoord coord) const
 
 void * WgSurface::Lock(WgAccessMode mode) 
 { 
-	return m_pRealSurface->lock(mode);
+	return m_pRealSurface->lock(mode); 
 }
 
 //____ LockRegion() ___________________________________________________________
 
 void * WgSurface::LockRegion(WgAccessMode mode, const WgRect& region) 
 { 
-	return m_pRealSurface->lockRegion(mode, _convert(region));
+	return m_pRealSurface->lockRegion(mode, region);
 }
 
 

@@ -105,8 +105,8 @@ void WgTextTool::setDefaultBreakRules()
 
 	// Set level 1 breaks
 
-	breakRulesTab[int(WgExtChar::BreakPermitted)] = int(int(WgBreakRules::BreakOn)) | 0x1;
-	breakRulesTab[int(WgExtChar::HyphenBreakPermitted)] = int(int(WgBreakRules::BreakOn)) | 0x1;
+	breakRulesTab[(int)WgExtChar::BreakPermitted] = int(WgBreakRules::BreakOn) | 0x1;
+	breakRulesTab[(int)WgExtChar::HyphenBreakPermitted] = int(WgBreakRules::BreakOn) | 0x1;
 
 	// Set level 2 breaks
 

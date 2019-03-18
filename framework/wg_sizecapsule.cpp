@@ -104,6 +104,18 @@ void WgSizeCapsule::SetMaxSize( WgSize _size )
 	}
 }
 
+//____ SetKeepAspectRatio() ___________________________________________________
+
+void WgSizeCapsule::SetKeepAspectRatio(bool bKeepAspect)
+{
+	if (bKeepAspect != m_bKeepAspect)
+	{
+		m_bKeepAspect = bKeepAspect;
+		_requestResize();
+	}
+}
+
+
 //____ PreferredPixelSize() ________________________________________________________
 
 WgSize WgSizeCapsule::PreferredPixelSize() const 
@@ -204,10 +216,15 @@ WgSize WgSizeCapsule::MaxPixelSize() const
 
 int WgSizeCapsule::MatchingPixelHeight( int width ) const
 {
-	if( m_pixelsPreferred.h != 0 )
+	if( m_pixelsPreferred.h > 0 )
 	{
-		int h = m_pixelsPreferred.h;
-		
+		int h;
+
+		if (m_bKeepAspect && m_pixelsPreferred.w > 0 )
+			h = width * m_pixelsPreferred.h / m_pixelsPreferred.w;
+		else
+			h = m_pixelsPreferred.h;
+
 		if( m_hook.Widget() )
 		{
 			int max = m_hook.Widget()->MaxPixelSize().h;
@@ -230,9 +247,15 @@ int WgSizeCapsule::MatchingPixelHeight( int width ) const
 
 int WgSizeCapsule::MatchingPixelWidth( int height ) const
 {
-	if( m_pixelsPreferred.w != 0 )
+	if( m_pixelsPreferred.w > 0 )
 	{
-		int w = m_pixelsPreferred.w;
+		int w;
+
+		if (m_bKeepAspect && m_pixelsPreferred.h > 0)
+			w = height * m_pixelsPreferred.w / m_pixelsPreferred.h;
+		else
+			w = m_pixelsPreferred.w;
+
 
 		if( m_hook.Widget() )
 		{

@@ -51,6 +51,10 @@ public:
 
 	WgSize			PreferredPixelSize() const;
 
+	int				MatchingPixelHeight(int pixelWidth) const;
+	int				MatchingPixelWidth(int pixelHeight) const;
+
+
 protected:
 
 	void	_onCloneContent( const WgWidget * _pOrg );

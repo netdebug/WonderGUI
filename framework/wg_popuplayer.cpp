@@ -579,7 +579,7 @@ void WgPopupLayer::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas, 
 
 	// Go through WidgetRenderContexts and render the patches in reverse order (topmost popup rendered last).
 
-	for (int i = renderList.size() - 1; i >= 0; i--)
+	for (int i = int(renderList.size()) - 1; i >= 0; i--)
 	{
 		WidgetRenderContext * p = &renderList[i];
 
@@ -625,8 +625,6 @@ void WgPopupLayer::_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas, 
 	
 void WgPopupLayer::_onNewSize( const WgSize& sz )
 {
-	m_size = sz;
-
 	WgLayer::_onNewSize(sz);
 }
 	

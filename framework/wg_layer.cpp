@@ -164,6 +164,18 @@ void WgLayer::_onRequestRender( const WgRect& rect, const WgLayerHook * pHook )
 }
 
 
+//____ _onNewSize() ___________________________________________________________
+
+void WgLayer::_onNewSize(const WgSize& sz)
+{
+	m_size = sz;
+
+	if (m_baseHook.Widget())
+		m_baseHook.Widget()->_onNewSize(sz);
+
+	WgContainer::_onNewSize(sz);
+}
+
 //____ _onBaseChanged() _______________________________________________________
 
 void WgLayer::_onBaseChanged()

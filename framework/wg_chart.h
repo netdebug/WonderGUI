@@ -93,6 +93,8 @@ public:
 	float	ValueRangeStart() { return m_topValue; }
 	float	ValueRangeEnd() { return m_bottomValue; }
 
+    bool    SetRenderSectionWidth( int nPoints );
+    int     RenderSectionWidth() const { return m_renderSectionWidth; }
 
 	bool	SetFixedSampleRange(float firstSample, float lastSample);
 	void	SetDynamicSampleRange();
@@ -112,10 +114,13 @@ public:
 
 	void	SetResizeResponder(std::function<void(WgChart * pWidget, WgSize newSize)> func);	// Called when widgets size has changed.
 	void	SetSampleRangeResponder(std::function<void(WgChart * pWidget, float firstSample, float lastSample)> func);	// Called when widgets sample range has changed.
-	void	SetValueRangeResponder(std::function<void(WgChart * pWidget, float topValue, float bottomValue)> func);		// Called when widgets sample range has changed.
+	void	SetValueRangeResponder(std::function<void(WgChart * pWidget, float topValue, float bottomValue)> func);		// Called when widgets value range has changed.
+
+	void	SetScale(int scale) { _setScale(scale); }
 
 
 protected:
+
 
 	struct Wave
 	{
@@ -144,7 +149,8 @@ protected:
 
 		std::vector<int>	resampledTop;
 		std::vector<int>	resampledBottom;
-		int					resampledDefault;
+		int					resampledDefault;   
+		int					resampledFirst;
 	};
 
 	struct LabelStyle
@@ -165,12 +171,19 @@ protected:
 	
 	bool	_setWaveSamples(int waveId, int firstSample, int nSamples, float * pTopBorderSamples, float * pBottomBorderSamples, float defaultSample);
 	void	_resampleAllWaves();
-	void	_resampleWave( Wave * pWave );
+	void	_resampleWave( Wave * pWave, bool bRequestRenderOnChanges = false );
+
+	void	_requestRenderOnNewSamples(	int begOrgSamples, int nbOrgTopSamples, int * pOrgTopSamples, int nbOrgBottomSamples, int * pOrgBottomSamples,
+										int begNewSamples, int nbNewTopSamples, int * pNewTopSamples, int nbNewBottomSamples, int * pNewBottomSamples,
+										int orgDefaultSample, int newDefaultSample, float maxLineThickness );
 	bool	_updateDynamics();
 	WgCoord	_placeLabel(WgCoord startPoint, WgOrigo alignment, WgCoord labelOffset, WgSize labelSize ) const;
 
 	Wave *	_getWave(int waveId);
 	const Wave *	_getWave(int waveId) const;
+
+	bool		_lineFragmentMinMax(int begin, int length, int nbSamples, int * pSamples, int defaultSample, int * wpMin, int * wpMax);
+
 
 //	void	_onEnable();
 //	void	_onDisable();
@@ -180,6 +193,8 @@ private:
 	WgSize			m_defaultSize;
 	WgMode			m_mode;
 
+    int             m_renderSectionWidth;      // Number of render sections chart is split in horizontally.
+    
 	WgBorders		m_pointPadding;			// Padding for the canvas in points. To allow thick lines to fully stay inside widget. Grid is allowed outside.
 	WgBorders		m_pixelPadding;			// Same, but in pixels.
 

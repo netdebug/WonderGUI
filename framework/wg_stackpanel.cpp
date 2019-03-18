@@ -164,9 +164,12 @@ int WgStackPanel::MatchingPixelHeight( int width ) const
 	WgStackHook * pHook = FirstHook();
 	while( pHook )
 	{
-		int h = pHook->Widget()->MatchingPixelHeight(width);
-		if( h > height )
-			height = h;
+		if (pHook->m_bVisible)
+		{
+			int h = pHook->Widget()->MatchingPixelHeight(width);
+			if( h > height )
+				height = h;
+		}
 		pHook = pHook->Next();
 	}
 
@@ -182,9 +185,12 @@ int WgStackPanel::MatchingPixelWidth( int height ) const
 	WgStackHook * pHook = FirstHook();
 	while( pHook )
 	{
-		int w = pHook->Widget()->MatchingPixelWidth(height);
-		if( w > width )
-			width = w;
+		if (pHook->m_bVisible)
+		{
+			int w = pHook->Widget()->MatchingPixelWidth(height);
+			if (w > width)
+				width = w;
+		}
 		pHook = pHook->Next();
 	}
 
@@ -280,14 +286,9 @@ void WgStackPanel::_onWidgetAppeared( WgVectorHook * pInserted )
 
 	WgSize preferred = pInserted->Widget()->PreferredPixelSize();
 
-	if( preferred.w > m_preferredSize.w )
+	if (preferred.w > m_preferredSize.w || preferred.h > m_preferredSize.h)
 	{
-		m_preferredSize.w = preferred.w;
-		bRequestResize = true;
-	}
-	if( preferred.h > m_preferredSize.h )
-	{
-		m_preferredSize.h = preferred.h;
+		m_preferredSize = preferred;
 		bRequestResize = true;
 	}
 
@@ -319,7 +320,7 @@ void WgStackPanel::_onWidgetDisappeared( WgVectorHook * pToBeRemoved )
 	WgStackHook * pHook = FirstHook();
 	while( pHook )
 	{
-		if( pHook != pToBeRemoved )
+		if( pHook != pToBeRemoved && pHook->m_bVisible )
 		{
 			WgSize sz = pHook->Widget()->PreferredPixelSize();
 			if( sz.w > preferredSize.w )
@@ -330,10 +331,11 @@ void WgStackPanel::_onWidgetDisappeared( WgVectorHook * pToBeRemoved )
 		pHook = pHook->Next();
 	}
 
-	if( preferredSize != m_preferredSize )
+	if (preferredSize != m_preferredSize)
+	{
+		m_preferredSize = preferredSize;
 		bRequestResize = true;
-
-	m_preferredSize = preferredSize;
+	}
 
 	// Check if removal might affect height for current width
 
@@ -379,11 +381,14 @@ void WgStackPanel::_refreshPreferredPixelSize()
 	WgStackHook * pHook = FirstHook();
 	while( pHook )
 	{
-		WgSize sz = pHook->_paddedPreferredPixelSize(m_scale);
-		if( sz.w > preferredSize.w )
-			preferredSize.w = sz.w;
-		if( sz.h > preferredSize.h )
-			preferredSize.h = sz.h;
+		if( pHook->m_bVisible )
+		{
+			WgSize sz = pHook->_paddedPreferredPixelSize(m_scale);
+			if( sz.w > preferredSize.w )
+				preferredSize.w = sz.w;
+			if( sz.h > preferredSize.h )
+				preferredSize.h = sz.h;
+		}
 		pHook = pHook->Next();
 	}
 

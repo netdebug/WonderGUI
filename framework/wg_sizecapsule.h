@@ -44,6 +44,7 @@ public:
 	void	SetPreferredSize( WgSize size );        // Measured in points
 	void	SetMinSize( WgSize size );              // Measured in points
 	void	SetMaxSize( WgSize size );              // Measured in points
+	void	SetKeepAspectRatio(bool bKeepAspect);
 
 	WgSize	PreferredPixelSize() const override;
 	WgSize	MinPixelSize() const override;
@@ -62,6 +63,8 @@ private:
 	WgSize			m_pointsMin;
 	WgSize			m_pointsMax;
 	WgSize			m_pointsPreferred;
+
+	bool			m_bKeepAspect = false;
 };
 
 #endif //WG_SIZECAPSULE_DOT_H

@@ -583,35 +583,35 @@ string WgEventLogger::_formatPointerStyle( const WgEvent::PointerChange * _pEven
 	switch( _pEvent->Style() )
 	{
 		case WgPointerStyle::Arrow:
-			return "PointerStyle::Arrow";
+			return "WgPointerStyle::Arrow";
 		case WgPointerStyle::Hourglass:
-			return "PointerStyle::Hourglass";
+			return "WgPointerStyle::Hourglass";
 		case WgPointerStyle::Hand:
-			return "PointerStyle::Hand";
+			return "WgPointerStyle::Hand";
 		case WgPointerStyle::Crosshair:
-			return "PointerStyle::Crosshair";
+			return "WgPointerStyle::Crosshair";
 		case WgPointerStyle::Help:
-			return "PointerStyle::Help";
+			return "WgPointerStyle::Help";
 		case WgPointerStyle::Ibeam:
-			return "PointerStyle::Ibeam";
+			return "WgPointerStyle::Ibeam";
 		case WgPointerStyle::Stop:
-			return "PointerStyle::Stop";
+			return "WgPointerStyle::Stop";
 		case WgPointerStyle::UpArrow:
-			return "PointerStyle::UpArrow";
+			return "WgPointerStyle::UpArrow";
 		case WgPointerStyle::ResizeAll:
-			return "PointerStyle::ResizeAll";
+			return "WgPointerStyle::ResizeAll";
 		case WgPointerStyle::ResizeNeSw:
-			return "PointerStyle::ResizeNeSW";
+			return "WgPointerStyle::ResizeNeSw";
 		case WgPointerStyle::ResizeNwSe:
-			return "PointerStyle::ResizeNwSe";
+			return "WgPointerStyle::ResizeNwSe";
 		case WgPointerStyle::ResizeNS:
-			return "PointerStyle::ResizeNS";
+			return "WgPointerStyle::ResizeNS";
 		case WgPointerStyle::ResizeWE:
-			return "PointerStyle::ResizeWE";
+			return "WgPointerStyle::ResizeWE";
 		default:
 		{
 			char	temp[64];
-			sprintf( temp, "%d (unkown enum)", (int) _pEvent->Style() );
+			sprintf( temp, "%d (unkown enum)", _pEvent->Style() );
 			return string(temp);
 		}
 	}

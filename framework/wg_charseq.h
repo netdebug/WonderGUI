@@ -191,9 +191,9 @@ class WgCharSeq8 : public WgCharSeq
 	friend class WgCharSeq;
 public:
 	WgCharSeq8( const char * pChar, WgCodePage codePage = WG2_DEFAULT_CODEPAGE );
-	WgCharSeq8( const char * pChar, int len, WgCodePage codePage =  WG2_DEFAULT_CODEPAGE );
-	WgCharSeq8( const std::string& str, WgCodePage codePage =  WG2_DEFAULT_CODEPAGE );
-	WgCharSeq8( const std::string& str, int ofs, int len, WgCodePage codePage =  WG2_DEFAULT_CODEPAGE );
+	WgCharSeq8( const char * pChar, int len, WgCodePage codePage = WG2_DEFAULT_CODEPAGE );
+	WgCharSeq8( const std::string& str, WgCodePage codePage = WG2_DEFAULT_CODEPAGE );
+	WgCharSeq8( const std::string& str, int ofs, int len, WgCodePage codePage = WG2_DEFAULT_CODEPAGE );
 
 protected:
 	WgCodePage	m_codepage;

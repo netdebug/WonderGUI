@@ -70,8 +70,11 @@ void WgPanel::SetMaskOp( WgMaskOp operation )
 
 void WgPanel::SetSkin( const WgSkinPtr& pSkin )
 {
-	m_pSkin = pSkin;
-	_requestRender();
+	if (pSkin != m_pSkin)
+	{
+		m_pSkin = pSkin;
+		_requestRender();
+	}
 }
 
 //____ _onCloneContent() _______________________________________________________

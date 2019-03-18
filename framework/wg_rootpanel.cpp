@@ -88,6 +88,9 @@ bool WgRootPanel::SetPixelGeo( const WgRect& geo )
 		m_bHasGeo = true;
 
 	m_geo = geo;
+
+	if( m_hook.Widget() )
+		m_hook.Widget()->_onNewSize(geo);
 	return true;
 }
 

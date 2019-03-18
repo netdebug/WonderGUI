@@ -51,6 +51,8 @@ public:
     static const char * GetClass();
     virtual WgWidget * NewOfMyType() const { return new WgKnob(); };
 
+	void	SetOrigo(WgOrigo origo);
+
     void    SetOversample(int oversample) { m_iOversampleX = oversample; }
     void    SetValue( float value );
     float   GetValue() { return m_fValue; }
@@ -62,48 +64,37 @@ public:
     }
     void    SetColor( WgColor color )
     {
-        if( m_lineColor != color )
+        if( m_kColor != color )
         {
-            m_lineColor = color;
-            m_kForeground = color;
-            m_kBackground = color;
-            m_kBackground.a = 64;
-            _myRequestRender();
+            m_kColor = color;
+            _requestRender();
         }
     };
 
     void    SetForegroundColor(WgColor color)
     {
-        if(m_kForeground != color)
+		SetColor(color);
+    };
+
+	void    SetBackgroundAlpha(float alpha)			// Set alpha of background relative foreground (0.0 -> 1.0). Forces regeneration of graphics.
+    {
+        if(m_fBackgroundAlpha != alpha)
         {
-            m_kForeground = color;
-            _myRequestRender();
+            m_fBackgroundAlpha = alpha;
+            _requestRenderBackBuffer();
         }
     };
 
-    void    SetBackgroundColor(WgColor color)
-    {
-        if(m_kBackground != color)
-        {
-            m_kBackground = color;
-            _myRequestRender();
-        }
-    };
-
-    void    SetLineColor(WgColor color)
-    {
-        if(m_lineColor != color)
-        {
-            m_lineColor = color;
-            _myRequestRender();
-        }
-    };
+	void	SetSkin(const WgSkinPtr& pSkin);
+	void	SetKnobScale(float scale);
 
 	// Speeds up things significantly by only updating needed quadrants, but generates artifacts if gradiants are present.
 	void	SetOptimizeUpdateRect(bool bOptimize)
 	{
 		m_bOptimizeUpdateRect = bOptimize;
 	}
+
+	void	SetMouseControl(bool bMouseControl);
 
     void    SetNumSteps(int steps);
     void    SetWidth(float width) { m_iWidth = width; }
@@ -118,6 +109,10 @@ public:
     //    WgSize  PreferredPointSize() { PreferredPixelSize()*m_scale/WG_SCALE_BASE;}
     //    void    SetPreferredPointSize(WgSize size) { SetPreferredPixelSize(size*WG_SCALE_BASE/m_scale); }
 
+	int		MatchingPixelHeight(int pixelWidth) const;
+	int		MatchingPixelWidth(int pixelHeight) const;
+
+
 protected:
     void    _onCloneContent( const WgWidget * _pOrg );
 	void	_renderPatches(WgGfxDevice * pDevice, const WgRect& _canvas, const WgRect& _window, WgPatches * _pPatches);
@@ -129,8 +124,8 @@ protected:
 	void	_onNewSize(const WgSize& size);
 
 
-	void	_myRequestRender();
-	void	_myRequestRender(const WgRect& rect);
+	void	_requestRenderBackBuffer();
+	void	_requestRenderBackBuffer(const WgRect& rect);
 
 
 
@@ -152,23 +147,9 @@ private:
 	void	_downsample(WgSurface* pSurf, int oversample);
     static inline WgColor Blend( const WgColor& start, const WgColor& dest, float grade );
 
-    // Anti-alias
-    void drawCircle(const int centerX, const int centerY, const float radX, const float radY);
-    void drawLine(const float x0, const float y0, const float x1, const float y1);
-    void plot(const int x, const int y, const float alpha);
-    void plot4(const int centerX, const int centerY, const int deltaX, const int deltaY, const float alpha);
-    static inline int ipart(double x) { return (int)std::floor(x); }
-    static inline float fpart(float x) { return std::abs(x) - ipart(x); }
-    static inline float rfpart(float x) { return 1.0f - fpart(x); }
-
-    // Anti-alias
-    int m_iNextPixel;
-    WgCoord m_pAAPix[WG_KNOB_PIXEL_BUFFER_SIZE];
-    WgColor m_pAACol[WG_KNOB_PIXEL_BUFFER_SIZE];
-    WgColor m_lineColor;
-
     WgSize m_preferredSize;
 	bool	m_bOptimizeUpdateRect = false;
+	float	m_knobScale = 1.f;					// Scale the knob inside its area (0.f-1.f)
 
     class WgSurface* m_pSurf = nullptr;
     class WgSurfaceFactory* m_pSurfaceFactory = nullptr;
@@ -178,10 +159,12 @@ private:
     int m_iOversampleX = 1;
     bool m_bPressed = false;
     bool m_bPointerInside = false;
+	bool m_bMouseControl = true;
 
-    WgColor m_kBackground = WgColor( 38,  169, 224, 64 );
-    WgColor m_kForeground = WgColor( 38,  169, 224, 255 );
-    float m_fAngleStart = 0.1f;
+    float	m_fBackgroundAlpha = 0.25f;							// Alpha of background, relative alpha of foreground.
+	WgColor m_kColor = WgColor( 38,  169, 224, 255 );
+	
+	float m_fAngleStart = 0.1f;
     float m_fAngleEnd = 0.9f;
     std::vector<float> m_AngleStart;
     std::vector<float> m_AngleEnd;
@@ -192,6 +175,7 @@ private:
     WgSize m_size = WgSize(0,0);
 
 	WgRect	m_backBufferDirtyRect;
+	WgOrigo	m_origo = WgOrigo::NorthWest;
 };
 
 

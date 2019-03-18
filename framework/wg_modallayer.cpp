@@ -535,13 +535,8 @@ void WgModalLayer::_updateKeyboardFocus()
 
 void WgModalLayer::_onNewSize( const WgSize& sz )
 {
-	m_size = sz;
-
-	// Update size of base widget
-
-	if( m_baseHook.Widget() )
-		m_baseHook.Widget()->_onNewSize(sz);
-
+    WgContainer::_onNewSize(sz);
+ 
 	// Refresh modal widgets geometry, their positions might have changed.
 
 	WgModalHook * pHook = m_modalHooks.First();

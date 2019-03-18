@@ -43,14 +43,14 @@ namespace wg
 	
 		//.____ Identification __________________________________________
 
-		bool							isInstanceOf( const char * pClassName ) const override;
-		const char *					className( void ) const override;
+		bool							isInstanceOf( const char * pClassName ) const;
+		const char *					className( void ) const;
 		static const char				CLASSNAME[];
 		static SoftSurfaceFactory_p	cast( Object * pObject );
 
 		//.____ Geometry _________________________________________________
 
-		Size				maxSize() const override;
+		Size				maxSize() const;
 
 		//.____ Misc _______________________________________________________
 

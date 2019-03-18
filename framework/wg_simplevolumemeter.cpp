@@ -215,8 +215,8 @@ void WgSimpleVolumeMeter::_requestRenderPartial( WgSize sz, int newLeftPeak, int
 
 	if( newLeftPeak != m_iPeak[0] )
 	{
-        beg = std::min(newLeftPeak,m_iPeak[0]);
-        end = std::max(newLeftPeak,m_iPeak[0]);
+		beg = std::min(newLeftPeak,m_iPeak[0]);
+		end = std::max(newLeftPeak,m_iPeak[0]);
 	}
 
 	if( m_bStereo && newRightPeak != m_iPeak[1] )

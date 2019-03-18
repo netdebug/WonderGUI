@@ -218,6 +218,7 @@ void WgRulerLabels::_setScale( int scale )
 		pLabel->text.SetScale(scale);
 		pLabel = pLabel->Next();
 	}
+	_requestResize();
 }
 
 

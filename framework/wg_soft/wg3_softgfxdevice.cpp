@@ -2581,7 +2581,16 @@ namespace wg
 
 		if (amount[2] <= 0 && pDst < pDstClip)
 		{
-			if (col[1].a == 255)
+			if (col[1].a == 0)
+			{
+				while (amount[2] <= 0 && pDst < pDstClip)
+				{
+					pDst += linePitch;
+					amount[2] += inc[2];
+					amount[3] += inc[3];
+				}
+			}
+			else if (col[1].a == 255)
 			{
 				while (amount[2] <= 0 && pDst < pDstClip)
 				{
