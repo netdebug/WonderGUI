@@ -994,7 +994,7 @@ void WgChart::_requestRenderOnNewSamples(   int begOrgSamples, int nbOrgTopSampl
 				else
 				{
 					int newOfs = min2 / 256 - margin;
-					int newHeight = max2 / 256 + 2 + margin - topDirtOfs;
+					int newHeight = max2 / 256 + 2 + margin - newOfs;
 
 					if (newOfs < topDirtOfs)
 					{
@@ -1016,7 +1016,7 @@ void WgChart::_requestRenderOnNewSamples(   int begOrgSamples, int nbOrgTopSampl
 			if (_lineFragmentMinMax(orgSampleOfs, nSamples, nbOrgBottomSamples, pOrgBottomSamples, orgDefaultSample, &min1, &max1))
 			{
 				bottomDirtOfs = min1 / 256 - margin;
-				bottomDirtHeight = max1 / 256 + 2 + margin - topDirtOfs;
+				bottomDirtHeight = max1 / 256 + 2 + margin - bottomDirtOfs;
 			}
 
 			if (_lineFragmentMinMax(newSampleOfs, nSamples, nbNewBottomSamples, pNewBottomSamples, newDefaultSample, &min2, &max2))
@@ -1025,13 +1025,13 @@ void WgChart::_requestRenderOnNewSamples(   int begOrgSamples, int nbOrgTopSampl
 				{
 					// Totally flat line section with no movement, no need to render it
 
-					topDirtOfs = 0;
-					topDirtHeight = 0;
+					bottomDirtOfs = 0;
+					bottomDirtHeight = 0;
 				}
 				else
 				{
 					int newOfs = min2 / 256 - margin;
-					int newHeight = max2 / 256 + 2 + margin - bottomDirtOfs;
+					int newHeight = max2 / 256 + 2 + margin - newOfs;
 
 					if (newOfs < bottomDirtOfs)
 					{

@@ -98,7 +98,8 @@ protected:
     // Overloaded from Widget
     
 	void			_onNewSize( const WgSize& size );
- 
+    void            _setScale(int scale);
+
     
 	// Overloaded from Container
 	
@@ -131,6 +132,9 @@ protected:
 	bool			m_bHorizontal;
 	WgSizeBroker * 	m_pSizeBroker;
 	WgSize			m_preferredSize;
+    
+    bool            m_bBlockRequestResize = false;
+    bool            m_bResizeRequestedWhileBlocked = false;
 
 };
 

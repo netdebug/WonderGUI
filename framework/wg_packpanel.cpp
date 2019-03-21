@@ -318,6 +318,19 @@ int WgPackPanel::MatchingPixelWidth( int height ) const
 	return width;
 }
 
+//____ _setScale() ____________________________________________________________
+
+void WgPackPanel::_setScale(int scale)
+{
+    m_bBlockRequestResize = true;
+    m_bResizeRequestedWhileBlocked = false;
+    WgVectorPanel::_setScale(scale);
+    m_bBlockRequestResize = false;
+    
+    if (m_bResizeRequestedWhileBlocked)
+        _refreshAllWidgets();
+}
+
 
 
 //____ _firstHookWithGeo() _____________________________________________________
@@ -392,7 +405,10 @@ void WgPackPanel::_onResizeRequested( WgVectorHook * pHook )
 
 	//
 	
-	_refreshAllWidgets();
+    if (m_bBlockRequestResize)
+        m_bResizeRequestedWhileBlocked = true;
+    else
+        _refreshAllWidgets();
 }
 
 //____ _onWidgetAppeared() ______________________________________________________
