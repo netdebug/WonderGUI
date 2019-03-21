@@ -16,7 +16,6 @@ cp wondergui.h	../../wg2/_kato_wg3/imports
 cd base
 cp wg_blob.* wg_color.* wg_enumextras.* wg_geo.* wg_gfxdevice.* \
    wg_nullgfxdevice.* \
-   wg_object.h \
    wg_pointers.* \
    wg_stronginterfaceptr.* \
    wg_strongptr.* \
